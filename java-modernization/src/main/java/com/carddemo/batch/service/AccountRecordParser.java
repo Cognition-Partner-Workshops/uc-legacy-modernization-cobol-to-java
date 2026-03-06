@@ -1,0 +1,73 @@
+package com.carddemo.batch.service;
+
+import com.carddemo.batch.model.AccountRecord;
+
+import java.math.BigDecimal;
+
+/**
+ * Parses fixed-width account records from ASCII text lines that mirror the
+ * COBOL VSAM KSDS layout defined in CVACT01Y.cpy.
+ * <p>
+ * Field offsets (0-based):
+ * <pre>
+ *   Offset  Len  Field
+ *   0       11   ACCT-ID               PIC 9(11)
+ *   11       1   ACCT-ACTIVE-STATUS    PIC X(01)
+ *   12      12   ACCT-CURR-BAL         PIC S9(10)V99
+ *   24      12   ACCT-CREDIT-LIMIT     PIC S9(10)V99
+ *   36      12   ACCT-CASH-CREDIT-LIMIT PIC S9(10)V99
+ *   48      10   ACCT-OPEN-DATE        PIC X(10)
+ *   58      10   ACCT-EXPIRAION-DATE   PIC X(10)
+ *   68      10   ACCT-REISSUE-DATE     PIC X(10)
+ *   78      12   ACCT-CURR-CYC-CREDIT  PIC S9(10)V99
+ *   90      12   ACCT-CURR-CYC-DEBIT   PIC S9(10)V99
+ *   102     10   ACCT-ADDR-ZIP         PIC X(10)
+ *   112     10   ACCT-GROUP-ID         PIC X(10)
+ *   122    178   FILLER                PIC X(178)
+ * </pre>
+ */
+public final class AccountRecordParser {
+
+    private AccountRecordParser() {
+        // utility class
+    }
+
+    /**
+     * Parses a single fixed-width line into an {@link AccountRecord}.
+     *
+     * @param line the raw fixed-width text line (at least 122 characters)
+     * @return the parsed account record
+     * @throws IllegalArgumentException if the line is too short
+     */
+    public static AccountRecord parse(String line) {
+        if (line.length() < 122) {
+            throw new IllegalArgumentException(
+                    "Account record line too short: expected at least 122 chars, got " + line.length());
+        }
+
+        long acctId = Long.parseLong(line.substring(0, 11));
+        String activeStatus = line.substring(11, 12);
+
+        BigDecimal currBal = ZonedDecimalParser.parse(line.substring(12, 24), 2);
+        BigDecimal creditLimit = ZonedDecimalParser.parse(line.substring(24, 36), 2);
+        BigDecimal cashCreditLimit = ZonedDecimalParser.parse(line.substring(36, 48), 2);
+
+        String openDate = line.substring(48, 58);
+        String expirationDate = line.substring(58, 68);
+        String reissueDate = line.substring(68, 78);
+
+        BigDecimal cycCredit = ZonedDecimalParser.parse(line.substring(78, 90), 2);
+        BigDecimal cycDebit = ZonedDecimalParser.parse(line.substring(90, 102), 2);
+
+        String addrZip = line.substring(102, 112).trim();
+        String groupId = line.length() >= 122 ? line.substring(112, 122).trim() : "";
+
+        return new AccountRecord(
+                acctId, activeStatus,
+                currBal, creditLimit, cashCreditLimit,
+                openDate, expirationDate, reissueDate,
+                cycCredit, cycDebit,
+                addrZip, groupId
+        );
+    }
+}
