@@ -1,0 +1,1634 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.151" tests="16" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="17"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-modernized/target/test-classes:/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-modernized/target/classes:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-17-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-modernized/target/surefire/surefirebooter-20260309140347209_3.jar /home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-modernized/target/surefire 2026-03-09T14-03-47_126-jvmRun1 surefire-20260309140347209_1tmp surefire_0-20260309140347209_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-modernized/target/test-classes:/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-modernized/target/classes:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/ubuntu"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2024-10-15"/>
+    <property name="java.home" value="/usr/lib/jvm/java-17-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-modernized"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-modernized/target/surefire/surefirebooter-20260309140347209_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="17.0.13+11-Ubuntu-2ubuntu122.04"/>
+    <property name="user.name" value="ubuntu"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="5.15.200"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/ubuntu/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-17"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="17.0.13"/>
+    <property name="user.dir" value="/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-modernized"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="17.0.13+11-Ubuntu-2ubuntu122.04"/>
+    <property name="java.specification.maintenance.version" value="1"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="61.0"/>
+  </properties>
+  <testcase name="vbrcFile_record1_vb1ShouldHaveIdAndStatus" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.049">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="processFullDataset_shouldHandleAllRecordsWithoutError" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.043">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000006
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :218.00
+ACCT-CREDIT-LIMIT       :3584.00
+ACCT-CASH-CREDIT-LIMIT  :2948.00
+ACCT-OPEN-DATE          :2017-12-23
+ACCT-EXPIRAION-DATE     :2025-10-08
+ACCT-REISSUE-DATE       :2025-10-08
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000007
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :193.00
+ACCT-CREDIT-LIMIT       :2065.00
+ACCT-CASH-CREDIT-LIMIT  :264.00
+ACCT-OPEN-DATE          :2012-10-12
+ACCT-EXPIRAION-DATE     :2024-12-13
+ACCT-REISSUE-DATE       :2024-12-13
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000008
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :605.00
+ACCT-CREDIT-LIMIT       :6104.00
+ACCT-CASH-CREDIT-LIMIT  :1318.00
+ACCT-OPEN-DATE          :2012-01-04
+ACCT-EXPIRAION-DATE     :2024-05-20
+ACCT-REISSUE-DATE       :2024-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000009
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :560.00
+ACCT-CREDIT-LIMIT       :8201.00
+ACCT-CASH-CREDIT-LIMIT  :2065.00
+ACCT-OPEN-DATE          :2016-08-27
+ACCT-EXPIRAION-DATE     :2024-12-27
+ACCT-REISSUE-DATE       :2024-12-27
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000010
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :159.00
+ACCT-CREDIT-LIMIT       :5401.00
+ACCT-CASH-CREDIT-LIMIT  :4442.00
+ACCT-OPEN-DATE          :2015-09-13
+ACCT-EXPIRAION-DATE     :2023-01-27
+ACCT-REISSUE-DATE       :2023-01-27
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000011
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :212.00
+ACCT-CREDIT-LIMIT       :4998.00
+ACCT-CASH-CREDIT-LIMIT  :3175.00
+ACCT-OPEN-DATE          :2014-09-12
+ACCT-EXPIRAION-DATE     :2025-03-12
+ACCT-REISSUE-DATE       :2025-03-12
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000012
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :176.00
+ACCT-CREDIT-LIMIT       :4636.00
+ACCT-CASH-CREDIT-LIMIT  :388.00
+ACCT-OPEN-DATE          :2009-06-17
+ACCT-EXPIRAION-DATE     :2023-07-07
+ACCT-REISSUE-DATE       :2023-07-07
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000013
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :41.00
+ACCT-CREDIT-LIMIT       :7542.00
+ACCT-CASH-CREDIT-LIMIT  :4922.00
+ACCT-OPEN-DATE          :2017-10-01
+ACCT-EXPIRAION-DATE     :2024-08-04
+ACCT-REISSUE-DATE       :2024-08-04
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000014
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :15.00
+ACCT-CREDIT-LIMIT       :2254.00
+ACCT-CASH-CREDIT-LIMIT  :212.00
+ACCT-OPEN-DATE          :2010-12-04
+ACCT-EXPIRAION-DATE     :2025-12-11
+ACCT-REISSUE-DATE       :2025-12-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000015
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :489.00
+ACCT-CREDIT-LIMIT       :8441.00
+ACCT-CASH-CREDIT-LIMIT  :3833.00
+ACCT-OPEN-DATE          :2009-10-06
+ACCT-EXPIRAION-DATE     :2025-06-09
+ACCT-REISSUE-DATE       :2025-06-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000016
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :733.00
+ACCT-CREDIT-LIMIT       :8922.00
+ACCT-CASH-CREDIT-LIMIT  :2632.00
+ACCT-OPEN-DATE          :2014-09-11
+ACCT-EXPIRAION-DATE     :2024-01-25
+ACCT-REISSUE-DATE       :2024-01-25
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000017
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :33.00
+ACCT-CREDIT-LIMIT       :568.00
+ACCT-CASH-CREDIT-LIMIT  :510.00
+ACCT-OPEN-DATE          :2014-05-17
+ACCT-EXPIRAION-DATE     :2025-03-01
+ACCT-REISSUE-DATE       :2025-03-01
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000018
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :144.00
+ACCT-CREDIT-LIMIT       :2903.00
+ACCT-CASH-CREDIT-LIMIT  :1496.00
+ACCT-OPEN-DATE          :2018-11-15
+ACCT-EXPIRAION-DATE     :2023-09-10
+ACCT-REISSUE-DATE       :2023-09-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000019
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :480.00
+ACCT-CREDIT-LIMIT       :6986.00
+ACCT-CASH-CREDIT-LIMIT  :3723.00
+ACCT-OPEN-DATE          :2011-12-14
+ACCT-EXPIRAION-DATE     :2025-07-23
+ACCT-REISSUE-DATE       :2025-07-23
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000020
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :369.00
+ACCT-CREDIT-LIMIT       :3767.00
+ACCT-CASH-CREDIT-LIMIT  :1040.00
+ACCT-OPEN-DATE          :2014-02-27
+ACCT-EXPIRAION-DATE     :2024-03-13
+ACCT-REISSUE-DATE       :2024-03-13
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000021
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :112.00
+ACCT-CREDIT-LIMIT       :1264.00
+ACCT-CASH-CREDIT-LIMIT  :180.00
+ACCT-OPEN-DATE          :2011-10-19
+ACCT-EXPIRAION-DATE     :2023-01-06
+ACCT-REISSUE-DATE       :2023-01-06
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000022
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :55.00
+ACCT-CREDIT-LIMIT       :8599.00
+ACCT-CASH-CREDIT-LIMIT  :4712.00
+ACCT-OPEN-DATE          :2016-11-21
+ACCT-EXPIRAION-DATE     :2025-12-28
+ACCT-REISSUE-DATE       :2025-12-28
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000023
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :104.00
+ACCT-CREDIT-LIMIT       :3377.00
+ACCT-CASH-CREDIT-LIMIT  :2904.00
+ACCT-OPEN-DATE          :2012-03-15
+ACCT-EXPIRAION-DATE     :2025-03-18
+ACCT-REISSUE-DATE       :2025-03-18
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000024
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :400.00
+ACCT-CREDIT-LIMIT       :5174.00
+ACCT-CASH-CREDIT-LIMIT  :4129.00
+ACCT-OPEN-DATE          :2015-08-08
+ACCT-EXPIRAION-DATE     :2025-02-11
+ACCT-REISSUE-DATE       :2025-02-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000025
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :61.00
+ACCT-CREDIT-LIMIT       :8194.00
+ACCT-CASH-CREDIT-LIMIT  :6582.00
+ACCT-OPEN-DATE          :2012-10-26
+ACCT-EXPIRAION-DATE     :2025-07-10
+ACCT-REISSUE-DATE       :2025-07-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000026
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :46.00
+ACCT-CREDIT-LIMIT       :2181.00
+ACCT-CASH-CREDIT-LIMIT  :1375.00
+ACCT-OPEN-DATE          :2009-04-20
+ACCT-EXPIRAION-DATE     :2024-12-19
+ACCT-REISSUE-DATE       :2024-12-19
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000027
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :284.00
+ACCT-CREDIT-LIMIT       :5572.00
+ACCT-CASH-CREDIT-LIMIT  :2075.00
+ACCT-OPEN-DATE          :2012-09-30
+ACCT-EXPIRAION-DATE     :2025-07-13
+ACCT-REISSUE-DATE       :2025-07-13
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000028
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :68.00
+ACCT-CREDIT-LIMIT       :868.00
+ACCT-CASH-CREDIT-LIMIT  :547.00
+ACCT-OPEN-DATE          :2015-05-20
+ACCT-EXPIRAION-DATE     :2024-05-09
+ACCT-REISSUE-DATE       :2024-05-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000029
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :339.00
+ACCT-CREDIT-LIMIT       :5511.00
+ACCT-CASH-CREDIT-LIMIT  :4361.00
+ACCT-OPEN-DATE          :2015-11-03
+ACCT-EXPIRAION-DATE     :2024-06-04
+ACCT-REISSUE-DATE       :2024-06-04
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000030
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :2.00
+ACCT-CREDIT-LIMIT       :120.00
+ACCT-CASH-CREDIT-LIMIT  :93.00
+ACCT-OPEN-DATE          :2011-08-26
+ACCT-EXPIRAION-DATE     :2024-06-27
+ACCT-REISSUE-DATE       :2024-06-27
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000031
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :31.00
+ACCT-CREDIT-LIMIT       :1140.00
+ACCT-CASH-CREDIT-LIMIT  :1077.00
+ACCT-OPEN-DATE          :2017-02-25
+ACCT-EXPIRAION-DATE     :2025-06-08
+ACCT-REISSUE-DATE       :2025-06-08
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000032
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :30.00
+ACCT-CREDIT-LIMIT       :1175.00
+ACCT-CASH-CREDIT-LIMIT  :846.00
+ACCT-OPEN-DATE          :2013-11-10
+ACCT-EXPIRAION-DATE     :2025-05-19
+ACCT-REISSUE-DATE       :2025-05-19
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000033
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :410.00
+ACCT-CREDIT-LIMIT       :6404.00
+ACCT-CASH-CREDIT-LIMIT  :951.00
+ACCT-OPEN-DATE          :2012-10-11
+ACCT-EXPIRAION-DATE     :2025-10-07
+ACCT-REISSUE-DATE       :2025-10-07
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000034
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :253.00
+ACCT-CREDIT-LIMIT       :3642.00
+ACCT-CASH-CREDIT-LIMIT  :2770.00
+ACCT-OPEN-DATE          :2009-05-10
+ACCT-EXPIRAION-DATE     :2025-10-06
+ACCT-REISSUE-DATE       :2025-10-06
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000035
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :166.00
+ACCT-CREDIT-LIMIT       :1947.00
+ACCT-CASH-CREDIT-LIMIT  :1525.00
+ACCT-OPEN-DATE          :2018-02-02
+ACCT-EXPIRAION-DATE     :2025-09-23
+ACCT-REISSUE-DATE       :2025-09-23
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000036
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :110.00
+ACCT-CREDIT-LIMIT       :3328.00
+ACCT-CASH-CREDIT-LIMIT  :839.00
+ACCT-OPEN-DATE          :2018-07-18
+ACCT-EXPIRAION-DATE     :2024-12-23
+ACCT-REISSUE-DATE       :2024-12-23
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000037
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :7.00
+ACCT-CREDIT-LIMIT       :446.00
+ACCT-CASH-CREDIT-LIMIT  :166.00
+ACCT-OPEN-DATE          :2016-09-10
+ACCT-EXPIRAION-DATE     :2023-10-24
+ACCT-REISSUE-DATE       :2023-10-24
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000038
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :612.00
+ACCT-CREDIT-LIMIT       :6505.00
+ACCT-CASH-CREDIT-LIMIT  :3476.00
+ACCT-OPEN-DATE          :2010-08-12
+ACCT-EXPIRAION-DATE     :2023-07-23
+ACCT-REISSUE-DATE       :2023-07-23
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000039
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :843.00
+ACCT-CREDIT-LIMIT       :9750.00
+ACCT-CASH-CREDIT-LIMIT  :6212.00
+ACCT-OPEN-DATE          :2018-08-26
+ACCT-EXPIRAION-DATE     :2025-09-08
+ACCT-REISSUE-DATE       :2025-09-08
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000040
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :43.00
+ACCT-CREDIT-LIMIT       :5823.00
+ACCT-CASH-CREDIT-LIMIT  :1674.00
+ACCT-OPEN-DATE          :2010-02-13
+ACCT-EXPIRAION-DATE     :2023-10-27
+ACCT-REISSUE-DATE       :2023-10-27
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000041
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :375.00
+ACCT-CREDIT-LIMIT       :6721.00
+ACCT-CASH-CREDIT-LIMIT  :3429.00
+ACCT-OPEN-DATE          :2015-02-07
+ACCT-EXPIRAION-DATE     :2023-04-24
+ACCT-REISSUE-DATE       :2023-04-24
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000042
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :302.00
+ACCT-CREDIT-LIMIT       :6563.00
+ACCT-CASH-CREDIT-LIMIT  :5103.00
+ACCT-OPEN-DATE          :2016-09-19
+ACCT-EXPIRAION-DATE     :2025-09-19
+ACCT-REISSUE-DATE       :2025-09-19
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000043
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :610.00
+ACCT-CREDIT-LIMIT       :6168.00
+ACCT-CASH-CREDIT-LIMIT  :1206.00
+ACCT-OPEN-DATE          :2012-04-09
+ACCT-EXPIRAION-DATE     :2025-08-29
+ACCT-REISSUE-DATE       :2025-08-29
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000044
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :263.00
+ACCT-CREDIT-LIMIT       :6899.00
+ACCT-CASH-CREDIT-LIMIT  :4432.00
+ACCT-OPEN-DATE          :2018-12-01
+ACCT-EXPIRAION-DATE     :2024-01-17
+ACCT-REISSUE-DATE       :2024-01-17
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000045
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :186.00
+ACCT-CREDIT-LIMIT       :2719.00
+ACCT-CASH-CREDIT-LIMIT  :688.00
+ACCT-OPEN-DATE          :2010-12-31
+ACCT-EXPIRAION-DATE     :2025-07-09
+ACCT-REISSUE-DATE       :2025-07-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000046
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :396.00
+ACCT-CREDIT-LIMIT       :7007.00
+ACCT-CASH-CREDIT-LIMIT  :5438.00
+ACCT-OPEN-DATE          :2013-09-06
+ACCT-EXPIRAION-DATE     :2025-06-20
+ACCT-REISSUE-DATE       :2025-06-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000047
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :32.00
+ACCT-CREDIT-LIMIT       :2338.00
+ACCT-CASH-CREDIT-LIMIT  :159.00
+ACCT-OPEN-DATE          :2014-04-03
+ACCT-EXPIRAION-DATE     :2025-08-23
+ACCT-REISSUE-DATE       :2025-08-23
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000048
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :226.00
+ACCT-CREDIT-LIMIT       :2306.00
+ACCT-CASH-CREDIT-LIMIT  :612.00
+ACCT-OPEN-DATE          :2017-03-18
+ACCT-EXPIRAION-DATE     :2025-02-06
+ACCT-REISSUE-DATE       :2025-02-06
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000049
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :100.00
+ACCT-CREDIT-LIMIT       :9048.00
+ACCT-CASH-CREDIT-LIMIT  :4807.00
+ACCT-OPEN-DATE          :2019-04-06
+ACCT-EXPIRAION-DATE     :2023-09-17
+ACCT-REISSUE-DATE       :2023-09-17
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000050
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :492.00
+ACCT-CREDIT-LIMIT       :6169.00
+ACCT-CASH-CREDIT-LIMIT  :4587.00
+ACCT-OPEN-DATE          :2011-04-22
+ACCT-EXPIRAION-DATE     :2023-03-09
+ACCT-REISSUE-DATE       :2023-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="arryFile_shouldHaveHeaderAndDataLines" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.005">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="vbrcFile_shouldAlternateVb1AndVb2" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.006">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="outFile_allRecords_shouldHaveDefaultDebitWhenZero" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.004">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="process_shouldCreateAllOutputFiles" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.003">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="outFile_shouldHaveHeaderAndDataLines" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.003">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="vbrcFile_shouldHaveHeaderAndInterleavedRecords" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.003">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="allRecords_vbrYearShouldMatchReissueDateYear" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.003">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="allRecords_outFileBalancesShouldMatchInput" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.003">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="arryFile_record5_shouldUseItsOwnBalance" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.002">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="vbrcFile_record1_vb2ShouldHaveBalanceLimitAndYear" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.002">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="outFile_record3_shouldHaveCorrectValues" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.002">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="outFile_record1_shouldHaveConvertedDateAndDefaultDebit" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.002">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="process_shouldReturn5Records" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.002">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+  <testcase name="arryFile_record1_shouldHaveCorrectArrayValues" classname="com.carddemo.batch.cbact01c.Cbact01cApplicationTest" time="0.003">
+    <system-out><![CDATA[START OF EXECUTION OF PROGRAM CBACT01C
+ACCT-ID                 :00000000001
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :194.00
+ACCT-CREDIT-LIMIT       :2020.00
+ACCT-CASH-CREDIT-LIMIT  :1020.00
+ACCT-OPEN-DATE          :2014-11-20
+ACCT-EXPIRAION-DATE     :2025-05-20
+ACCT-REISSUE-DATE       :2025-05-20
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000002
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :158.00
+ACCT-CREDIT-LIMIT       :6130.00
+ACCT-CASH-CREDIT-LIMIT  :5448.00
+ACCT-OPEN-DATE          :2013-06-19
+ACCT-EXPIRAION-DATE     :2024-08-11
+ACCT-REISSUE-DATE       :2024-08-11
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000003
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :147.00
+ACCT-CREDIT-LIMIT       :4909.00
+ACCT-CASH-CREDIT-LIMIT  :538.00
+ACCT-OPEN-DATE          :2013-08-23
+ACCT-EXPIRAION-DATE     :2024-01-10
+ACCT-REISSUE-DATE       :2024-01-10
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000004
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :40.00
+ACCT-CREDIT-LIMIT       :3503.00
+ACCT-CASH-CREDIT-LIMIT  :2789.00
+ACCT-OPEN-DATE          :2012-11-17
+ACCT-EXPIRAION-DATE     :2023-12-16
+ACCT-REISSUE-DATE       :2023-12-16
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+ACCT-ID                 :00000000005
+ACCT-ACTIVE-STATUS      :Y
+ACCT-CURR-BAL           :345.00
+ACCT-CREDIT-LIMIT       :3819.00
+ACCT-CASH-CREDIT-LIMIT  :2430.00
+ACCT-OPEN-DATE          :2012-10-03
+ACCT-EXPIRAION-DATE     :2025-03-09
+ACCT-REISSUE-DATE       :2025-03-09
+ACCT-CURR-CYC-CREDIT    :0.00
+ACCT-CURR-CYC-DEBIT     :0.00
+ACCT-GROUP-ID           :
+-------------------------------------------------
+END OF EXECUTION OF PROGRAM CBACT01C
+]]></system-out>
+  </testcase>
+</testsuite>
