@@ -25,31 +25,41 @@
        ENVIRONMENT DIVISION.                                                    
        INPUT-OUTPUT SECTION.                                                    
        FILE-CONTROL.                                                            
+      *    Input: Transaction category balance file - drives the main
+      *    processing loop. Each record holds a balance per
+      *    transaction category per account (sequential read).
            SELECT TCATBAL-FILE ASSIGN TO TCATBALF                               
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS SEQUENTIAL                                    
                   RECORD KEY   IS FD-TRAN-CAT-KEY                               
                   FILE STATUS  IS TCATBALF-STATUS.                              
-                                                                                
+                                                                               
+      *    Input: Card cross-reference file - used to look up the
+      *    card number for an account (random access by acct ID)
            SELECT XREF-FILE ASSIGN TO   XREFFILE                                
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS RANDOM                                        
                   RECORD KEY   IS FD-XREF-CARD-NUM                              
                   ALTERNATE RECORD KEY IS FD-XREF-ACCT-ID                       
                   FILE STATUS  IS XREFFILE-STATUS.                              
-                                                                                
+                                                                               
+      *    I-O: Account master file - read for account data and
+      *    rewritten with updated balances after interest posting
            SELECT ACCOUNT-FILE ASSIGN TO ACCTFILE                               
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS RANDOM                                        
                   RECORD KEY   IS FD-ACCT-ID                                    
                   FILE STATUS  IS ACCTFILE-STATUS.                              
-                                                                                
+                                                                               
+      *    Input: Disclosure group file - provides interest rates
+      *    by account group / transaction type / category
            SELECT DISCGRP-FILE ASSIGN TO DISCGRP                                
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS RANDOM                                        
                   RECORD KEY   IS FD-DISCGRP-KEY                                
                   FILE STATUS  IS DISCGRP-STATUS.                               
-                                                                                
+                                                                               
+      *    Output: New interest charge transactions written here
            SELECT TRANSACT-FILE ASSIGN TO TRANSACT                              
                   ORGANIZATION IS SEQUENTIAL                                    
                   ACCESS MODE  IS SEQUENTIAL                                    
@@ -58,6 +68,8 @@
       *                                                                         
        DATA DIVISION.                                                           
        FILE SECTION.                                                            
+      *    Transaction category balance - composite key:
+      *    account ID + transaction type + category code
        FD  TCATBAL-FILE.                                                        
        01  FD-TRAN-CAT-BAL-RECORD.                                              
            05 FD-TRAN-CAT-KEY.                                                  
@@ -73,6 +85,8 @@
            05 FD-XREF-ACCT-ID                   PIC 9(11).                      
            05 FD-XREF-FILLER                    PIC X(14).                      
                                                                                 
+      *    Disclosure group file - interest rates keyed by
+      *    account group + transaction type + category
        FD  DISCGRP-FILE.                                                        
        01  FD-DISCGRP-REC.                                                      
            05 FD-DISCGRP-KEY.                                                   
@@ -94,26 +108,31 @@
        WORKING-STORAGE SECTION.                                                 
                                                                                 
       *****************************************************************         
+      *    Include transaction category balance record layout
        COPY CVTRA01Y.                                                           
        01  TCATBALF-STATUS.                                                     
            05  TCATBALF-STAT1      PIC X.                                       
            05  TCATBALF-STAT2      PIC X.                                       
                                                                                 
+      *    Include card cross-reference record layout
        COPY CVACT03Y.                                                           
        01  XREFFILE-STATUS.                                                     
            05  XREFFILE-STAT1      PIC X.                                       
            05  XREFFILE-STAT2      PIC X.                                       
                                                                                 
+      *    Include disclosure group record layout (interest rates)
        COPY CVTRA02Y.                                                           
        01  DISCGRP-STATUS.                                                      
            05 DISCGRP-STAT1        PIC X.                                       
            05 DISCGRP-STAT2        PIC X.                                       
                                                                                 
+      *    Include account master record layout
        COPY CVACT01Y.                                                           
        01  ACCTFILE-STATUS.                                                     
            05  ACCTFILE-STAT1      PIC X.                                       
            05  ACCTFILE-STAT2      PIC X.                                       
                                                                                 
+      *    Include transaction record layout for writing interest txns
        COPY CVTRA05Y.                                                           
        01  TRANFILE-STATUS.                                                     
            05  TRANFILE-STAT1      PIC X.                                       
@@ -137,7 +156,8 @@
        01  END-OF-FILE             PIC X(01)    VALUE 'N'.                      
        01  ABCODE                  PIC S9(9) BINARY.                            
        01  TIMING                  PIC S9(9) BINARY.                            
-      * T I M E S T A M P   D B 2  X(26)     EEEE-MM-DD-UU.MM.SS.HH0000         
+      * COBOL CURRENT-DATE to DB2 timestamp conversion fields.
+      * DB2 format: YYYY-MM-DD-HH.MM.SS.MMMMMM
        01  COBOL-TS.                                                            
            05 COB-YYYY                  PIC X(04).                              
            05 COB-MM                    PIC X(02).                              
@@ -164,18 +184,30 @@
            06 DB2-MIL                   PIC 9(002).                             
            06 DB2-REST                  PIC X(04).                              
        01 WS-MISC-VARS.                                                         
+      *    Track account changes to accumulate interest per account
            05 WS-LAST-ACCT-NUM          PIC X(11) VALUE SPACES.                 
+      *    Interest computed for current transaction category
            05 WS-MONTHLY-INT            PIC S9(09)V99.                          
+      *    Running total interest for current account
            05 WS-TOTAL-INT              PIC S9(09)V99.                          
            05 WS-FIRST-TIME             PIC X(01) VALUE 'Y'.                    
        01 WS-COUNTERS.                                                          
            05 WS-RECORD-COUNT           PIC 9(09) VALUE 0.                      
+      *    Sequential suffix for generating unique transaction IDs
            05 WS-TRANID-SUFFIX          PIC 9(06) VALUE 0.                      
                                                                                 
        LINKAGE SECTION.                                                         
+      *    JCL PARM: date string used as prefix for transaction IDs
        01  EXTERNAL-PARMS.                                                      
            05  PARM-LENGTH         PIC S9(04) COMP.                             
            05  PARM-DATE           PIC X(10).                                   
+      *****************************************************************         
+      * MAINLINE: For each transaction category balance record,
+      * look up the interest rate from the disclosure group file,
+      * compute monthly interest, write an interest transaction,
+      * and update the account master with accumulated interest.
+      * When the account number changes, the prior account is
+      * updated before processing the new account.
       *****************************************************************         
        PROCEDURE DIVISION USING EXTERNAL-PARMS.                                 
            DISPLAY 'START OF EXECUTION OF PROGRAM CBACT04C'.                    
@@ -185,12 +217,15 @@
            PERFORM 0300-ACCTFILE-OPEN.                                          
            PERFORM 0400-TRANFILE-OPEN.                                          
                                                                                 
+      *    Main processing loop - reads category balances sequentially
            PERFORM UNTIL END-OF-FILE = 'Y'                                      
                IF  END-OF-FILE = 'N'                                            
                    PERFORM 1000-TCATBALF-GET-NEXT                               
                    IF  END-OF-FILE = 'N'                                        
                      ADD 1 TO WS-RECORD-COUNT                                   
                      DISPLAY TRAN-CAT-BAL-RECORD                                
+      *              Account break: when a new account is encountered,
+      *              update the prior account and load new account data
                      IF TRANCAT-ACCT-ID NOT= WS-LAST-ACCT-NUM                   
                        IF WS-FIRST-TIME NOT = 'Y'                               
                           PERFORM 1050-UPDATE-ACCOUNT                           
@@ -231,6 +266,8 @@
                                                                                 
            GOBACK.                                                              
       *---------------------------------------------------------------*         
+      * Open transaction category balance file for sequential input
+      *---------------------------------------------------------------*         
        0000-TCATBALF-OPEN.                                                      
            MOVE 8 TO APPL-RESULT.                                               
            OPEN INPUT TCATBAL-FILE                                              
@@ -249,6 +286,8 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Open cross-reference file for random lookup by account ID
+      *---------------------------------------------------------------*         
        0100-XREFFILE-OPEN.                                                      
            MOVE 8 TO APPL-RESULT.                                               
            OPEN INPUT XREF-FILE                                                 
@@ -266,6 +305,8 @@
                PERFORM 9999-ABEND-PROGRAM                                       
            END-IF                                                               
            EXIT.                                                                
+      *---------------------------------------------------------------*         
+      * Open disclosure group file for random interest rate lookup
       *---------------------------------------------------------------*         
        0200-DISCGRP-OPEN.                                                       
            MOVE 8 TO APPL-RESULT.                                               
@@ -286,6 +327,8 @@
            EXIT.                                                                
                                                                                 
       *---------------------------------------------------------------*         
+      * Open account master for I-O (read + rewrite with new balance)
+      *---------------------------------------------------------------*         
        0300-ACCTFILE-OPEN.                                                      
            MOVE 8 TO APPL-RESULT.                                               
            OPEN I-O ACCOUNT-FILE                                                
@@ -304,6 +347,8 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Open transaction file for writing new interest transactions
+      *---------------------------------------------------------------*         
        0400-TRANFILE-OPEN.                                                      
            MOVE 8 TO APPL-RESULT.                                               
            OPEN OUTPUT TRANSACT-FILE                                            
@@ -321,6 +366,9 @@
                PERFORM 9999-ABEND-PROGRAM                                       
            END-IF                                                               
            EXIT.                                                                
+      *---------------------------------------------------------------*         
+      * Read next transaction category balance record sequentially.
+      * Status 10 = EOF, other non-zero = error/abend.
       *---------------------------------------------------------------*         
        1000-TCATBALF-GET-NEXT.                                                  
            READ TCATBAL-FILE INTO TRAN-CAT-BAL-RECORD.                          
@@ -347,8 +395,11 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
-       1050-UPDATE-ACCOUNT.                                                     
-      * Update the balances in account record to reflect posted trans.          
+      * Update account master with accumulated interest. Adds total
+      * interest to current balance, resets cycle credits/debits
+      * to zero, then rewrites the account record.
+      *---------------------------------------------------------------*         
+       1050-UPDATE-ACCOUNT.          
            ADD WS-TOTAL-INT  TO ACCT-CURR-BAL                                   
            MOVE 0 TO ACCT-CURR-CYC-CREDIT                                       
            MOVE 0 TO ACCT-CURR-CYC-DEBIT                                        
@@ -368,6 +419,8 @@
                PERFORM 9999-ABEND-PROGRAM                                       
            END-IF                                                               
            EXIT.                                                                
+      *---------------------------------------------------------------*         
+      * Read the account master record by account ID (random access)
       *---------------------------------------------------------------*         
        1100-GET-ACCT-DATA.                                                      
            READ ACCOUNT-FILE INTO ACCOUNT-RECORD                                
@@ -390,6 +443,9 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Read the cross-reference record by account ID to get the
+      * card number needed for writing interest transactions
+      *---------------------------------------------------------------*         
        1110-GET-XREF-DATA.                                                      
            READ XREF-FILE INTO CARD-XREF-RECORD                                 
             KEY IS FD-XREF-ACCT-ID                                              
@@ -411,6 +467,10 @@
                PERFORM 9999-ABEND-PROGRAM                                       
            END-IF                                                               
            EXIT.                                                                
+      *---------------------------------------------------------------*         
+      * Look up interest rate from disclosure group file using
+      * account group + transaction type + category as key.
+      * If not found (status 23), falls back to DEFAULT group.
       *---------------------------------------------------------------*         
        1200-GET-INTEREST-RATE.                                                  
            READ DISCGRP-FILE INTO DIS-GROUP-RECORD                              
@@ -440,6 +500,8 @@
            EXIT.                                                                
                                                                                 
       *---------------------------------------------------------------*         
+      * Fallback: read interest rate using DEFAULT group code
+      *---------------------------------------------------------------*         
        1200-A-GET-DEFAULT-INT-RATE.                                             
            READ DISCGRP-FILE INTO DIS-GROUP-RECORD                              
                                                                                 
@@ -459,6 +521,10 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Compute monthly interest: (balance * rate) / 1200
+      * The division by 1200 converts annual rate to monthly.
+      * Accumulates into WS-TOTAL-INT, then writes a transaction.
+      *---------------------------------------------------------------*         
        1300-COMPUTE-INTEREST.                                                   
                                                                                 
            COMPUTE WS-MONTHLY-INT                                               
@@ -469,6 +535,10 @@
                                                                                 
            EXIT.                                                                
                                                                                 
+      *---------------------------------------------------------------*         
+      * Create and write an interest charge transaction record.
+      * Transaction ID = PARM-DATE + sequential suffix.
+      * Type 01/Cat 05 = system-generated interest charge.
       *---------------------------------------------------------------*         
        1300-B-WRITE-TX.                                                         
            ADD 1 TO WS-TRANID-SUFFIX                                            
@@ -515,9 +585,13 @@
            EXIT.                                                                
                                                                                 
       *---------------------------------------------------------------*         
-       1400-COMPUTE-FEES.                                                       
+      * Placeholder for future fee computation logic
+      *---------------------------------------------------------------*         
+       1400-COMPUTE-FEES.
       * To be implemented                                                       
            EXIT.                                                                
+      *---------------------------------------------------------------*         
+      * Close the transaction category balance input file
       *---------------------------------------------------------------*         
        9000-TCATBALF-CLOSE.                                                     
            MOVE 8 TO  APPL-RESULT.                                              
@@ -538,6 +612,8 @@
            EXIT.                                                                
                                                                                 
       *---------------------------------------------------------------*         
+      * Close the cross-reference file
+      *---------------------------------------------------------------*         
        9100-XREFFILE-CLOSE.                                                     
            MOVE 8 TO APPL-RESULT.                                               
            CLOSE XREF-FILE                                                      
@@ -555,6 +631,8 @@
                PERFORM 9999-ABEND-PROGRAM                                       
            END-IF                                                               
            EXIT.                                                                
+      *---------------------------------------------------------------*         
+      * Close the disclosure group file
       *---------------------------------------------------------------*         
        9200-DISCGRP-CLOSE.                                                      
            MOVE 8 TO APPL-RESULT.                                               
@@ -574,6 +652,8 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Close the account master file
+      *---------------------------------------------------------------*         
        9300-ACCTFILE-CLOSE.                                                     
            MOVE 8 TO APPL-RESULT.                                               
            CLOSE ACCOUNT-FILE                                                   
@@ -592,6 +672,7 @@
            END-IF                                                               
            EXIT.                                                                
                                                                                 
+      * Close the transaction output file
        9400-TRANFILE-CLOSE.                                                     
            MOVE 8 TO APPL-RESULT.                                               
            CLOSE TRANSACT-FILE                                                  
@@ -610,6 +691,8 @@
            END-IF                                                               
            EXIT.                                                                
                                                                                 
+      * Convert COBOL CURRENT-DATE to DB2 timestamp format
+      * (YYYY-MM-DD-HH.MM.SS.MMMMMM)
        Z-GET-DB2-FORMAT-TIMESTAMP.                                              
            MOVE FUNCTION CURRENT-DATE TO COBOL-TS                               
            MOVE COB-YYYY TO DB2-YYYY                                            
@@ -625,12 +708,15 @@
       *    DISPLAY 'DB2-TIMESTAMP = ' DB2-FORMAT-TS                             
            EXIT.                                                                
                                                                                 
+      * Abnormal termination - calls LE abend routine CEE3ABD
        9999-ABEND-PROGRAM.                                                      
            DISPLAY 'ABENDING PROGRAM'                                           
            MOVE 0 TO TIMING                                                     
            MOVE 999 TO ABCODE                                                   
            CALL 'CEE3ABD' USING ABCODE, TIMING.                                 
-                                                                                
+                                                                               
+      *****************************************************************         
+      * Translate file status bytes to a 4-digit displayable code
       *****************************************************************         
        9910-DISPLAY-IO-STATUS.                                                  
            IF  IO-STATUS NOT NUMERIC                                            

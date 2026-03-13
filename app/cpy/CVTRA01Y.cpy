@@ -1,5 +1,9 @@
       *****************************************************************         
-      *    Data-structure for transaction category balance (RECLN = 50)         
+      * Transaction category balance record (TCATBAL file, RECLN=50).
+      * Key: account ID + type code + category code. Stores the
+      * running balance for each transaction category per account.
+      * Updated by CBTRN02C when posting daily transactions and
+      * by CBACT04C during interest calculation.
       *****************************************************************         
        01  TRAN-CAT-BAL-RECORD.                                                 
            05  TRAN-CAT-KEY.                                                    

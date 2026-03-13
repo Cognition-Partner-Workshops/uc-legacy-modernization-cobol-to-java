@@ -1,3 +1,9 @@
+      * Common work areas for online CICS programs. Contains:
+      * - CCARD-AID: Translated PF key / AID byte identifier
+      * - Navigation fields: next program, mapset, and map names
+      * - Error/return message areas (75-char each)
+      * - Key lookup fields: account ID, card number, customer ID
+      * Populated by CSSTRPFY.cpy (PF key translation paragraph).
 000100 01  CC-WORK-AREAS.                                               00010004
 000200    05 CC-WORK-AREA.                                              00020001
 000900       10 CCARD-AID                         PIC X(5).             00090001

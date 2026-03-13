@@ -20,7 +20,11 @@
 //*YLIBS JCLLIB ORDER=VIPINGP.CNTL.PROCLIB
 //*
 //**********************************************************************
-//*  EXECUTE IMS PROGRAM
+//*  Load the pending-authorization IMS database (DBPAUTP0) from
+//*  two sequential files previously created by PAUDBUNL/UNLDPADB.
+//*  INFILE1 = root segments (PAUTSUM0 – account summary)
+//*  INFILE2 = child segments (PAUTDTL1 – authorization details)
+//*  Executes PAUDBLOD as an IMS BMP using PSB PSBPAUTB.
 //**********************************************************************
 //*
 //STEP01  EXEC PGM=DFSRRC00,

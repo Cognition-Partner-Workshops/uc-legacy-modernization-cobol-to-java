@@ -85,7 +85,14 @@
                  88 WS-FRD-UPDT-FAILED      VALUE 'F'.                          
               05 WS-FRD-ACT-MSG             PIC X(50).                          
                                                                                 
-       PROCEDURE DIVISION.                                                      
+       PROCEDURE DIVISION.
+      * CICS/IMS/DB2 fraud-marking subroutine.  Called via CICS LINK
+      * from COPAUS1C.  Receives an authorization detail record plus
+      * an action flag (F = report fraud, R = remove fraud) through
+      * the COMMAREA.  Inserts a row into the DB2 CARDDEMO.AUTHFRDS
+      * table; if the row already exists (SQLCODE -803 duplicate key)
+      * it updates the existing row instead.  Returns a success/fail
+      * status and message to the caller.
        MAIN-PARA.                                                               
                                                                                 
            EXEC CICS ASKTIME NOHANDLE                                           
@@ -241,4 +248,4 @@
               INTO WS-FRD-ACT-MSG                                               
               END-STRING                                                        
            END-IF                                                               
-           .                                                                    
+           .                                                                                                                                        

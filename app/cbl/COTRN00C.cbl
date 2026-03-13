@@ -90,6 +90,11 @@
 
       *----------------------------------------------------------------*
       *                       PROCEDURE DIVISION
+      * MAINLINE: Transaction list screen with pagination. Browses
+      * the TRANSACT file and displays 10 transactions per page.
+      * User can filter by transaction ID, page forward/backward
+      * with PF7/PF8, and select a transaction with 'S' to view
+      * details via COTRN01C. PF3 = return to main menu.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -141,7 +146,10 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Check if user selected a row (S = view detail). If so,
+      * XCTL to COTRN01C with the selected transaction ID.
+      * Otherwise validate the filter transaction ID and perform
+      * a forward page to populate the screen.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 
@@ -229,7 +237,8 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-PF7-KEY
+      * Page backward (PF7): position browse at the first transaction
+      * ID on the current page and read backward to fill the screen.
       *----------------------------------------------------------------*
        PROCESS-PF7-KEY.
 
@@ -252,7 +261,8 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-PF8-KEY
+      * Page forward (PF8): position browse at the last transaction
+      * ID on the current page and read forward to fill the screen.
       *----------------------------------------------------------------*
        PROCESS-PF8-KEY.
 
@@ -274,7 +284,10 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-PAGE-FORWARD
+      * Start browse at current position, skip one record (to avoid
+      * repeating last row), clear the 10-row display area, then
+      * READNEXT up to 10 records into screen fields. Check if
+      * more records exist to enable/disable next-page indicator.
       *----------------------------------------------------------------*
        PROCESS-PAGE-FORWARD.
 
@@ -328,7 +341,10 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-PAGE-BACKWARD
+      * Start browse at current position, skip one record backward,
+      * clear the 10-row display area, then READPREV up to 10
+      * records (filling from row 10 down to row 1). Adjusts the
+      * page number counter accordingly.
       *----------------------------------------------------------------*
        PROCESS-PAGE-BACKWARD.
 
@@ -376,7 +392,9 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      POPULATE-TRAN-DATA
+      * Move transaction record fields (ID, card number, type code,
+      * category, source, amount, description, date) into the
+      * appropriate screen row based on WS-IDX (1..10).
       *----------------------------------------------------------------*
        POPULATE-TRAN-DATA.
 

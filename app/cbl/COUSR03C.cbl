@@ -77,6 +77,12 @@
 
       *----------------------------------------------------------------*
       *                       PROCEDURE DIVISION
+      * MAINLINE: Delete a user from the USRSEC security file.
+      * Accepts a user ID (either typed or passed from user list),
+      * reads and displays the user record for confirmation, then
+      * on PF5 performs the DELETE.
+      * Keys: ENTER = look up, PF3 = back, PF4 = clear,
+      * PF5 = confirm delete, PF12 = back to admin menu.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -137,7 +143,8 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Validate user ID is non-blank, read the user record for
+      * UPDATE, and populate screen with user details for review.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 
@@ -169,7 +176,8 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      DELETE-USER-INFO
+      * Validate user ID, re-read the record for UPDATE lock,
+      * then call DELETE-USER-SEC-FILE to remove the record.
       *----------------------------------------------------------------*
        DELETE-USER-INFO.
 
@@ -262,7 +270,8 @@
            MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF COUSR3AO.
 
       *----------------------------------------------------------------*
-      *                      READ-USER-SEC-FILE
+      * Read user record for UPDATE (locks the record). On success,
+      * prompt to press PF5 to delete. On NOTFND, display error.
       *----------------------------------------------------------------*
        READ-USER-SEC-FILE.
 
@@ -300,7 +309,8 @@
            END-EVALUATE.
 
       *----------------------------------------------------------------*
-      *                      DELETE-USER-SEC-FILE
+      * Delete the previously locked user record from USRSEC.
+      * Display success message or error on failure.
       *----------------------------------------------------------------*
        DELETE-USER-SEC-FILE.
 

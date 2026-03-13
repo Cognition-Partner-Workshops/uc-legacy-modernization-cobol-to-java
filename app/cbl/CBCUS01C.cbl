@@ -26,6 +26,7 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
+      *    Input: VSAM KSDS customer master file (indexed by cust ID)
            SELECT CUSTFILE-FILE ASSIGN TO   CUSTFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS SEQUENTIAL
@@ -34,6 +35,7 @@
       *
        DATA DIVISION.
        FILE SECTION.
+      *    Customer master file - keyed by 9-digit customer ID
        FD  CUSTFILE-FILE.
        01  FD-CUSTFILE-REC.
            05 FD-CUST-ID                        PIC 9(09).
@@ -42,6 +44,7 @@
        WORKING-STORAGE SECTION.
 
       *****************************************************************
+      *    Include customer record layout (CUSTOMER-RECORD structure)
        COPY CVCUS01Y.
        01  CUSTFILE-STATUS.
            05  CUSTFILE-STAT1      PIC X.
@@ -58,6 +61,7 @@
            05  IO-STATUS-0401      PIC 9   VALUE 0.
            05  IO-STATUS-0403      PIC 999 VALUE 0.
 
+      *    Application return code: 0=OK, 12=error, 16=end-of-file
        01  APPL-RESULT             PIC S9(9)   COMP.
            88  APPL-AOK            VALUE 0.
            88  APPL-EOF            VALUE 16.
@@ -66,6 +70,9 @@
        01  ABCODE                  PIC S9(9) BINARY.
        01  TIMING                  PIC S9(9) BINARY. 
 
+      *****************************************************************
+      * MAINLINE: Opens the customer file, reads each customer
+      * record sequentially, displays it to SYSOUT, then closes.
       *****************************************************************
        PROCEDURE DIVISION.
            DISPLAY 'START OF EXECUTION OF PROGRAM CBCUS01C'.
@@ -88,6 +95,9 @@
 
       *****************************************************************
       * I/O ROUTINES TO ACCESS A KSDS, VSAM DATA SET...               *
+      *****************************************************************
+      * Read next customer record from the VSAM file.
+      * Status 00 = success, 10 = EOF, other = error/abend.
       *****************************************************************
        1000-CUSTFILE-GET-NEXT.
            READ CUSTFILE-FILE INTO CUSTOMER-RECORD.
@@ -115,6 +125,8 @@
            END-IF
            EXIT.
       *---------------------------------------------------------------*
+      * Open the indexed customer file for sequential input
+      *---------------------------------------------------------------*
        0000-CUSTFILE-OPEN.
            MOVE 8 TO APPL-RESULT.
            OPEN INPUT CUSTFILE-FILE
@@ -132,6 +144,8 @@
                PERFORM Z-ABEND-PROGRAM
            END-IF
            EXIT.
+      *---------------------------------------------------------------*
+      * Close the customer file after all records are processed
       *---------------------------------------------------------------*
        9000-CUSTFILE-CLOSE.
            ADD 8 TO ZERO GIVING APPL-RESULT.
@@ -151,12 +165,16 @@
            END-IF
            EXIT.
 
+      * Abnormal termination - calls LE abend routine CEE3ABD
        Z-ABEND-PROGRAM.
            DISPLAY 'ABENDING PROGRAM'
            MOVE 0 TO TIMING
            MOVE 999 TO ABCODE
            CALL 'CEE3ABD' USING ABCODE, TIMING.
 
+      *****************************************************************
+      * Translate file status bytes to a 4-digit displayable code.
+      * Handles both numeric and non-numeric (binary) status values.
       *****************************************************************
        Z-DISPLAY-IO-STATUS.
            IF  IO-STATUS NOT NUMERIC

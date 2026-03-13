@@ -174,6 +174,18 @@
 012000 LINKAGE SECTION.                                                 01270000
 012100                                                                  01280000
 012200 PROCEDURE DIVISION.                                              01290000
+      * CICS/MQ account-inquiry service.  Listens on an MQ input
+      * queue for account lookup requests.  For each request:
+      *   1. Gets the next message from the request queue (MQGET)
+      *   2. Extracts the account ID from the request
+      *   3. Reads the account master record from VSAM file ACCTDAT
+      *   4. Formats a response containing account details (balance,
+      *      credit limit, open date, expiration, reissue flag,
+      *      current cycle credit/debit, and cash advance credit)
+      *   5. Puts the response on the reply queue (MQPUT)
+      * Processes messages in a loop until the queue is empty
+      * (MQRC-NO-MSG-AVAILABLE).  Uses CICS MQ API calls (MQOPEN,
+      * MQGET, MQPUT, MQCLOSE) for queue operations.
 012300                                                                  01300000
 012400 1000-CONTROL.                                                    01310007
 012500                                                                  01320000

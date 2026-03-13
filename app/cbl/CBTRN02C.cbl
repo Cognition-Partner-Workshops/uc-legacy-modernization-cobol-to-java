@@ -26,34 +26,35 @@
        ENVIRONMENT DIVISION.                                                    
        INPUT-OUTPUT SECTION.                                                    
        FILE-CONTROL.                                                            
+      *    Input: Daily transaction feed (sequential flat file)                 
            SELECT DALYTRAN-FILE ASSIGN TO DALYTRAN                              
                   ORGANIZATION IS SEQUENTIAL                                    
                   ACCESS MODE  IS SEQUENTIAL                                    
                   FILE STATUS  IS DALYTRAN-STATUS.                              
-                                                                                
+      *    Output: Posted transaction file (indexed by transaction ID)         
            SELECT TRANSACT-FILE ASSIGN TO TRANFILE                              
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS RANDOM                                        
                   RECORD KEY   IS FD-TRANS-ID                                   
                   FILE STATUS  IS TRANFILE-STATUS.                              
-                                                                                
+      *    Input: Card-to-account cross-reference (verify card number)         
            SELECT XREF-FILE ASSIGN TO   XREFFILE                                
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS RANDOM                                        
                   RECORD KEY   IS FD-XREF-CARD-NUM                              
                   FILE STATUS  IS XREFFILE-STATUS.                              
-                                                                                
+      *    Output: Rejected transactions with validation failure reason        
            SELECT DALYREJS-FILE ASSIGN TO DALYREJS                              
                   ORGANIZATION IS SEQUENTIAL                                    
                   ACCESS MODE  IS SEQUENTIAL                                    
                   FILE STATUS  IS DALYREJS-STATUS.                              
-                                                                                
+      *    I-O: Account master - read for validation, rewrite balances         
            SELECT ACCOUNT-FILE ASSIGN TO ACCTFILE                               
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS RANDOM                                        
                   RECORD KEY   IS FD-ACCT-ID                                    
                   FILE STATUS  IS ACCTFILE-STATUS.                              
-                                                                                
+      *    I-O: Transaction category balance totals (running sums)             
            SELECT TCATBAL-FILE ASSIGN TO TCATBALF                               
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS RANDOM                                        
@@ -99,16 +100,19 @@
        WORKING-STORAGE SECTION.                                                 
                                                                                 
       *****************************************************************         
+      *    Include daily transaction record layout                             
        COPY CVTRA06Y.                                                           
        01  DALYTRAN-STATUS.                                                     
            05  DALYTRAN-STAT1      PIC X.                                       
            05  DALYTRAN-STAT2      PIC X.                                       
                                                                                 
+      *    Include posted transaction record layout                             
        COPY CVTRA05Y.                                                           
        01  TRANFILE-STATUS.                                                     
            05  TRANFILE-STAT1      PIC X.                                       
            05  TRANFILE-STAT2      PIC X.                                       
                                                                                 
+      *    Include cross-reference record layout                                
        COPY CVACT03Y.                                                           
        01  XREFFILE-STATUS.                                                     
            05  XREFFILE-STAT1      PIC X.                                       
@@ -118,11 +122,13 @@
            05  DALYREJS-STAT1      PIC X.                                       
            05  DALYREJS-STAT2      PIC X.                                       
                                                                                 
+      *    Include account record layout                                        
        COPY CVACT01Y.                                                           
        01  ACCTFILE-STATUS.                                                     
            05  ACCTFILE-STAT1      PIC X.                                       
            05  ACCTFILE-STAT2      PIC X.                                       
                                                                                 
+      *    Include transaction category balance record layout                   
        COPY CVTRA01Y.                                                           
        01  TCATBALF-STATUS.                                                     
            05  TCATBALF-STAT1      PIC X.                                       
@@ -189,6 +195,13 @@
         01 WS-FLAGS.                                                            
            05 WS-CREATE-TRANCAT-REC         PIC X(01) VALUE 'N'.                
                                                                                 
+      *****************************************************************         
+      * MAINLINE: Validate and post daily transactions. For each               
+      * transaction: verify card via xref, check account credit limit          
+      * and expiration date. Valid transactions are posted to the              
+      * transaction file, account balances are updated, and category           
+      * balance totals are maintained. Invalid transactions go to the          
+      * rejects file with a reason code.                                       
       *****************************************************************         
        PROCEDURE DIVISION.                                                      
            DISPLAY 'START OF EXECUTION OF PROGRAM CBTRN02C'.                    
@@ -342,6 +355,7 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Read next daily transaction; sets EOF flag on status '10'              
        1000-DALYTRAN-GET-NEXT.                                                  
            READ DALYTRAN-FILE INTO DALYTRAN-RECORD.                             
            IF  DALYTRAN-STATUS = '00'                                           
@@ -367,6 +381,7 @@
                END-IF                                                           
            END-IF                                                               
            EXIT.                                                                
+      * Validate transaction: check xref then account limits                   
        1500-VALIDATE-TRAN.                                                      
            PERFORM 1500-A-LOOKUP-XREF.                                          
            IF WS-VALIDATION-FAIL-REASON = 0                                     
@@ -377,6 +392,7 @@
       * ADD MORE VALIDATIONS HERE                                               
            EXIT.                                                                
                                                                                 
+      * Verify card number exists in cross-reference file                       
        1500-A-LOOKUP-XREF.                                                      
       *    DISPLAY 'CARD NUMBER: ' DALYTRAN-CARD-NUM                            
            MOVE DALYTRAN-CARD-NUM TO FD-XREF-CARD-NUM                           
@@ -390,6 +406,7 @@
                   CONTINUE                                                      
            END-READ                                                             
            EXIT.                                                                
+      * Verify account: check credit limit and expiration date                 
        1500-B-LOOKUP-ACCT.                                                      
            MOVE XREF-ACCT-ID TO FD-ACCT-ID                                      
            READ ACCOUNT-FILE INTO ACCOUNT-RECORD                                
@@ -421,6 +438,8 @@
            END-READ                                                             
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Post a validated transaction: map daily fields to posted record,       
+      * update category balance, update account, write transaction file.       
        2000-POST-TRANSACTION.                                                   
            MOVE  DALYTRAN-ID            TO    TRAN-ID                           
            MOVE  DALYTRAN-TYPE-CD       TO    TRAN-TYPE-CD                      
@@ -443,6 +462,7 @@
                                                                                 
            EXIT.                                                                
                                                                                 
+      * Write failed transaction to rejects file with reason trailer           
        2500-WRITE-REJECT-REC.                                                   
            MOVE DALYTRAN-RECORD TO REJECT-TRAN-DATA                             
            MOVE WS-VALIDATION-TRAILER TO VALIDATION-TRAILER                     
@@ -464,8 +484,9 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Update (or create) the transaction category balance record.            
+      * Key = account ID + transaction type + category code.                   
        2700-UPDATE-TCATBAL.                                                     
-      * Update the balances in transaction balance file.                        
            MOVE XREF-ACCT-ID TO FD-TRANCAT-ACCT-ID                              
            MOVE DALYTRAN-TYPE-CD TO FD-TRANCAT-TYPE-CD                          
            MOVE DALYTRAN-CAT-CD TO FD-TRANCAT-CD                                
@@ -500,6 +521,7 @@
                                                                                 
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Create a new category balance record (first txn for this key)          
        2700-A-CREATE-TCATBAL-REC.                                               
            INITIALIZE TRAN-CAT-BAL-RECORD                                       
            MOVE XREF-ACCT-ID TO TRANCAT-ACCT-ID                                 
@@ -523,6 +545,7 @@
                PERFORM 9999-ABEND-PROGRAM                                       
            END-IF.                                                              
       *---------------------------------------------------------------*         
+      * Add transaction amount to existing category balance record             
        2700-B-UPDATE-TCATBAL-REC.                                               
            ADD DALYTRAN-AMT TO TRAN-CAT-BAL                                     
            REWRITE FD-TRAN-CAT-BAL-RECORD FROM TRAN-CAT-BAL-RECORD              
@@ -542,8 +565,9 @@
            END-IF.                                                              
                                                                                 
       *---------------------------------------------------------------*         
+      * Update account balances: add to current balance and cycle              
+      * credit/debit totals, then rewrite the account record.                  
        2800-UPDATE-ACCOUNT-REC.                                                 
-      * Update the balances in account record to reflect posted trans.          
            ADD DALYTRAN-AMT  TO ACCT-CURR-BAL                                   
            IF DALYTRAN-AMT >= 0                                                 
               ADD DALYTRAN-AMT TO ACCT-CURR-CYC-CREDIT                          
@@ -559,6 +583,7 @@
            END-REWRITE.                                                         
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Write the posted transaction record to the transaction file            
        2900-WRITE-TRANSACTION-FILE.                                             
            MOVE 8 TO  APPL-RESULT.                                              
            WRITE FD-TRANFILE-REC FROM TRAN-RECORD                               
@@ -689,6 +714,7 @@
            END-IF                                                               
            EXIT.                                                                
                                                                                 
+      * Convert COBOL CURRENT-DATE to DB2-style timestamp format               
        Z-GET-DB2-FORMAT-TIMESTAMP.                                              
            MOVE FUNCTION CURRENT-DATE TO COBOL-TS                               
            MOVE COB-YYYY TO DB2-YYYY                                            
@@ -704,6 +730,7 @@
       *    DISPLAY 'DB2-TIMESTAMP = ' DB2-FORMAT-TS                             
            EXIT.                                                                
                                                                                 
+      * Abnormal termination - calls LE abend routine                          
        9999-ABEND-PROGRAM.                                                      
            DISPLAY 'ABENDING PROGRAM'                                           
            MOVE 0 TO TIMING                                                     
@@ -711,6 +738,7 @@
            CALL 'CEE3ABD' USING ABCODE, TIMING.                                 
                                                                                 
       *****************************************************************         
+      * Translate file status bytes to a 4-digit displayable code              
        9910-DISPLAY-IO-STATUS.                                                  
            IF  IO-STATUS NOT NUMERIC                                            
            OR  IO-STAT1 = '9'                                                   

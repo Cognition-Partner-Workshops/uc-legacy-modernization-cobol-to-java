@@ -36,7 +36,9 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
+      *    Output: Plain-text statement file
            SELECT STMT-FILE ASSIGN TO STMTFILE.
+      *    Output: HTML-formatted statement file
            SELECT HTML-FILE ASSIGN TO HTMLFILE.
       *
        DATA DIVISION.
@@ -56,18 +58,22 @@
 
        COPY CVACT01Y.
 
+      *    Binary counters for card and transaction table indices
        01  COMP-VARIABLES          COMP.
            05  CR-CNT              PIC S9(4) VALUE 0.
            05  TR-CNT              PIC S9(4) VALUE 0.
            05  CR-JMP              PIC S9(4) VALUE 0.
            05  TR-JMP              PIC S9(4) VALUE 0.
+      *    Running total of transaction amounts (packed decimal)
        01  COMP3-VARIABLES         COMP-3.
            05  WS-TOTAL-AMT        PIC S9(9)V99 VALUE 0.
        01  MISC-VARIABLES.
+      *    WS-FL-DD drives the ALTER-based state machine (see 0000-START)
            05  WS-FL-DD            PIC X(8) VALUE 'TRNXFILE'.
            05  WS-TRN-AMT          PIC S9(9)V99 VALUE 0.
            05  WS-SAVE-CARD VALUE SPACES PIC X(16).
            05  END-OF-FILE         PIC X(01) VALUE 'N'.
+      *    Communication area for subroutine CBSTM03B (file I/O)
        01  WS-M03B-AREA.
            05  WS-M03B-DD          PIC X(08).
            05  WS-M03B-OPER        PIC X(01).
@@ -222,16 +228,20 @@
            05  HTML-BSIC-LN PIC X(100).
            05  HTML-TRAN-LN PIC X(100).
 
+      *    2-dimensional table: up to 51 cards x 10 transactions each.
+      *    Loaded in 8500-READTRNX-READ before statement generation.
        01  WS-TRNX-TABLE.
            05  WS-CARD-TBL OCCURS 51 TIMES.
                10  WS-CARD-NUM                          PIC X(16).
                10  WS-TRAN-TBL OCCURS 10 TIMES.
                    15  WS-TRAN-NUM                      PIC X(16).
                    15  WS-TRAN-REST                     PIC X(318).
+      *    Per-card transaction count (parallel array to WS-CARD-TBL)
        01  WS-TRN-TBL-CNTR.
            05  WS-TRN-TBL-CTR OCCURS 51 TIMES.
                10  WS-TRCT               PIC S9(4) COMP.
 
+      *    Pointers for navigating z/OS control blocks (PSA -> TCB -> TIOT)
        01  PSAPTR                  POINTER.
        01  BUMP-TIOT               PIC S9(08) BINARY VALUE ZERO.
        01  TIOT-INDEX              REDEFINES BUMP-TIOT POINTER.
@@ -259,9 +269,16 @@
            05  FILLER       PIC X(04).
              88  END-OF-TIOT      VALUE LOW-VALUES.
       *****************************************************************
+      * MAINLINE: Generate account statements in plain text and HTML.
+      * 1. Walk z/OS control blocks (PSA/TCB/TIOT) to display DD names
+      * 2. Open files via CBSTM03B using ALTER-based state machine
+      * 3. Load all transactions into a 2D in-memory table
+      * 4. For each cross-ref record, look up customer + account,
+      *    then write the statement with all matching transactions
+      *****************************************************************
        PROCEDURE DIVISION.
       *****************************************************************
-      *    Check Unit Control blocks                                  *
+      *    Check Unit Control blocks (z/OS internals)                *
       *****************************************************************
            SET ADDRESS OF PSA-BLOCK   TO PSAPTR.
            SET ADDRESS OF TCB-BLOCK   TO TCB-POINT.
@@ -293,6 +310,9 @@
            OPEN OUTPUT STMT-FILE HTML-FILE.
            INITIALIZE WS-TRNX-TABLE WS-TRN-TBL-CNTR.
 
+      * State machine driven by WS-FL-DD. Uses ALTER to redirect
+      * GO TO targets for file open sequence, then falls through
+      * to the main processing loop.
        0000-START.
 
            EVALUATE WS-FL-DD
@@ -313,6 +333,9 @@
              WHEN OTHER
                GO TO 9999-GOBACK.
 
+      * Main loop: for each cross-ref record, look up customer and
+      * account data, create statement headers, then print matching
+      * transactions from the in-memory table.
        1000-MAINLINE.
            PERFORM UNTIL END-OF-FILE = 'Y'
                IF  END-OF-FILE = 'N'
@@ -342,6 +365,7 @@
            GOBACK.
 
       *---------------------------------------------------------------*
+      * Read next cross-reference record via CBSTM03B subroutine
        1000-XREFFILE-GET-NEXT.
 
            MOVE 'XREFFILE' TO WS-M03B-DD.
@@ -365,6 +389,7 @@
 
            EXIT.
 
+      * Look up customer record by customer ID (random read via sub)
        2000-CUSTFILE-GET.
 
            MOVE 'CUSTFILE' TO WS-M03B-DD.
@@ -389,6 +414,7 @@
 
            EXIT.
 
+      * Look up account record by account ID (random read via sub)
        3000-ACCTFILE-GET.
 
            MOVE 'ACCTFILE' TO WS-M03B-DD.
@@ -413,6 +439,9 @@
 
            EXIT.
 
+      * Search in-memory transaction table for current card number,
+      * write each matching transaction to both statement formats,
+      * then write totals and HTML footer.
        4000-TRNXFILE-GET.
            PERFORM VARYING CR-JMP FROM 1 BY 1
              UNTIL CR-JMP > CR-CNT
@@ -455,6 +484,8 @@
 
            EXIT.
       *---------------------------------------------------------------*
+      * Build and write statement header lines (name, address, account
+      * details) to both plain-text and HTML output files.
        5000-CREATE-STATEMENT.
            INITIALIZE STATEMENT-LINES.
            WRITE FD-STMTFILE-REC FROM ST-LINE0.
@@ -503,6 +534,8 @@
 
            EXIT.
 
+      * Write HTML boilerplate: doctype, head, table structure, and
+      * bank name/address header.
        5100-WRITE-HTML-HEADER.
 
            SET HTML-L01 TO TRUE.
@@ -555,6 +588,8 @@
            EXIT.
 
       *---------------------------------------------------------------*
+      * Write customer name, address, and basic details (account ID,
+      * balance, FICO score) section into HTML statement.
        5200-WRITE-HTML-NMADBS.
 
            MOVE ST-NAME TO L23-NAME.
@@ -672,6 +707,7 @@
            EXIT.
 
       *---------------------------------------------------------------*
+      * Write one transaction line to both plain-text and HTML output
        6000-WRITE-TRANS.
            MOVE TRNX-ID TO ST-TRANID.
            MOVE TRNX-DESC TO ST-TRANDT.
@@ -723,10 +759,12 @@
            EXIT.
 
       *---------------------------------------------------------------*
+      * ALTER target - initially points to 8100-TRNXFILE-OPEN but
+      * gets redirected by 0000-START to open files in sequence.
        8100-FILE-OPEN.
            GO TO 8100-TRNXFILE-OPEN
            .
-
+      * Open transaction file, read first record, load into table
        8100-TRNXFILE-OPEN.
            MOVE 'TRNXFILE' TO WS-M03B-DD.
            SET M03B-OPEN TO TRUE.
@@ -762,6 +800,7 @@
            EXIT.
 
       *---------------------------------------------------------------*
+      * Open cross-reference file for sequential iteration
        8200-XREFFILE-OPEN.
            MOVE 'XREFFILE' TO WS-M03B-DD.
            SET M03B-OPEN TO TRUE.
@@ -780,6 +819,7 @@
            GO TO 0000-START.
            EXIT.
       *---------------------------------------------------------------*
+      * Open customer file for random key lookup
        8300-CUSTFILE-OPEN.
            MOVE 'CUSTFILE' TO WS-M03B-DD.
            SET M03B-OPEN TO TRUE.
@@ -798,6 +838,7 @@
            GO TO 0000-START.
            EXIT.
       *---------------------------------------------------------------*
+      * Open account file for random key lookup, then start mainline
        8400-ACCTFILE-OPEN.
            MOVE 'ACCTFILE' TO WS-M03B-DD.
            SET M03B-OPEN TO TRUE.
@@ -815,6 +856,9 @@
            GO TO 1000-MAINLINE.
            EXIT.
       *---------------------------------------------------------------*
+      * Read all transaction records into the 2D in-memory table
+      * (WS-TRNX-TABLE). Groups transactions by card number.
+      * On EOF, saves counts and proceeds to open cross-ref file.
        8500-READTRNX-READ.
            IF WS-SAVE-CARD = TRNX-CARD-NUM
                ADD 1 TO TR-CNT
@@ -853,6 +897,7 @@
            EXIT.
 
       *---------------------------------------------------------------*
+      * Close all files via CBSTM03B subroutine
        9100-TRNXFILE-CLOSE.
            MOVE 'TRNXFILE' TO WS-M03B-DD.
            SET M03B-CLOSE TO TRUE.
@@ -918,6 +963,7 @@
 
            EXIT.
 
+      * Abnormal termination - calls LE abend routine
        9999-ABEND-PROGRAM.
            DISPLAY 'ABENDING PROGRAM'
            CALL 'CEE3ABD'.

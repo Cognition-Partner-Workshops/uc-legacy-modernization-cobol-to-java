@@ -495,6 +495,19 @@
 049500       OCCURS 1 TO 32767 TIMES DEPENDING ON EIBCALEN.
 049600
 049700 PROCEDURE DIVISION.
+      * CICS/DB2 BMS program – paginated list of transaction types.
+      * Reads from DB2 CARDDEMO.TRANSACTION_TYPE table using forward
+      * and backward cursors (C-TR-TYPE-FORWARD / C-TR-TYPE-BACKWARD)
+      * to display 7 rows per page.  Supports:
+      *   - PF7/PF8 for page-up/page-down navigation
+      *   - Filtering by type code and/or description
+      *   - Row selection with 'U' (update) or 'D' (delete) which
+      *     transfers to the update program COTRTUPC via XCTL
+      *   - PF6 to add a new transaction type via COTRTUPC
+      *   - PF3 to return to the main menu
+      * The screen data array and paging keys are passed through the
+      * COMMAREA (WS-THIS-PROGCOMMAREA) across pseudo-conversational
+      * CICS transactions.
 049800 0000-MAIN.
 049900
 050000     INITIALIZE CC-WORK-AREA

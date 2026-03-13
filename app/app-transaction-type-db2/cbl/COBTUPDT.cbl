@@ -78,6 +78,16 @@
                                                                         00598033
                                                                         00600032
        PROCEDURE DIVISION.                                              00610032
+      * Batch DB2 utility – applies add/update/delete operations to
+      * the CARDDEMO.TRANSACTION_TYPE table.  Reads a sequential
+      * input file where each record starts with an action code:
+      *   A = INSERT a new transaction type row
+      *   U = UPDATE the description of an existing row
+      *   D = DELETE the row by type code
+      *   * = comment line (ignored)
+      * Each record also contains a 2-char type code and a 50-char
+      * description.  Used for batch maintenance of the transaction
+      * type reference table.
                                                                         00620032
        0001-OPEN-FILES.                                                 00630032
            OPEN INPUT TR-RECORD.                                        00640032

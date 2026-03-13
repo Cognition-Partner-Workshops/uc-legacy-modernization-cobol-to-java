@@ -175,6 +175,14 @@
 
        PROCEDURE DIVISION.
       *****************************************************************
+      * CICS/IMS BMS program – summary list of pending authorization
+      * messages for a given account.  Displays up to 5 authorization
+      * summary rows per page with PF7/PF8 paging.  The user enters
+      * an account ID; the program reads the IMS PAUTSUM0 root
+      * segment and its PAUTDTL1 children, then populates a BMS map
+      * (COPAU00).  Selecting a row with 'S' transfers control to
+      * the detail view program COPAUS1C via XCTL.
+      *****************************************************************
        MAIN-PARA.
       *****************************************************************
 

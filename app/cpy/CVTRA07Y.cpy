@@ -1,5 +1,10 @@
       *****************************************************************         
-      *    Reporting data structure for transaction report                      
+      * Report formatting structures for CBTRN03C transaction
+      * detail report. Includes report header (name + date range),
+      * column headers, detail line layout (trans ID, account,
+      * type, category, source, amount), and page/account/grand
+      * total lines. All PIC fields are pre-formatted for 133-col
+      * print output.
       *****************************************************************         
        01  REPORT-NAME-HEADER.                                                  
            05  REPT-SHORT-NAME                  PIC X(38) VALUE                 

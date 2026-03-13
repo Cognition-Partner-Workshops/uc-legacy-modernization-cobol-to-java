@@ -14,6 +14,10 @@
       * either express or implied. See the License for the specific     
       * language governing permissions and limitations under the License
       ****************************************************************** 
+      * Working storage for current date/time in multiple formats:
+      * raw (YYYYMMDD / HHMMSSMS), display (MM/DD/YY, HH:MM:SS),
+      * and ISO timestamp (YYYY-MM-DD HH:MM:SS.mmmmmm).
+      * Populated via ACCEPT FROM DATE/TIME or ASKTIME/FORMATTIME.
        01 WS-DATE-TIME.
          05 WS-CURDATE-DATA.
            10  WS-CURDATE.

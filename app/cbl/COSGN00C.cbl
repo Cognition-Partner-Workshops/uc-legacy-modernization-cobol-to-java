@@ -68,6 +68,10 @@
 
       *----------------------------------------------------------------*
       *                      PROCEDURE DIVISION
+      * MAINLINE: Display signon screen, accept user ID and password,
+      * authenticate against USRSEC file, and route to the appropriate
+      * menu (admin menu COADM01C or regular menu COMEN01C).
+      * Keys: ENTER = submit credentials, PF3 = exit application.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -103,7 +107,8 @@
 
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Receive map input, validate user ID and password are non-blank,
+      * then look up the user in the security file.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 
@@ -140,7 +145,8 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      SEND-SIGNON-SCREEN
+      * Populate header fields (date/time/titles) and send the signon
+      * BMS map to the terminal with any error message.
       *----------------------------------------------------------------*
        SEND-SIGNON-SCREEN.
 
@@ -157,7 +163,8 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      SEND-PLAIN-TEXT
+      * Send a plain text message (e.g. 'Thank you') and end the
+      * CICS task without returning to pseudo-conversational mode.
       *----------------------------------------------------------------*
        SEND-PLAIN-TEXT.
 
@@ -172,7 +179,8 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      POPULATE-HEADER-INFO
+      * Format current date/time and move application titles, tran ID,
+      * program name, APPLID, and SYSID into the BMS map header fields.
       *----------------------------------------------------------------*
        POPULATE-HEADER-INFO.
 
@@ -204,7 +212,9 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      READ-USER-SEC-FILE
+      * Read the user security record by user ID. On success, verify
+      * password and transfer control: admins go to COADM01C, regular
+      * users go to COMEN01C. RESP 13 = user not found.
       *----------------------------------------------------------------*
        READ-USER-SEC-FILE.
 

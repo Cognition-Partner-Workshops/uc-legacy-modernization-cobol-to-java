@@ -342,6 +342,18 @@
 034200       OCCURS 1 TO 32767 TIMES DEPENDING ON EIBCALEN.             03420000
 034300                                                                  03430000
 034400 PROCEDURE DIVISION.                                              03440000
+      * CICS/DB2 BMS program – transaction type update/add/delete.
+      * Invoked via XCTL from the list program COTRTLIC.  Based on
+      * the COMMAREA action flag (TTUP-CHANGE-ACTION), this program:
+      *   - Shows existing transaction type details for review
+      *   - Validates user input (type code numeric, description
+      *     not empty)
+      *   - Confirms updates or deletes before committing to DB2
+      *   - Performs INSERT, UPDATE, or DELETE on the DB2
+      *     CARDDEMO.TRANSACTION_TYPE table
+      *   - Handles DB2 lock errors (SQLCODE -911) with retry logic
+      *   - Supports PF3 to cancel and return to list, PF12 to
+      *     go back, and ENTER to confirm changes
 034500 0000-MAIN.                                                       03450000
 034600                                                                  03460000
 034700                                                                  03470000

@@ -214,7 +214,22 @@
        01  DFHCOMMAREA.                                                         
          05  LK-COMMAREA                           PIC X(4096).                 
                                                                                 
-      * ------------------------------------------------------------- *         
+      * ------------------------------------------------------------- *
+      * CICS/IMS/MQ card-authorization decision engine.  Triggered by
+      * an MQ message on the request queue, this program:
+      *   1. Reads the authorization request from MQ
+      *   2. Looks up the card cross-reference (CCXREF) to find the
+      *      account and customer IDs
+      *   3. Reads the account master (ACCTDAT) and customer master
+      *      (CUSTDAT) files via CICS
+      *   4. Reads or creates a pending-authorization summary segment
+      *      in the IMS database (PAUTSUM0)
+      *   5. Applies business rules (credit limit, card active status,
+      *      fraud flags) to approve or decline the transaction
+      *   6. Puts the response message on the reply MQ queue
+      *   7. Writes the authorization detail to the IMS DB (PAUTDTL1)
+      * Processes up to WS-REQSTS-PROCESS-LIMIT messages per trigger.
+      * ------------------------------------------------------------- *
        PROCEDURE DIVISION.                                                      
       * ------------------------------------------------------------- *         
        MAIN-PARA.                                                               
@@ -1023,4 +1038,4 @@
            .                                                                    
        9990-EXIT.                                                               
            EXIT.                                                                
-      *                                                                         
+      *                                                                                                                                                  

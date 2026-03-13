@@ -28,24 +28,25 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
+      *    Transaction file - sequential read for statement generation
            SELECT TRNX-FILE ASSIGN TO TRNXFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS SEQUENTIAL
                   RECORD KEY   IS FD-TRNXS-ID
                   FILE STATUS  IS TRNXFILE-STATUS.
-
+      *    Cross-reference file - sequential read to iterate by card
            SELECT XREF-FILE ASSIGN TO   XREFFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS SEQUENTIAL
                   RECORD KEY   IS FD-XREF-CARD-NUM
                   FILE STATUS  IS XREFFILE-STATUS.
-
+      *    Customer file - random read by customer ID
            SELECT CUST-FILE ASSIGN TO CUSTFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS RANDOM
                   RECORD KEY   IS FD-CUST-ID
                   FILE STATUS  IS CUSTFILE-STATUS.
-
+      *    Account file - random read by account ID
            SELECT ACCT-FILE ASSIGN TO ACCTFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS RANDOM
@@ -97,6 +98,9 @@
            05  ACCTFILE-STAT2      PIC X.
 
        LINKAGE SECTION.
+      *    Communication area passed from CBSTM03A (caller).
+      *    DD name selects the file, OPER selects the operation,
+      *    RC returns file status, KEY/FLDT pass record data.
        01  LK-M03B-AREA.
            05  LK-M03B-DD          PIC X(08).
            05  LK-M03B-OPER        PIC X(01).
@@ -111,6 +115,11 @@
            05  LK-M03B-KEY-LN      PIC S9(4).
            05  LK-M03B-FLDT        PIC X(1000).
 
+      *****************************************************************
+      * Entry point: Dispatch to the correct file handler based on
+      * the DD name passed in LK-M03B-DD. Each handler supports
+      * Open (O), Read (R), Read-by-Key (K), and Close (C).
+      *****************************************************************
        PROCEDURE DIVISION USING LK-M03B-AREA.
 
        0000-START.
@@ -130,6 +139,7 @@
        9999-GOBACK.
            GOBACK.
 
+      * Transaction file handler: Open/Read(sequential)/Close
        1000-TRNXFILE-PROC.
 
            IF M03B-OPEN
@@ -154,6 +164,7 @@
        1999-EXIT.
            EXIT.
 
+      * Cross-reference file handler: Open/Read(sequential)/Close
        2000-XREFFILE-PROC.
 
            IF M03B-OPEN
@@ -178,6 +189,7 @@
        2999-EXIT.
            EXIT.
 
+      * Customer file handler: Open/Read-by-Key/Close
        3000-CUSTFILE-PROC.
 
            IF M03B-OPEN
@@ -203,6 +215,7 @@
        3999-EXIT.
            EXIT.
 
+      * Account file handler: Open/Read-by-Key/Close
        4000-ACCTFILE-PROC.
 
            IF M03B-OPEN

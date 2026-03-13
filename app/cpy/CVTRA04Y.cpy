@@ -1,5 +1,9 @@
       *****************************************************************         
-      *    Data-structure for transaction category type (RECLN = 60)            
+      * Transaction category record (TRANCATG file, RECLN = 60).
+      * Key: type code + 4-digit category code. Stores the
+      * category description (e.g., 'Groceries', 'Fuel').
+      * Used for category lookups in reporting (CBTRN03C)
+      * and transaction display screens.
       *****************************************************************         
        01  TRAN-CAT-RECORD.                                                     
            05  TRAN-CAT-KEY.                                                    

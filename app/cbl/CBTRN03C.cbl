@@ -26,32 +26,33 @@
        ENVIRONMENT DIVISION.                                                    
        INPUT-OUTPUT SECTION.                                                    
        FILE-CONTROL.                                                            
+      *    Input: Posted transaction file (sequential read)                    
            SELECT TRANSACT-FILE ASSIGN TO TRANFILE                              
                   ORGANIZATION IS SEQUENTIAL                                    
                   FILE STATUS  IS TRANFILE-STATUS.                              
-                                                                                
+      *    Input: Card-to-account cross-reference (random by card num)         
            SELECT XREF-FILE ASSIGN TO CARDXREF                                  
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS RANDOM                                        
                   RECORD KEY   IS FD-XREF-CARD-NUM                              
                   FILE STATUS  IS CARDXREF-STATUS.                              
-                                                                                
+      *    Input: Transaction type descriptions (random by type code)          
            SELECT TRANTYPE-FILE ASSIGN TO TRANTYPE                              
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS RANDOM                                        
                   RECORD KEY   IS FD-TRAN-TYPE                                  
                   FILE STATUS  IS TRANTYPE-STATUS.                              
-                                                                                
+      *    Input: Transaction category descriptions (random by key)            
            SELECT TRANCATG-FILE ASSIGN TO TRANCATG                              
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS RANDOM                                        
                   RECORD KEY   IS FD-TRAN-CAT-KEY                               
                   FILE STATUS  IS TRANCATG-STATUS.                              
-                                                                                
+      *    Output: Transaction detail report (sequential print file)           
            SELECT REPORT-FILE ASSIGN TO TRANREPT                                
                   ORGANIZATION IS SEQUENTIAL                                    
                   FILE STATUS  IS TRANREPT-STATUS.                              
-                                                                                
+      *    Input: Date range parameters (start/end dates for report)           
            SELECT DATE-PARMS-FILE ASSIGN TO DATEPARM                            
                   ORGANIZATION IS SEQUENTIAL                                    
                   FILE STATUS  IS DATEPARM-STATUS.                              
@@ -90,26 +91,31 @@
        WORKING-STORAGE SECTION.                                                 
                                                                                 
       *****************************************************************         
+      *    Include posted transaction record layout                            
        COPY CVTRA05Y.                                                           
        01 TRANFILE-STATUS.                                                      
           05 TRANFILE-STAT1     PIC X.                                          
           05 TRANFILE-STAT2     PIC X.                                          
                                                                                 
+      *    Include cross-reference record layout                                
        COPY CVACT03Y.                                                           
        01  CARDXREF-STATUS.                                                     
            05  CARDXREF-STAT1      PIC X.                                       
            05  CARDXREF-STAT2      PIC X.                                       
                                                                                 
+      *    Include transaction type record layout                               
        COPY CVTRA03Y.                                                           
        01  TRANTYPE-STATUS.                                                     
            05  TRANTYPE-STAT1      PIC X.                                       
            05  TRANTYPE-STAT2      PIC X.                                       
                                                                                 
+      *    Include transaction category record layout                           
        COPY CVTRA04Y.                                                           
        01  TRANCATG-STATUS.                                                     
            05  TRANCATG-STAT1      PIC X.                                       
            05  TRANCATG-STAT2      PIC X.                                       
                                                                                 
+      *    Include report line/header record layouts                            
        COPY CVTRA07Y.                                                           
        01 TRANREPT-STATUS.                                                      
            05 REPTFILE-STAT1     PIC X.                                         
@@ -155,6 +161,12 @@
        01 ABCODE                PIC S9(9) BINARY.                               
        01 TIMING                PIC S9(9) BINARY.                               
                                                                                 
+      *****************************************************************         
+      * MAINLINE: Generate a transaction detail report for a given date        
+      * range. Reads posted transactions sequentially, filters by date,        
+      * enriches each with type/category descriptions via reference            
+      * file lookups, and writes formatted report with page/account/           
+      * grand totals.                                                          
       *****************************************************************         
        PROCEDURE DIVISION.                                                      
            DISPLAY 'START OF EXECUTION OF PROGRAM CBTRN03C'.                    
@@ -243,7 +255,7 @@
            .                                                                    
                                                                                 
       *****************************************************************         
-      * I/O ROUTINES TO ACCESS A KSDS, VSAM DATA SET...               *         
+      * Read next posted transaction record sequentially                       
       *****************************************************************         
        1000-TRANFILE-GET-NEXT.                                                  
            READ TRANSACT-FILE INTO TRAN-RECORD.                                 
@@ -271,6 +283,8 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Format and write one transaction detail line; manages page             
+      * breaks by checking line counter against page size.                     
        1100-WRITE-TRANSACTION-REPORT.                                           
            IF WS-FIRST-TIME = 'Y'                                               
               MOVE 'N' TO WS-FIRST-TIME                                         
@@ -290,6 +304,7 @@
            EXIT.                                                                
                                                                                 
       *---------------------------------------------------------------*         
+      * Write page subtotal line and reset page accumulator                    
        1110-WRITE-PAGE-TOTALS.                                                  
            MOVE WS-PAGE-TOTAL TO REPT-PAGE-TOTAL                                
            MOVE REPORT-PAGE-TOTALS TO FD-REPTFILE-REC                           
@@ -303,6 +318,7 @@
                                                                                 
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Write account subtotal line when card number changes                   
        1120-WRITE-ACCOUNT-TOTALS.                                               
            MOVE WS-ACCOUNT-TOTAL   TO REPT-ACCOUNT-TOTAL                        
            MOVE REPORT-ACCOUNT-TOTALS TO FD-REPTFILE-REC                        
@@ -315,12 +331,14 @@
                                                                                 
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Write grand total line at end of report                                
        1110-WRITE-GRAND-TOTALS.                                                 
            MOVE WS-GRAND-TOTAL TO REPT-GRAND-TOTAL                              
            MOVE REPORT-GRAND-TOTALS TO FD-REPTFILE-REC                          
            PERFORM 1111-WRITE-REPORT-REC                                        
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Write report name header and column headers for a new page             
        1120-WRITE-HEADERS.                                                      
            MOVE REPORT-NAME-HEADER TO FD-REPTFILE-REC                           
            PERFORM 1111-WRITE-REPORT-REC                                        
@@ -340,6 +358,7 @@
                                                                                 
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Low-level write to report file with error checking                     
        1111-WRITE-REPORT-REC.                                                   
                                                                                 
            WRITE FD-REPTFILE-REC                                                
@@ -358,6 +377,7 @@
            END-IF                                                               
            EXIT.                                                                
                                                                                 
+      * Build transaction detail line from current record and write             
        1120-WRITE-DETAIL.                                                       
            INITIALIZE TRANSACTION-DETAIL-REPORT                                 
            MOVE TRAN-ID TO TRAN-REPORT-TRANS-ID                                 
@@ -481,6 +501,7 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Look up card number in cross-reference to get account ID               
        1500-A-LOOKUP-XREF.                                                      
            READ XREF-FILE INTO CARD-XREF-RECORD                                 
               INVALID KEY                                                       
@@ -491,6 +512,7 @@
            END-READ                                                             
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Look up transaction type description by type code                      
        1500-B-LOOKUP-TRANTYPE.                                                  
            READ TRANTYPE-FILE INTO TRAN-TYPE-RECORD                             
               INVALID KEY                                                       
@@ -501,6 +523,7 @@
            END-READ                                                             
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Look up transaction category description by type+category key          
        1500-C-LOOKUP-TRANCATG.                                                  
            READ TRANCATG-FILE INTO TRAN-CAT-RECORD                              
               INVALID KEY                                                       
@@ -623,6 +646,7 @@
                                                                                 
                                                                                 
                                                                                 
+      * Abnormal termination - calls LE abend routine                          
        9999-ABEND-PROGRAM.                                                      
            DISPLAY 'ABENDING PROGRAM'                                           
            MOVE 0 TO TIMING                                                     
@@ -630,6 +654,7 @@
            CALL 'CEE3ABD' USING ABCODE, TIMING.                                 
                                                                                 
       *****************************************************************         
+      * Translate file status bytes to a 4-digit displayable code              
        9910-DISPLAY-IO-STATUS.                                                  
            IF IO-STATUS NOT NUMERIC                                             
               OR IO-STAT1 = '9'                                                 

@@ -160,6 +160,13 @@
                                                  PASFLPCB               01380000
                                                  PADFLPCB.              01381000
       *----------------------------------------------------------------*01390000
+      * Batch IMS utility – unloads the pending-authorization IMS
+      * database to two GSAM (Generalized Sequential Access Method)
+      * output datasets.  Reads each root segment (PAUTSUM0) via GN
+      * call, writes it to the parent GSAM file, then reads all
+      * child segments (PAUTDTL1) via GNP and writes them to the
+      * child GSAM file.  Used for database backup or migration.
+      *----------------------------------------------------------------*
       *                                                                 01400000
        MAIN-PARA.                                                       01410000
             ENTRY 'DLITCBL'                 USING PAUTBPCB              01420000

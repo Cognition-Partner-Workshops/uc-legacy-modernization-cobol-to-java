@@ -16,6 +16,10 @@
       * either express or implied. See the License for the specific     
       * language governing permissions and limitations under the License
       ****************************************************************** 
+      * Regular user main menu option table. Maps menu option
+      * numbers (1-11) to program names and descriptions. Each
+      * entry includes an option number, display name, COBOL
+      * program ID, and user type flag. Used by COMEN01C.
        01 CARDDEMO-MAIN-MENU-OPTIONS.
 
          05 CDEMO-MENU-OPT-COUNT           PIC 9(02) VALUE 11.

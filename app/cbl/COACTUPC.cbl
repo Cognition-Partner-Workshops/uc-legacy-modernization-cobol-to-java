@@ -855,6 +855,18 @@
          05  FILLER                                PIC X(1)
              OCCURS 1 TO 32767 TIMES DEPENDING ON EIBCALEN.
 
+      * MAINLINE: Update account master data. This is the largest
+      * online program in CardDemo. Multi-step workflow:
+      * 1) Accept account ID input and fetch account, card xref,
+      *    and customer records from ACCTDAT, CXACAIX, CUSTDAT
+      * 2) Display current account details for editing
+      * 3) Validate all changed fields (status, credit limit,
+      *    cash advance limit, dates, balances, names, addresses)
+      * 4) Detect changes by comparing old vs new field values
+      * 5) On PF5 confirmation: lock records, verify no concurrent
+      *    changes, REWRITE account and customer records
+      * Uses numbered paragraphs: 1000 = send map, 2000 = receive
+      * inputs, 9000-9200 = file I/O, EDIT-* = field validation.
        PROCEDURE DIVISION.
        0000-MAIN.
 

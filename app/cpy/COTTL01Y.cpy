@@ -14,6 +14,9 @@
       * either express or implied. See the License for the specific     
       * language governing permissions and limitations under the License
       ****************************************************************** 
+      * Screen title literals displayed at the top of every CICS
+      * map. Includes the AWS branding line, application name
+      * (CardDemo), and a thank-you message for session exit.
        01 CCDA-SCREEN-TITLE.
          05 CCDA-TITLE01    PIC X(40) VALUE
             '      AWS Mainframe Modernization       '.

@@ -17,10 +17,13 @@
 //* language governing permissions and limitations under the License
 //******************************************************************
 //*
-//*
-//*
 //**********************************************************************
-//*  EXECUTE IMS PROGRAM
+//*  Unload the pending-authorization IMS database (DBPAUTP0) to
+//*  two sequential flat files using COBOL program PAUDBUNL.
+//*  STEP0  - Delete prior output files (IEFBR14)
+//*  STEP01 - Run PAUDBUNL via IMS DLI to write root segments
+//*           (OUTFIL1) and child segments (OUTFIL2).
+//*  Output can be reloaded by LOADPADB JCL / PAUDBLOD program.
 //**********************************************************************
 //STEP0  EXEC PGM=IEFBR14
 //*

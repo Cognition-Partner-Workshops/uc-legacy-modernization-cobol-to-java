@@ -17,10 +17,13 @@
 //* language governing permissions and limitations under the License
 //******************************************************************
 //*
-//*
-//*
 //**********************************************************************
-//*  EXECUTE IMS PROGRAM
+//*  Unload the pending-authorization IMS database to two GSAM
+//*  (Generalized Sequential Access Method) sequential files.
+//*  Executes DBUNLDGS as an IMS DLI batch job using PSB DLIGSAMP.
+//*  PASFILOP = root segment output (PAUTSUM0 account summaries)
+//*  PADFILOP = child segment output (PAUTDTL1 auth details)
+//*  Used for database backup or data migration.
 //**********************************************************************
 //*
 //STEP01  EXEC PGM=DFSRRC00,

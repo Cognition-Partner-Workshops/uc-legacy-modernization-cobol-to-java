@@ -93,6 +93,10 @@
 
       *----------------------------------------------------------------*
       *                       PROCEDURE DIVISION
+      * MAINLINE: List all users from the USRSEC security file with
+      * pagination (10 users per page). Admin users can select U to
+      * update a user (COUSR02C) or D to delete (COUSR03C).
+      * PF7/PF8 = page up/down, PF3 = return to admin menu.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -144,7 +148,9 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Check if a row was selected (U = update, D = delete). If so,
+      * XCTL to the appropriate program. Otherwise, use the filter
+      * user ID to position the browse and display the next page.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 
@@ -277,7 +283,9 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-PAGE-FORWARD
+      * Browse forward through USRSEC file: start at current key,
+      * skip one record, clear the 10-row display, then READNEXT
+      * up to 10 records. Check for more records to set page flag.
       *----------------------------------------------------------------*
        PROCESS-PAGE-FORWARD.
 
@@ -331,7 +339,9 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-PAGE-BACKWARD
+      * Browse backward through USRSEC file: start at current key,
+      * skip one record, clear the 10-row display, then READPREV
+      * up to 10 records (filling from row 10 down to row 1).
       *----------------------------------------------------------------*
        PROCESS-PAGE-BACKWARD.
 
@@ -379,7 +389,9 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      POPULATE-USER-DATA
+      * Move user record fields (ID, first name, last name, type)
+      * into the appropriate screen row based on WS-IDX (1..10).
+      * Also tracks first/last user IDs for pagination.
       *----------------------------------------------------------------*
        POPULATE-USER-DATA.
 

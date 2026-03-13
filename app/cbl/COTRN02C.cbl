@@ -102,6 +102,13 @@
 
       *----------------------------------------------------------------*
       *                       PROCEDURE DIVISION
+      * MAINLINE: Add a new transaction to the TRANSACT file.
+      * Accepts account ID or card number, type code, category,
+      * source, amount, description, dates, and merchant info.
+      * Validates all fields including date format (YYYY-MM-DD)
+      * and amount format (+/-99999999.99). On confirmation (Y),
+      * generates a new transaction ID and writes the record.
+      * Keys: ENTER = process, PF3 = back, PF4 = clear, PF5 = copy.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -159,7 +166,9 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Validate key fields (account/card), validate data fields
+      * (type, category, amount, dates, merchant), then on Y
+      * confirmation call ADD-TRANSACTION to write the record.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 
@@ -188,7 +197,10 @@
            END-EVALUATE.
 
       *----------------------------------------------------------------*
-      *                      VALIDATE-INPUT-KEY-FIELDS
+      * Validate account ID or card number: if account ID given,
+      * look up card via CXACAIX alternate index; if card number
+      * given, look up account via CCXREF. At least one must be
+      * provided. Both must be numeric.
       *----------------------------------------------------------------*
        VALIDATE-INPUT-KEY-FIELDS.
 
@@ -230,7 +242,10 @@
            END-EVALUATE.
 
       *----------------------------------------------------------------*
-      *                 VALIDATE-INPUT-DATA-FIELDS
+      * Validate all transaction data fields: type code, category,
+      * source, description, amount format, origination date format
+      * (YYYY-MM-DD), processing date format, and all merchant
+      * fields (ID, name, city, zip). Uses CSUTLDTC for date check.
       *----------------------------------------------------------------*
        VALIDATE-INPUT-DATA-FIELDS.
 

@@ -16,7 +16,10 @@
       * either express or implied. See the License for the specific
       * language governing permissions and limitations under the License
       ******************************************************************
-      *
+      * Alternate transaction record layout used by the statement
+      * reporting programs (CBSTM03A/B). Same fields as CVTRA05Y
+      * but with TRNX- prefix to avoid name conflicts when both
+      * copybooks are included in the same program.
        01  TRNX-RECORD.
            05  TRNX-KEY.
                10  TRNX-CARD-NUM                       PIC X(16).

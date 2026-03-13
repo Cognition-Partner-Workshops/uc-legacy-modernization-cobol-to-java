@@ -154,6 +154,13 @@
              OCCURS 1 TO 32767 TIMES DEPENDING ON EIBCALEN.
 
        PROCEDURE DIVISION.
+      * CICS/IMS BMS program – detail view of a single pending
+      * authorization message.  Displays card number, date/time,
+      * amount, response code, decline reason, merchant details, and
+      * fraud status.  PF5 toggles the fraud flag (calls COPAUS2C
+      * via CICS LINK to write to the DB2 AUTHFRDS table).  PF8
+      * scrolls to the next authorization detail within the same
+      * account.  PF3 returns to the summary list (COPAUS0C).
        MAIN-PARA.
 
            SET ERR-FLG-OFF     TO TRUE

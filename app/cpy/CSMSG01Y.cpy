@@ -14,6 +14,8 @@
       * either express or implied. See the License for the specific     
       * language governing permissions and limitations under the License
       ****************************************************************** 
+      * Shared message literals used across all CICS screens:
+      * thank-you message and invalid-key-pressed prompt.
        01 CCDA-COMMON-MESSAGES.
          05 CCDA-MSG-THANK-YOU         PIC X(50) VALUE
               'Thank you for using CardDemo application...      '.

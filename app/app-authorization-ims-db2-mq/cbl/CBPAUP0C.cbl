@@ -129,6 +129,15 @@
        01 PGM-PCB-MASK              PIC X.
       *
       *----------------------------------------------------------------*
+      * Batch IMS program that purges expired pending authorization
+      * messages from the IMS database.  For each summary segment
+      * (PAUTSUM0) it walks the child detail segments (PAUTDTL1),
+      * checks whether the authorization date is older than the
+      * configurable expiry-days threshold, and deletes qualifying
+      * detail records.  When all children are removed the parent
+      * summary is also deleted.  Periodic IMS checkpoints are taken
+      * every P-CHKP-FREQ summaries processed.
+      *----------------------------------------------------------------*
        PROCEDURE DIVISION                  USING IO-PCB-MASK
                                                  PGM-PCB-MASK.
       *----------------------------------------------------------------*

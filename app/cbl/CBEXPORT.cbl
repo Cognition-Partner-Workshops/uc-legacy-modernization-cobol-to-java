@@ -32,36 +32,38 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
+      *    Input: Customer master - sequential read of all customers
            SELECT CUSTOMER-INPUT ASSIGN TO CUSTFILE
                ORGANIZATION IS INDEXED
                ACCESS MODE IS SEQUENTIAL
                RECORD KEY IS CUST-ID
                FILE STATUS IS WS-CUSTOMER-STATUS.
-               
+      *    Input: Account master - sequential read of all accounts
            SELECT ACCOUNT-INPUT ASSIGN TO ACCTFILE
                ORGANIZATION IS INDEXED
                ACCESS MODE IS SEQUENTIAL
                RECORD KEY IS ACCT-ID
                FILE STATUS IS WS-ACCOUNT-STATUS.
-               
+      *    Input: Card-to-account cross-reference file
            SELECT XREF-INPUT ASSIGN TO XREFFILE
                ORGANIZATION IS INDEXED
                ACCESS MODE IS SEQUENTIAL
                RECORD KEY IS XREF-CARD-NUM
                FILE STATUS IS WS-XREF-STATUS.
-               
+      *    Input: Transaction history file
            SELECT TRANSACTION-INPUT ASSIGN TO TRANSACT
                ORGANIZATION IS INDEXED
                ACCESS MODE IS SEQUENTIAL
                RECORD KEY IS TRAN-ID
                FILE STATUS IS WS-TRANSACTION-STATUS.
-               
+      *    Input: Card master file
            SELECT CARD-INPUT ASSIGN TO CARDFILE
                ORGANIZATION IS INDEXED
                ACCESS MODE IS SEQUENTIAL
                RECORD KEY IS CARD-NUM
                FILE STATUS IS WS-CARD-STATUS.
-               
+      *    Output: Multi-record export file (500-byte fixed-length
+      *    records, keyed by sequence number)
            SELECT EXPORT-OUTPUT ASSIGN TO EXPFILE
                ORGANIZATION IS INDEXED
                ACCESS MODE IS SEQUENTIAL
@@ -71,6 +73,7 @@
        DATA DIVISION.
        FILE SECTION.
        
+      *    Each FD uses a copybook for the record layout
        FD  CUSTOMER-INPUT.
        COPY CVCUS01Y.
 
@@ -93,9 +96,10 @@
 
        WORKING-STORAGE SECTION.
 
+      *    Include export record layout (multi-record type structure)
        COPY CVEXPORT.
 
-      * File Status Variables
+      * File status: 00=OK, 10=EOF, other=error
        01  WS-FILE-STATUS-AREA.
            05  WS-CUSTOMER-STATUS                      PIC X(02).
                88  WS-CUSTOMER-EOF                     VALUE '10'.
@@ -146,6 +150,12 @@
        PROCEDURE DIVISION.
 
       *****************************************************************
+      * MAINLINE: Export all CardDemo data to a single multi-record
+      * file. Processes each entity type in sequence: customers,
+      * accounts, cross-references, transactions, and cards.
+      * Each record type is identified by a single-char code
+      * (C, A, X, T, D) in the export record.
+      *****************************************************************
        0000-MAIN-PROCESSING.
       *****************************************************************
            PERFORM 1000-INITIALIZE
@@ -158,8 +168,9 @@
            GOBACK.
 
       *****************************************************************
-       1000-INITIALIZE.
+      * Generate export timestamp and open all input/output files
       *****************************************************************
+       1000-INITIALIZE.
            DISPLAY 'CBEXPORT: Starting Customer Data Export'
            
            PERFORM 1050-GENERATE-TIMESTAMP
@@ -169,8 +180,10 @@
            DISPLAY 'CBEXPORT: Export Time: ' WS-EXPORT-TIME.
 
       *****************************************************************
-       1050-GENERATE-TIMESTAMP.
+      * Build formatted date/time strings from COBOL intrinsics
+      * for stamping each export record
       *****************************************************************
+       1050-GENERATE-TIMESTAMP.
       *    Get current date and time
            ACCEPT WS-CURRENT-DATE FROM DATE YYYYMMDD
            ACCEPT WS-CURRENT-TIME FROM TIME
@@ -195,8 +208,10 @@
            .
 
       *****************************************************************
-       1100-OPEN-FILES.
+      * Open all 5 input files and the export output file.
+      * Abend immediately if any file fails to open.
       *****************************************************************
+       1100-OPEN-FILES.
            OPEN INPUT CUSTOMER-INPUT
            IF NOT WS-CUSTOMER-OK
                DISPLAY 'ERROR: Cannot open CUSTOMER-INPUT, Status: '
@@ -240,8 +255,9 @@
            END-IF.
 
       *****************************************************************
-       2000-EXPORT-CUSTOMERS.
+      * Read all customer records and write type 'C' export records
       *****************************************************************
+       2000-EXPORT-CUSTOMERS.
            DISPLAY 'CBEXPORT: Processing customer records'
            
            PERFORM 2100-READ-CUSTOMER-RECORD
@@ -255,8 +271,9 @@
                    WS-CUSTOMER-RECORDS-EXPORTED.
 
       *****************************************************************
-       2100-READ-CUSTOMER-RECORD.
+      * Read next customer; sets WS-CUSTOMER-EOF at end-of-file
       *****************************************************************
+       2100-READ-CUSTOMER-RECORD.
            READ CUSTOMER-INPUT
            
            IF NOT WS-CUSTOMER-OK AND NOT WS-CUSTOMER-EOF
@@ -266,8 +283,10 @@
            END-IF.
 
       *****************************************************************
-       2200-CREATE-CUSTOMER-EXP-REC.
+      * Map customer fields to export record and write to output.
+      * Record type 'C', branch '0001', region 'NORTH'.
       *****************************************************************
+       2200-CREATE-CUSTOMER-EXP-REC.
            INITIALIZE EXPORT-RECORD
            
       *    Set record type and common fields
@@ -308,9 +327,10 @@
            
            ADD 1 TO WS-CUSTOMER-RECORDS-EXPORTED
            ADD 1 TO WS-TOTAL-RECORDS-EXPORTED.    
-  *****************************************************************
-       3000-EXPORT-ACCOUNTS.
+       *****************************************************************
+      * Read all account records and write type 'A' export records
       *****************************************************************
+       3000-EXPORT-ACCOUNTS.
            DISPLAY 'CBEXPORT: Processing account records'
            
            PERFORM 3100-READ-ACCOUNT-RECORD
@@ -324,8 +344,9 @@
                    WS-ACCOUNT-RECORDS-EXPORTED.
 
       *****************************************************************
-       3100-READ-ACCOUNT-RECORD.
+      * Read next account; sets WS-ACCOUNT-EOF at end-of-file
       *****************************************************************
+       3100-READ-ACCOUNT-RECORD.
            READ ACCOUNT-INPUT
            
            IF NOT WS-ACCOUNT-OK AND NOT WS-ACCOUNT-EOF
@@ -335,8 +356,10 @@
            END-IF.
 
       *****************************************************************
-       3200-CREATE-ACCOUNT-EXP-REC.
+      * Map account fields to export record and write to output.
+      * Record type 'A'.
       *****************************************************************
+       3200-CREATE-ACCOUNT-EXP-REC.
            INITIALIZE EXPORT-RECORD
            
       *    Set record type and common fields
@@ -373,8 +396,9 @@
            ADD 1 TO WS-TOTAL-RECORDS-EXPORTED.
 
       *****************************************************************
-       4000-EXPORT-XREFS.
+      * Read all cross-reference records and write type 'X' exports
       *****************************************************************
+       4000-EXPORT-XREFS.
            DISPLAY 'CBEXPORT: Processing cross-reference records'
            
            PERFORM 4100-READ-XREF-RECORD
@@ -388,8 +412,9 @@
                    WS-XREF-RECORDS-EXPORTED.
 
       *****************************************************************
-       4100-READ-XREF-RECORD.
+      * Read next cross-reference; sets WS-XREF-EOF at end-of-file
       *****************************************************************
+       4100-READ-XREF-RECORD.
            READ XREF-INPUT
            
            IF NOT WS-XREF-OK AND NOT WS-XREF-EOF
@@ -399,8 +424,9 @@
            END-IF.
 
       *****************************************************************
-       4200-CREATE-XREF-EXPORT-RECORD.
+      * Map cross-ref fields to export record and write. Type 'X'.
       *****************************************************************
+       4200-CREATE-XREF-EXPORT-RECORD.
            INITIALIZE EXPORT-RECORD
            
       *    Set record type and common fields
@@ -428,8 +454,9 @@
            ADD 1 TO WS-TOTAL-RECORDS-EXPORTED.
 
       *****************************************************************
-       5000-EXPORT-TRANSACTIONS.
+      * Read all transaction records and write type 'T' exports
       *****************************************************************
+       5000-EXPORT-TRANSACTIONS.
            DISPLAY 'CBEXPORT: Processing transaction records'
            
            PERFORM 5100-READ-TRANSACTION-RECORD
@@ -443,8 +470,9 @@
                    WS-TRAN-RECORDS-EXPORTED.                            
 
       *****************************************************************
-       5100-READ-TRANSACTION-RECORD.
+      * Read next transaction; sets WS-TRANSACTION-EOF at end-of-file
       *****************************************************************
+       5100-READ-TRANSACTION-RECORD.
            READ TRANSACTION-INPUT
            
            IF NOT WS-TRANSACTION-OK AND NOT WS-TRANSACTION-EOF
@@ -454,8 +482,9 @@
            END-IF.
 
       *****************************************************************
-       5200-CREATE-TRAN-EXP-REC.                                        
+      * Map transaction fields to export record and write. Type 'T'.
       *****************************************************************
+       5200-CREATE-TRAN-EXP-REC.                                        
            INITIALIZE EXPORT-RECORD
            
       *    Set record type and common fields
@@ -493,8 +522,9 @@
            ADD 1 TO WS-TOTAL-RECORDS-EXPORTED.
 
       *****************************************************************
-       5500-EXPORT-CARDS.
+      * Read all card records and write type 'D' export records
       *****************************************************************
+       5500-EXPORT-CARDS.
            DISPLAY 'CBEXPORT: Processing card records'
            
            PERFORM 5600-READ-CARD-RECORD
@@ -508,8 +538,9 @@
                    WS-CARD-RECORDS-EXPORTED.
 
       *****************************************************************
-       5600-READ-CARD-RECORD.
+      * Read next card record; sets WS-CARD-EOF at end-of-file
       *****************************************************************
+       5600-READ-CARD-RECORD.
            READ CARD-INPUT
            
            IF NOT WS-CARD-OK AND NOT WS-CARD-EOF
@@ -519,8 +550,9 @@
            END-IF.
 
       *****************************************************************
-       5700-CREATE-CARD-EXPORT-RECORD.
+      * Map card fields to export record and write. Type 'D'.
       *****************************************************************
+       5700-CREATE-CARD-EXPORT-RECORD.
            INITIALIZE EXPORT-RECORD
            
       *    Set record type and common fields
@@ -551,8 +583,9 @@
            ADD 1 TO WS-TOTAL-RECORDS-EXPORTED.
 
       *****************************************************************
-       6000-FINALIZE.
+      * Close all files and display final export statistics
       *****************************************************************
+       6000-FINALIZE.
            CLOSE CUSTOMER-INPUT
            CLOSE ACCOUNT-INPUT
            CLOSE XREF-INPUT
@@ -573,8 +606,9 @@
                    WS-TOTAL-RECORDS-EXPORTED.
 
       *****************************************************************
-       9999-ABEND-PROGRAM.
+      * Abnormal termination - calls LE abend routine
       *****************************************************************
+       9999-ABEND-PROGRAM.
            DISPLAY 'CBEXPORT: ABENDING PROGRAM'
            CALL 'CEE3ABD'.      
       *

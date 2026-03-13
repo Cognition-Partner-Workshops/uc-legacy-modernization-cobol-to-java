@@ -81,6 +81,12 @@
 
       *----------------------------------------------------------------*
       *                       PROCEDURE DIVISION
+      * MAINLINE: View a single transaction's details. Accepts a
+      * transaction ID (either typed or passed from the transaction
+      * list screen COTRN00C), reads the TRANSACT file, and displays
+      * all fields: card number, type, category, source, amount,
+      * description, dates, and merchant information.
+      * Keys: ENTER = look up, PF3 = back, PF4 = clear, PF5 = list.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -139,7 +145,8 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Validate tran ID is non-blank, read the transaction record,
+      * and populate all screen fields with the transaction details.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 
@@ -262,7 +269,8 @@
            MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF COTRN1AO.
 
       *----------------------------------------------------------------*
-      *                      READ-TRANSACT-FILE
+      * Read a single transaction record by tran ID from TRANSACT
+      * file. Handles NOTFND (not found) and other error responses.
       *----------------------------------------------------------------*
        READ-TRANSACT-FILE.
 

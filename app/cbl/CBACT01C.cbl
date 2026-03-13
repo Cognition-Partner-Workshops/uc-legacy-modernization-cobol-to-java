@@ -26,22 +26,25 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
+      *    Input: VSAM KSDS account master file (indexed by acct ID)
            SELECT ACCTFILE-FILE ASSIGN TO ACCTFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS SEQUENTIAL
                   RECORD KEY   IS FD-ACCT-ID
                   FILE STATUS  IS ACCTFILE-STATUS.
-      *
+      *    Output: Sequential flat file with selected account fields
            SELECT OUT-FILE ASSIGN TO OUTFILE
                   ORGANIZATION IS SEQUENTIAL
                   ACCESS MODE IS SEQUENTIAL
                   FILE STATUS IS OUTFILE-STATUS.
-      *
+      *    Output: Sequential file with array-structured records
+      *    (repeating balance/debit groups per account)
            SELECT ARRY-FILE ASSIGN TO ARRYFILE
                   ORGANIZATION IS SEQUENTIAL
                   ACCESS MODE IS SEQUENTIAL
                   FILE STATUS IS ARRYFILE-STATUS.
-      *
+      *    Output: Variable-length record file (two record formats
+      *    per account: short status rec + longer balance rec)
            SELECT VBRC-FILE ASSIGN TO VBRCFILE
                   ORGANIZATION IS SEQUENTIAL
                   ACCESS MODE IS SEQUENTIAL
@@ -49,10 +52,12 @@
       *
        DATA DIVISION.
        FILE SECTION.
+      *    Account master input - keyed by 11-digit account ID
        FD  ACCTFILE-FILE.
        01  FD-ACCTFILE-REC.
            05 FD-ACCT-ID                        PIC 9(11).
            05 FD-ACCT-DATA                      PIC X(289).
+      *    Sequential output - one flat record per account
        FD OUT-FILE.
        01 OUT-ACCT-REC.
           05  OUT-ACCT-ID                PIC 9(11).
@@ -68,6 +73,8 @@
                                          USAGE IS COMP-3.
           05  OUT-ACCT-GROUP-ID          PIC X(10).
       *
+      *    Array-structured output - account ID + 5 repeating
+      *    balance/debit pairs (demonstrates OCCURS clause)
        FD ARRY-FILE.
        01 ARR-ARRAY-REC.
           05  ARR-ACCT-ID                PIC 9(11).
@@ -77,6 +84,10 @@
                                          USAGE IS COMP-3.
           05  ARR-FILLER                 PIC X(04).
       *
+      *    Variable-length record output - demonstrates RECORDING
+      *    MODE V with two different record formats per account:
+      *    VBRC-REC1 (12 bytes: ID + status) and
+      *    VBRC-REC2 (39 bytes: ID + balances + reissue year)
        FD VBRC-FILE
                   RECORDING MODE IS V
                   RECORD IS VARYING IN SIZE
@@ -85,9 +96,12 @@
        01 VBR-REC                        PIC X(80).
        WORKING-STORAGE SECTION.
 
-      ****0************************************************************
+      *****************************************************************
+      *    Include account record layout (ACCOUNT-RECORD structure)
        COPY CVACT01Y.
+      *    Include date conversion record layout for COBDATFT calls
        COPY CODATECN.
+      *    File status codes (00=OK, 10=EOF, other=error)
        01  ACCTFILE-STATUS.
            05  ACCTFILE-STAT1      PIC X.
            05  ACCTFILE-STAT2      PIC X.
@@ -101,6 +115,7 @@
            05  VBRCFILE-STAT1      PIC X.
            05  VBRCFILE-STAT2      PIC X.
 
+      *    Working area for translating file status to displayable form
        01  IO-STATUS.
            05  IO-STAT1            PIC X.
            05  IO-STAT2            PIC X.
@@ -112,6 +127,7 @@
            05  IO-STATUS-0401      PIC 9   VALUE 0.
            05  IO-STATUS-0403      PIC 999 VALUE 0.
 
+      *    Application return code: 0=OK, 12=error, 16=end-of-file
        01  APPL-RESULT             PIC S9(9)   COMP.
            88  APPL-AOK            VALUE 0.
            88  APPL-EOF            VALUE 16.
@@ -120,9 +136,11 @@
        01  ABCODE                  PIC S9(9) BINARY.
        01  TIMING                  PIC S9(9) BINARY.
        01  WS-RECD-LEN             PIC  9(04).
+      *    Short variable-length record: account ID + active flag
        01 VBRC-REC1.
           05  VB1-ACCT-ID                PIC 9(11).
           05  VB1-ACCT-ACTIVE-STATUS     PIC X(01).
+      *    Long variable-length record: account ID + financial fields
        01 VBRC-REC2.
           05  VB2-ACCT-ID                PIC 9(11).
           05  VB2-ACCT-CURR-BAL          PIC S9(10)V99.
@@ -137,13 +155,19 @@
        01 WS-REISSUE-DATE REDEFINES WS-ACCT-REISSUE-DATE  PIC X(10).
 
       *****************************************************************
+      * MAINLINE: Opens all 4 files, reads each account record
+      * sequentially, writes it to 3 different output formats
+      * (flat, array, variable-length), then closes files.
+      *****************************************************************
        PROCEDURE DIVISION.
            DISPLAY 'START OF EXECUTION OF PROGRAM CBACT01C'.
+      *    Open all input and output files
            PERFORM 0000-ACCTFILE-OPEN.
            PERFORM 2000-OUTFILE-OPEN.
            PERFORM 3000-ARRFILE-OPEN.
            PERFORM 4000-VBRFILE-OPEN.
 
+      *    Main processing loop: read each account and produce output
            PERFORM UNTIL END-OF-FILE = 'Y'
                IF  END-OF-FILE = 'N'
                    PERFORM 1000-ACCTFILE-GET-NEXT
@@ -161,6 +185,11 @@
 
       *****************************************************************
       * I/O ROUTINES TO ACCESS A KSDS, VSAM DATA SET...               *
+      *****************************************************************
+      * Read next account record and write to all output files.
+      * On successful read: display, populate, and write flat,
+      * array, and variable-length output records.
+      * Status 10 = EOF, other non-zero = abend.
       *****************************************************************
        1000-ACCTFILE-GET-NEXT.
            READ ACCTFILE-FILE INTO ACCOUNT-RECORD.
@@ -197,6 +226,8 @@
            END-IF
            EXIT.
       *---------------------------------------------------------------*
+      * Display all fields of current account record to SYSOUT
+      *---------------------------------------------------------------*
        1100-DISPLAY-ACCT-RECORD.
            DISPLAY 'ACCT-ID                 :'   ACCT-ID
            DISPLAY 'ACCT-ACTIVE-STATUS      :'   ACCT-ACTIVE-STATUS
@@ -211,6 +242,11 @@
            DISPLAY 'ACCT-GROUP-ID           :'   ACCT-GROUP-ID
            DISPLAY '-------------------------------------------------'
            EXIT.
+      *---------------------------------------------------------------*
+      * Populate the flat sequential output record (OUT-ACCT-REC)
+      * from the account master record. Calls COBDATFT assembler
+      * routine to reformat the reissue date. If cycle debit is
+      * zero, defaults it to 2525.00.
       *---------------------------------------------------------------*
        1300-POPUL-ACCT-RECORD.
            MOVE   ACCT-ID                 TO   OUT-ACCT-ID.
@@ -239,6 +275,8 @@
            MOVE   ACCT-GROUP-ID           TO   OUT-ACCT-GROUP-ID.
            EXIT.
       *---------------------------------------------------------------*
+      * Write the populated flat record to the sequential output file
+      *---------------------------------------------------------------*
        1350-WRITE-ACCT-RECORD.
            WRITE OUT-ACCT-REC.
 
@@ -250,6 +288,10 @@
            END-IF.
            EXIT.
       *---------------------------------------------------------------*
+      * Populate the array-structured output record. Fills 3 of
+      * the 5 OCCURS slots with balance/debit pairs (slot 3 uses
+      * negative test values). Remaining slots stay initialized.
+      *---------------------------------------------------------------*
        1400-POPUL-ARRAY-RECORD.
            MOVE   ACCT-ID         TO   ARR-ACCT-ID.
            MOVE   ACCT-CURR-BAL   TO   ARR-ACCT-CURR-BAL(1).
@@ -259,6 +301,8 @@
            MOVE   -1025.00        TO   ARR-ACCT-CURR-BAL(3).
            MOVE   -2500.00        TO   ARR-ACCT-CURR-CYC-DEBIT(3).
            EXIT.
+      *---------------------------------------------------------------*
+      * Write the array-structured record to output file
       *---------------------------------------------------------------*
        1450-WRITE-ARRY-RECORD.
            WRITE ARR-ARRAY-REC.
@@ -273,6 +317,10 @@
            END-IF.
            EXIT.
       *---------------------------------------------------------------*
+      * Populate two variable-length record formats:
+      * VBRC-REC1 (short): account ID + active status
+      * VBRC-REC2 (long):  account ID + balances + reissue year
+      *---------------------------------------------------------------*
        1500-POPUL-VBRC-RECORD.
            MOVE   ACCT-ID            TO VB1-ACCT-ID
                                         VB2-ACCT-ID.
@@ -283,6 +331,8 @@
            DISPLAY 'VBRC-REC1:' VBRC-REC1.
            DISPLAY 'VBRC-REC2:' VBRC-REC2.
            EXIT.
+      *---------------------------------------------------------------*
+      * Write short variable-length record (12 bytes) to VBRC file
       *---------------------------------------------------------------*
        1550-WRITE-VB1-RECORD.
            MOVE 12 TO WS-RECD-LEN.
@@ -299,6 +349,8 @@
            END-IF.
            EXIT.
       *---------------------------------------------------------------*
+      * Write long variable-length record (39 bytes) to VBRC file
+      *---------------------------------------------------------------*
        1575-WRITE-VB2-RECORD.
            MOVE 39 TO WS-RECD-LEN.
            MOVE VBRC-REC2 TO VBR-REC(1:WS-RECD-LEN).
@@ -313,6 +365,8 @@
               PERFORM 9999-ABEND-PROGRAM
            END-IF.
            EXIT.
+      *---------------------------------------------------------------*
+      * Open the indexed account master file for sequential input
       *---------------------------------------------------------------*
        0000-ACCTFILE-OPEN.
            MOVE 8 TO APPL-RESULT.
@@ -331,6 +385,7 @@
                PERFORM 9999-ABEND-PROGRAM
            END-IF
            EXIT.
+      * Open the flat sequential output file for writing
        2000-OUTFILE-OPEN.
            MOVE 8 TO APPL-RESULT.
            OPEN OUTPUT OUT-FILE
@@ -348,6 +403,8 @@
                PERFORM 9999-ABEND-PROGRAM
            END-IF
            EXIT.
+      *---------------------------------------------------------------*
+      * Open the array-structured output file for writing
       *---------------------------------------------------------------*
        3000-ARRFILE-OPEN.
            MOVE 8 TO APPL-RESULT.
@@ -367,6 +424,8 @@
            END-IF
            EXIT.
       *---------------------------------------------------------------*
+      * Open the variable-length record output file for writing
+      *---------------------------------------------------------------*
        4000-VBRFILE-OPEN.
            MOVE 8 TO APPL-RESULT.
            OPEN OUTPUT VBRC-FILE
@@ -384,6 +443,8 @@
                PERFORM 9999-ABEND-PROGRAM
            END-IF
            EXIT.
+      *---------------------------------------------------------------*
+      * Close the account master input file
       *---------------------------------------------------------------*
        9000-ACCTFILE-CLOSE.
            ADD 8 TO ZERO GIVING APPL-RESULT.
@@ -403,12 +464,16 @@
            END-IF
            EXIT.
 
+      * Abnormal termination - calls LE abend routine CEE3ABD
        9999-ABEND-PROGRAM.
            DISPLAY 'ABENDING PROGRAM'
            MOVE 0 TO TIMING
            MOVE 999 TO ABCODE
            CALL 'CEE3ABD' USING ABCODE, TIMING.
 
+      *****************************************************************
+      * Translate file status bytes to a 4-digit displayable code.
+      * Handles both numeric and non-numeric (binary) status values.
       *****************************************************************
        9910-DISPLAY-IO-STATUS.
            IF  IO-STATUS NOT NUMERIC

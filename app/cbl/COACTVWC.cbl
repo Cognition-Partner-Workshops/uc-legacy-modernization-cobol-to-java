@@ -258,6 +258,12 @@
          05  FILLER                                PIC X(1)                     
              OCCURS 1 TO 32767 TIMES DEPENDING ON EIBCALEN.                     
                                                                                 
+      * MAINLINE: Accept an account ID from the user, look up the
+      * account in ACCTDAT, its card(s) in CARDAIX, and the customer
+      * record from CUSTDAT, then display all details on screen.
+      * PF3 = return to calling program or main menu.
+      * Uses numbered paragraphs: 1000 = send map, 2000 = receive
+      * and validate input, 9000 = read account/card/customer data.
        PROCEDURE DIVISION.                                                      
        0000-MAIN.                                                               
                                                                                 

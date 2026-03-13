@@ -14,6 +14,9 @@
       * either express or implied. See the License for the specific
       * language governing permissions and limitations under the License
       ******************************************************************
+      * Date conversion record. Accepts a date in either
+      * YYYYMMDD (type 1) or YYYY-MM-DD (type 2) format and
+      * converts to the other format. Used by CSUTLDTC utility.
        01  CODATECN-REC.
            05  CODATECN-IN-REC.
                10  CODATECN-TYPE             PIC X.

@@ -26,6 +26,7 @@
        ENVIRONMENT DIVISION.                                                    
        INPUT-OUTPUT SECTION.                                                    
        FILE-CONTROL.                                                            
+      *    Input: VSAM KSDS card data file (indexed by card number)
            SELECT CARDFILE-FILE ASSIGN TO   CARDFILE                            
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS SEQUENTIAL                                    
@@ -33,7 +34,8 @@
                   FILE STATUS  IS CARDFILE-STATUS.                              
       *                                                                         
        DATA DIVISION.                                                           
-       FILE SECTION.                                                            
+       FILE SECTION.                                                           
+      *    Card master file - keyed by 16-digit card number
        FD  CARDFILE-FILE.                                                       
        01  FD-CARDFILE-REC.                                                     
            05 FD-CARD-NUM                       PIC X(16).                      
@@ -42,7 +44,9 @@
        WORKING-STORAGE SECTION.                                                 
                                                                                 
       *****************************************************************         
+      *    Include card record layout (CARD-RECORD structure)
        COPY CVACT02Y.                                                           
+      *    File status codes (00=OK, 10=EOF, other=error)
        01  CARDFILE-STATUS.                                                     
            05  CARDFILE-STAT1      PIC X.                                       
            05  CARDFILE-STAT2      PIC X.                                       
@@ -58,6 +62,7 @@
            05  IO-STATUS-0401      PIC 9   VALUE 0.                             
            05  IO-STATUS-0403      PIC 999 VALUE 0.                             
                                                                                 
+      *    Application return code: 0=OK, 12=error, 16=end-of-file
        01  APPL-RESULT             PIC S9(9)   COMP.                            
            88  APPL-AOK            VALUE 0.                                     
            88  APPL-EOF            VALUE 16.                                    
@@ -67,10 +72,14 @@
        01  TIMING                  PIC S9(9) BINARY.                            
                                                                                 
       *****************************************************************         
+      * MAINLINE: Opens the card file, reads each card record
+      * sequentially, displays it to SYSOUT, then closes the file.
+      *****************************************************************         
        PROCEDURE DIVISION.                                                      
            DISPLAY 'START OF EXECUTION OF PROGRAM CBACT02C'.                    
            PERFORM 0000-CARDFILE-OPEN.                                          
-                                                                                
+                                                                               
+      *    Main loop: read and display every card record until EOF
            PERFORM UNTIL END-OF-FILE = 'Y'                                      
                IF  END-OF-FILE = 'N'                                            
                    PERFORM 1000-CARDFILE-GET-NEXT                               
@@ -79,7 +88,7 @@
                    END-IF                                                       
                END-IF                                                           
            END-PERFORM.                                                         
-                                                                                
+                                                                               
            PERFORM 9000-CARDFILE-CLOSE.                                         
                                                                                 
            DISPLAY 'END OF EXECUTION OF PROGRAM CBACT02C'.                      
@@ -88,6 +97,9 @@
                                                                                 
       *****************************************************************         
       * I/O ROUTINES TO ACCESS A KSDS, VSAM DATA SET...               *         
+      *****************************************************************         
+      * Read next card record from the indexed VSAM file.
+      * Status 00 = success, 10 = EOF, other = error/abend.
       *****************************************************************         
        1000-CARDFILE-GET-NEXT.                                                  
            READ CARDFILE-FILE INTO CARD-RECORD.                                 
@@ -115,6 +127,8 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Open the indexed card file for sequential input reading
+      *---------------------------------------------------------------*         
        0000-CARDFILE-OPEN.                                                      
            MOVE 8 TO APPL-RESULT.                                               
            OPEN INPUT CARDFILE-FILE                                             
@@ -132,6 +146,8 @@
                PERFORM 9999-ABEND-PROGRAM                                       
            END-IF                                                               
            EXIT.                                                                
+      *---------------------------------------------------------------*         
+      * Close the card data file after all records are processed
       *---------------------------------------------------------------*         
        9000-CARDFILE-CLOSE.                                                     
            ADD 8 TO ZERO GIVING APPL-RESULT.                                    
@@ -151,12 +167,16 @@
            END-IF                                                               
            EXIT.                                                                
                                                                                 
+      * Abnormal termination - calls LE abend routine CEE3ABD
        9999-ABEND-PROGRAM.                                                      
            DISPLAY 'ABENDING PROGRAM'                                           
            MOVE 0 TO TIMING                                                     
            MOVE 999 TO ABCODE                                                   
            CALL 'CEE3ABD' USING ABCODE, TIMING.                                 
-                                                                                
+                                                                               
+      *****************************************************************         
+      * Translate file status bytes to a 4-digit displayable code.
+      * Handles both numeric and non-numeric (binary) status values.
       *****************************************************************         
        9910-DISPLAY-IO-STATUS.                                                  
            IF  IO-STATUS NOT NUMERIC                                            

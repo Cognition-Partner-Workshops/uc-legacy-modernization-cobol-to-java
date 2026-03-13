@@ -14,6 +14,10 @@
       * either express or implied. See the License for the specific     
       * language governing permissions and limitations under the License
       ****************************************************************** 
+      * User security record layout (USRSEC file, RECLN 80).
+      * Stores user ID, first/last name, password, and user type
+      * (A = admin, U = regular user). Used for authentication
+      * in the signon screen (COSGN00C) and user management.
        01 SEC-USER-DATA.
          05 SEC-USR-ID                 PIC X(08).
          05 SEC-USR-FNAME              PIC X(20).

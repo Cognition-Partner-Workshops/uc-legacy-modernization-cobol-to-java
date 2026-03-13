@@ -244,6 +244,12 @@
          05  FILLER                                PIC X(1)                     
              OCCURS 1 TO 32767 TIMES DEPENDING ON EIBCALEN.                     
                                                                                 
+      * MAINLINE: Display credit card details. Accepts account ID
+      * and card number, reads the card record from CARDDAT, and
+      * displays all fields (card number, name, status, expiry,
+      * CVV, account ID). PF3 = return to caller or main menu.
+      * Can be invoked from the card list screen (COCRDLIC) with
+      * pre-populated search criteria or directly with manual input.
        PROCEDURE DIVISION.                                                      
        0000-MAIN.                                                               
                                                                                 

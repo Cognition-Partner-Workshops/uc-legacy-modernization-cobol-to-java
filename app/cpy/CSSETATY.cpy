@@ -14,6 +14,11 @@
       * either express or implied. See the License for the specific     
       * language governing permissions and limitations under the License
       ****************************************************************** 
+      * Template copybook for field-level error highlighting.
+      * Intended to be included with compiler REPLACE directives
+      * that substitute (TESTVAR1), (SCRNVAR2), and (MAPNAME3)
+      * with actual field names. Sets the screen attribute to
+      * DFHRED (red) when validation fails, and shows '*' if blank.
       *    Set (TESTVAR1) to red if in error and * if blankACSHLIM
            IF (FLG-(TESTVAR1)-NOT-OK                                 
            OR  FLG-(TESTVAR1)-BLANK)                                    

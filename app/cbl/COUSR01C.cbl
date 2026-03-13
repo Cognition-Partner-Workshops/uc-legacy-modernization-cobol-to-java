@@ -66,6 +66,11 @@
 
       *----------------------------------------------------------------*
       *                      PROCEDURE DIVISION
+      * MAINLINE: Add a new user to the USRSEC security file.
+      * Accepts first name, last name, user ID, password, and user
+      * type (admin/regular). Validates all fields are non-blank,
+      * then writes the new record. Handles duplicate key errors.
+      * Keys: ENTER = submit, PF3 = back to admin menu, PF4 = clear.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -110,7 +115,9 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Validate that all required fields are non-blank (first name,
+      * last name, user ID, password, user type), then write the
+      * new user record to the USRSEC file.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 
@@ -233,7 +240,9 @@
            MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF COUSR1AO.
 
       *----------------------------------------------------------------*
-      *                      WRITE-USER-SEC-FILE
+      * Write the new user record to USRSEC. On NORMAL response,
+      * clear the form and display success. On DUPKEY/DUPREC, show
+      * 'User ID already exists' error.
       *----------------------------------------------------------------*
        WRITE-USER-SEC-FILE.
 

@@ -70,6 +70,10 @@
                                                                                 
       *----------------------------------------------------------------*        
       *                       PROCEDURE DIVISION                                
+      * MAINLINE: Display admin menu. Handles PGMIDERR for missing
+      * programs. On first entry show menu; on re-entry process the
+      * user's option selection. ENTER = process, PF3 = return to
+      * signon screen (COSGN00C).
       *----------------------------------------------------------------*        
        PROCEDURE DIVISION.                                                      
        MAIN-PARA.                                                               
@@ -114,7 +118,8 @@
            END-EXEC.                                                            
                                                                                 
       *----------------------------------------------------------------*        
-      *                      PROCESS-ENTER-KEY                                  
+      * Parse and validate option number, then XCTL to the selected
+      * admin program. DUMMY programs show 'not installed' message.
       *----------------------------------------------------------------*        
        PROCESS-ENTER-KEY.                                                       
                                                                                 
@@ -265,7 +270,9 @@
                                                                                 
            END-PERFORM.                                                         
       *----------------------------------------------------------------*        
-      *      PGMIDERROR     HANDLE-MISSING MENU OPTIONS                         
+      * PGMIDERR handler: catches program-not-found errors when a
+      * menu option references a program not defined in the CSD.
+      * Displays a friendly 'not installed' message and returns.
       *----------------------------------------------------------------*        
        PGMIDERR-ERR-PARA.
            MOVE SPACES             TO WS-MESSAGE                                
@@ -285,4 +292,4 @@
                                                                                 
       *                                                                         
       * Ver: CardDemo_v1.0-15-g27d6c6f-68 Date: 2022-07-19 23:12:32 CDT         
-      *                                                                         
+      *                                                                                                                                                  

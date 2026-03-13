@@ -294,6 +294,11 @@
          05  FILLER                                PIC X(1)                     
              OCCURS 1 TO 32767 TIMES DEPENDING ON EIBCALEN.                     
                                                                                 
+      * MAINLINE: List credit cards with pagination. Admin users
+      * see all cards; regular users see only their account's cards.
+      * Supports PF7/PF8 for page up/down, S to view detail, U to
+      * update a selected card. Browses CARDDAT (or CARDAIX for
+      * account-filtered views) and displays 7 cards per page.
        PROCEDURE DIVISION.                                                      
        0000-MAIN.                                                               
                                                                                 

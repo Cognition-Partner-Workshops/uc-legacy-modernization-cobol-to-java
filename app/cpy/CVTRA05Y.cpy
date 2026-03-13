@@ -1,5 +1,10 @@
       *****************************************************************         
-      *    Data-structure for TRANsaction record (RECLN = 350)                  
+      * Transaction record layout (TRANSACT file, RECLN = 350).
+      * Key: TRAN-ID (16-char generated ID). Contains type code,
+      * category, source, free-text description, signed amount,
+      * merchant details, card number, and origination/processing
+      * timestamps. Used by COTRN00C/01C/02C online screens and
+      * CBTRN01C/02C/03C batch posting and reporting programs.
       *****************************************************************         
        01  TRAN-RECORD.                                                         
            05  TRAN-ID                                 PIC X(16).               

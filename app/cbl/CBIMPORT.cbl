@@ -34,12 +34,13 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
+      *    Input: Multi-record export file from CBEXPORT
            SELECT EXPORT-INPUT ASSIGN TO EXPFILE
                ORGANIZATION IS INDEXED
                ACCESS MODE IS SEQUENTIAL
                RECORD KEY IS EXPORT-SEQUENCE-NUM
                FILE STATUS IS WS-EXPORT-STATUS.
-               
+      *    Output files - one per entity type (normalized targets)
            SELECT CUSTOMER-OUTPUT ASSIGN TO CUSTOUT
                ORGANIZATION IS SEQUENTIAL
                ACCESS MODE IS SEQUENTIAL
@@ -64,7 +65,7 @@
                ORGANIZATION IS SEQUENTIAL
                ACCESS MODE IS SEQUENTIAL
                FILE STATUS IS WS-CARD-STATUS.
-               
+      *    Error log for unrecognized record types
            SELECT ERROR-OUTPUT ASSIGN TO ERROUT
                ORGANIZATION IS SEQUENTIAL
                ACCESS MODE IS SEQUENTIAL
@@ -110,9 +111,10 @@
 
        WORKING-STORAGE SECTION.
 
+      *    Include export record layout (same as CBEXPORT uses)
        COPY CVEXPORT.
 
-      * File Status Variables
+      * File status: 00=OK, 10=EOF, other=error
        01  WS-FILE-STATUS-AREA.
            05  WS-EXPORT-STATUS                        PIC X(02).
                88  WS-EXPORT-EOF                       VALUE '10'.
@@ -162,8 +164,11 @@
        PROCEDURE DIVISION.
 
       *****************************************************************
-       0000-MAIN-PROCESSING.
+      * MAINLINE: Read the multi-record export file, split records
+      * by type (C/A/X/T/D) into separate normalized output files.
+      * Unknown record types go to the error log.
       *****************************************************************
+       0000-MAIN-PROCESSING.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS-EXPORT-FILE
            PERFORM 3000-VALIDATE-IMPORT
@@ -171,8 +176,9 @@
            GOBACK.
 
       *****************************************************************
-       1000-INITIALIZE.
+      * Set up import timestamp and open all files
       *****************************************************************
+       1000-INITIALIZE.
            DISPLAY 'CBIMPORT: Starting Customer Data Import'
            
            MOVE FUNCTION CURRENT-DATE(1:4) TO WS-IMPORT-DATE(1:4)
@@ -193,8 +199,10 @@
            DISPLAY 'CBIMPORT: Import Time: ' WS-IMPORT-TIME.
 
       *****************************************************************
-       1100-OPEN-FILES.
+      * Open input export file + all 5 output files + error log.
+      * Abend immediately if any file fails to open.
       *****************************************************************
+       1100-OPEN-FILES.
            OPEN INPUT EXPORT-INPUT
            IF NOT WS-EXPORT-OK
                DISPLAY 'ERROR: Cannot open EXPORT-INPUT, Status: '
@@ -245,8 +253,10 @@
            END-IF.
 
       *****************************************************************
-       2000-PROCESS-EXPORT-FILE.
+      * Main processing loop: read each export record and route
+      * it to the appropriate output file based on record type.
       *****************************************************************
+       2000-PROCESS-EXPORT-FILE.
            PERFORM 2100-READ-EXPORT-RECORD
            
            PERFORM UNTIL WS-EXPORT-EOF
@@ -256,8 +266,9 @@
            END-PERFORM.
 
       *****************************************************************
-       2100-READ-EXPORT-RECORD.
+      * Read next export record; sets WS-EXPORT-EOF at end-of-file
       *****************************************************************
+       2100-READ-EXPORT-RECORD.
            READ EXPORT-INPUT INTO EXPORT-RECORD
            
            IF NOT WS-EXPORT-OK AND NOT WS-EXPORT-EOF
@@ -267,8 +278,10 @@
            END-IF.
 
       *****************************************************************
-       2200-PROCESS-RECORD-BY-TYPE.
+      * Route record by type: C=Customer, A=Account, X=Xref,
+      * T=Transaction, D=Card, OTHER=Unknown (error log)
       *****************************************************************
+       2200-PROCESS-RECORD-BY-TYPE.
            EVALUATE EXPORT-REC-TYPE
                WHEN 'C'
                    PERFORM 2300-PROCESS-CUSTOMER-RECORD
@@ -285,8 +298,10 @@
            END-EVALUATE.
 
       *****************************************************************
-       2300-PROCESS-CUSTOMER-RECORD.
+      * Map export customer fields to normalized customer record
+      * and write to CUSTOMER-OUTPUT file
       *****************************************************************
+       2300-PROCESS-CUSTOMER-RECORD.
            INITIALIZE CUSTOMER-RECORD
            
       *    Map export fields to customer record
@@ -320,8 +335,10 @@
            ADD 1 TO WS-CUSTOMER-RECORDS-IMPORTED.
 
       *****************************************************************
-       2400-PROCESS-ACCOUNT-RECORD.
+      * Map export account fields to normalized account record
+      * and write to ACCOUNT-OUTPUT file
       *****************************************************************
+       2400-PROCESS-ACCOUNT-RECORD.
            INITIALIZE ACCOUNT-RECORD
            
       *    Map export fields to account record
@@ -349,8 +366,10 @@
            ADD 1 TO WS-ACCOUNT-RECORDS-IMPORTED.
 
       *****************************************************************
-       2500-PROCESS-XREF-RECORD.
+      * Map export xref fields to normalized cross-reference record
+      * and write to XREF-OUTPUT file
       *****************************************************************
+       2500-PROCESS-XREF-RECORD.
            INITIALIZE CARD-XREF-RECORD
            
       *    Map export fields to xref record
@@ -369,8 +388,10 @@
            ADD 1 TO WS-XREF-RECORDS-IMPORTED.
 
       *****************************************************************
-       2600-PROCESS-TRAN-RECORD.
+      * Map export transaction fields to normalized transaction
+      * record and write to TRANSACTION-OUTPUT file
       *****************************************************************
+       2600-PROCESS-TRAN-RECORD.
            INITIALIZE TRAN-RECORD
            
       *    Map export fields to transaction record
@@ -399,8 +420,10 @@
            ADD 1 TO WS-TRAN-RECORDS-IMPORTED.
 
       *****************************************************************
-       2650-PROCESS-CARD-RECORD.
+      * Map export card fields to normalized card record
+      * and write to CARD-OUTPUT file
       *****************************************************************
+       2650-PROCESS-CARD-RECORD.
            INITIALIZE CARD-RECORD
            
       *    Map export fields to card record
@@ -422,8 +445,9 @@
            ADD 1 TO WS-CARD-RECORDS-IMPORTED.
 
       *****************************************************************
-       2700-PROCESS-UNKNOWN-RECORD.
+      * Log unrecognized record types to the error output file
       *****************************************************************
+       2700-PROCESS-UNKNOWN-RECORD.
            ADD 1 TO WS-UNKNOWN-RECORD-TYPE-COUNT
            
            MOVE FUNCTION CURRENT-DATE TO ERR-TIMESTAMP
@@ -434,8 +458,9 @@
            PERFORM 2750-WRITE-ERROR.
 
       *****************************************************************
-       2750-WRITE-ERROR.
+      * Write a pipe-delimited error record to ERROR-OUTPUT
       *****************************************************************
+       2750-WRITE-ERROR.
            WRITE ERROR-OUTPUT-RECORD FROM WS-ERROR-RECORD
            
            IF NOT WS-ERROR-OK
@@ -446,14 +471,16 @@
            ADD 1 TO WS-ERROR-RECORDS-WRITTEN.
 
       *****************************************************************
-       3000-VALIDATE-IMPORT.
+      * Placeholder for import validation (checksum verification)
       *****************************************************************
+       3000-VALIDATE-IMPORT.
            DISPLAY 'CBIMPORT: Import validation completed'
            DISPLAY 'CBIMPORT: No validation errors detected'.
 
       *****************************************************************
-       4000-FINALIZE.
+      * Close all files and display final import statistics
       *****************************************************************
+       4000-FINALIZE.
            CLOSE EXPORT-INPUT
            CLOSE CUSTOMER-OUTPUT
            CLOSE ACCOUNT-OUTPUT
@@ -478,8 +505,9 @@
                    WS-UNKNOWN-RECORD-TYPE-COUNT.
 
       *****************************************************************
-       9999-ABEND-PROGRAM.
+      * Abnormal termination - calls LE abend routine
       *****************************************************************
+       9999-ABEND-PROGRAM.
            DISPLAY 'CBIMPORT: ABENDING PROGRAM'
            CALL 'CEE3ABD'.      
       *

@@ -363,6 +363,14 @@
          05  FILLER                                PIC X(1)                     
              OCCURS 1 TO 32767 TIMES DEPENDING ON EIBCALEN.                     
                                                                                 
+      * MAINLINE: Update credit card details. Multi-step workflow:
+      * 1) Accept account/card number and fetch current details
+      * 2) Allow user to edit name, status, expiry month/year
+      * 3) Validate all changes and detect what was modified
+      * 4) Show confirmation prompt (PF5 to save)
+      * 5) Lock record, verify no concurrent changes, then REWRITE
+      * Tracks old vs new values in WS-THIS-PROGCOMMAREA to detect
+      * changes and handle optimistic concurrency control.
        PROCEDURE DIVISION.                                                      
        0000-MAIN.                                                               
                                                                                 

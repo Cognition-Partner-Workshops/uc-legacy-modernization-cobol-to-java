@@ -31,6 +31,9 @@
        01 PARM-VALUE                      PIC X(8).
 
 
+      * Read wait duration (centiseconds) from SYSIN and call the
+      * MVSWAIT system routine to pause execution for that interval.
+      * Used as a batch utility to introduce delays between job steps.
        PROCEDURE DIVISION.                                              00040000
 
            ACCEPT PARM-VALUE      FROM SYSIN.

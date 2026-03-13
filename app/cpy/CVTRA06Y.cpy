@@ -1,5 +1,9 @@
       *****************************************************************         
-      *    Data-structure for DALYTRANsaction record (RECLN = 350)              
+      * Daily transaction record layout (DALYTRAN file, RECLN = 350).
+      * Same structure as CVTRA05Y (TRANSACT) but with DALYTRAN-
+      * prefix. Holds transactions from the daily feed before they
+      * are validated and posted to the TRANSACT master by
+      * CBTRN01C/02C batch programs.
       *****************************************************************         
        01  DALYTRAN-RECORD.                                                     
            05  DALYTRAN-ID                             PIC X(16).               

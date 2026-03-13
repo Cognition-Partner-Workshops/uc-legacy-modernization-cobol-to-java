@@ -94,6 +94,10 @@
 
       *----------------------------------------------------------------*
       *                       PROCEDURE DIVISION
+      * MAINLINE: Online bill payment screen. Accepts an account ID,
+      * looks up the account balance, and on confirmation creates a
+      * bill-payment transaction that zeroes out the current balance.
+      * Keys: ENTER = process, PF3 = back, PF4 = clear screen.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -149,7 +153,10 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Validate account ID input, read account balance, and on
+      * confirmation (Y): look up card via xref, generate next tran ID
+      * by reading last record backward, create a bill payment
+      * transaction, and update the account balance to zero.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 
@@ -244,7 +251,8 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      GET-CURRENT-TIMESTAMP
+      * Get current date/time from CICS and format as YYYY-MM-DD
+      * HH:MM:SS timestamp for transaction origination/processing.
       *----------------------------------------------------------------*
        GET-CURRENT-TIMESTAMP.
 
@@ -338,7 +346,8 @@
            MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF COBIL0AO.
 
       *----------------------------------------------------------------*
-      *                      READ-ACCTDAT-FILE
+      * Read account master record for UPDATE by account ID. Returns
+      * the account record with a lock for subsequent REWRITE.
       *----------------------------------------------------------------*
        READ-ACCTDAT-FILE.
 
@@ -372,7 +381,8 @@
            END-EVALUATE.
 
       *----------------------------------------------------------------*
-      *                      UPDATE-ACCTDAT-FILE
+      * Rewrite the account record (previously read for UPDATE) with
+      * the updated balance after bill payment deduction.
       *----------------------------------------------------------------*
        UPDATE-ACCTDAT-FILE.
 
@@ -403,7 +413,8 @@
            END-EVALUATE.
 
       *----------------------------------------------------------------*
-      *                      READ-CXACAIX-FILE
+      * Read card cross-reference by account ID (alternate index) to
+      * get the card number needed for the bill payment transaction.
       *----------------------------------------------------------------*
        READ-CXACAIX-FILE.
 
@@ -436,7 +447,8 @@
            END-EVALUATE.
 
       *----------------------------------------------------------------*
-      *                      STARTBR-TRANSACT-FILE
+      * Start browse on transaction file at HIGH-VALUES to position
+      * at the end for READPREV (find the last/highest tran ID).
       *----------------------------------------------------------------*
        STARTBR-TRANSACT-FILE.
 
@@ -467,7 +479,8 @@
            END-EVALUATE.
 
       *----------------------------------------------------------------*
-      *                      READPREV-TRANSACT-FILE
+      * Read the previous (last) transaction record to determine the
+      * highest existing transaction ID for generating the next one.
       *----------------------------------------------------------------*
        READPREV-TRANSACT-FILE.
 
@@ -505,7 +518,8 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      WRITE-TRANSACT-FILE
+      * Write the new bill payment transaction record. On success,
+      * display confirmation with the assigned transaction ID.
       *----------------------------------------------------------------*
        WRITE-TRANSACT-FILE.
 

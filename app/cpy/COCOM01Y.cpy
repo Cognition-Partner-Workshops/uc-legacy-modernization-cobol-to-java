@@ -16,6 +16,11 @@
       * either express or implied. See the License for the specific     
       * language governing permissions and limitations under the License
       ****************************************************************** 
+      * COMMAREA passed between all CardDemo CICS programs via
+      * XCTL/RETURN. Contains general navigation state (from/to
+      * program and transaction IDs), user identity and type
+      * (admin vs regular), program re-entry context, customer/
+      * account/card identifiers, and last-used map/mapset names.
        01 CARDDEMO-COMMAREA.
           05 CDEMO-GENERAL-INFO.
              10 CDEMO-FROM-TRANID             PIC X(04).

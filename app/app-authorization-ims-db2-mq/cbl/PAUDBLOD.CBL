@@ -165,6 +165,14 @@
                                                  PAUTBPCB.              01181056
       *                                          PGM-PCB-MASK.          01190028
       *----------------------------------------------------------------*01200026
+      * Batch IMS utility – loads the pending-authorization IMS
+      * database from two sequential input files previously created
+      * by PAUDBUNL.  Reads root segment records from INFILE1 and
+      * inserts them into PAUTSUM0 via ISRT.  Then reads child
+      * segment records from INFILE2 and inserts them as PAUTDTL1
+      * children using qualified SSAs.  Used for database restore
+      * or migration.
+      *----------------------------------------------------------------*
       *                                                                 01210026
        MAIN-PARA.                                                       01220026
       *     DISPLAY 'CHECK PROG PCB:' PAUTBPCB.                         01222039

@@ -123,6 +123,17 @@
 012000 LINKAGE SECTION.                                                 01230012
 012100                                                                  01240012
 012200 PROCEDURE DIVISION.                                              01250012
+      * CICS/MQ date-service program.  Listens on an MQ input queue
+      * for date-related requests.  For each request message:
+      *   1. Gets the next message from the request queue (MQGET)
+      *   2. Parses the request to determine the date operation
+      *      (e.g., date validation, format conversion, or
+      *      date arithmetic such as adding/subtracting days)
+      *   3. Performs the requested date calculation
+      *   4. Formats and puts the response on the reply queue (MQPUT)
+      * Processes messages in a loop until the queue is empty.
+      * Used as a shared date utility service for other CardDemo
+      * programs that need date operations via MQ messaging.
 012300                                                                  01260012
 012400 1000-CONTROL.                                                    01270012
 012500                                                                  01280012

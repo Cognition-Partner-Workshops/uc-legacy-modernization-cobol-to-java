@@ -1,5 +1,9 @@
       *****************************************************************         
-      *    Data-structure for disclosure group (RECLN = 50)                     
+      * Disclosure group record (DISCGRP file, RECLN = 50).
+      * Key: account group ID + transaction type + category code.
+      * Stores the interest rate applicable to a specific
+      * transaction category for an account group. Used by
+      * CBACT04C to look up rates during interest calculation.
       *****************************************************************         
        01  DIS-GROUP-RECORD.                                                    
            05  DIS-GROUP-KEY.                                                   

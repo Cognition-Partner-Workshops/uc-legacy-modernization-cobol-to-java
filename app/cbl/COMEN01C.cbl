@@ -70,6 +70,10 @@
 
       *----------------------------------------------------------------*
       *                       PROCEDURE DIVISION
+      * MAINLINE: Display the regular user main menu. On first entry,
+      * show the menu screen. On re-entry, handle user selection:
+      * ENTER = process selected option, PF3 = return to signon.
+      * Routes to the selected sub-program via XCTL with COMMAREA.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -110,7 +114,10 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Parse the option number from input, validate it is in range,
+      * check user-type restrictions (admin-only options blocked for
+      * regular users), then XCTL to the selected program. Handles
+      * 'DUMMY' (coming soon) and missing programs gracefully.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 
@@ -191,7 +198,7 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      RETURN-TO-SIGNON-SCREEN
+      * Transfer control back to signon program (COSGN00C) via XCTL.
       *----------------------------------------------------------------*
        RETURN-TO-SIGNON-SCREEN.
 
@@ -257,7 +264,9 @@
            MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF COMEN1AO.
 
       *----------------------------------------------------------------*
-      *                      BUILD-MENU-OPTIONS
+      * Loop through the menu option table (from COMEN02Y copybook)
+      * and format each option as 'NN. Description' into the
+      * corresponding screen output field (OPTN001O..OPTN012O).
       *----------------------------------------------------------------*
        BUILD-MENU-OPTIONS.
 

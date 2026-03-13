@@ -158,6 +158,12 @@
 
       *----------------------------------------------------------------*
       *                       PROCEDURE DIVISION
+      * MAINLINE: Online report submission screen. Accepts a report
+      * type (Monthly, Yearly, or Custom date range) and submits a
+      * batch JCL job via the CICS internal reader (INTRDR TDQ).
+      * The JCL invokes the TRANREPT procedure to generate a
+      * transaction detail report for the selected date range.
+      * Keys: ENTER = submit report, PF3 = return to menu.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -203,7 +209,11 @@
 
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Determine report type from user selection:
+      * - Monthly: auto-calculate current month start/end dates
+      * - Yearly: auto-calculate Jan 1 to Dec 31 of current year
+      * - Custom: validate user-entered start/end date fields
+      * Then call SUBMIT-JOB-TO-INTRDR to submit the batch job.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 

@@ -26,6 +26,8 @@
        ENVIRONMENT DIVISION.                                                    
        INPUT-OUTPUT SECTION.                                                    
        FILE-CONTROL.                                                            
+      *    Input: VSAM KSDS cross-reference file linking cards to
+      *    accounts and customers (indexed by card number)
            SELECT XREFFILE-FILE ASSIGN TO   XREFFILE                            
                   ORGANIZATION IS INDEXED                                       
                   ACCESS MODE  IS SEQUENTIAL                                    
@@ -33,7 +35,9 @@
                   FILE STATUS  IS XREFFILE-STATUS.                              
       *                                                                         
        DATA DIVISION.                                                           
-       FILE SECTION.                                                            
+       FILE SECTION.                                                           
+      *    Card cross-reference file - maps card numbers to account
+      *    and customer IDs
        FD  XREFFILE-FILE.                                                       
        01  FD-XREFFILE-REC.                                                     
            05 FD-XREF-CARD-NUM                  PIC X(16).                      
@@ -42,6 +46,7 @@
        WORKING-STORAGE SECTION.                                                 
                                                                                 
       *****************************************************************         
+      *    Include cross-reference record layout (CARD-XREF-RECORD)
        COPY CVACT03Y.                                                           
        01  XREFFILE-STATUS.                                                     
            05  XREFFILE-STAT1      PIC X.                                       
@@ -58,6 +63,7 @@
            05  IO-STATUS-0401      PIC 9   VALUE 0.                             
            05  IO-STATUS-0403      PIC 999 VALUE 0.                             
                                                                                 
+      *    Application return code: 0=OK, 12=error, 16=end-of-file
        01  APPL-RESULT             PIC S9(9)   COMP.                            
            88  APPL-AOK            VALUE 0.                                     
            88  APPL-EOF            VALUE 16.                                    
@@ -66,6 +72,9 @@
        01  ABCODE                  PIC S9(9) BINARY.                            
        01  TIMING                  PIC S9(9) BINARY.                            
                                                                                 
+      *****************************************************************         
+      * MAINLINE: Opens the cross-reference file, reads each record
+      * sequentially, displays it to SYSOUT, then closes the file.
       *****************************************************************         
        PROCEDURE DIVISION.                                                      
            DISPLAY 'START OF EXECUTION OF PROGRAM CBACT03C'.                    
@@ -88,6 +97,9 @@
                                                                                 
       *****************************************************************         
       * I/O ROUTINES TO ACCESS A KSDS, VSAM DATA SET...               *         
+      *****************************************************************         
+      * Read next cross-reference record from the VSAM file.
+      * Status 00 = success, 10 = EOF, other = error/abend.
       *****************************************************************         
        1000-XREFFILE-GET-NEXT.                                                  
            READ XREFFILE-FILE INTO CARD-XREF-RECORD.                            
@@ -115,6 +127,8 @@
            END-IF                                                               
            EXIT.                                                                
       *---------------------------------------------------------------*         
+      * Open the indexed cross-reference file for sequential reading
+      *---------------------------------------------------------------*         
        0000-XREFFILE-OPEN.                                                      
            MOVE 8 TO APPL-RESULT.                                               
            OPEN INPUT XREFFILE-FILE                                             
@@ -132,6 +146,8 @@
                PERFORM 9999-ABEND-PROGRAM                                       
            END-IF                                                               
            EXIT.                                                                
+      *---------------------------------------------------------------*         
+      * Close the cross-reference file after all records are read
       *---------------------------------------------------------------*         
        9000-XREFFILE-CLOSE.                                                     
            ADD 8 TO ZERO GIVING APPL-RESULT.                                    
@@ -151,12 +167,16 @@
            END-IF                                                               
            EXIT.                                                                
                                                                                 
+      * Abnormal termination - calls LE abend routine CEE3ABD
        9999-ABEND-PROGRAM.                                                      
            DISPLAY 'ABENDING PROGRAM'                                           
            MOVE 0 TO TIMING                                                     
            MOVE 999 TO ABCODE                                                   
            CALL 'CEE3ABD' USING ABCODE, TIMING.                                 
-                                                                                
+                                                                               
+      *****************************************************************         
+      * Translate file status bytes to a 4-digit displayable code.
+      * Handles both numeric and non-numeric (binary) status values.
       *****************************************************************         
        9910-DISPLAY-IO-STATUS.                                                  
            IF  IO-STATUS NOT NUMERIC                                            

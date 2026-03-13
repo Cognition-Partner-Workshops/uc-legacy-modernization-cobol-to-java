@@ -26,35 +26,36 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
+      *    Input: Daily transaction feed (sequential flat file)
            SELECT DALYTRAN-FILE ASSIGN TO DALYTRAN
                   ORGANIZATION IS SEQUENTIAL
                   ACCESS MODE  IS SEQUENTIAL
                   FILE STATUS  IS DALYTRAN-STATUS.
-
+      *    Input: Customer master - random lookup to verify customer
            SELECT CUSTOMER-FILE ASSIGN TO   CUSTFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS RANDOM
                   RECORD KEY   IS FD-CUST-ID
                   FILE STATUS  IS CUSTFILE-STATUS.
-
+      *    Input: Card-to-account cross-reference - verify card number
            SELECT XREF-FILE ASSIGN TO   XREFFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS RANDOM
                   RECORD KEY   IS FD-XREF-CARD-NUM
                   FILE STATUS  IS XREFFILE-STATUS.
-
+      *    Input: Card master - verify card is valid
            SELECT CARD-FILE ASSIGN TO   CARDFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS RANDOM
                   RECORD KEY   IS FD-CARD-NUM
                   FILE STATUS  IS CARDFILE-STATUS.
-
+      *    Input: Account master - look up account for the card
            SELECT ACCOUNT-FILE ASSIGN TO   ACCTFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS RANDOM
                   RECORD KEY   IS FD-ACCT-ID
                   FILE STATUS  IS ACCTFILE-STATUS.
-
+      *    Input: Posted transaction file - for reference lookups
            SELECT TRANSACT-FILE ASSIGN TO   TRANFILE
                   ORGANIZATION IS INDEXED
                   ACCESS MODE  IS RANDOM
@@ -96,31 +97,37 @@
        WORKING-STORAGE SECTION.
 
       *****************************************************************
+      *    Include daily transaction record layout
        COPY CVTRA06Y.
        01  DALYTRAN-STATUS.
            05  DALYTRAN-STAT1      PIC X.
            05  DALYTRAN-STAT2      PIC X.
 
+      *    Include customer record layout
        COPY CVCUS01Y.
        01  CUSTFILE-STATUS.
            05  CUSTFILE-STAT1      PIC X.
            05  CUSTFILE-STAT2      PIC X.
 
+      *    Include cross-reference record layout
        COPY CVACT03Y.
        01  XREFFILE-STATUS.
            05  XREFFILE-STAT1      PIC X.
            05  XREFFILE-STAT2      PIC X.
 
+      *    Include card record layout
        COPY CVACT02Y.
        01  CARDFILE-STATUS.
            05  CARDFILE-STAT1      PIC X.
            05  CARDFILE-STAT2      PIC X.
 
+      *    Include account record layout
        COPY CVACT01Y.
        01  ACCTFILE-STATUS.
            05  ACCTFILE-STAT1      PIC X.
            05  ACCTFILE-STAT2      PIC X.
 
+      *    Include posted transaction record layout
        COPY CVTRA05Y.
        01  TRANFILE-STATUS.
            05  TRANFILE-STAT1      PIC X.
@@ -139,6 +146,7 @@
            05  IO-STATUS-0401      PIC 9   VALUE 0.
            05  IO-STATUS-0403      PIC 999 VALUE 0.
 
+      *    Application return code: 0=OK, 12=error, 16=end-of-file
        01  APPL-RESULT             PIC S9(9)   COMP.
            88  APPL-AOK            VALUE 0.
            88  APPL-EOF            VALUE 16.
@@ -150,6 +158,11 @@
            05 WS-XREF-READ-STATUS  PIC 9(04).
            05 WS-ACCT-READ-STATUS  PIC 9(04).
 
+      *****************************************************************
+      * MAINLINE: Read daily transaction file sequentially. For each
+      * transaction, verify the card number via cross-reference lookup
+      * and then read the associated account. This is a read-only
+      * validation pass (version 1) - does not post transactions.
       *****************************************************************
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -197,7 +210,8 @@
            GOBACK.
 
       *****************************************************************
-      * READS FILE                                                    *
+      * Read next daily transaction record sequentially.
+      * Status 00=OK, 10=EOF, other=error/abend.
       *****************************************************************
        1000-DALYTRAN-GET-NEXT.
            READ DALYTRAN-FILE INTO DALYTRAN-RECORD.
@@ -224,6 +238,7 @@
            END-IF
            EXIT.
       *---------------------------------------------------------------*
+      * Look up card number in cross-reference file to get account ID
        2000-LOOKUP-XREF.
            MOVE XREF-CARD-NUM TO FD-XREF-CARD-NUM
            READ XREF-FILE  RECORD INTO CARD-XREF-RECORD
@@ -238,6 +253,7 @@
                   DISPLAY 'CUSTOMER ID: ' XREF-CUST-ID
            END-READ.
       *---------------------------------------------------------------*
+      * Read account master record by account ID
        3000-READ-ACCOUNT.
            MOVE ACCT-ID TO FD-ACCT-ID
            READ ACCOUNT-FILE RECORD INTO ACCOUNT-RECORD
@@ -249,6 +265,7 @@
                   DISPLAY 'SUCCESSFUL READ OF ACCOUNT FILE'
            END-READ.
       *---------------------------------------------------------------*
+      * Open daily transaction file for sequential input
        0000-DALYTRAN-OPEN.
            MOVE 8 TO APPL-RESULT.
            OPEN INPUT DALYTRAN-FILE
@@ -268,6 +285,7 @@
            EXIT.
 
       *---------------------------------------------------------------*
+      * Open customer file for random key access
        0100-CUSTFILE-OPEN.
            MOVE 8 TO APPL-RESULT.
            OPEN INPUT CUSTOMER-FILE
@@ -286,6 +304,7 @@
            END-IF
            EXIT.
       *---------------------------------------------------------------*
+      * Open cross-reference file for random key access
        0200-XREFFILE-OPEN.
            MOVE 8 TO APPL-RESULT.
            OPEN INPUT XREF-FILE
@@ -304,6 +323,7 @@
            END-IF
            EXIT.
       *---------------------------------------------------------------*
+      * Open card master file for random key access
        0300-CARDFILE-OPEN.
            MOVE 8 TO APPL-RESULT.
            OPEN INPUT CARD-FILE
@@ -322,6 +342,7 @@
            END-IF
            EXIT.
       *---------------------------------------------------------------*
+      * Open account master file for random key access
        0400-ACCTFILE-OPEN.
            MOVE 8 TO APPL-RESULT.
            OPEN INPUT ACCOUNT-FILE
@@ -340,6 +361,7 @@
            END-IF
            EXIT.
       *---------------------------------------------------------------*
+      * Open posted transaction file for random key access
        0500-TRANFILE-OPEN.
            MOVE 8 TO APPL-RESULT.
            OPEN INPUT TRANSACT-FILE
@@ -466,12 +488,15 @@
            END-IF
            EXIT.
 
+      * Abnormal termination - calls LE abend routine CEE3ABD
        Z-ABEND-PROGRAM.
            DISPLAY 'ABENDING PROGRAM'
            MOVE 0 TO TIMING
            MOVE 999 TO ABCODE
            CALL 'CEE3ABD' USING ABCODE, TIMING.
 
+      *****************************************************************
+      * Translate file status bytes to a 4-digit displayable code
       *****************************************************************
        Z-DISPLAY-IO-STATUS.
            IF  IO-STATUS NOT NUMERIC

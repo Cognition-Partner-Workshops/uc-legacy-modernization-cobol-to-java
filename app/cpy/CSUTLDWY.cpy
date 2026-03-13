@@ -1,5 +1,10 @@
       ******************************************************************
-      *Working Storage Copybook for DATE related code
+      * Working Storage Copybook for DATE related code.
+      * Defines the date field being validated (CCYYMMDD with
+      * individual CC, YY, MM, DD sub-fields), validation flags
+      * for year/month/day, current-date work area, and the
+      * result structure returned by CSUTLDTC date validation.
+      * Companion to CSUTLDPY.cpy (Procedure Division logic).
       ******************************************************************
            10 WS-EDIT-DATE-CCYYMMDD.
               20 WS-EDIT-DATE-CCYY.

@@ -85,6 +85,16 @@
           01 LS-DATE-FORMAT  PIC X(10).                                         
           01 LS-RESULT       PIC X(80).                                         
                                                                                 
+      * Date validation utility subroutine. Called by online and
+      * batch programs to verify a date string is valid.
+      * Input:  LS-DATE (10-char date), LS-DATE-FORMAT (mask,
+      *         e.g. 'YYYYMMDD' or 'YYYY-MM-DD').
+      * Output: LS-RESULT (80-char message with severity code,
+      *         message number, result text, tested date, and mask).
+      * Uses IBM Language Environment CEEDAYS API to convert the
+      * date to a Lillian day number. If CEEDAYS returns severity
+      * 0, the date is valid; otherwise the feedback code is
+      * translated to a human-readable error in WS-RESULT.
        PROCEDURE DIVISION USING LS-DATE, LS-DATE-FORMAT, LS-RESULT.             
            
            INITIALIZE WS-MESSAGE
@@ -100,6 +110,8 @@
            EXIT PROGRAM                                                         
       *    GOBACK                                                               
            .                                                                    
+      * Prepare CEEDAYS vstring inputs, call CEEDAYS, then
+      * translate the feedback code into a result message.
        A000-MAIN.                                                               
                                                                                 
            MOVE LENGTH OF LS-DATE                                               

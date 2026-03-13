@@ -77,6 +77,13 @@
 
       *----------------------------------------------------------------*
       *                       PROCEDURE DIVISION
+      * MAINLINE: Update an existing user in the USRSEC file.
+      * Accepts a user ID (either typed or passed from user list),
+      * reads the current record, displays it for editing, and on
+      * PF5 saves changes. Detects which fields actually changed
+      * before performing the REWRITE.
+      * Keys: ENTER = look up, PF3 = save and back, PF4 = clear,
+      * PF5 = save changes, PF12 = back without saving.
       *----------------------------------------------------------------*
        PROCEDURE DIVISION.
        MAIN-PARA.
@@ -138,7 +145,8 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *                      PROCESS-ENTER-KEY
+      * Validate user ID is non-blank, read the user record for
+      * UPDATE, and populate screen fields with current values.
       *----------------------------------------------------------------*
        PROCESS-ENTER-KEY.
 
@@ -172,7 +180,10 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *                      UPDATE-USER-INFO
+      * Compare screen fields against the existing record to detect
+      * changes in first name, last name, password, or user type.
+      * If any field changed, perform REWRITE; otherwise prompt
+      * 'Please modify to update'.
       *----------------------------------------------------------------*
        UPDATE-USER-INFO.
 
@@ -315,7 +326,8 @@
            MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF COUSR2AO.
 
       *----------------------------------------------------------------*
-      *                      READ-USER-SEC-FILE
+      * Read user record for UPDATE (locks the record). On success,
+      * prompt to press PF5 to save. On NOTFND, display error.
       *----------------------------------------------------------------*
        READ-USER-SEC-FILE.
 
@@ -353,7 +365,8 @@
            END-EVALUATE.
 
       *----------------------------------------------------------------*
-      *                      UPDATE-USER-SEC-FILE
+      * REWRITE the previously locked user record with updated
+      * field values. Display success or error message.
       *----------------------------------------------------------------*
        UPDATE-USER-SEC-FILE.
 

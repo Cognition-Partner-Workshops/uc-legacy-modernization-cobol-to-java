@@ -153,6 +153,14 @@
        PROCEDURE DIVISION                  USING PAUTBPCB.              01180028
       *                                          PGM-PCB-MASK.          01190028
       *----------------------------------------------------------------*01200026
+      * Batch IMS utility – unloads the pending-authorization IMS
+      * database to two sequential output files.  Reads each root
+      * segment (PAUTSUM0) via GN call and writes it to OPFILE1.
+      * For each root, reads all child detail segments (PAUTDTL1)
+      * via GNP and writes them to OPFILE2 keyed by the parent
+      * account ID.  The output files can later be reloaded by
+      * PAUDBLOD.  Used for database backup or migration.
+      *----------------------------------------------------------------*
       *                                                                 01210026
        MAIN-PARA.                                                       01220026
             ENTRY 'DLITCBL'                 USING PAUTBPCB.             01225033
