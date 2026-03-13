@@ -1,0 +1,68 @@
+{
+  "_metadata": {
+    "source_file": "trantype.txt",
+    "copybook": "",
+    "record_name": "TRAN-TYPE-RECORD",
+    "record_length": 60,
+    "record_count": 7,
+    "fields": [
+      {
+        "name": "TRAN-TYPE",
+        "pic_type": "X(02)",
+        "offset": 0,
+        "length": 2,
+        "decimal_places": 0,
+        "is_signed": false,
+        "is_filler": false
+      },
+      {
+        "name": "TRAN-TYPE-DESC",
+        "pic_type": "X(50)",
+        "offset": 2,
+        "length": 50,
+        "decimal_places": 0,
+        "is_signed": false,
+        "is_filler": false
+      },
+      {
+        "name": "FILLER",
+        "pic_type": "X(08)",
+        "offset": 52,
+        "length": 8,
+        "decimal_places": 0,
+        "is_signed": false,
+        "is_filler": true
+      }
+    ]
+  },
+  "records": [
+    {
+      "TRAN-TYPE": "01",
+      "TRAN-TYPE-DESC": "Purchase"
+    },
+    {
+      "TRAN-TYPE": "02",
+      "TRAN-TYPE-DESC": "Payment"
+    },
+    {
+      "TRAN-TYPE": "03",
+      "TRAN-TYPE-DESC": "Credit"
+    },
+    {
+      "TRAN-TYPE": "04",
+      "TRAN-TYPE-DESC": "Authorization"
+    },
+    {
+      "TRAN-TYPE": "05",
+      "TRAN-TYPE-DESC": "Refund"
+    },
+    {
+      "TRAN-TYPE": "06",
+      "TRAN-TYPE-DESC": "Reversal"
+    },
+    {
+      "TRAN-TYPE": "07",
+      "TRAN-TYPE-DESC": "Adjustment"
+    }
+  ]
+}
