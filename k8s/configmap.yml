@@ -1,0 +1,30 @@
+# ============================================================
+# CardDemo ConfigMap - Application Configuration
+# Replaces mainframe JCL PARM values and CICS SIT parameters
+# ============================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: carddemo-config
+  namespace: carddemo
+  labels:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/component: config
+data:
+  # Cassandra settings (replaces VSAM KSDS configuration)
+  CASSANDRA_CONTACT_POINTS: "carddemo-cassandra.carddemo.svc.cluster.local"
+  CASSANDRA_PORT: "9042"
+  CASSANDRA_DATACENTER: "datacenter1"
+  CASSANDRA_KEYSPACE: "carddemo"
+
+  # JDBC settings (replaces DB2 subsystem configuration)
+  JDBC_URL: "jdbc:postgresql://carddemo-postgres.carddemo.svc.cluster.local:5432/carddemo"
+  JDBC_DRIVER: "org.postgresql.Driver"
+
+  # Application settings
+  SERVER_PORT: "8080"
+  H2_CONSOLE_ENABLED: "false"
+  SPRING_PROFILES_ACTIVE: "kubernetes"
+
+  # Logging
+  LOG_LEVEL: "INFO"

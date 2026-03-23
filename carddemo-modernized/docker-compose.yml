@@ -1,0 +1,96 @@
+# ============================================================
+# CardDemo Modernized - Docker Compose
+# Full stack: Application + Cassandra + PostgreSQL (JDBC/ODBC)
+# ============================================================
+
+version: '3.8'
+
+services:
+  # --------------------------------------------------------
+  # Cassandra - Replaces VSAM KSDS data storage
+  # --------------------------------------------------------
+  cassandra:
+    image: cassandra:4.1
+    container_name: carddemo-cassandra
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=CardDemoCluster
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=128M
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'describe cluster'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    networks:
+      - carddemo-network
+
+  # --------------------------------------------------------
+  # PostgreSQL - Replaces DB2 relational database (JDBC/ODBC)
+  # --------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: carddemo-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: carddemo
+      POSTGRES_USER: carddemo
+      POSTGRES_PASSWORD: carddemo_secret
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carddemo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carddemo-network
+
+  # --------------------------------------------------------
+  # CardDemo Application - Modernized Reactive Java
+  # --------------------------------------------------------
+  carddemo-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carddemo-app
+    ports:
+      - "8080:8080"
+    environment:
+      # Cassandra configuration (replaces VSAM)
+      CASSANDRA_CONTACT_POINTS: cassandra
+      CASSANDRA_PORT: 9042
+      CASSANDRA_DATACENTER: datacenter1
+      CASSANDRA_USERNAME: cassandra
+      CASSANDRA_PASSWORD: cassandra
+      # JDBC configuration (replaces DB2)
+      JDBC_URL: jdbc:postgresql://postgres:5432/carddemo
+      JDBC_USERNAME: carddemo
+      JDBC_PASSWORD: carddemo_secret
+      JDBC_DRIVER: org.postgresql.Driver
+      # Application settings
+      SERVER_PORT: 8080
+      H2_CONSOLE_ENABLED: "false"
+    depends_on:
+      cassandra:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - carddemo-network
+
+volumes:
+  cassandra-data:
+    driver: local
+  postgres-data:
+    driver: local
+
+networks:
+  carddemo-network:
+    driver: bridge

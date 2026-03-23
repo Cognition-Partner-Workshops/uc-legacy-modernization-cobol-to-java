@@ -1,0 +1,30 @@
+# ============================================================
+# CardDemo Ingress - External Access Configuration
+# Replaces mainframe TN3270 terminal access and VTAM definitions
+# ============================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: carddemo-ingress
+  namespace: carddemo
+  labels:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/component: ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: carddemo.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: carddemo-service
+                port:
+                  number: 80

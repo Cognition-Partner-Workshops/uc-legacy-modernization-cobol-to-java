@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: carddemo
+  labels:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/part-of: carddemo-modernized
+    modernization: cobol-to-java

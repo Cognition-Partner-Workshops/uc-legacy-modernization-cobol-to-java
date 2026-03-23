@@ -1,0 +1,85 @@
+# ============================================================
+# PostgreSQL StatefulSet - Relational Database (JDBC/ODBC)
+# Replaces DB2 subsystem from the legacy mainframe
+# ============================================================
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: carddemo-postgres
+  namespace: carddemo
+  labels:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/component: postgres
+spec:
+  serviceName: carddemo-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: carddemo
+      app.kubernetes.io/component: postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: carddemo
+        app.kubernetes.io/component: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              value: "carddemo"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: carddemo-secrets
+                  key: JDBC_USERNAME
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: carddemo-secrets
+                  key: JDBC_PASSWORD
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "carddemo"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: carddemo-postgres
+  namespace: carddemo
+  labels:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/component: postgres
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/component: postgres
+  ports:
+    - port: 5432
+      targetPort: postgres
+      name: postgres

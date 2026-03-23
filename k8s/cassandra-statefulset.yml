@@ -1,0 +1,82 @@
+# ============================================================
+# Cassandra StatefulSet - NoSQL Data Store
+# Replaces VSAM KSDS data storage from the legacy mainframe
+# ============================================================
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: carddemo-cassandra
+  namespace: carddemo
+  labels:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/component: cassandra
+spec:
+  serviceName: carddemo-cassandra
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: carddemo
+      app.kubernetes.io/component: cassandra
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: carddemo
+        app.kubernetes.io/component: cassandra
+    spec:
+      containers:
+        - name: cassandra
+          image: cassandra:4.1
+          ports:
+            - containerPort: 9042
+              name: cql
+          env:
+            - name: CASSANDRA_CLUSTER_NAME
+              value: "CardDemoCluster"
+            - name: CASSANDRA_DC
+              value: "datacenter1"
+            - name: MAX_HEAP_SIZE
+              value: "512M"
+            - name: HEAP_NEWSIZE
+              value: "128M"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          volumeMounts:
+            - name: cassandra-data
+              mountPath: /var/lib/cassandra
+          readinessProbe:
+            exec:
+              command: ["cqlsh", "-e", "describe cluster"]
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: cassandra-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: carddemo-cassandra
+  namespace: carddemo
+  labels:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/component: cassandra
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/component: cassandra
+  ports:
+    - port: 9042
+      targetPort: cql
+      name: cql

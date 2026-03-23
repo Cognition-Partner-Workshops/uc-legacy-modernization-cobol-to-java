@@ -1,0 +1,22 @@
+# ============================================================
+# CardDemo Service - Network Configuration
+# Replaces mainframe TCP/IP listener and CICS socket definition
+# ============================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: carddemo-service
+  namespace: carddemo
+  labels:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/component: application
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: carddemo
+    app.kubernetes.io/component: application
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

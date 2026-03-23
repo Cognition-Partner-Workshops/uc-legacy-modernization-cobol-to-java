@@ -1,0 +1,87 @@
+spring:
+  application:
+    name: carddemo-modernized
+
+  # ============================================================
+  # Reactive Cassandra Configuration
+  # Replaces VSAM KSDS data storage from legacy mainframe
+  # ============================================================
+  cassandra:
+    keyspace-name: carddemo
+    contact-points: ${CASSANDRA_CONTACT_POINTS:localhost}
+    port: ${CASSANDRA_PORT:9042}
+    local-datacenter: ${CASSANDRA_DATACENTER:datacenter1}
+    schema-action: CREATE_IF_NOT_EXISTS
+    username: ${CASSANDRA_USERNAME:cassandra}
+    password: ${CASSANDRA_PASSWORD:cassandra}
+
+  # ============================================================
+  # JDBC/ODBC Relational Database Configuration
+  # Replaces DB2 integration from legacy mainframe
+  # Supports JDBC (direct) and ODBC (via JDBC-ODBC bridge)
+  # ============================================================
+  datasource:
+    url: ${JDBC_URL:jdbc:h2:mem:carddemo;DB_CLOSE_DELAY=-1}
+    username: ${JDBC_USERNAME:sa}
+    password: ${JDBC_PASSWORD:}
+    driver-class-name: ${JDBC_DRIVER:org.h2.Driver}
+    # For ODBC connectivity, use a JDBC-ODBC bridge driver:
+    # driver-class-name: sun.jdbc.odbc.JdbcOdbcDriver
+    # url: jdbc:odbc:CardDemoDSN
+    # For PostgreSQL production:
+    # driver-class-name: org.postgresql.Driver
+    # url: jdbc:postgresql://localhost:5432/carddemo
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+  h2:
+    console:
+      enabled: ${H2_CONSOLE_ENABLED:true}
+      path: /h2-console
+
+# ============================================================
+# Server Configuration
+# ============================================================
+server:
+  port: ${SERVER_PORT:8080}
+
+# ============================================================
+# Actuator Configuration (for Kubernetes probes)
+# ============================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+# ============================================================
+# Application Configuration
+# ============================================================
+carddemo:
+  security:
+    jwt-secret: ${JWT_SECRET:CardDemoSecretKeyForJWTTokenGenerationMustBeAtLeast256Bits}
+    jwt-expiration-ms: ${JWT_EXPIRATION:3600000}
+  pagination:
+    default-page-size: 10
+
+# ============================================================
+# Logging
+# ============================================================
+logging:
+  level:
+    com.carddemo: DEBUG
+    org.springframework.data.cassandra: INFO
+    org.springframework.jdbc: INFO
