@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Bill Payment</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        .form-group { margin: 15px 0; }
+        label { display: block; color: #ffff00; margin-bottom: 3px; }
+        input { width: 100%; padding: 8px; font-family: 'Courier New', monospace; background-color: #000000; color: #00ff00; border: 1px solid #00ff00; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; margin-top: 15px; font-family: 'Courier New', monospace; background-color: #004400; color: #00ff00; border: 1px solid #00ff00; cursor: pointer; }
+        a { color: #00ff00; text-decoration: none; }
+        .nav { margin-bottom: 20px; }
+        .error { color: #ff0000; text-align: center; margin: 10px 0; }
+        .message { color: #ffff00; text-align: center; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/menu}">&lt; Back to Main Menu</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>BILL PAYMENT</h2>
+        <div class="error" th:if="${error}" th:text="${error}"></div>
+        <div class="message" th:if="${message}" th:text="${message}"></div>
+        <form th:action="@{/billpay}" method="post" th:object="${paymentRequest}">
+            <div class="form-group">
+                <label>Account ID:</label>
+                <input type="text" th:field="*{acctId}" maxlength="11" required>
+            </div>
+            <div class="form-group">
+                <label>Payment Amount ($):</label>
+                <input type="number" step="0.01" min="0.01" th:field="*{amount}" required>
+            </div>
+            <button type="submit">PROCESS PAYMENT</button>
+        </form>
+    </div>
+</body>
+</html>

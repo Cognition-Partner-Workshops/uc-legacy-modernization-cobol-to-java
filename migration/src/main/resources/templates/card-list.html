@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Card List</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 8px; text-align: left; border: 1px solid #00ff00; }
+        th { background-color: #004400; color: #ffffff; }
+        a { color: #00ff00; text-decoration: none; }
+        a:hover { color: #ffffff; }
+        .nav { margin-bottom: 20px; }
+        .search { margin-bottom: 15px; }
+        .search input { padding: 6px; font-family: 'Courier New', monospace; background-color: #000000; color: #00ff00; border: 1px solid #00ff00; }
+        .search button { padding: 6px 15px; font-family: 'Courier New', monospace; background-color: #004400; color: #00ff00; border: 1px solid #00ff00; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/menu}">&lt; Back to Main Menu</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>CARD LIST</h2>
+        <div class="search">
+            <form th:action="@{/cards}" method="get">
+                <label>Account ID: </label>
+                <input type="text" name="acctId" th:value="${acctId}" maxlength="11">
+                <button type="submit">SEARCH</button>
+                <a th:href="@{/cards}">Show All</a>
+            </form>
+        </div>
+        <table>
+            <thead>
+                <tr><th>Card Number</th><th>Account ID</th><th>Embossed Name</th><th>Expiration</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="card : ${cards}">
+                    <td><a th:href="@{/cards/{num}(num=${card.cardNum})}" th:text="${card.cardNum}"></a></td>
+                    <td><a th:href="@{/accounts/{id}(id=${card.acctId})}" th:text="${card.acctId}"></a></td>
+                    <td th:text="${card.embossedName}"></td>
+                    <td th:text="${card.expirationDate}"></td>
+                    <td th:text="${card.activeStatus}"></td>
+                    <td><a th:href="@{/cards/{num}/edit(num=${card.cardNum})}">Edit</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

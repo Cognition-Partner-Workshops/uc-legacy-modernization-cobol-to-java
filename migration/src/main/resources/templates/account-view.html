@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Account View</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 8px; text-align: left; border: 1px solid #00ff00; }
+        th { background-color: #004400; color: #ffffff; }
+        a { color: #00ff00; text-decoration: none; }
+        a:hover { color: #ffffff; }
+        .nav { margin-bottom: 20px; }
+        .detail { margin: 10px 0; }
+        .detail label { color: #ffff00; display: inline-block; width: 200px; }
+        .message { color: #ffff00; text-align: center; }
+        .pagination { text-align: center; margin-top: 15px; }
+        .pagination a { margin: 0 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/menu}">&lt; Back to Main Menu</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>ACCOUNT VIEW</h2>
+        <div class="message" th:if="${message}" th:text="${message}"></div>
+
+        <!-- Single Account View -->
+        <div th:if="${account != null}">
+            <div class="detail"><label>Account ID:</label><span th:text="${account.acctId}"></span></div>
+            <div class="detail"><label>Status:</label><span th:text="${account.activeStatus}"></span></div>
+            <div class="detail"><label>Current Balance:</label><span th:text="${#numbers.formatDecimal(account.currentBalance, 1, 2)}"></span></div>
+            <div class="detail"><label>Credit Limit:</label><span th:text="${#numbers.formatDecimal(account.creditLimit, 1, 2)}"></span></div>
+            <div class="detail"><label>Cash Credit Limit:</label><span th:text="${#numbers.formatDecimal(account.cashCreditLimit, 1, 2)}"></span></div>
+            <div class="detail"><label>Open Date:</label><span th:text="${account.openDate}"></span></div>
+            <div class="detail"><label>Expiration Date:</label><span th:text="${account.expirationDate}"></span></div>
+            <div class="detail"><label>Reissue Date:</label><span th:text="${account.reissueDate}"></span></div>
+            <div class="detail"><label>Current Cycle Credit:</label><span th:text="${#numbers.formatDecimal(account.currentCycleCredit, 1, 2)}"></span></div>
+            <div class="detail"><label>Current Cycle Debit:</label><span th:text="${#numbers.formatDecimal(account.currentCycleDebit, 1, 2)}"></span></div>
+            <div class="detail"><label>Group ID:</label><span th:text="${account.groupId}"></span></div>
+            <p><a th:href="@{/accounts/{id}/edit(id=${account.acctId})}">Edit Account</a> |
+               <a th:href="@{/cards(acctId=${account.acctId})}">View Cards</a> |
+               <a th:href="@{/transactions(acctId=${account.acctId})}">View Transactions</a></p>
+        </div>
+
+        <!-- Account List -->
+        <div th:if="${accounts != null}">
+            <table>
+                <thead>
+                    <tr><th>Account ID</th><th>Status</th><th>Balance</th><th>Credit Limit</th><th>Expiration</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="acct : ${accounts.content}">
+                        <td><a th:href="@{/accounts/{id}(id=${acct.acctId})}" th:text="${acct.acctId}"></a></td>
+                        <td th:text="${acct.activeStatus}"></td>
+                        <td th:text="${#numbers.formatDecimal(acct.currentBalance, 1, 2)}"></td>
+                        <td th:text="${#numbers.formatDecimal(acct.creditLimit, 1, 2)}"></td>
+                        <td th:text="${acct.expirationDate}"></td>
+                        <td><a th:href="@{/accounts/{id}/edit(id=${acct.acctId})}">Edit</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination" th:if="${accounts.totalPages > 1}">
+                <a th:if="${accounts.number > 0}" th:href="@{/accounts(page=${accounts.number - 1})}">&lt; Prev</a>
+                <span th:text="'Page ' + (${accounts.number} + 1) + ' of ' + ${accounts.totalPages}"></span>
+                <a th:if="${accounts.number < accounts.totalPages - 1}" th:href="@{/accounts(page=${accounts.number + 1})}">Next &gt;</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

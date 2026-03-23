@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Transaction Detail</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        .detail { margin: 10px 0; }
+        .detail label { color: #ffff00; display: inline-block; width: 200px; }
+        a { color: #00ff00; text-decoration: none; }
+        a:hover { color: #ffffff; }
+        .nav { margin-bottom: 20px; }
+        .message { color: #ffff00; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/transactions}">&lt; Back to Transaction List</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>TRANSACTION DETAIL</h2>
+        <div class="message" th:if="${message}" th:text="${message}"></div>
+        <div class="detail"><label>Transaction ID:</label><span th:text="${transaction.tranId}"></span></div>
+        <div class="detail"><label>Type Code:</label><span th:text="${transaction.typeCd}"></span></div>
+        <div class="detail"><label>Category Code:</label><span th:text="${transaction.catCd}"></span></div>
+        <div class="detail"><label>Source:</label><span th:text="${transaction.source}"></span></div>
+        <div class="detail"><label>Description:</label><span th:text="${transaction.description}"></span></div>
+        <div class="detail"><label>Amount:</label><span th:text="${#numbers.formatDecimal(transaction.amount, 1, 2)}"></span></div>
+        <div class="detail"><label>Merchant ID:</label><span th:text="${transaction.merchantId}"></span></div>
+        <div class="detail"><label>Merchant Name:</label><span th:text="${transaction.merchantName}"></span></div>
+        <div class="detail"><label>Merchant City:</label><span th:text="${transaction.merchantCity}"></span></div>
+        <div class="detail"><label>Merchant Zip:</label><span th:text="${transaction.merchantZip}"></span></div>
+        <div class="detail"><label>Card Number:</label><span th:text="${transaction.cardNum}"></span></div>
+        <div class="detail"><label>Original Timestamp:</label><span th:text="${transaction.origTimestamp}"></span></div>
+        <div class="detail"><label>Processed Timestamp:</label><span th:text="${transaction.procTimestamp}"></span></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Card Update</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        .form-group { margin: 10px 0; }
+        label { display: block; color: #ffff00; margin-bottom: 3px; }
+        input, select { width: 100%; padding: 6px; font-family: 'Courier New', monospace; background-color: #000000; color: #00ff00; border: 1px solid #00ff00; box-sizing: border-box; }
+        button { padding: 10px 20px; margin: 15px 5px 0 0; font-family: 'Courier New', monospace; background-color: #004400; color: #00ff00; border: 1px solid #00ff00; cursor: pointer; }
+        a { color: #00ff00; text-decoration: none; }
+        .nav { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/cards/{num}(num=${card.cardNum})}">&lt; Back to Card Detail</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>CARD UPDATE</h2>
+        <p>Card Number: <span th:text="${card.cardNum}"></span></p>
+        <form th:action="@{/cards/{num}/edit(num=${card.cardNum})}" method="post" th:object="${updateRequest}">
+            <div class="form-group">
+                <label>Embossed Name:</label>
+                <input type="text" th:field="*{embossedName}" th:placeholder="${card.embossedName}" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>Expiration Date:</label>
+                <input type="date" th:field="*{expirationDate}">
+            </div>
+            <div class="form-group">
+                <label>Active Status (Y/N):</label>
+                <input type="text" th:field="*{activeStatus}" th:placeholder="${card.activeStatus}" maxlength="1">
+            </div>
+            <button type="submit">UPDATE</button>
+            <button type="button" onclick="history.back()">CANCEL</button>
+        </form>
+    </div>
+</body>
+</html>

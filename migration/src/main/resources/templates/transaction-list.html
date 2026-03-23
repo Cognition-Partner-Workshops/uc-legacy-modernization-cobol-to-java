@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Transaction List</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+        th, td { padding: 6px; text-align: left; border: 1px solid #00ff00; }
+        th { background-color: #004400; color: #ffffff; }
+        a { color: #00ff00; text-decoration: none; }
+        a:hover { color: #ffffff; }
+        .nav { margin-bottom: 20px; }
+        .search { margin-bottom: 15px; }
+        .search input { padding: 6px; font-family: 'Courier New', monospace; background-color: #000000; color: #00ff00; border: 1px solid #00ff00; }
+        .search button { padding: 6px 15px; font-family: 'Courier New', monospace; background-color: #004400; color: #00ff00; border: 1px solid #00ff00; cursor: pointer; }
+        .pagination { text-align: center; margin-top: 15px; }
+        .pagination a { margin: 0 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/menu}">&lt; Back to Main Menu</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>TRANSACTION LIST</h2>
+        <div class="search">
+            <form th:action="@{/transactions}" method="get" style="display:inline">
+                <label>Account ID: </label>
+                <input type="text" name="acctId" th:value="${acctId}" maxlength="11">
+                <label> Card #: </label>
+                <input type="text" name="cardNum" th:value="${cardNum}" maxlength="16">
+                <button type="submit">SEARCH</button>
+            </form>
+            <a th:href="@{/transactions}">Show All</a> |
+            <a th:href="@{/transactions/add}">Add Transaction</a>
+        </div>
+        <table>
+            <thead>
+                <tr><th>Tran ID</th><th>Type</th><th>Cat</th><th>Amount</th><th>Card Number</th><th>Description</th><th>Date</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="tran : ${transactions.content}">
+                    <td><a th:href="@{/transactions/{id}(id=${tran.tranId})}" th:text="${tran.tranId}"></a></td>
+                    <td th:text="${tran.typeCd}"></td>
+                    <td th:text="${tran.catCd}"></td>
+                    <td th:text="${#numbers.formatDecimal(tran.amount, 1, 2)}"></td>
+                    <td th:text="${tran.cardNum}"></td>
+                    <td th:text="${#strings.abbreviate(tran.description, 30)}"></td>
+                    <td th:text="${tran.origTimestamp}"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pagination" th:if="${transactions.totalPages > 1}">
+            <a th:if="${transactions.number > 0}" th:href="@{/transactions(page=${transactions.number - 1})}">&lt; Prev</a>
+            <span th:text="'Page ' + (${transactions.number} + 1) + ' of ' + ${transactions.totalPages}"></span>
+            <a th:if="${transactions.number < transactions.totalPages - 1}" th:href="@{/transactions(page=${transactions.number + 1})}">Next &gt;</a>
+        </div>
+    </div>
+</body>
+</html>

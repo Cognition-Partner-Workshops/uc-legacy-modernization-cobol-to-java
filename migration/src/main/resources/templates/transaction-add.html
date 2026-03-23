@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Add Transaction</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        .form-group { margin: 10px 0; }
+        label { display: block; color: #ffff00; margin-bottom: 3px; }
+        input, textarea { width: 100%; padding: 6px; font-family: 'Courier New', monospace; background-color: #000000; color: #00ff00; border: 1px solid #00ff00; box-sizing: border-box; }
+        button { padding: 10px 20px; margin: 15px 5px 0 0; font-family: 'Courier New', monospace; background-color: #004400; color: #00ff00; border: 1px solid #00ff00; cursor: pointer; }
+        a { color: #00ff00; text-decoration: none; }
+        .nav { margin-bottom: 20px; }
+        .error { color: #ff0000; text-align: center; margin: 10px 0; }
+        .message { color: #ffff00; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/transactions}">&lt; Back to Transaction List</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>ADD TRANSACTION</h2>
+        <div class="error" th:if="${error}" th:text="${error}"></div>
+        <div class="message" th:if="${message}" th:text="${message}"></div>
+        <form th:action="@{/transactions/add}" method="post" th:object="${transactionRequest}">
+            <div class="form-group">
+                <label>Card Number:</label>
+                <input type="text" th:field="*{cardNum}" maxlength="16" required>
+            </div>
+            <div class="form-group">
+                <label>Type Code:</label>
+                <input type="text" th:field="*{typeCd}" maxlength="2" required>
+            </div>
+            <div class="form-group">
+                <label>Category Code:</label>
+                <input type="number" th:field="*{catCd}" required>
+            </div>
+            <div class="form-group">
+                <label>Amount:</label>
+                <input type="number" step="0.01" th:field="*{amount}" required>
+            </div>
+            <div class="form-group">
+                <label>Source:</label>
+                <input type="text" th:field="*{source}" maxlength="10">
+            </div>
+            <div class="form-group">
+                <label>Description:</label>
+                <input type="text" th:field="*{description}" maxlength="100">
+            </div>
+            <div class="form-group">
+                <label>Merchant Name:</label>
+                <input type="text" th:field="*{merchantName}" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>Merchant City:</label>
+                <input type="text" th:field="*{merchantCity}" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>Merchant Zip:</label>
+                <input type="text" th:field="*{merchantZip}" maxlength="10">
+            </div>
+            <button type="submit">ADD TRANSACTION</button>
+            <button type="button" onclick="history.back()">CANCEL</button>
+        </form>
+    </div>
+</body>
+</html>

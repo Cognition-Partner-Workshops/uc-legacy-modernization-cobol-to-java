@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardDemo - Sign On</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 50px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; color: #00ff00; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 8px; font-family: 'Courier New', monospace; font-size: 14px; background-color: #000000; color: #00ff00; border: 1px solid #00ff00; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; margin-top: 15px; font-family: 'Courier New', monospace; font-size: 14px; background-color: #004400; color: #00ff00; border: 1px solid #00ff00; cursor: pointer; }
+        button:hover { background-color: #006600; }
+        .error { color: #ff0000; text-align: center; margin: 10px 0; }
+        .message { color: #ffff00; text-align: center; margin: 10px 0; }
+        .header { text-align: center; border-bottom: 1px solid #00ff00; padding-bottom: 10px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AWS CardDemo</h1>
+            <h2>SIGN ON</h2>
+        </div>
+        <div class="error" th:if="${error}" th:text="${error}"></div>
+        <div class="error" th:if="${param.error}">Invalid credentials. Try again ...</div>
+        <div class="message" th:if="${message}" th:text="${message}"></div>
+        <div class="message" th:if="${param.logout}">You have been logged out.</div>
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label for="username">USER ID:</label>
+                <input type="text" id="username" name="username" maxlength="8" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="password">PASSWORD:</label>
+                <input type="password" id="password" name="password" maxlength="8" required>
+            </div>
+            <button type="submit">SIGN ON</button>
+        </form>
+    </div>
+</body>
+</html>

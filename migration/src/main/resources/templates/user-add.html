@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Add User</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        .form-group { margin: 10px 0; }
+        label { display: block; color: #ffff00; margin-bottom: 3px; }
+        input, select { width: 100%; padding: 6px; font-family: 'Courier New', monospace; background-color: #000000; color: #00ff00; border: 1px solid #00ff00; box-sizing: border-box; }
+        button { padding: 10px 20px; margin: 15px 5px 0 0; font-family: 'Courier New', monospace; background-color: #004400; color: #00ff00; border: 1px solid #00ff00; cursor: pointer; }
+        a { color: #00ff00; text-decoration: none; }
+        .nav { margin-bottom: 20px; }
+        .error { color: #ff0000; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/admin/users}">&lt; Back to User List</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>ADD USER</h2>
+        <div class="error" th:if="${error}" th:text="${error}"></div>
+        <form th:action="@{/admin/users/add}" method="post" th:object="${userRequest}">
+            <div class="form-group">
+                <label>User ID:</label>
+                <input type="text" th:field="*{userId}" maxlength="8" required>
+            </div>
+            <div class="form-group">
+                <label>First Name:</label>
+                <input type="text" th:field="*{firstName}" maxlength="20" required>
+            </div>
+            <div class="form-group">
+                <label>Last Name:</label>
+                <input type="text" th:field="*{lastName}" maxlength="20" required>
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" th:field="*{password}" maxlength="8" required>
+            </div>
+            <div class="form-group">
+                <label>User Type:</label>
+                <select th:field="*{userType}">
+                    <option value="U">User</option>
+                    <option value="A">Admin</option>
+                </select>
+            </div>
+            <button type="submit">ADD USER</button>
+            <button type="button" onclick="history.back()">CANCEL</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Card Detail</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        .detail { margin: 10px 0; }
+        .detail label { color: #ffff00; display: inline-block; width: 180px; }
+        a { color: #00ff00; text-decoration: none; }
+        a:hover { color: #ffffff; }
+        .nav { margin-bottom: 20px; }
+        .actions { margin-top: 20px; }
+        .message { color: #ffff00; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/cards}">&lt; Back to Card List</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>CARD DETAIL</h2>
+        <div class="message" th:if="${message}" th:text="${message}"></div>
+        <div class="detail"><label>Card Number:</label><span th:text="${card.cardNum}"></span></div>
+        <div class="detail"><label>Account ID:</label><a th:href="@{/accounts/{id}(id=${card.acctId})}" th:text="${card.acctId}"></a></div>
+        <div class="detail"><label>CVV Code:</label><span th:text="${card.cvvCode}"></span></div>
+        <div class="detail"><label>Embossed Name:</label><span th:text="${card.embossedName}"></span></div>
+        <div class="detail"><label>Expiration Date:</label><span th:text="${card.expirationDate}"></span></div>
+        <div class="detail"><label>Active Status:</label><span th:text="${card.activeStatus}"></span></div>
+        <div class="actions">
+            <a th:href="@{/cards/{num}/edit(num=${card.cardNum})}">Edit Card</a> |
+            <a th:href="@{/transactions(cardNum=${card.cardNum})}">View Transactions</a>
+        </div>
+    </div>
+</body>
+</html>

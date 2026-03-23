@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Delete User</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ff0000; }
+        .detail { margin: 10px 0; }
+        .detail label { color: #ffff00; display: inline-block; width: 120px; }
+        button { padding: 10px 20px; margin: 15px 5px 0 0; font-family: 'Courier New', monospace; border: 1px solid #00ff00; cursor: pointer; }
+        .delete-btn { background-color: #440000; color: #ff0000; border-color: #ff0000; }
+        .cancel-btn { background-color: #004400; color: #00ff00; }
+        a { color: #00ff00; text-decoration: none; }
+        .nav { margin-bottom: 20px; }
+        .warning { color: #ff0000; text-align: center; margin: 20px 0; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/admin/users}">&lt; Back to User List</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>DELETE USER</h2>
+        <div class="warning">Are you sure you want to delete this user?</div>
+        <div class="detail"><label>User ID:</label><span th:text="${user.userId}"></span></div>
+        <div class="detail"><label>First Name:</label><span th:text="${user.firstName}"></span></div>
+        <div class="detail"><label>Last Name:</label><span th:text="${user.lastName}"></span></div>
+        <div class="detail"><label>Type:</label><span th:text="${user.userType == 'A' ? 'Admin' : 'User'}"></span></div>
+        <form th:action="@{/admin/users/{id}/delete(id=${user.userId})}" method="post">
+            <button type="submit" class="delete-btn">CONFIRM DELETE</button>
+            <button type="button" class="cancel-btn" onclick="history.back()">CANCEL</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Reports</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        .form-group { margin: 10px 0; display: inline-block; margin-right: 15px; }
+        label { color: #ffff00; margin-right: 5px; }
+        input { padding: 6px; font-family: 'Courier New', monospace; background-color: #000000; color: #00ff00; border: 1px solid #00ff00; }
+        button { padding: 6px 15px; font-family: 'Courier New', monospace; background-color: #004400; color: #00ff00; border: 1px solid #00ff00; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+        th, td { padding: 6px; text-align: left; border: 1px solid #00ff00; }
+        th { background-color: #004400; color: #ffffff; }
+        a { color: #00ff00; text-decoration: none; }
+        .nav { margin-bottom: 20px; }
+        .summary { margin: 15px 0; color: #ffff00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/menu}">&lt; Back to Main Menu</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>TRANSACTION REPORT</h2>
+        <form th:action="@{/reports}" method="post" th:object="${reportRequest}">
+            <div class="form-group">
+                <label>Account ID:</label>
+                <input type="text" th:field="*{acctId}" maxlength="11" required>
+            </div>
+            <div class="form-group">
+                <label>Start Date:</label>
+                <input type="date" th:field="*{startDate}">
+            </div>
+            <div class="form-group">
+                <label>End Date:</label>
+                <input type="date" th:field="*{endDate}">
+            </div>
+            <button type="submit">GENERATE REPORT</button>
+        </form>
+        <div th:if="${report != null}">
+            <div class="summary">
+                <p>Account: <span th:text="${report.account?.acctId}"></span></p>
+                <p>Customer: <span th:if="${report.customer != null}" th:text="${report.customer.firstName + ' ' + report.customer.lastName}"></span></p>
+                <p>Transactions Found: <span th:text="${report.transactionCount}"></span></p>
+            </div>
+            <table th:if="${report.transactions != null and !report.transactions.isEmpty()}">
+                <thead>
+                    <tr><th>Tran ID</th><th>Type</th><th>Amount</th><th>Description</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="tran : ${report.transactions}">
+                        <td th:text="${tran.tranId}"></td>
+                        <td th:text="${tran.typeCd}"></td>
+                        <td th:text="${#numbers.formatDecimal(tran.amount, 1, 2)}"></td>
+                        <td th:text="${#strings.abbreviate(tran.description, 40)}"></td>
+                        <td th:text="${tran.origTimestamp}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

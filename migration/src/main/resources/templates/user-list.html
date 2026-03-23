@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - User List</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 30px auto; background-color: #000040; padding: 30px; border: 2px solid #00ff00; }
+        h1 { text-align: center; color: #ffffff; }
+        h2 { text-align: center; color: #ffff00; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 8px; text-align: left; border: 1px solid #00ff00; }
+        th { background-color: #004400; color: #ffffff; }
+        a { color: #00ff00; text-decoration: none; }
+        a:hover { color: #ffffff; }
+        .nav { margin-bottom: 20px; }
+        .actions { margin-bottom: 15px; }
+        .message { color: #ffff00; text-align: center; }
+        .error { color: #ff0000; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a th:href="@{/admin/menu}">&lt; Back to Admin Menu</a></div>
+        <h1>AWS CardDemo</h1>
+        <h2>USER LIST</h2>
+        <div class="message" th:if="${message}" th:text="${message}"></div>
+        <div class="error" th:if="${error}" th:text="${error}"></div>
+        <div class="actions"><a th:href="@{/admin/users/add}">+ Add New User</a></div>
+        <table>
+            <thead>
+                <tr><th>User ID</th><th>First Name</th><th>Last Name</th><th>Type</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.userId}"></td>
+                    <td th:text="${user.firstName}"></td>
+                    <td th:text="${user.lastName}"></td>
+                    <td th:text="${user.userType == 'A' ? 'Admin' : 'User'}"></td>
+                    <td>
+                        <a th:href="@{/admin/users/{id}/edit(id=${user.userId})}">Edit</a> |
+                        <a th:href="@{/admin/users/{id}/delete(id=${user.userId})}">Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
