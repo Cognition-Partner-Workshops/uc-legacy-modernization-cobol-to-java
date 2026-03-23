@@ -30,7 +30,7 @@ public class DataExportJob {
         this.dataMigrationService = dataMigrationService;
     }
 
-    @Bean
+    @Bean("dataExportJobBean")
     public Job dataExportJob(JobRepository jobRepository, Step dataExportStep) {
         return new JobBuilder("dataExportJob", jobRepository)
                 .start(dataExportStep)

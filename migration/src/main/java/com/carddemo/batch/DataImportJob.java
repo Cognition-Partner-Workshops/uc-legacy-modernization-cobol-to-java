@@ -28,7 +28,7 @@ public class DataImportJob {
         this.dataMigrationService = dataMigrationService;
     }
 
-    @Bean
+    @Bean("dataImportJobBean")
     public Job dataImportJob(JobRepository jobRepository, Step dataImportStep) {
         return new JobBuilder("dataImportJob", jobRepository)
                 .start(dataImportStep)

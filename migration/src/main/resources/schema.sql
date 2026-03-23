@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS user_security (
     user_type VARCHAR(1)
 );
 
-CREATE TABLE IF NOT EXISTS transaction_category_balances (
+CREATE TABLE IF NOT EXISTS tran_cat_balance (
     acct_id VARCHAR(11),
     type_cd VARCHAR(2),
     cat_cd INT,
