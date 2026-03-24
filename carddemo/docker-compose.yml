@@ -1,0 +1,60 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      CARDDEMO_DATABASE_URL: postgresql://carddemo:carddemo@db:5432/carddemo
+      CARDDEMO_REDIS_URL: redis://redis:6379/0
+      CARDDEMO_CELERY_BROKER_URL: redis://redis:6379/0
+      CARDDEMO_CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: carddemo
+      POSTGRES_PASSWORD: carddemo
+      POSTGRES_DB: carddemo
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carddemo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    build: .
+    environment:
+      CARDDEMO_DATABASE_URL: postgresql://carddemo:carddemo@db:5432/carddemo
+      CARDDEMO_CELERY_BROKER_URL: redis://redis:6379/0
+      CARDDEMO_CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.batch worker --loglevel=info
+
+volumes:
+  pgdata:

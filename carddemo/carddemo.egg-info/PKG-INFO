@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: carddemo
+Version: 1.0.0
+Summary: CardDemo - Credit Card Management Application (migrated from COBOL/CICS to Python/FastAPI)
+Requires-Python: >=3.11
+Requires-Dist: fastapi>=0.110.0
+Requires-Dist: uvicorn[standard]>=0.27.0
+Requires-Dist: sqlalchemy>=2.0.25
+Requires-Dist: alembic>=1.13.1
+Requires-Dist: pydantic>=2.5.0
+Requires-Dist: pydantic-settings>=2.1.0
+Requires-Dist: celery[redis]>=5.3.6
+Requires-Dist: redis>=5.0.1
+Requires-Dist: psycopg2-binary>=2.9.9
+Requires-Dist: python-jose[cryptography]>=3.3.0
+Requires-Dist: passlib[bcrypt]>=1.7.4
+Requires-Dist: jinja2>=3.1.3
+Requires-Dist: typer>=0.9.0
+Requires-Dist: httpx>=0.26.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.4; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.3; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: httpx>=0.26.0; extra == "dev"
+Requires-Dist: ruff>=0.2.0; extra == "dev"
