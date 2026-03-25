@@ -38,12 +38,12 @@ Each module is scored on three dimensions (1-10 scale):
 | **2** | `CBTRN02C` | Batch | 731 | 8 | 10 | 10 | **9.30** |
 | **3** | `CBACT04C` | Batch | 652 | 8 | 9 | 9 | **8.65** |
 | **4** | `CBSTM03A` | Batch | 924 | 9 | 7 | 8 | **8.00** |
-| **5** | `COCRDLIC` | Online | 1,459 | 8 | 7 | 7 | **7.35** |
+| **5** | `COBIL00C` | Online | 572 | 6 | 9 | 8 | **7.65** |
 | **6** | `COCRDUPC` | Online | 1,560 | 8 | 8 | 6 | **7.40** |
-| **7** | `COBIL00C` | Online | 572 | 6 | 9 | 8 | **7.65** |
+| **7** | `COCRDLIC` | Online | 1,459 | 8 | 7 | 7 | **7.35** |
 | **8** | `COSGN00C` | Online | 260 | 4 | 9 | 8 | **6.95** |
-| **9** | `CBTRN03C` | Batch | 649 | 7 | 6 | 7 | **6.65** |
-| **10** | `COTRN02C` | Online | 783 | 7 | 7 | 6 | **6.70** |
+| **9** | `COTRN02C` | Online | 783 | 7 | 7 | 6 | **6.70** |
+| **10** | `CBTRN03C` | Batch | 649 | 7 | 6 | 7 | **6.65** |
 
 ---
 
@@ -113,19 +113,19 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### #5: COCRDLIC -- Credit Card List (Composite: 7.35)
+### #5: COBIL00C -- Bill Payment (Composite: 7.65)
 
 | Dimension | Score | Rationale |
 |---|---|---|
-| Complexity | **8** | 1,459 lines. Complex paginated browse logic: STARTBR/READNEXT/READPREV for forward/backward scrolling. Filter by account. Multiple XCTL targets (view, update). Screen state management across pseudo-conversational CICS. Generic key positioning for browse restart. |
-| Risk | **7** | Read-only display, but card numbers (PAN) are PCI-sensitive. Navigation bugs could display wrong customer's cards. Cross-reference lookup (XREFFILE + CARDFILE) must stay consistent. |
-| Business Impact | **7** | Primary card lookup interface. Gateway to card view/update functions. Used frequently by operators. |
+| Complexity | **6** | 572 lines -- moderate size. Reads XREFFILE and ACCTFILE, updates ACCTFILE balance, writes new transaction to TRANSACT. Validation of payment amount against balance. |
+| Risk | **9** | Direct financial transaction: modifies account balance. Creates debit transactions. No reversal mechanism in current code. EXEC CICS REWRITE on ACCTFILE must succeed atomically with WRITE to TRANSACT. Partial failure = inconsistent data. |
+| Business Impact | **8** | Revenue-critical: bill payments reduce account balances. High-frequency user operation. Errors directly affect customer accounts and potentially result in disputes. |
 
 **Modernization Concerns**:
-- VSAM browse (STARTBR/READNEXT/READPREV) maps to database cursor/pagination (LIMIT/OFFSET or keyset pagination)
-- PCI compliance: card numbers must be masked in transit and at rest
-- Paginated list pattern is reusable -- build a generic paginated list component
-- XCTL-based drill-down (list -> view/update) maps to REST API + SPA routing
+- Critical to wrap in database transaction for atomicity (balance update + transaction creation)
+- Add idempotency key to prevent duplicate payments
+- Implement payment reversal/void capability
+- Consider async payment processing with confirmation for large amounts
 
 ---
 
@@ -145,19 +145,19 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### #7: COBIL00C -- Bill Payment (Composite: 7.65)
+### #7: COCRDLIC -- Credit Card List (Composite: 7.35)
 
 | Dimension | Score | Rationale |
 |---|---|---|
-| Complexity | **6** | 572 lines -- moderate size. Reads XREFFILE and ACCTFILE, updates ACCTFILE balance, writes new transaction to TRANSACT. Validation of payment amount against balance. |
-| Risk | **9** | Direct financial transaction: modifies account balance. Creates debit transactions. No reversal mechanism in current code. EXEC CICS REWRITE on ACCTFILE must succeed atomically with WRITE to TRANSACT. Partial failure = inconsistent data. |
-| Business Impact | **8** | Revenue-critical: bill payments reduce account balances. High-frequency user operation. Errors directly affect customer accounts and potentially result in disputes. |
+| Complexity | **8** | 1,459 lines. Complex paginated browse logic: STARTBR/READNEXT/READPREV for forward/backward scrolling. Filter by account. Multiple XCTL targets (view, update). Screen state management across pseudo-conversational CICS. Generic key positioning for browse restart. |
+| Risk | **7** | Read-only display, but card numbers (PAN) are PCI-sensitive. Navigation bugs could display wrong customer's cards. Cross-reference lookup (XREFFILE + CARDFILE) must stay consistent. |
+| Business Impact | **7** | Primary card lookup interface. Gateway to card view/update functions. Used frequently by operators. |
 
 **Modernization Concerns**:
-- Critical to wrap in database transaction for atomicity (balance update + transaction creation)
-- Add idempotency key to prevent duplicate payments
-- Implement payment reversal/void capability
-- Consider async payment processing with confirmation for large amounts
+- VSAM browse (STARTBR/READNEXT/READPREV) maps to database cursor/pagination (LIMIT/OFFSET or keyset pagination)
+- PCI compliance: card numbers must be masked in transit and at rest
+- Paginated list pattern is reusable -- build a generic paginated list component
+- XCTL-based drill-down (list -> view/update) maps to REST API + SPA routing
 
 ---
 
@@ -178,23 +178,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### #9: CBTRN03C -- Daily Transaction Report (Composite: 6.65)
-
-| Dimension | Score | Rationale |
-|---|---|---|
-| Complexity | **7** | 649 lines. Multi-file input: TRANFILE, CARDXREF, TRANTYPE, TRANCATG, DATEPARM. Report formatting with headers, detail lines, page/account/grand totals. Date range filtering. Uses CVTRA07Y report layout copybook. |
-| Risk | **6** | Read-only reporting -- no data modification. Incorrect reports could mislead operations but don't corrupt data. Date parameter handling must be accurate. |
-| Business Impact | **7** | Key operational report for daily reconciliation. Used by operations and management. Regulatory requirement for transaction audit trail. |
-
-**Modernization Concerns**:
-- Replace fixed-format report with modern reporting framework
-- Enable on-demand report generation (not just batch)
-- Add export formats: PDF, CSV, Excel
-- Consider real-time dashboards as supplement to batch reports
-
----
-
-### #10: COTRN02C -- Transaction Add (Composite: 6.70)
+### #9: COTRN02C -- Transaction Add (Composite: 6.70)
 
 | Dimension | Score | Rationale |
 |---|---|---|
@@ -207,6 +191,22 @@ Each module is scored on three dimensions (1-10 scale):
 - Validation rules should be externalized and shared with batch posting (CBTRN02C)
 - Consider making this a REST API endpoint for integration with external systems
 - Add transaction approval workflow for amounts above threshold
+
+---
+
+### #10: CBTRN03C -- Daily Transaction Report (Composite: 6.65)
+
+| Dimension | Score | Rationale |
+|---|---|---|
+| Complexity | **7** | 649 lines. Multi-file input: TRANFILE, CARDXREF, TRANTYPE, TRANCATG, DATEPARM. Report formatting with headers, detail lines, page/account/grand totals. Date range filtering. Uses CVTRA07Y report layout copybook. |
+| Risk | **6** | Read-only reporting -- no data modification. Incorrect reports could mislead operations but don't corrupt data. Date parameter handling must be accurate. |
+| Business Impact | **7** | Key operational report for daily reconciliation. Used by operations and management. Regulatory requirement for transaction audit trail. |
+
+**Modernization Concerns**:
+- Replace fixed-format report with modern reporting framework
+- Enable on-demand report generation (not just batch)
+- Add export formats: PDF, CSV, Excel
+- Consider real-time dashboards as supplement to batch reports
 
 ---
 

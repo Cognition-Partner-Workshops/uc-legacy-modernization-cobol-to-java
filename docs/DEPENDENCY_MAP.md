@@ -105,6 +105,8 @@ Batch programs are invoked by JCL jobs. They use standard COBOL file I/O (OPEN/R
 
 | Caller | Callee | Mechanism | Purpose |
 |---|---|---|---|
+| `CBSTM03A` | `CBSTM03B` | `CALL 'CBSTM03B'` | File handling for statement generation (reads transactions, customers, accounts, cross-references) |
+| `CBSTM03A` | `CEE3ABD` | `CALL 'CEE3ABD'` | LE abnormal termination |
 | `COBSWAIT` | `MVSWAIT` (ASM) | `CALL 'MVSWAIT'` | Timed wait via assembler STIMER |
 | `CBACT01C` | `COBDATFT` (ASM) | `CALL 'COBDATFT'` | Date formatting via assembler routine |
 | `CBTRN01C` | `CEE3ABD` | `CALL 'CEE3ABD'` | LE abnormal termination (abend handler) |
