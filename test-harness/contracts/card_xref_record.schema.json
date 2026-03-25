@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CardXrefRecord",
+  "description": "Card cross-reference record (CVACT03Y, 50 bytes)",
+  "type": "object",
+  "properties": {
+    "XREF-CARD-NUM": {
+      "type": "string",
+      "maxLength": 16,
+      "description": "COBOL PIC X(16) (alpha, 16 bytes)"
+    },
+    "XREF-CUST-ID": {
+      "type": "integer",
+      "description": "COBOL PIC 9(09) (unsigned numeric, 9 digits)"
+    },
+    "XREF-ACCT-ID": {
+      "type": "integer",
+      "description": "COBOL PIC 9(11) (unsigned numeric, 11 digits)"
+    }
+  },
+  "required": [
+    "XREF-CARD-NUM",
+    "XREF-CUST-ID",
+    "XREF-ACCT-ID"
+  ],
+  "additionalProperties": true
+}

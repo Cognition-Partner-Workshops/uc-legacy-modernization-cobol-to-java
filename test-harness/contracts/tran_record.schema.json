@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TransactionRecord",
+  "description": "Transaction record (CVTRA05Y, 350 bytes)",
+  "type": "object",
+  "properties": {
+    "TRAN-ID": {
+      "type": "string",
+      "maxLength": 16,
+      "description": "COBOL PIC X(16) (alpha, 16 bytes)"
+    },
+    "TRAN-TYPE-CD": {
+      "type": "string",
+      "maxLength": 2,
+      "description": "COBOL PIC X(02) (alpha, 2 bytes)"
+    },
+    "TRAN-CAT-CD": {
+      "type": "integer",
+      "description": "COBOL PIC 9(04) (unsigned numeric, 4 digits)"
+    },
+    "TRAN-SOURCE": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "TRAN-DESC": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "COBOL PIC X(100) (alpha, 100 bytes)"
+    },
+    "TRAN-AMT": {
+      "type": "number",
+      "description": "COBOL PIC S9(09)V99 (signed numeric, 2 decimal places)"
+    },
+    "TRAN-MERCHANT-ID": {
+      "type": "integer",
+      "description": "COBOL PIC 9(09) (unsigned numeric, 9 digits)"
+    },
+    "TRAN-MERCHANT-NAME": {
+      "type": "string",
+      "maxLength": 50,
+      "description": "COBOL PIC X(50) (alpha, 50 bytes)"
+    },
+    "TRAN-MERCHANT-CITY": {
+      "type": "string",
+      "maxLength": 50,
+      "description": "COBOL PIC X(50) (alpha, 50 bytes)"
+    },
+    "TRAN-MERCHANT-ZIP": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "TRAN-CARD-NUM": {
+      "type": "string",
+      "maxLength": 16,
+      "description": "COBOL PIC X(16) (alpha, 16 bytes)"
+    },
+    "TRAN-ORIG-TS": {
+      "type": "string",
+      "maxLength": 26,
+      "description": "COBOL PIC X(26) (alpha, 26 bytes)"
+    },
+    "TRAN-PROC-TS": {
+      "type": "string",
+      "maxLength": 26,
+      "description": "COBOL PIC X(26) (alpha, 26 bytes)"
+    }
+  },
+  "required": [
+    "TRAN-ID",
+    "TRAN-TYPE-CD",
+    "TRAN-CAT-CD",
+    "TRAN-SOURCE",
+    "TRAN-DESC",
+    "TRAN-AMT",
+    "TRAN-MERCHANT-ID",
+    "TRAN-MERCHANT-NAME",
+    "TRAN-MERCHANT-CITY",
+    "TRAN-MERCHANT-ZIP",
+    "TRAN-CARD-NUM",
+    "TRAN-ORIG-TS",
+    "TRAN-PROC-TS"
+  ],
+  "additionalProperties": true
+}

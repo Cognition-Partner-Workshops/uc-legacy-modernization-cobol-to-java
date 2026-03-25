@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DailyTransactionRecord",
+  "description": "Daily transaction record (CVTRA06Y, 350 bytes)",
+  "type": "object",
+  "properties": {
+    "DALYTRAN-ID": {
+      "type": "string",
+      "maxLength": 16,
+      "description": "COBOL PIC X(16) (alpha, 16 bytes)"
+    },
+    "DALYTRAN-TYPE-CD": {
+      "type": "string",
+      "maxLength": 2,
+      "description": "COBOL PIC X(02) (alpha, 2 bytes)"
+    },
+    "DALYTRAN-CAT-CD": {
+      "type": "integer",
+      "description": "COBOL PIC 9(04) (unsigned numeric, 4 digits)"
+    },
+    "DALYTRAN-SOURCE": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "DALYTRAN-DESC": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "COBOL PIC X(100) (alpha, 100 bytes)"
+    },
+    "DALYTRAN-AMT": {
+      "type": "number",
+      "description": "COBOL PIC S9(09)V99 (signed numeric, 2 decimal places)"
+    },
+    "DALYTRAN-MERCHANT-ID": {
+      "type": "integer",
+      "description": "COBOL PIC 9(09) (unsigned numeric, 9 digits)"
+    },
+    "DALYTRAN-MERCHANT-NAME": {
+      "type": "string",
+      "maxLength": 50,
+      "description": "COBOL PIC X(50) (alpha, 50 bytes)"
+    },
+    "DALYTRAN-MERCHANT-CITY": {
+      "type": "string",
+      "maxLength": 50,
+      "description": "COBOL PIC X(50) (alpha, 50 bytes)"
+    },
+    "DALYTRAN-MERCHANT-ZIP": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "DALYTRAN-CARD-NUM": {
+      "type": "string",
+      "maxLength": 16,
+      "description": "COBOL PIC X(16) (alpha, 16 bytes)"
+    },
+    "DALYTRAN-ORIG-TS": {
+      "type": "string",
+      "maxLength": 26,
+      "description": "COBOL PIC X(26) (alpha, 26 bytes)"
+    },
+    "DALYTRAN-PROC-TS": {
+      "type": "string",
+      "maxLength": 26,
+      "description": "COBOL PIC X(26) (alpha, 26 bytes)"
+    }
+  },
+  "required": [
+    "DALYTRAN-ID",
+    "DALYTRAN-TYPE-CD",
+    "DALYTRAN-CAT-CD",
+    "DALYTRAN-SOURCE",
+    "DALYTRAN-DESC",
+    "DALYTRAN-AMT",
+    "DALYTRAN-MERCHANT-ID",
+    "DALYTRAN-MERCHANT-NAME",
+    "DALYTRAN-MERCHANT-CITY",
+    "DALYTRAN-MERCHANT-ZIP",
+    "DALYTRAN-CARD-NUM",
+    "DALYTRAN-ORIG-TS",
+    "DALYTRAN-PROC-TS"
+  ],
+  "additionalProperties": true
+}

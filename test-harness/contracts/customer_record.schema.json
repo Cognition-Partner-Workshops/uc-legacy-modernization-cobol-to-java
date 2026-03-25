@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CustomerRecord",
+  "description": "Customer master record (CVCUS01Y, 500 bytes)",
+  "type": "object",
+  "properties": {
+    "CUST-ID": {
+      "type": "integer",
+      "description": "COBOL PIC 9(09) (unsigned numeric, 9 digits)"
+    },
+    "CUST-FIRST-NAME": {
+      "type": "string",
+      "maxLength": 25,
+      "description": "COBOL PIC X(25) (alpha, 25 bytes)"
+    },
+    "CUST-MIDDLE-NAME": {
+      "type": "string",
+      "maxLength": 25,
+      "description": "COBOL PIC X(25) (alpha, 25 bytes)"
+    },
+    "CUST-LAST-NAME": {
+      "type": "string",
+      "maxLength": 25,
+      "description": "COBOL PIC X(25) (alpha, 25 bytes)"
+    },
+    "CUST-ADDR-LINE-1": {
+      "type": "string",
+      "maxLength": 50,
+      "description": "COBOL PIC X(50) (alpha, 50 bytes)"
+    },
+    "CUST-ADDR-LINE-2": {
+      "type": "string",
+      "maxLength": 50,
+      "description": "COBOL PIC X(50) (alpha, 50 bytes)"
+    },
+    "CUST-ADDR-LINE-3": {
+      "type": "string",
+      "maxLength": 50,
+      "description": "COBOL PIC X(50) (alpha, 50 bytes)"
+    },
+    "CUST-ADDR-STATE-CD": {
+      "type": "string",
+      "maxLength": 2,
+      "description": "COBOL PIC X(02) (alpha, 2 bytes)"
+    },
+    "CUST-ADDR-COUNTRY-CD": {
+      "type": "string",
+      "maxLength": 3,
+      "description": "COBOL PIC X(03) (alpha, 3 bytes)"
+    },
+    "CUST-ADDR-ZIP": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "CUST-PHONE-NUM-1": {
+      "type": "string",
+      "maxLength": 15,
+      "description": "COBOL PIC X(15) (alpha, 15 bytes)"
+    },
+    "CUST-PHONE-NUM-2": {
+      "type": "string",
+      "maxLength": 15,
+      "description": "COBOL PIC X(15) (alpha, 15 bytes)"
+    },
+    "CUST-SSN": {
+      "type": "integer",
+      "description": "COBOL PIC 9(09) (unsigned numeric, 9 digits)"
+    },
+    "CUST-GOVT-ISSUED-ID": {
+      "type": "string",
+      "maxLength": 20,
+      "description": "COBOL PIC X(20) (alpha, 20 bytes)"
+    },
+    "CUST-DOB-YYYY-MM-DD": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "CUST-EFT-ACCOUNT-ID": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "CUST-PRI-CARD-HOLDER-IND": {
+      "type": "string",
+      "maxLength": 1,
+      "description": "COBOL PIC X(01) (alpha, 1 bytes)"
+    },
+    "CUST-FICO-CREDIT-SCORE": {
+      "type": "integer",
+      "description": "COBOL PIC 9(03) (unsigned numeric, 3 digits)"
+    }
+  },
+  "required": [
+    "CUST-ID",
+    "CUST-FIRST-NAME",
+    "CUST-MIDDLE-NAME",
+    "CUST-LAST-NAME",
+    "CUST-ADDR-LINE-1",
+    "CUST-ADDR-LINE-2",
+    "CUST-ADDR-LINE-3",
+    "CUST-ADDR-STATE-CD",
+    "CUST-ADDR-COUNTRY-CD",
+    "CUST-ADDR-ZIP",
+    "CUST-PHONE-NUM-1",
+    "CUST-PHONE-NUM-2",
+    "CUST-SSN",
+    "CUST-GOVT-ISSUED-ID",
+    "CUST-DOB-YYYY-MM-DD",
+    "CUST-EFT-ACCOUNT-ID",
+    "CUST-PRI-CARD-HOLDER-IND",
+    "CUST-FICO-CREDIT-SCORE"
+  ],
+  "additionalProperties": true
+}

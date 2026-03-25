@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TransactionCategoryBalanceRecord",
+  "description": "Transaction category balance record (CVTRA01Y, 50 bytes)",
+  "type": "object",
+  "properties": {
+    "TRANCAT-ACCT-ID": {
+      "type": "integer",
+      "description": "COBOL PIC 9(11) (unsigned numeric, 11 digits)"
+    },
+    "TRANCAT-TYPE-CD": {
+      "type": "string",
+      "maxLength": 2,
+      "description": "COBOL PIC X(02) (alpha, 2 bytes)"
+    },
+    "TRANCAT-CD": {
+      "type": "integer",
+      "description": "COBOL PIC 9(04) (unsigned numeric, 4 digits)"
+    },
+    "TRAN-CAT-BAL": {
+      "type": "number",
+      "description": "COBOL PIC S9(09)V99 (signed numeric, 2 decimal places)"
+    }
+  },
+  "required": [
+    "TRANCAT-ACCT-ID",
+    "TRANCAT-TYPE-CD",
+    "TRANCAT-CD",
+    "TRAN-CAT-BAL"
+  ],
+  "additionalProperties": true
+}

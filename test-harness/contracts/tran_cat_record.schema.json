@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TransactionCategoryRecord",
+  "description": "Transaction category record (CVTRA04Y, 60 bytes)",
+  "type": "object",
+  "properties": {
+    "TRAN-TYPE-CD": {
+      "type": "string",
+      "maxLength": 2,
+      "description": "COBOL PIC X(02) (alpha, 2 bytes)"
+    },
+    "TRAN-CAT-CD": {
+      "type": "integer",
+      "description": "COBOL PIC 9(04) (unsigned numeric, 4 digits)"
+    },
+    "TRAN-CAT-TYPE-DESC": {
+      "type": "string",
+      "maxLength": 50,
+      "description": "COBOL PIC X(50) (alpha, 50 bytes)"
+    }
+  },
+  "required": [
+    "TRAN-TYPE-CD",
+    "TRAN-CAT-CD",
+    "TRAN-CAT-TYPE-DESC"
+  ],
+  "additionalProperties": true
+}

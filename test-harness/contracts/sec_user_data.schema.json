@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SecurityUserData",
+  "description": "Security / user record (CSUSR01Y, 80 bytes)",
+  "type": "object",
+  "properties": {
+    "SEC-USR-ID": {
+      "type": "string",
+      "maxLength": 8,
+      "description": "COBOL PIC X(08) (alpha, 8 bytes)"
+    },
+    "SEC-USR-FNAME": {
+      "type": "string",
+      "maxLength": 20,
+      "description": "COBOL PIC X(20) (alpha, 20 bytes)"
+    },
+    "SEC-USR-LNAME": {
+      "type": "string",
+      "maxLength": 20,
+      "description": "COBOL PIC X(20) (alpha, 20 bytes)"
+    },
+    "SEC-USR-PWD": {
+      "type": "string",
+      "maxLength": 8,
+      "description": "COBOL PIC X(08) (alpha, 8 bytes)"
+    },
+    "SEC-USR-TYPE": {
+      "type": "string",
+      "maxLength": 1,
+      "description": "COBOL PIC X(01) (alpha, 1 bytes)"
+    },
+    "SEC-USR-FILLER": {
+      "type": "string",
+      "maxLength": 23,
+      "description": "COBOL PIC X(23) (alpha, 23 bytes)"
+    }
+  },
+  "required": [
+    "SEC-USR-ID",
+    "SEC-USR-FNAME",
+    "SEC-USR-LNAME",
+    "SEC-USR-PWD",
+    "SEC-USR-TYPE",
+    "SEC-USR-FILLER"
+  ],
+  "additionalProperties": true
+}

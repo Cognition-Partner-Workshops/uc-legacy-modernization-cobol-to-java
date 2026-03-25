@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TransactionTypeRecord",
+  "description": "Transaction type record (CVTRA03Y, 60 bytes)",
+  "type": "object",
+  "properties": {
+    "TRAN-TYPE": {
+      "type": "string",
+      "maxLength": 2,
+      "description": "COBOL PIC X(02) (alpha, 2 bytes)"
+    },
+    "TRAN-TYPE-DESC": {
+      "type": "string",
+      "maxLength": 50,
+      "description": "COBOL PIC X(50) (alpha, 50 bytes)"
+    }
+  },
+  "required": [
+    "TRAN-TYPE",
+    "TRAN-TYPE-DESC"
+  ],
+  "additionalProperties": true
+}

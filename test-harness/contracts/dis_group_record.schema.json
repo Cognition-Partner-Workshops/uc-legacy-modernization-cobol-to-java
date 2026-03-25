@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DisclosureGroupRecord",
+  "description": "Disclosure group record (CVTRA02Y, 50 bytes)",
+  "type": "object",
+  "properties": {
+    "DIS-ACCT-GROUP-ID": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "DIS-TRAN-TYPE-CD": {
+      "type": "string",
+      "maxLength": 2,
+      "description": "COBOL PIC X(02) (alpha, 2 bytes)"
+    },
+    "DIS-TRAN-CAT-CD": {
+      "type": "integer",
+      "description": "COBOL PIC 9(04) (unsigned numeric, 4 digits)"
+    },
+    "DIS-INT-RATE": {
+      "type": "number",
+      "description": "COBOL PIC S9(04)V99 (signed numeric, 2 decimal places)"
+    }
+  },
+  "required": [
+    "DIS-ACCT-GROUP-ID",
+    "DIS-TRAN-TYPE-CD",
+    "DIS-TRAN-CAT-CD",
+    "DIS-INT-RATE"
+  ],
+  "additionalProperties": true
+}

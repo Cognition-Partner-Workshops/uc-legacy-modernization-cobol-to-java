@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AccountRecord",
+  "description": "Account master record (CVACT01Y, 300 bytes)",
+  "type": "object",
+  "properties": {
+    "ACCT-ID": {
+      "type": "integer",
+      "description": "COBOL PIC 9(11) (unsigned numeric, 11 digits)"
+    },
+    "ACCT-ACTIVE-STATUS": {
+      "type": "string",
+      "maxLength": 1,
+      "description": "COBOL PIC X(01) (alpha, 1 bytes)"
+    },
+    "ACCT-CURR-BAL": {
+      "type": "number",
+      "description": "COBOL PIC S9(10)V99 (signed numeric, 2 decimal places)"
+    },
+    "ACCT-CREDIT-LIMIT": {
+      "type": "number",
+      "description": "COBOL PIC S9(10)V99 (signed numeric, 2 decimal places)"
+    },
+    "ACCT-CASH-CREDIT-LIMIT": {
+      "type": "number",
+      "description": "COBOL PIC S9(10)V99 (signed numeric, 2 decimal places)"
+    },
+    "ACCT-OPEN-DATE": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "ACCT-EXPIRAION-DATE": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "ACCT-REISSUE-DATE": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "ACCT-CURR-CYC-CREDIT": {
+      "type": "number",
+      "description": "COBOL PIC S9(10)V99 (signed numeric, 2 decimal places)"
+    },
+    "ACCT-CURR-CYC-DEBIT": {
+      "type": "number",
+      "description": "COBOL PIC S9(10)V99 (signed numeric, 2 decimal places)"
+    },
+    "ACCT-ADDR-ZIP": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    },
+    "ACCT-GROUP-ID": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "COBOL PIC X(10) (alpha, 10 bytes)"
+    }
+  },
+  "required": [
+    "ACCT-ID",
+    "ACCT-ACTIVE-STATUS",
+    "ACCT-CURR-BAL",
+    "ACCT-CREDIT-LIMIT",
+    "ACCT-CASH-CREDIT-LIMIT",
+    "ACCT-OPEN-DATE",
+    "ACCT-EXPIRAION-DATE",
+    "ACCT-REISSUE-DATE",
+    "ACCT-CURR-CYC-CREDIT",
+    "ACCT-CURR-CYC-DEBIT",
+    "ACCT-ADDR-ZIP",
+    "ACCT-GROUP-ID"
+  ],
+  "additionalProperties": true
+}
