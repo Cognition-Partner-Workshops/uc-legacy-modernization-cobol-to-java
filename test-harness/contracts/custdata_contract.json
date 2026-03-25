@@ -1,0 +1,153 @@
+{
+  "file_key": "custdata",
+  "copybook": "CVCUS01Y.cpy",
+  "record_length": 500,
+  "computed_length": 500,
+  "field_count": 18,
+  "fields": [
+    {
+      "cobol_name": "CUST-ID",
+      "java_name": "custId",
+      "cobol_pic_type": "unsigned",
+      "java_type": "int",
+      "length": 9,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-FIRST-NAME",
+      "java_name": "custFirstName",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 25,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-MIDDLE-NAME",
+      "java_name": "custMiddleName",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 25,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-LAST-NAME",
+      "java_name": "custLastName",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 25,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-ADDR-LINE-1",
+      "java_name": "custAddrLine1",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 50,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-ADDR-LINE-2",
+      "java_name": "custAddrLine2",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 50,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-ADDR-LINE-3",
+      "java_name": "custAddrLine3",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 50,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-ADDR-STATE-CD",
+      "java_name": "custAddrStateCd",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 2,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-ADDR-COUNTRY-CD",
+      "java_name": "custAddrCountryCd",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 3,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-ADDR-ZIP",
+      "java_name": "custAddrZip",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 10,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-PHONE-NUM-1",
+      "java_name": "custPhoneNum1",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 15,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-PHONE-NUM-2",
+      "java_name": "custPhoneNum2",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 15,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-SSN",
+      "java_name": "custSsn",
+      "cobol_pic_type": "unsigned",
+      "java_type": "int",
+      "length": 9,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-GOVT-ISSUED-ID",
+      "java_name": "custGovtIssuedId",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 20,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-DOB-YYYY-MM-DD",
+      "java_name": "custDobYyyyMmDd",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 10,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-EFT-ACCOUNT-ID",
+      "java_name": "custEftAccountId",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 10,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-PRI-CARD-HOLDER-IND",
+      "java_name": "custPriCardHolderInd",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 1,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "CUST-FICO-CREDIT-SCORE",
+      "java_name": "custFicoCreditScore",
+      "cobol_pic_type": "unsigned",
+      "java_type": "int",
+      "length": 3,
+      "decimal_places": 0
+    }
+  ]
+}

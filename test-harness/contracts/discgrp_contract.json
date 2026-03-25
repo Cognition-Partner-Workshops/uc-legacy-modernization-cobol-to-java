@@ -1,0 +1,41 @@
+{
+  "file_key": "discgrp",
+  "copybook": "CVTRA02Y.cpy",
+  "record_length": 50,
+  "computed_length": 50,
+  "field_count": 4,
+  "fields": [
+    {
+      "cobol_name": "DIS-ACCT-GROUP-ID",
+      "java_name": "disAcctGroupId",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 10,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "DIS-TRAN-TYPE-CD",
+      "java_name": "disTranTypeCd",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 2,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "DIS-TRAN-CAT-CD",
+      "java_name": "disTranCatCd",
+      "cobol_pic_type": "unsigned",
+      "java_type": "int",
+      "length": 4,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "DIS-INT-RATE",
+      "java_name": "disIntRate",
+      "cobol_pic_type": "signed_decimal",
+      "java_type": "BigDecimal",
+      "length": 6,
+      "decimal_places": 2
+    }
+  ]
+}

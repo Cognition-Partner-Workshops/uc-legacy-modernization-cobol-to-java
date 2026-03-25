@@ -1,0 +1,33 @@
+{
+  "file_key": "trancatg",
+  "copybook": "CVTRA04Y.cpy",
+  "record_length": 60,
+  "computed_length": 60,
+  "field_count": 3,
+  "fields": [
+    {
+      "cobol_name": "TRAN-TYPE-CD",
+      "java_name": "tranTypeCd",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 2,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "TRAN-CAT-CD",
+      "java_name": "tranCatCd",
+      "cobol_pic_type": "unsigned",
+      "java_type": "int",
+      "length": 4,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "TRAN-CAT-TYPE-DESC",
+      "java_name": "tranCatTypeDesc",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 50,
+      "decimal_places": 0
+    }
+  ]
+}

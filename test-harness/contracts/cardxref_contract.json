@@ -1,0 +1,33 @@
+{
+  "file_key": "cardxref",
+  "copybook": "CVACT03Y.cpy",
+  "record_length": 36,
+  "computed_length": 36,
+  "field_count": 3,
+  "fields": [
+    {
+      "cobol_name": "XREF-CARD-NUM",
+      "java_name": "xrefCardNum",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 16,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "XREF-CUST-ID",
+      "java_name": "xrefCustId",
+      "cobol_pic_type": "unsigned",
+      "java_type": "int",
+      "length": 9,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "XREF-ACCT-ID",
+      "java_name": "xrefAcctId",
+      "cobol_pic_type": "unsigned",
+      "java_type": "long",
+      "length": 11,
+      "decimal_places": 0
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "file_key": "tcatbal",
+  "copybook": "CVTRA01Y.cpy",
+  "record_length": 50,
+  "computed_length": 50,
+  "field_count": 4,
+  "fields": [
+    {
+      "cobol_name": "TRANCAT-ACCT-ID",
+      "java_name": "trancatAcctId",
+      "cobol_pic_type": "unsigned",
+      "java_type": "long",
+      "length": 11,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "TRANCAT-TYPE-CD",
+      "java_name": "trancatTypeCd",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 2,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "TRANCAT-CD",
+      "java_name": "trancatCd",
+      "cobol_pic_type": "unsigned",
+      "java_type": "int",
+      "length": 4,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "TRAN-CAT-BAL",
+      "java_name": "tranCatBal",
+      "cobol_pic_type": "signed_decimal",
+      "java_type": "BigDecimal",
+      "length": 11,
+      "decimal_places": 2
+    }
+  ]
+}

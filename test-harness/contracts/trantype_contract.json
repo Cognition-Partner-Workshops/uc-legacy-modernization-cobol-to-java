@@ -1,0 +1,25 @@
+{
+  "file_key": "trantype",
+  "copybook": "CVTRA03Y.cpy",
+  "record_length": 60,
+  "computed_length": 60,
+  "field_count": 2,
+  "fields": [
+    {
+      "cobol_name": "TRAN-TYPE",
+      "java_name": "tranType",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 2,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "TRAN-TYPE-DESC",
+      "java_name": "tranTypeDesc",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 50,
+      "decimal_places": 0
+    }
+  ]
+}

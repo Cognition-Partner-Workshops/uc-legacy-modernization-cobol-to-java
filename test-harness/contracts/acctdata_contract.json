@@ -1,0 +1,105 @@
+{
+  "file_key": "acctdata",
+  "copybook": "CVACT01Y.cpy",
+  "record_length": 300,
+  "computed_length": 300,
+  "field_count": 12,
+  "fields": [
+    {
+      "cobol_name": "ACCT-ID",
+      "java_name": "acctId",
+      "cobol_pic_type": "unsigned",
+      "java_type": "long",
+      "length": 11,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "ACCT-ACTIVE-STATUS",
+      "java_name": "acctActiveStatus",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 1,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "ACCT-CURR-BAL",
+      "java_name": "acctCurrBal",
+      "cobol_pic_type": "signed_decimal",
+      "java_type": "BigDecimal",
+      "length": 12,
+      "decimal_places": 2
+    },
+    {
+      "cobol_name": "ACCT-CREDIT-LIMIT",
+      "java_name": "acctCreditLimit",
+      "cobol_pic_type": "signed_decimal",
+      "java_type": "BigDecimal",
+      "length": 12,
+      "decimal_places": 2
+    },
+    {
+      "cobol_name": "ACCT-CASH-CREDIT-LIMIT",
+      "java_name": "acctCashCreditLimit",
+      "cobol_pic_type": "signed_decimal",
+      "java_type": "BigDecimal",
+      "length": 12,
+      "decimal_places": 2
+    },
+    {
+      "cobol_name": "ACCT-OPEN-DATE",
+      "java_name": "acctOpenDate",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 10,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "ACCT-EXPIRAION-DATE",
+      "java_name": "acctExpiraionDate",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 10,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "ACCT-REISSUE-DATE",
+      "java_name": "acctReissueDate",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 10,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "ACCT-CURR-CYC-CREDIT",
+      "java_name": "acctCurrCycCredit",
+      "cobol_pic_type": "signed_decimal",
+      "java_type": "BigDecimal",
+      "length": 12,
+      "decimal_places": 2
+    },
+    {
+      "cobol_name": "ACCT-CURR-CYC-DEBIT",
+      "java_name": "acctCurrCycDebit",
+      "cobol_pic_type": "signed_decimal",
+      "java_type": "BigDecimal",
+      "length": 12,
+      "decimal_places": 2
+    },
+    {
+      "cobol_name": "ACCT-ADDR-ZIP",
+      "java_name": "acctAddrZip",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 10,
+      "decimal_places": 0
+    },
+    {
+      "cobol_name": "ACCT-GROUP-ID",
+      "java_name": "acctGroupId",
+      "cobol_pic_type": "alpha",
+      "java_type": "String",
+      "length": 10,
+      "decimal_places": 0
+    }
+  ]
+}
