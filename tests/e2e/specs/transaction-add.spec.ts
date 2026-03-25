@@ -357,19 +357,4 @@ test.describe('Transaction Add (COTRN02C)', () => {
     await expect(page).toHaveURL(/\/(menu|transaction)/);
   });
 
-  /** Helper: fill all data fields */
-  async function fillDataFields(page: import('@playwright/test').Page) {
-    const t = Transactions.validAdd;
-    await page.fill(Selectors.txnTypeCd, t.typeCd);
-    await page.fill(Selectors.txnCatCd, t.categoryCd);
-    await page.fill(Selectors.txnSource, t.source);
-    await page.fill(Selectors.txnDesc, t.description);
-    await page.fill(Selectors.txnAmount, t.amount);
-    await page.fill(Selectors.txnOrigDate, t.origDate);
-    await page.fill(Selectors.txnProcDate, t.procDate);
-    await page.fill(Selectors.txnMerchantId, t.merchantId);
-    await page.fill(Selectors.txnMerchantName, t.merchantName);
-    await page.fill(Selectors.txnMerchantCity, t.merchantCity);
-    await page.fill(Selectors.txnMerchantZip, t.merchantZip);
-  }
 });
