@@ -157,7 +157,7 @@ Each module is scored on four dimensions (1-10 scale), then weighted to produce 
 
 ---
 
-### #5 — COCRDLIC (Credit Card List) — Score: 7.50
+### #5 — COCRDLIC (Credit Card List) — Score: 7.55
 
 **Location:** `app/cbl/COCRDLIC.cbl` (1,460 lines)
 
@@ -208,7 +208,7 @@ Each module is scored on four dimensions (1-10 scale), then weighted to produce 
 
 ---
 
-### #7 — COSGN00C (Sign-on) — Score: 7.30
+### #7 — COSGN00C (Sign-on) — Score: 7.25
 
 **Location:** `app/cbl/COSGN00C.cbl` (261 lines)
 
@@ -235,7 +235,7 @@ Each module is scored on four dimensions (1-10 scale), then weighted to produce 
 
 ---
 
-### #8 — COTRN02C (Transaction Add) — Score: 7.10
+### #8 — COTRN02C (Transaction Add) — Score: 7.05
 
 **Location:** `app/cbl/COTRN02C.cbl` (783 lines)
 
@@ -415,7 +415,7 @@ Based on the hotspot analysis, risk profiles, and dependency constraints, here i
 
 ### Critical Findings
 
-1. **COACTUPC is 2.7x larger than any other program** (4,237 lines vs. next-largest COTRTLIC at 2,098). It should be decomposed during migration rather than converted 1:1.
+1. **COACTUPC is 2.7x larger than any other core program** (4,237 lines vs. next-largest COCRDUPC at 1,560). It should be decomposed during migration rather than converted 1:1.
 
 2. **Plain-text passwords** in COSGN00C/CSUSR01Y represent an immediate security risk that should be the first migration target regardless of other priorities.
 
