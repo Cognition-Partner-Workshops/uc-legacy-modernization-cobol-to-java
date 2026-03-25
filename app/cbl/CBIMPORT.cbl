@@ -159,6 +159,12 @@
            05  ERR-MESSAGE                             PIC X(50).
            05  FILLER                          PIC X(43) VALUE SPACES.
 
+       01  WS-VALIDATION-FIELDS.
+           05  WS-COMPUTED-TOTAL          PIC 9(09) VALUE 0.
+           05  WS-VALIDATION-PASSED       PIC X(01) VALUE 'Y'.
+               88  VALIDATION-OK          VALUE 'Y'.
+               88  VALIDATION-FAILED      VALUE 'N'.
+
        PROCEDURE DIVISION.
 
       *****************************************************************
@@ -448,8 +454,52 @@
       *****************************************************************
        3000-VALIDATE-IMPORT.
       *****************************************************************
-           DISPLAY 'CBIMPORT: Import validation completed'
-           DISPLAY 'CBIMPORT: No validation errors detected'.
+           MOVE 'Y' TO WS-VALIDATION-PASSED
+           
+           COMPUTE WS-COMPUTED-TOTAL =
+               WS-CUSTOMER-RECORDS-IMPORTED +
+               WS-ACCOUNT-RECORDS-IMPORTED +
+               WS-XREF-RECORDS-IMPORTED +
+               WS-TRAN-RECORDS-IMPORTED +
+               WS-CARD-RECORDS-IMPORTED +
+               WS-UNKNOWN-RECORD-TYPE-COUNT
+           
+           IF WS-COMPUTED-TOTAL NOT = WS-TOTAL-RECORDS-READ
+               MOVE 'N' TO WS-VALIDATION-PASSED
+               MOVE FUNCTION CURRENT-DATE TO ERR-TIMESTAMP
+               MOVE SPACES TO ERR-RECORD-TYPE
+               MOVE 0 TO ERR-SEQUENCE
+               MOVE 'Record count mismatch in validation'
+                   TO ERR-MESSAGE
+               PERFORM 2750-WRITE-ERROR
+               DISPLAY 'CBIMPORT: VALIDATION ERROR - '
+                   'Record count mismatch: Read='
+                   WS-TOTAL-RECORDS-READ
+                   ' Computed='
+                   WS-COMPUTED-TOTAL
+           END-IF
+           
+           IF WS-ERROR-RECORDS-WRITTEN > 0
+               MOVE 'N' TO WS-VALIDATION-PASSED
+               DISPLAY 'CBIMPORT: VALIDATION WARNING - '
+                   'Errors encountered during import: '
+                   WS-ERROR-RECORDS-WRITTEN
+           END-IF
+           
+           IF WS-UNKNOWN-RECORD-TYPE-COUNT > 0
+               MOVE 'N' TO WS-VALIDATION-PASSED
+               DISPLAY 'CBIMPORT: VALIDATION WARNING - '
+                   'Unknown record types found: '
+                   WS-UNKNOWN-RECORD-TYPE-COUNT
+           END-IF
+           
+           IF VALIDATION-OK
+               DISPLAY 'CBIMPORT: Import validation completed'
+               DISPLAY 'CBIMPORT: No validation errors detected'
+           ELSE
+               DISPLAY 'CBIMPORT: Import validation completed'
+                   ' with errors'
+           END-IF.
 
       *****************************************************************
        4000-FINALIZE.
