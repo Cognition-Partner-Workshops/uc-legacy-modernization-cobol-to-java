@@ -1,0 +1,6 @@
+--- BATCH ADDITION START ---
+REC 00001:     0.00 +     0.00 =      0.00
+REC 00002:     0.00 +     1.00 =      1.00
+REC 00003:     1.00 +     0.00 =      1.00
+--- BATCH COMPLETE ---
+RECORDS PROCESSED: 00003
