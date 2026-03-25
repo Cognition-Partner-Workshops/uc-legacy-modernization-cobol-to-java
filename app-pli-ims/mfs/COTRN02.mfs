@@ -1,0 +1,128 @@
+***********************************************************************
+* Copyright Amazon.com, Inc. or its affiliates.
+* All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+* either express or implied. See the License for the specific
+* language governing permissions and limitations under the License
+***********************************************************************
+*    MFS Source for COTRN02 - Transaction Add Screen
+*    Converted from BMS: app/bms/COTRN02.bms
+***********************************************************************
+         PRINT NOGEN
+COTRN02  FMT   DEV(TYPE=3270,FEAT=IGNORE,DSCA=X'00A0')
+         DIV   TYPE=INOUT
+         DPAGE FILL=PT,CURSOR=((6,21))
+***********************************************************************
+*    Header Fields
+***********************************************************************
+         DFLD  'Tran:',POS=(1,1),LTH=5,ATTR=(PROT,NUM)
+TRNNAME  DFLD  POS=(1,7),LTH=4,ATTR=(PROT,NUM)
+TITLE01  DFLD  POS=(1,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Date:',POS=(1,65),LTH=5,ATTR=(PROT,NUM)
+CURDATE  DFLD  POS=(1,71),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Prog:',POS=(2,1),LTH=5,ATTR=(PROT,NUM)
+PGMNAME  DFLD  POS=(2,7),LTH=8,ATTR=(PROT,NUM)
+TITLE02  DFLD  POS=(2,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Time:',POS=(2,65),LTH=5,ATTR=(PROT,NUM)
+CURTIME  DFLD  POS=(2,71),LTH=8,ATTR=(PROT,NUM)
+***********************************************************************
+*    Transaction Add Body
+***********************************************************************
+         DFLD  'Add Transaction',POS=(4,30),LTH=15,ATTR=(PROT,HI)
+         DFLD  'Enter Acct #:',POS=(6,6),LTH=13,ATTR=(PROT,NUM)
+ACTIDIN  DFLD  POS=(6,21),LTH=11,ATTR=(MOD,NUM)
+         DFLD  '(or)',POS=(6,37),LTH=4,ATTR=(PROT,NUM)
+         DFLD  'Card #:',POS=(6,46),LTH=7,ATTR=(PROT,NUM)
+CARDNIN  DFLD  POS=(6,55),LTH=16,ATTR=(MOD,NUM)
+         DFLD  '----------------------------------------------', X
+               POS=(8,6),LTH=70,ATTR=(PROT,NUM)
+         DFLD  'Type CD:',POS=(10,6),LTH=8,ATTR=(PROT,NUM)
+TTYPCD   DFLD  POS=(10,15),LTH=2,ATTR=(MOD,NUM)
+         DFLD  'Category CD:',POS=(10,23),LTH=12,ATTR=(PROT,NUM)
+TCATCD   DFLD  POS=(10,36),LTH=4,ATTR=(MOD,NUM)
+         DFLD  'Source:',POS=(10,46),LTH=7,ATTR=(PROT,NUM)
+TRNSRC   DFLD  POS=(10,54),LTH=10,ATTR=(MOD,NUM)
+         DFLD  'Description:',POS=(12,6),LTH=12,ATTR=(PROT,NUM)
+TDESC    DFLD  POS=(12,19),LTH=60,ATTR=(MOD,NUM)
+         DFLD  'Amount:',POS=(14,6),LTH=7,ATTR=(PROT,NUM)
+TRNAMT   DFLD  POS=(14,14),LTH=12,ATTR=(MOD,NUM)
+         DFLD  'Orig Date:',POS=(14,31),LTH=10,ATTR=(PROT,NUM)
+TORIGDT  DFLD  POS=(14,42),LTH=10,ATTR=(MOD,NUM)
+         DFLD  'Proc Date:',POS=(14,57),LTH=10,ATTR=(PROT,NUM)
+TPROCDT  DFLD  POS=(14,68),LTH=10,ATTR=(MOD,NUM)
+         DFLD  '(-99999999.99)',POS=(15,13),LTH=14,ATTR=(PROT,NUM)
+         DFLD  '(YYYY-MM-DD)',POS=(15,41),LTH=12,ATTR=(PROT,NUM)
+         DFLD  '(YYYY-MM-DD)',POS=(15,67),LTH=12,ATTR=(PROT,NUM)
+         DFLD  'Merchant ID:',POS=(16,6),LTH=12,ATTR=(PROT,NUM)
+TMID     DFLD  POS=(16,19),LTH=9,ATTR=(MOD,NUM)
+         DFLD  'Merchant Name:',POS=(16,33),LTH=14,ATTR=(PROT,NUM)
+MNAME    DFLD  POS=(16,48),LTH=30,ATTR=(MOD,NUM)
+         DFLD  'Merchant City:',POS=(18,6),LTH=14,ATTR=(PROT,NUM)
+MCITY    DFLD  POS=(18,21),LTH=25,ATTR=(MOD,NUM)
+         DFLD  'Merchant Zip:',POS=(18,53),LTH=13,ATTR=(PROT,NUM)
+MZIP     DFLD  POS=(18,67),LTH=10,ATTR=(MOD,NUM)
+         DFLD  'You are about to add this transaction. Please confirm :', X
+               POS=(21,6),LTH=55,ATTR=(PROT,NUM)
+CONFIRM  DFLD  POS=(21,63),LTH=1,ATTR=(MOD,NUM)
+         DFLD  '(Y/N)',POS=(21,66),LTH=5,ATTR=(PROT,NUM)
+ERRMSG   DFLD  POS=(23,1),LTH=78,ATTR=(PROT,MOD)
+         DFLD  'ENTER=Continue  F3=Back  F4=Clear  F5=Copy Last Tran.', X
+               POS=(24,1),LTH=53,ATTR=(PROT,NUM)
+         FMTEND
+***********************************************************************
+*    MOD - Message Output Descriptor
+***********************************************************************
+CTRN02MO MSG   TYPE=OUTPUT,SOR=(COTRN02,IGNORE),NXT=CTRN02MI
+         SEG
+         MFLD  TRNNAME,LTH=4
+         MFLD  TITLE01,LTH=40
+         MFLD  CURDATE,LTH=8
+         MFLD  PGMNAME,LTH=8
+         MFLD  TITLE02,LTH=40
+         MFLD  CURTIME,LTH=8
+         MFLD  ACTIDIN,LTH=11
+         MFLD  CARDNIN,LTH=16
+         MFLD  TTYPCD,LTH=2
+         MFLD  TCATCD,LTH=4
+         MFLD  TRNSRC,LTH=10
+         MFLD  TDESC,LTH=60
+         MFLD  TRNAMT,LTH=12
+         MFLD  TORIGDT,LTH=10
+         MFLD  TPROCDT,LTH=10
+         MFLD  TMID,LTH=9
+         MFLD  MNAME,LTH=30
+         MFLD  MCITY,LTH=25
+         MFLD  MZIP,LTH=10
+         MFLD  CONFIRM,LTH=1
+         MFLD  ERRMSG,LTH=78
+         MSGEND
+***********************************************************************
+*    MID - Message Input Descriptor
+***********************************************************************
+CTRN02MI MSG   TYPE=INPUT,SOR=(COTRN02,IGNORE),NXT=CTRN02MO
+         SEG
+         MFLD  ACTIDIN,LTH=11,FILL=NULL
+         MFLD  CARDNIN,LTH=16,FILL=NULL
+         MFLD  TTYPCD,LTH=2,FILL=NULL
+         MFLD  TCATCD,LTH=4,FILL=NULL
+         MFLD  TRNSRC,LTH=10,FILL=NULL
+         MFLD  TDESC,LTH=60,FILL=NULL
+         MFLD  TRNAMT,LTH=12,FILL=NULL
+         MFLD  TORIGDT,LTH=10,FILL=NULL
+         MFLD  TPROCDT,LTH=10,FILL=NULL
+         MFLD  TMID,LTH=9,FILL=NULL
+         MFLD  MNAME,LTH=30,FILL=NULL
+         MFLD  MCITY,LTH=25,FILL=NULL
+         MFLD  MZIP,LTH=10,FILL=NULL
+         MFLD  CONFIRM,LTH=1,FILL=NULL
+         MSGEND
+         END

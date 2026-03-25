@@ -1,0 +1,112 @@
+***********************************************************************
+* Copyright Amazon.com, Inc. or its affiliates.
+* All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+* either express or implied. See the License for the specific
+* language governing permissions and limitations under the License
+***********************************************************************
+*    MFS Source for CORPT00 - Transaction Reports Screen
+*    Converted from BMS: app/bms/CORPT00.bms
+***********************************************************************
+         PRINT NOGEN
+CORPT00  FMT   DEV(TYPE=3270,FEAT=IGNORE,DSCA=X'00A0')
+         DIV   TYPE=INOUT
+         DPAGE FILL=PT,CURSOR=((7,10))
+***********************************************************************
+*    Header Fields
+***********************************************************************
+         DFLD  'Tran:',POS=(1,1),LTH=5,ATTR=(PROT,NUM)
+TRNNAME  DFLD  POS=(1,7),LTH=4,ATTR=(PROT,NUM)
+TITLE01  DFLD  POS=(1,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Date:',POS=(1,65),LTH=5,ATTR=(PROT,NUM)
+CURDATE  DFLD  POS=(1,71),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Prog:',POS=(2,1),LTH=5,ATTR=(PROT,NUM)
+PGMNAME  DFLD  POS=(2,7),LTH=8,ATTR=(PROT,NUM)
+TITLE02  DFLD  POS=(2,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Time:',POS=(2,65),LTH=5,ATTR=(PROT,NUM)
+CURTIME  DFLD  POS=(2,71),LTH=8,ATTR=(PROT,NUM)
+***********************************************************************
+*    Report Selection Body
+***********************************************************************
+         DFLD  'Transaction Reports',POS=(4,30),LTH=19, X
+               ATTR=(PROT,HI)
+MONTHLY  DFLD  POS=(7,10),LTH=1,ATTR=(MOD,NUM)
+         DFLD  'Monthly (Current Month)',POS=(7,15),LTH=23, X
+               ATTR=(PROT,HI)
+YEARLY   DFLD  POS=(9,10),LTH=1,ATTR=(MOD,NUM)
+         DFLD  'Yearly (Current Year)',POS=(9,15),LTH=21, X
+               ATTR=(PROT,HI)
+CUSTOM   DFLD  POS=(11,10),LTH=1,ATTR=(MOD,NUM)
+         DFLD  'Custom (Date Range)',POS=(11,15),LTH=19, X
+               ATTR=(PROT,HI)
+         DFLD  'Start Date :',POS=(13,15),LTH=12,ATTR=(PROT,NUM)
+SDTMM    DFLD  POS=(13,29),LTH=2,ATTR=(MOD,NUM)
+         DFLD  '/',POS=(13,32),LTH=1,ATTR=(PROT,NUM)
+SDTDD    DFLD  POS=(13,34),LTH=2,ATTR=(MOD,NUM)
+         DFLD  '/',POS=(13,37),LTH=1,ATTR=(PROT,NUM)
+SDTYYYY  DFLD  POS=(13,39),LTH=4,ATTR=(MOD,NUM)
+         DFLD  '(MM/DD/YYYY)',POS=(13,46),LTH=12,ATTR=(PROT,NUM)
+         DFLD  '  End Date :',POS=(14,15),LTH=12,ATTR=(PROT,NUM)
+EDTMM    DFLD  POS=(14,29),LTH=2,ATTR=(MOD,NUM)
+         DFLD  '/',POS=(14,32),LTH=1,ATTR=(PROT,NUM)
+EDTDD    DFLD  POS=(14,34),LTH=2,ATTR=(MOD,NUM)
+         DFLD  '/',POS=(14,37),LTH=1,ATTR=(PROT,NUM)
+EDTYYYY  DFLD  POS=(14,39),LTH=4,ATTR=(MOD,NUM)
+         DFLD  '(MM/DD/YYYY)',POS=(14,46),LTH=12,ATTR=(PROT,NUM)
+         DFLD  'The Report will be submitted for printing. Please confirm: ', X
+               POS=(19,6),LTH=59,ATTR=(PROT,NUM)
+CONFIRM  DFLD  POS=(19,66),LTH=1,ATTR=(MOD,NUM)
+         DFLD  '(Y/N)',POS=(19,69),LTH=5,ATTR=(PROT,NUM)
+ERRMSG   DFLD  POS=(23,1),LTH=78,ATTR=(PROT,MOD)
+         DFLD  'ENTER=Continue  F3=Back',POS=(24,1),LTH=23, X
+               ATTR=(PROT,NUM)
+         FMTEND
+***********************************************************************
+*    MOD - Message Output Descriptor
+***********************************************************************
+CRPT00MO MSG   TYPE=OUTPUT,SOR=(CORPT00,IGNORE),NXT=CRPT00MI
+         SEG
+         MFLD  TRNNAME,LTH=4
+         MFLD  TITLE01,LTH=40
+         MFLD  CURDATE,LTH=8
+         MFLD  PGMNAME,LTH=8
+         MFLD  TITLE02,LTH=40
+         MFLD  CURTIME,LTH=8
+         MFLD  MONTHLY,LTH=1
+         MFLD  YEARLY,LTH=1
+         MFLD  CUSTOM,LTH=1
+         MFLD  SDTMM,LTH=2
+         MFLD  SDTDD,LTH=2
+         MFLD  SDTYYYY,LTH=4
+         MFLD  EDTMM,LTH=2
+         MFLD  EDTDD,LTH=2
+         MFLD  EDTYYYY,LTH=4
+         MFLD  CONFIRM,LTH=1
+         MFLD  ERRMSG,LTH=78
+         MSGEND
+***********************************************************************
+*    MID - Message Input Descriptor
+***********************************************************************
+CRPT00MI MSG   TYPE=INPUT,SOR=(CORPT00,IGNORE),NXT=CRPT00MO
+         SEG
+         MFLD  MONTHLY,LTH=1,FILL=NULL
+         MFLD  YEARLY,LTH=1,FILL=NULL
+         MFLD  CUSTOM,LTH=1,FILL=NULL
+         MFLD  SDTMM,LTH=2,FILL=NULL
+         MFLD  SDTDD,LTH=2,FILL=NULL
+         MFLD  SDTYYYY,LTH=4,FILL=NULL
+         MFLD  EDTMM,LTH=2,FILL=NULL
+         MFLD  EDTDD,LTH=2,FILL=NULL
+         MFLD  EDTYYYY,LTH=4,FILL=NULL
+         MFLD  CONFIRM,LTH=1,FILL=NULL
+         MSGEND
+         END

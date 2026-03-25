@@ -1,0 +1,150 @@
+***********************************************************************
+* Copyright Amazon.com, Inc. or its affiliates.
+* All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+* either express or implied. See the License for the specific
+* language governing permissions and limitations under the License
+***********************************************************************
+*    MFS Source for COCRDLI - Card List Screen
+*    Converted from BMS: app/bms/COCRDLI.bms
+***********************************************************************
+         PRINT NOGEN
+COCRDLI  FMT   DEV(TYPE=3270,FEAT=IGNORE,DSCA=X'00A0')
+         DIV   TYPE=INOUT
+         DPAGE FILL=PT,CURSOR=((6,21))
+***********************************************************************
+*    Header Fields
+***********************************************************************
+         DFLD  'Tran:',POS=(1,1),LTH=5,ATTR=(PROT,NUM)
+TRNNAME  DFLD  POS=(1,7),LTH=4,ATTR=(PROT,NUM)
+TITLE01  DFLD  POS=(1,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Date:',POS=(1,65),LTH=5,ATTR=(PROT,NUM)
+CURDATE  DFLD  POS=(1,71),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Prog:',POS=(2,1),LTH=5,ATTR=(PROT,NUM)
+PGMNAME  DFLD  POS=(2,7),LTH=8,ATTR=(PROT,NUM)
+TITLE02  DFLD  POS=(2,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Time:',POS=(2,65),LTH=5,ATTR=(PROT,NUM)
+CURTIME  DFLD  POS=(2,71),LTH=8,ATTR=(PROT,NUM)
+***********************************************************************
+*    Card List Body
+***********************************************************************
+         DFLD  'Credit Card List',POS=(4,32),LTH=16,ATTR=(PROT,HI)
+         DFLD  'Page:',POS=(4,65),LTH=5,ATTR=(PROT,HI)
+PAGENUM  DFLD  POS=(4,71),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Enter Account ID:',POS=(6,5),LTH=17,ATTR=(PROT,NUM)
+APTS     DFLD  POS=(6,23),LTH=11,ATTR=(MOD,NUM)
+***********************************************************************
+*    Column Headers
+***********************************************************************
+         DFLD  'Sel',POS=(8,5),LTH=3,ATTR=(PROT,NUM)
+         DFLD  'Account Num',POS=(8,12),LTH=11,ATTR=(PROT,NUM)
+         DFLD  'Card Number',POS=(8,27),LTH=16,ATTR=(PROT,NUM)
+         DFLD  'Card Status',POS=(8,47),LTH=11,ATTR=(PROT,NUM)
+         DFLD  '---',POS=(9,5),LTH=3,ATTR=(PROT,NUM)
+         DFLD  '-----------',POS=(9,12),LTH=11,ATTR=(PROT,NUM)
+         DFLD  '----------------',POS=(9,27),LTH=16,ATTR=(PROT,NUM)
+         DFLD  '-----------',POS=(9,47),LTH=11,ATTR=(PROT,NUM)
+***********************************************************************
+*    Data Rows (7 rows)
+***********************************************************************
+CRDSEL1  DFLD  POS=(10,6),LTH=1,ATTR=(MOD,NUM)
+ACCTNO1  DFLD  POS=(10,12),LTH=11,ATTR=(PROT,NUM)
+CRDNUM1  DFLD  POS=(10,27),LTH=16,ATTR=(PROT,NUM)
+CRDSTS1  DFLD  POS=(10,47),LTH=1,ATTR=(PROT,NUM)
+CRDSEL2  DFLD  POS=(11,6),LTH=1,ATTR=(MOD,NUM)
+ACCTNO2  DFLD  POS=(11,12),LTH=11,ATTR=(PROT,NUM)
+CRDNUM2  DFLD  POS=(11,27),LTH=16,ATTR=(PROT,NUM)
+CRDSTS2  DFLD  POS=(11,47),LTH=1,ATTR=(PROT,NUM)
+CRDSEL3  DFLD  POS=(12,6),LTH=1,ATTR=(MOD,NUM)
+ACCTNO3  DFLD  POS=(12,12),LTH=11,ATTR=(PROT,NUM)
+CRDNUM3  DFLD  POS=(12,27),LTH=16,ATTR=(PROT,NUM)
+CRDSTS3  DFLD  POS=(12,47),LTH=1,ATTR=(PROT,NUM)
+CRDSEL4  DFLD  POS=(13,6),LTH=1,ATTR=(MOD,NUM)
+ACCTNO4  DFLD  POS=(13,12),LTH=11,ATTR=(PROT,NUM)
+CRDNUM4  DFLD  POS=(13,27),LTH=16,ATTR=(PROT,NUM)
+CRDSTS4  DFLD  POS=(13,47),LTH=1,ATTR=(PROT,NUM)
+CRDSEL5  DFLD  POS=(14,6),LTH=1,ATTR=(MOD,NUM)
+ACCTNO5  DFLD  POS=(14,12),LTH=11,ATTR=(PROT,NUM)
+CRDNUM5  DFLD  POS=(14,27),LTH=16,ATTR=(PROT,NUM)
+CRDSTS5  DFLD  POS=(14,47),LTH=1,ATTR=(PROT,NUM)
+CRDSEL6  DFLD  POS=(15,6),LTH=1,ATTR=(MOD,NUM)
+ACCTNO6  DFLD  POS=(15,12),LTH=11,ATTR=(PROT,NUM)
+CRDNUM6  DFLD  POS=(15,27),LTH=16,ATTR=(PROT,NUM)
+CRDSTS6  DFLD  POS=(15,47),LTH=1,ATTR=(PROT,NUM)
+CRDSEL7  DFLD  POS=(16,6),LTH=1,ATTR=(MOD,NUM)
+ACCTNO7  DFLD  POS=(16,12),LTH=11,ATTR=(PROT,NUM)
+CRDNUM7  DFLD  POS=(16,27),LTH=16,ATTR=(PROT,NUM)
+CRDSTS7  DFLD  POS=(16,47),LTH=1,ATTR=(PROT,NUM)
+         DFLD  'Select S to view card details',POS=(21,12), X
+               LTH=29,ATTR=(PROT,NUM)
+ERRMSG   DFLD  POS=(23,1),LTH=78,ATTR=(PROT,MOD)
+         DFLD  'ENTER=Continue  F3=Back  F7=Up  F8=Down', X
+               POS=(24,1),LTH=39,ATTR=(PROT,NUM)
+         FMTEND
+***********************************************************************
+*    MOD - Message Output Descriptor
+***********************************************************************
+CCRDLIMO MSG   TYPE=OUTPUT,SOR=(COCRDLI,IGNORE),NXT=CCRDLIMI
+         SEG
+         MFLD  TRNNAME,LTH=4
+         MFLD  TITLE01,LTH=40
+         MFLD  CURDATE,LTH=8
+         MFLD  PGMNAME,LTH=8
+         MFLD  TITLE02,LTH=40
+         MFLD  CURTIME,LTH=8
+         MFLD  PAGENUM,LTH=8
+         MFLD  APTS,LTH=11
+         MFLD  CRDSEL1,LTH=1
+         MFLD  ACCTNO1,LTH=11
+         MFLD  CRDNUM1,LTH=16
+         MFLD  CRDSTS1,LTH=1
+         MFLD  CRDSEL2,LTH=1
+         MFLD  ACCTNO2,LTH=11
+         MFLD  CRDNUM2,LTH=16
+         MFLD  CRDSTS2,LTH=1
+         MFLD  CRDSEL3,LTH=1
+         MFLD  ACCTNO3,LTH=11
+         MFLD  CRDNUM3,LTH=16
+         MFLD  CRDSTS3,LTH=1
+         MFLD  CRDSEL4,LTH=1
+         MFLD  ACCTNO4,LTH=11
+         MFLD  CRDNUM4,LTH=16
+         MFLD  CRDSTS4,LTH=1
+         MFLD  CRDSEL5,LTH=1
+         MFLD  ACCTNO5,LTH=11
+         MFLD  CRDNUM5,LTH=16
+         MFLD  CRDSTS5,LTH=1
+         MFLD  CRDSEL6,LTH=1
+         MFLD  ACCTNO6,LTH=11
+         MFLD  CRDNUM6,LTH=16
+         MFLD  CRDSTS6,LTH=1
+         MFLD  CRDSEL7,LTH=1
+         MFLD  ACCTNO7,LTH=11
+         MFLD  CRDNUM7,LTH=16
+         MFLD  CRDSTS7,LTH=1
+         MFLD  ERRMSG,LTH=78
+         MSGEND
+***********************************************************************
+*    MID - Message Input Descriptor
+***********************************************************************
+CCRDLIMI MSG   TYPE=INPUT,SOR=(COCRDLI,IGNORE),NXT=CCRDLIMO
+         SEG
+         MFLD  APTS,LTH=11,FILL=NULL
+         MFLD  CRDSEL1,LTH=1,FILL=NULL
+         MFLD  CRDSEL2,LTH=1,FILL=NULL
+         MFLD  CRDSEL3,LTH=1,FILL=NULL
+         MFLD  CRDSEL4,LTH=1,FILL=NULL
+         MFLD  CRDSEL5,LTH=1,FILL=NULL
+         MFLD  CRDSEL6,LTH=1,FILL=NULL
+         MFLD  CRDSEL7,LTH=1,FILL=NULL
+         MSGEND
+         END

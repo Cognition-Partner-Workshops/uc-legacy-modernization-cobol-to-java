@@ -1,0 +1,83 @@
+***********************************************************************
+* Copyright Amazon.com, Inc. or its affiliates.
+* All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+* either express or implied. See the License for the specific
+* language governing permissions and limitations under the License
+***********************************************************************
+*    MFS Source for COCRDSL - Card View Screen
+*    Converted from BMS: app/bms/COCRDSL.bms
+***********************************************************************
+         PRINT NOGEN
+COCRDSL  FMT   DEV(TYPE=3270,FEAT=IGNORE,DSCA=X'00A0')
+         DIV   TYPE=INOUT
+         DPAGE FILL=PT,CURSOR=((6,21))
+***********************************************************************
+*    Header Fields
+***********************************************************************
+         DFLD  'Tran:',POS=(1,1),LTH=5,ATTR=(PROT,NUM)
+TRNNAME  DFLD  POS=(1,7),LTH=4,ATTR=(PROT,NUM)
+TITLE01  DFLD  POS=(1,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Date:',POS=(1,65),LTH=5,ATTR=(PROT,NUM)
+CURDATE  DFLD  POS=(1,71),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Prog:',POS=(2,1),LTH=5,ATTR=(PROT,NUM)
+PGMNAME  DFLD  POS=(2,7),LTH=8,ATTR=(PROT,NUM)
+TITLE02  DFLD  POS=(2,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Time:',POS=(2,65),LTH=5,ATTR=(PROT,NUM)
+CURTIME  DFLD  POS=(2,71),LTH=8,ATTR=(PROT,NUM)
+***********************************************************************
+*    Card View Body
+***********************************************************************
+         DFLD  'Card Details',POS=(4,34),LTH=12,ATTR=(PROT,HI)
+         DFLD  'Account Number:',POS=(6,5),LTH=15,ATTR=(PROT,NUM)
+ACCTNO   DFLD  POS=(6,21),LTH=11,ATTR=(MOD,NUM)
+         DFLD  'Card Number:',POS=(8,5),LTH=12,ATTR=(PROT,NUM)
+CARDNO   DFLD  POS=(8,18),LTH=16,ATTR=(PROT,NUM)
+         DFLD  'Cardholder Name:',POS=(10,5),LTH=16,ATTR=(PROT,NUM)
+CRDNAME  DFLD  POS=(10,22),LTH=50,ATTR=(PROT,NUM)
+         DFLD  'Active:',POS=(12,5),LTH=7,ATTR=(PROT,NUM)
+CRDSTCD  DFLD  POS=(12,13),LTH=1,ATTR=(PROT,NUM)
+         DFLD  'Expiry Date:',POS=(12,20),LTH=12,ATTR=(PROT,NUM)
+EXPMON   DFLD  POS=(12,33),LTH=2,ATTR=(PROT,NUM)
+         DFLD  '/',POS=(12,36),LTH=1,ATTR=(PROT,NUM)
+EXPYEAR  DFLD  POS=(12,38),LTH=4,ATTR=(PROT,NUM)
+ERRMSG   DFLD  POS=(23,1),LTH=78,ATTR=(PROT,MOD)
+         DFLD  'ENTER=Continue  F3=Back  F5=Update',POS=(24,1), X
+               LTH=34,ATTR=(PROT,NUM)
+         FMTEND
+***********************************************************************
+*    MOD - Message Output Descriptor
+***********************************************************************
+CCRDSLMO MSG   TYPE=OUTPUT,SOR=(COCRDSL,IGNORE),NXT=CCRDSLMI
+         SEG
+         MFLD  TRNNAME,LTH=4
+         MFLD  TITLE01,LTH=40
+         MFLD  CURDATE,LTH=8
+         MFLD  PGMNAME,LTH=8
+         MFLD  TITLE02,LTH=40
+         MFLD  CURTIME,LTH=8
+         MFLD  ACCTNO,LTH=11
+         MFLD  CARDNO,LTH=16
+         MFLD  CRDNAME,LTH=50
+         MFLD  CRDSTCD,LTH=1
+         MFLD  EXPMON,LTH=2
+         MFLD  EXPYEAR,LTH=4
+         MFLD  ERRMSG,LTH=78
+         MSGEND
+***********************************************************************
+*    MID - Message Input Descriptor
+***********************************************************************
+CCRDSLMI MSG   TYPE=INPUT,SOR=(COCRDSL,IGNORE),NXT=CCRDSLMO
+         SEG
+         MFLD  ACCTNO,LTH=11,FILL=NULL
+         MSGEND
+         END

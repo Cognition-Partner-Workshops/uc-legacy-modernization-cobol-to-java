@@ -1,0 +1,203 @@
+***********************************************************************
+* Copyright Amazon.com, Inc. or its affiliates.
+* All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+* either express or implied. See the License for the specific
+* language governing permissions and limitations under the License
+***********************************************************************
+*    MFS Source for COUSR00 - List Users Screen
+*    Converted from BMS: app/bms/COUSR00.bms
+***********************************************************************
+         PRINT NOGEN
+COUSR00  FMT   DEV(TYPE=3270,FEAT=IGNORE,DSCA=X'00A0')
+         DIV   TYPE=INOUT
+         DPAGE FILL=PT,CURSOR=((6,21))
+***********************************************************************
+*    Header Fields
+***********************************************************************
+         DFLD  'Tran:',POS=(1,1),LTH=5,ATTR=(PROT,NUM)
+TRNNAME  DFLD  POS=(1,7),LTH=4,ATTR=(PROT,NUM)
+TITLE01  DFLD  POS=(1,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Date:',POS=(1,65),LTH=5,ATTR=(PROT,NUM)
+CURDATE  DFLD  POS=(1,71),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Prog:',POS=(2,1),LTH=5,ATTR=(PROT,NUM)
+PGMNAME  DFLD  POS=(2,7),LTH=8,ATTR=(PROT,NUM)
+TITLE02  DFLD  POS=(2,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Time:',POS=(2,65),LTH=5,ATTR=(PROT,NUM)
+CURTIME  DFLD  POS=(2,71),LTH=8,ATTR=(PROT,NUM)
+***********************************************************************
+*    User List Body
+***********************************************************************
+         DFLD  'List Users',POS=(4,35),LTH=10,ATTR=(PROT,HI)
+         DFLD  'Page:',POS=(4,65),LTH=5,ATTR=(PROT,HI)
+PAGENUM  DFLD  POS=(4,71),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Search User ID:',POS=(6,5),LTH=15,ATTR=(PROT,NUM)
+USRIDIN  DFLD  POS=(6,21),LTH=8,ATTR=(MOD,NUM)
+***********************************************************************
+*    Column Headers
+***********************************************************************
+         DFLD  'Sel',POS=(8,5),LTH=3,ATTR=(PROT,NUM)
+         DFLD  'User ID ',POS=(8,12),LTH=8,ATTR=(PROT,NUM)
+         DFLD  '     First Name     ',POS=(8,24),LTH=20, X
+               ATTR=(PROT,NUM)
+         DFLD  '     Last Name      ',POS=(8,48),LTH=20, X
+               ATTR=(PROT,NUM)
+         DFLD  'Type',POS=(8,72),LTH=4,ATTR=(PROT,NUM)
+         DFLD  '---',POS=(9,5),LTH=3,ATTR=(PROT,NUM)
+         DFLD  '--------',POS=(9,12),LTH=8,ATTR=(PROT,NUM)
+         DFLD  '--------------------',POS=(9,24),LTH=20, X
+               ATTR=(PROT,NUM)
+         DFLD  '--------------------',POS=(9,48),LTH=20, X
+               ATTR=(PROT,NUM)
+         DFLD  '----',POS=(9,72),LTH=4,ATTR=(PROT,NUM)
+***********************************************************************
+*    Data Rows (10 rows)
+***********************************************************************
+SEL0001  DFLD  POS=(10,6),LTH=1,ATTR=(MOD,NUM)
+USRID01  DFLD  POS=(10,12),LTH=8,ATTR=(PROT,NUM)
+FNAME01  DFLD  POS=(10,24),LTH=20,ATTR=(PROT,NUM)
+LNAME01  DFLD  POS=(10,48),LTH=20,ATTR=(PROT,NUM)
+UTYPE01  DFLD  POS=(10,73),LTH=1,ATTR=(PROT,NUM)
+SEL0002  DFLD  POS=(11,6),LTH=1,ATTR=(MOD,NUM)
+USRID02  DFLD  POS=(11,12),LTH=8,ATTR=(PROT,NUM)
+FNAME02  DFLD  POS=(11,24),LTH=20,ATTR=(PROT,NUM)
+LNAME02  DFLD  POS=(11,48),LTH=20,ATTR=(PROT,NUM)
+UTYPE02  DFLD  POS=(11,73),LTH=1,ATTR=(PROT,NUM)
+SEL0003  DFLD  POS=(12,6),LTH=1,ATTR=(MOD,NUM)
+USRID03  DFLD  POS=(12,12),LTH=8,ATTR=(PROT,NUM)
+FNAME03  DFLD  POS=(12,24),LTH=20,ATTR=(PROT,NUM)
+LNAME03  DFLD  POS=(12,48),LTH=20,ATTR=(PROT,NUM)
+UTYPE03  DFLD  POS=(12,73),LTH=1,ATTR=(PROT,NUM)
+SEL0004  DFLD  POS=(13,6),LTH=1,ATTR=(MOD,NUM)
+USRID04  DFLD  POS=(13,12),LTH=8,ATTR=(PROT,NUM)
+FNAME04  DFLD  POS=(13,24),LTH=20,ATTR=(PROT,NUM)
+LNAME04  DFLD  POS=(13,48),LTH=20,ATTR=(PROT,NUM)
+UTYPE04  DFLD  POS=(13,73),LTH=1,ATTR=(PROT,NUM)
+SEL0005  DFLD  POS=(14,6),LTH=1,ATTR=(MOD,NUM)
+USRID05  DFLD  POS=(14,12),LTH=8,ATTR=(PROT,NUM)
+FNAME05  DFLD  POS=(14,24),LTH=20,ATTR=(PROT,NUM)
+LNAME05  DFLD  POS=(14,48),LTH=20,ATTR=(PROT,NUM)
+UTYPE05  DFLD  POS=(14,73),LTH=1,ATTR=(PROT,NUM)
+SEL0006  DFLD  POS=(15,6),LTH=1,ATTR=(MOD,NUM)
+USRID06  DFLD  POS=(15,12),LTH=8,ATTR=(PROT,NUM)
+FNAME06  DFLD  POS=(15,24),LTH=20,ATTR=(PROT,NUM)
+LNAME06  DFLD  POS=(15,48),LTH=20,ATTR=(PROT,NUM)
+UTYPE06  DFLD  POS=(15,73),LTH=1,ATTR=(PROT,NUM)
+SEL0007  DFLD  POS=(16,6),LTH=1,ATTR=(MOD,NUM)
+USRID07  DFLD  POS=(16,12),LTH=8,ATTR=(PROT,NUM)
+FNAME07  DFLD  POS=(16,24),LTH=20,ATTR=(PROT,NUM)
+LNAME07  DFLD  POS=(16,48),LTH=20,ATTR=(PROT,NUM)
+UTYPE07  DFLD  POS=(16,73),LTH=1,ATTR=(PROT,NUM)
+SEL0008  DFLD  POS=(17,6),LTH=1,ATTR=(MOD,NUM)
+USRID08  DFLD  POS=(17,12),LTH=8,ATTR=(PROT,NUM)
+FNAME08  DFLD  POS=(17,24),LTH=20,ATTR=(PROT,NUM)
+LNAME08  DFLD  POS=(17,48),LTH=20,ATTR=(PROT,NUM)
+UTYPE08  DFLD  POS=(17,73),LTH=1,ATTR=(PROT,NUM)
+SEL0009  DFLD  POS=(18,6),LTH=1,ATTR=(MOD,NUM)
+USRID09  DFLD  POS=(18,12),LTH=8,ATTR=(PROT,NUM)
+FNAME09  DFLD  POS=(18,24),LTH=20,ATTR=(PROT,NUM)
+LNAME09  DFLD  POS=(18,48),LTH=20,ATTR=(PROT,NUM)
+UTYPE09  DFLD  POS=(18,73),LTH=1,ATTR=(PROT,NUM)
+SEL0010  DFLD  POS=(19,6),LTH=1,ATTR=(MOD,NUM)
+USRID10  DFLD  POS=(19,12),LTH=8,ATTR=(PROT,NUM)
+FNAME10  DFLD  POS=(19,24),LTH=20,ATTR=(PROT,NUM)
+LNAME10  DFLD  POS=(19,48),LTH=20,ATTR=(PROT,NUM)
+UTYPE10  DFLD  POS=(19,73),LTH=1,ATTR=(PROT,NUM)
+         DFLD  'Type U to Update or D to Delete a User from the list', X
+               POS=(21,12),LTH=56,ATTR=(PROT,NUM)
+ERRMSG   DFLD  POS=(23,1),LTH=78,ATTR=(PROT,MOD)
+         DFLD  'ENTER=Continue  F3=Back  F7=Up  F8=Down', X
+               POS=(24,1),LTH=39,ATTR=(PROT,NUM)
+         FMTEND
+***********************************************************************
+*    MOD - Message Output Descriptor
+***********************************************************************
+CUSR00MO MSG   TYPE=OUTPUT,SOR=(COUSR00,IGNORE),NXT=CUSR00MI
+         SEG
+         MFLD  TRNNAME,LTH=4
+         MFLD  TITLE01,LTH=40
+         MFLD  CURDATE,LTH=8
+         MFLD  PGMNAME,LTH=8
+         MFLD  TITLE02,LTH=40
+         MFLD  CURTIME,LTH=8
+         MFLD  PAGENUM,LTH=8
+         MFLD  USRIDIN,LTH=8
+         MFLD  SEL0001,LTH=1
+         MFLD  USRID01,LTH=8
+         MFLD  FNAME01,LTH=20
+         MFLD  LNAME01,LTH=20
+         MFLD  UTYPE01,LTH=1
+         MFLD  SEL0002,LTH=1
+         MFLD  USRID02,LTH=8
+         MFLD  FNAME02,LTH=20
+         MFLD  LNAME02,LTH=20
+         MFLD  UTYPE02,LTH=1
+         MFLD  SEL0003,LTH=1
+         MFLD  USRID03,LTH=8
+         MFLD  FNAME03,LTH=20
+         MFLD  LNAME03,LTH=20
+         MFLD  UTYPE03,LTH=1
+         MFLD  SEL0004,LTH=1
+         MFLD  USRID04,LTH=8
+         MFLD  FNAME04,LTH=20
+         MFLD  LNAME04,LTH=20
+         MFLD  UTYPE04,LTH=1
+         MFLD  SEL0005,LTH=1
+         MFLD  USRID05,LTH=8
+         MFLD  FNAME05,LTH=20
+         MFLD  LNAME05,LTH=20
+         MFLD  UTYPE05,LTH=1
+         MFLD  SEL0006,LTH=1
+         MFLD  USRID06,LTH=8
+         MFLD  FNAME06,LTH=20
+         MFLD  LNAME06,LTH=20
+         MFLD  UTYPE06,LTH=1
+         MFLD  SEL0007,LTH=1
+         MFLD  USRID07,LTH=8
+         MFLD  FNAME07,LTH=20
+         MFLD  LNAME07,LTH=20
+         MFLD  UTYPE07,LTH=1
+         MFLD  SEL0008,LTH=1
+         MFLD  USRID08,LTH=8
+         MFLD  FNAME08,LTH=20
+         MFLD  LNAME08,LTH=20
+         MFLD  UTYPE08,LTH=1
+         MFLD  SEL0009,LTH=1
+         MFLD  USRID09,LTH=8
+         MFLD  FNAME09,LTH=20
+         MFLD  LNAME09,LTH=20
+         MFLD  UTYPE09,LTH=1
+         MFLD  SEL0010,LTH=1
+         MFLD  USRID10,LTH=8
+         MFLD  FNAME10,LTH=20
+         MFLD  LNAME10,LTH=20
+         MFLD  UTYPE10,LTH=1
+         MFLD  ERRMSG,LTH=78
+         MSGEND
+***********************************************************************
+*    MID - Message Input Descriptor
+***********************************************************************
+CUSR00MI MSG   TYPE=INPUT,SOR=(COUSR00,IGNORE),NXT=CUSR00MO
+         SEG
+         MFLD  USRIDIN,LTH=8,FILL=NULL
+         MFLD  SEL0001,LTH=1,FILL=NULL
+         MFLD  SEL0002,LTH=1,FILL=NULL
+         MFLD  SEL0003,LTH=1,FILL=NULL
+         MFLD  SEL0004,LTH=1,FILL=NULL
+         MFLD  SEL0005,LTH=1,FILL=NULL
+         MFLD  SEL0006,LTH=1,FILL=NULL
+         MFLD  SEL0007,LTH=1,FILL=NULL
+         MFLD  SEL0008,LTH=1,FILL=NULL
+         MFLD  SEL0009,LTH=1,FILL=NULL
+         MFLD  SEL0010,LTH=1,FILL=NULL
+         MSGEND
+         END

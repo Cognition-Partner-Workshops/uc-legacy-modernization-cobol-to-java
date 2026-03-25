@@ -1,0 +1,25 @@
+***********************************************************************
+* Copyright Amazon.com, Inc. or its affiliates.
+* All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+* either express or implied. See the License for the specific
+* language governing permissions and limitations under the License
+***********************************************************************
+*    PSB for CBACT04P - Batch Interest Calculation
+*    Needs: ACCTDAT, TRANSACT DB PCBs
+***********************************************************************
+ACCTPCB  PCB   TYPE=DB,DBDNAME=DBACCTDT,PROCOPT=AP,KEYLEN=11
+         SENSEG  NAME=ACCTSEG0,PARENT=0
+TRANPCB  PCB   TYPE=DB,DBDNAME=DBTRANSC,PROCOPT=AP,KEYLEN=16
+         SENSEG  NAME=TRANSEG0,PARENT=0
+         PSBGEN  LANG=PLI,PSBNAME=PCBACT04,CMPAT=YES
+         END

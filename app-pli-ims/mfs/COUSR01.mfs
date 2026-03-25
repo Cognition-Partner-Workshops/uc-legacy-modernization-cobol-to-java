@@ -1,0 +1,88 @@
+***********************************************************************
+* Copyright Amazon.com, Inc. or its affiliates.
+* All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+* either express or implied. See the License for the specific
+* language governing permissions and limitations under the License
+***********************************************************************
+*    MFS Source for COUSR01 - Add User Screen
+*    Converted from BMS: app/bms/COUSR01.bms
+***********************************************************************
+         PRINT NOGEN
+COUSR01  FMT   DEV(TYPE=3270,FEAT=IGNORE,DSCA=X'00A0')
+         DIV   TYPE=INOUT
+         DPAGE FILL=PT,CURSOR=((8,18))
+***********************************************************************
+*    Header Fields
+***********************************************************************
+         DFLD  'Tran:',POS=(1,1),LTH=5,ATTR=(PROT,NUM)
+TRNNAME  DFLD  POS=(1,7),LTH=4,ATTR=(PROT,NUM)
+TITLE01  DFLD  POS=(1,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Date:',POS=(1,65),LTH=5,ATTR=(PROT,NUM)
+CURDATE  DFLD  POS=(1,71),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Prog:',POS=(2,1),LTH=5,ATTR=(PROT,NUM)
+PGMNAME  DFLD  POS=(2,7),LTH=8,ATTR=(PROT,NUM)
+TITLE02  DFLD  POS=(2,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Time:',POS=(2,65),LTH=5,ATTR=(PROT,NUM)
+CURTIME  DFLD  POS=(2,71),LTH=8,ATTR=(PROT,NUM)
+***********************************************************************
+*    Add User Body
+***********************************************************************
+         DFLD  'Add User',POS=(4,35),LTH=9,ATTR=(PROT,HI)
+         DFLD  'First Name:',POS=(8,6),LTH=11,ATTR=(PROT,NUM)
+FNAME    DFLD  POS=(8,18),LTH=20,ATTR=(MOD,NUM)
+         DFLD  'Last Name:',POS=(8,45),LTH=10,ATTR=(PROT,NUM)
+LNAME    DFLD  POS=(8,56),LTH=20,ATTR=(MOD,NUM)
+         DFLD  'User ID:',POS=(11,6),LTH=8,ATTR=(PROT,NUM)
+USERID   DFLD  POS=(11,15),LTH=8,ATTR=(MOD,NUM)
+         DFLD  '(8 Char)',POS=(11,24),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Password:',POS=(11,45),LTH=9,ATTR=(PROT,NUM)
+PASSWD   DFLD  POS=(11,55),LTH=8,ATTR=(MOD,NODISP)
+         DFLD  '(8 Char)',POS=(11,64),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'User Type: ',POS=(14,6),LTH=11,ATTR=(PROT,NUM)
+USRTYPE  DFLD  POS=(14,17),LTH=1,ATTR=(MOD,NUM)
+         DFLD  '(A=Admin, U=User)',POS=(14,19),LTH=17, X
+               ATTR=(PROT,NUM)
+ERRMSG   DFLD  POS=(23,1),LTH=78,ATTR=(PROT,MOD)
+         DFLD  'ENTER=Add User  F3=Back  F4=Clear  F12=Exit', X
+               POS=(24,1),LTH=43,ATTR=(PROT,NUM)
+         FMTEND
+***********************************************************************
+*    MOD - Message Output Descriptor
+***********************************************************************
+CUSR01MO MSG   TYPE=OUTPUT,SOR=(COUSR01,IGNORE),NXT=CUSR01MI
+         SEG
+         MFLD  TRNNAME,LTH=4
+         MFLD  TITLE01,LTH=40
+         MFLD  CURDATE,LTH=8
+         MFLD  PGMNAME,LTH=8
+         MFLD  TITLE02,LTH=40
+         MFLD  CURTIME,LTH=8
+         MFLD  FNAME,LTH=20
+         MFLD  LNAME,LTH=20
+         MFLD  USERID,LTH=8
+         MFLD  PASSWD,LTH=8
+         MFLD  USRTYPE,LTH=1
+         MFLD  ERRMSG,LTH=78
+         MSGEND
+***********************************************************************
+*    MID - Message Input Descriptor
+***********************************************************************
+CUSR01MI MSG   TYPE=INPUT,SOR=(COUSR01,IGNORE),NXT=CUSR01MO
+         SEG
+         MFLD  FNAME,LTH=20,FILL=NULL
+         MFLD  LNAME,LTH=20,FILL=NULL
+         MFLD  USERID,LTH=8,FILL=NULL
+         MFLD  PASSWD,LTH=8,FILL=NULL
+         MFLD  USRTYPE,LTH=1,FILL=NULL
+         MSGEND
+         END

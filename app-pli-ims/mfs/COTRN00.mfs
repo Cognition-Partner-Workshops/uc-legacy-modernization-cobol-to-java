@@ -1,0 +1,204 @@
+***********************************************************************
+* Copyright Amazon.com, Inc. or its affiliates.
+* All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+* either express or implied. See the License for the specific
+* language governing permissions and limitations under the License
+***********************************************************************
+*    MFS Source for COTRN00 - Transaction List Screen
+*    Converted from BMS: app/bms/COTRN00.bms
+***********************************************************************
+         PRINT NOGEN
+COTRN00  FMT   DEV(TYPE=3270,FEAT=IGNORE,DSCA=X'00A0')
+         DIV   TYPE=INOUT
+         DPAGE FILL=PT,CURSOR=((6,21))
+***********************************************************************
+*    Header Fields
+***********************************************************************
+         DFLD  'Tran:',POS=(1,1),LTH=5,ATTR=(PROT,NUM)
+TRNNAME  DFLD  POS=(1,7),LTH=4,ATTR=(PROT,NUM)
+TITLE01  DFLD  POS=(1,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Date:',POS=(1,65),LTH=5,ATTR=(PROT,NUM)
+CURDATE  DFLD  POS=(1,71),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Prog:',POS=(2,1),LTH=5,ATTR=(PROT,NUM)
+PGMNAME  DFLD  POS=(2,7),LTH=8,ATTR=(PROT,NUM)
+TITLE02  DFLD  POS=(2,21),LTH=40,ATTR=(PROT,NUM)
+         DFLD  'Time:',POS=(2,65),LTH=5,ATTR=(PROT,NUM)
+CURTIME  DFLD  POS=(2,71),LTH=8,ATTR=(PROT,NUM)
+***********************************************************************
+*    Transaction List Body
+***********************************************************************
+         DFLD  'Transaction List',POS=(4,32),LTH=16,ATTR=(PROT,HI)
+         DFLD  'Page:',POS=(4,65),LTH=5,ATTR=(PROT,HI)
+PAGENUM  DFLD  POS=(4,71),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Account ID:',POS=(6,5),LTH=11,ATTR=(PROT,NUM)
+ACTIDIS  DFLD  POS=(6,17),LTH=11,ATTR=(MOD,NUM)
+         DFLD  'Card Num:',POS=(6,32),LTH=9,ATTR=(PROT,NUM)
+CARDNIN  DFLD  POS=(6,42),LTH=16,ATTR=(MOD,NUM)
+***********************************************************************
+*    Column Headers
+***********************************************************************
+         DFLD  'Sel',POS=(8,3),LTH=3,ATTR=(PROT,NUM)
+         DFLD  'Trans ID',POS=(8,7),LTH=8,ATTR=(PROT,NUM)
+         DFLD  'Date',POS=(8,20),LTH=10,ATTR=(PROT,NUM)
+         DFLD  'Description',POS=(8,33),LTH=26,ATTR=(PROT,NUM)
+         DFLD  'Amount',POS=(8,62),LTH=14,ATTR=(PROT,NUM)
+         DFLD  '---',POS=(9,3),LTH=3,ATTR=(PROT,NUM)
+         DFLD  '--------',POS=(9,7),LTH=8,ATTR=(PROT,NUM)
+         DFLD  '----------',POS=(9,20),LTH=10,ATTR=(PROT,NUM)
+         DFLD  '--------------------------',POS=(9,33),LTH=26, X
+               ATTR=(PROT,NUM)
+         DFLD  '--------------',POS=(9,62),LTH=14,ATTR=(PROT,NUM)
+***********************************************************************
+*    Data Rows (10 rows)
+***********************************************************************
+SEL0001  DFLD  POS=(10,4),LTH=1,ATTR=(MOD,NUM)
+TRNID01  DFLD  POS=(10,7),LTH=16,ATTR=(PROT,NUM)
+TDATE01  DFLD  POS=(10,24),LTH=10,ATTR=(PROT,NUM)
+TDESC01  DFLD  POS=(10,35),LTH=26,ATTR=(PROT,NUM)
+TAMT001  DFLD  POS=(10,62),LTH=14,ATTR=(PROT,NUM)
+SEL0002  DFLD  POS=(11,4),LTH=1,ATTR=(MOD,NUM)
+TRNID02  DFLD  POS=(11,7),LTH=16,ATTR=(PROT,NUM)
+TDATE02  DFLD  POS=(11,24),LTH=10,ATTR=(PROT,NUM)
+TDESC02  DFLD  POS=(11,35),LTH=26,ATTR=(PROT,NUM)
+TAMT002  DFLD  POS=(11,62),LTH=14,ATTR=(PROT,NUM)
+SEL0003  DFLD  POS=(12,4),LTH=1,ATTR=(MOD,NUM)
+TRNID03  DFLD  POS=(12,7),LTH=16,ATTR=(PROT,NUM)
+TDATE03  DFLD  POS=(12,24),LTH=10,ATTR=(PROT,NUM)
+TDESC03  DFLD  POS=(12,35),LTH=26,ATTR=(PROT,NUM)
+TAMT003  DFLD  POS=(12,62),LTH=14,ATTR=(PROT,NUM)
+SEL0004  DFLD  POS=(13,4),LTH=1,ATTR=(MOD,NUM)
+TRNID04  DFLD  POS=(13,7),LTH=16,ATTR=(PROT,NUM)
+TDATE04  DFLD  POS=(13,24),LTH=10,ATTR=(PROT,NUM)
+TDESC04  DFLD  POS=(13,35),LTH=26,ATTR=(PROT,NUM)
+TAMT004  DFLD  POS=(13,62),LTH=14,ATTR=(PROT,NUM)
+SEL0005  DFLD  POS=(14,4),LTH=1,ATTR=(MOD,NUM)
+TRNID05  DFLD  POS=(14,7),LTH=16,ATTR=(PROT,NUM)
+TDATE05  DFLD  POS=(14,24),LTH=10,ATTR=(PROT,NUM)
+TDESC05  DFLD  POS=(14,35),LTH=26,ATTR=(PROT,NUM)
+TAMT005  DFLD  POS=(14,62),LTH=14,ATTR=(PROT,NUM)
+SEL0006  DFLD  POS=(15,4),LTH=1,ATTR=(MOD,NUM)
+TRNID06  DFLD  POS=(15,7),LTH=16,ATTR=(PROT,NUM)
+TDATE06  DFLD  POS=(15,24),LTH=10,ATTR=(PROT,NUM)
+TDESC06  DFLD  POS=(15,35),LTH=26,ATTR=(PROT,NUM)
+TAMT006  DFLD  POS=(15,62),LTH=14,ATTR=(PROT,NUM)
+SEL0007  DFLD  POS=(16,4),LTH=1,ATTR=(MOD,NUM)
+TRNID07  DFLD  POS=(16,7),LTH=16,ATTR=(PROT,NUM)
+TDATE07  DFLD  POS=(16,24),LTH=10,ATTR=(PROT,NUM)
+TDESC07  DFLD  POS=(16,35),LTH=26,ATTR=(PROT,NUM)
+TAMT007  DFLD  POS=(16,62),LTH=14,ATTR=(PROT,NUM)
+SEL0008  DFLD  POS=(17,4),LTH=1,ATTR=(MOD,NUM)
+TRNID08  DFLD  POS=(17,7),LTH=16,ATTR=(PROT,NUM)
+TDATE08  DFLD  POS=(17,24),LTH=10,ATTR=(PROT,NUM)
+TDESC08  DFLD  POS=(17,35),LTH=26,ATTR=(PROT,NUM)
+TAMT008  DFLD  POS=(17,62),LTH=14,ATTR=(PROT,NUM)
+SEL0009  DFLD  POS=(18,4),LTH=1,ATTR=(MOD,NUM)
+TRNID09  DFLD  POS=(18,7),LTH=16,ATTR=(PROT,NUM)
+TDATE09  DFLD  POS=(18,24),LTH=10,ATTR=(PROT,NUM)
+TDESC09  DFLD  POS=(18,35),LTH=26,ATTR=(PROT,NUM)
+TAMT009  DFLD  POS=(18,62),LTH=14,ATTR=(PROT,NUM)
+SEL0010  DFLD  POS=(19,4),LTH=1,ATTR=(MOD,NUM)
+TRNID10  DFLD  POS=(19,7),LTH=16,ATTR=(PROT,NUM)
+TDATE10  DFLD  POS=(19,24),LTH=10,ATTR=(PROT,NUM)
+TDESC10  DFLD  POS=(19,35),LTH=26,ATTR=(PROT,NUM)
+TAMT010  DFLD  POS=(19,62),LTH=14,ATTR=(PROT,NUM)
+         DFLD  'Select S to view transaction details',POS=(21,12), X
+               LTH=36,ATTR=(PROT,NUM)
+ERRMSG   DFLD  POS=(23,1),LTH=78,ATTR=(PROT,MOD)
+         DFLD  'ENTER=Continue  F3=Back  F7=Up  F8=Down', X
+               POS=(24,1),LTH=39,ATTR=(PROT,NUM)
+         FMTEND
+***********************************************************************
+*    MOD - Message Output Descriptor
+***********************************************************************
+CTRN00MO MSG   TYPE=OUTPUT,SOR=(COTRN00,IGNORE),NXT=CTRN00MI
+         SEG
+         MFLD  TRNNAME,LTH=4
+         MFLD  TITLE01,LTH=40
+         MFLD  CURDATE,LTH=8
+         MFLD  PGMNAME,LTH=8
+         MFLD  TITLE02,LTH=40
+         MFLD  CURTIME,LTH=8
+         MFLD  PAGENUM,LTH=8
+         MFLD  ACTIDIS,LTH=11
+         MFLD  CARDNIN,LTH=16
+         MFLD  SEL0001,LTH=1
+         MFLD  TRNID01,LTH=16
+         MFLD  TDATE01,LTH=10
+         MFLD  TDESC01,LTH=26
+         MFLD  TAMT001,LTH=14
+         MFLD  SEL0002,LTH=1
+         MFLD  TRNID02,LTH=16
+         MFLD  TDATE02,LTH=10
+         MFLD  TDESC02,LTH=26
+         MFLD  TAMT002,LTH=14
+         MFLD  SEL0003,LTH=1
+         MFLD  TRNID03,LTH=16
+         MFLD  TDATE03,LTH=10
+         MFLD  TDESC03,LTH=26
+         MFLD  TAMT003,LTH=14
+         MFLD  SEL0004,LTH=1
+         MFLD  TRNID04,LTH=16
+         MFLD  TDATE04,LTH=10
+         MFLD  TDESC04,LTH=26
+         MFLD  TAMT004,LTH=14
+         MFLD  SEL0005,LTH=1
+         MFLD  TRNID05,LTH=16
+         MFLD  TDATE05,LTH=10
+         MFLD  TDESC05,LTH=26
+         MFLD  TAMT005,LTH=14
+         MFLD  SEL0006,LTH=1
+         MFLD  TRNID06,LTH=16
+         MFLD  TDATE06,LTH=10
+         MFLD  TDESC06,LTH=26
+         MFLD  TAMT006,LTH=14
+         MFLD  SEL0007,LTH=1
+         MFLD  TRNID07,LTH=16
+         MFLD  TDATE07,LTH=10
+         MFLD  TDESC07,LTH=26
+         MFLD  TAMT007,LTH=14
+         MFLD  SEL0008,LTH=1
+         MFLD  TRNID08,LTH=16
+         MFLD  TDATE08,LTH=10
+         MFLD  TDESC08,LTH=26
+         MFLD  TAMT008,LTH=14
+         MFLD  SEL0009,LTH=1
+         MFLD  TRNID09,LTH=16
+         MFLD  TDATE09,LTH=10
+         MFLD  TDESC09,LTH=26
+         MFLD  TAMT009,LTH=14
+         MFLD  SEL0010,LTH=1
+         MFLD  TRNID10,LTH=16
+         MFLD  TDATE10,LTH=10
+         MFLD  TDESC10,LTH=26
+         MFLD  TAMT010,LTH=14
+         MFLD  ERRMSG,LTH=78
+         MSGEND
+***********************************************************************
+*    MID - Message Input Descriptor
+***********************************************************************
+CTRN00MI MSG   TYPE=INPUT,SOR=(COTRN00,IGNORE),NXT=CTRN00MO
+         SEG
+         MFLD  ACTIDIS,LTH=11,FILL=NULL
+         MFLD  CARDNIN,LTH=16,FILL=NULL
+         MFLD  SEL0001,LTH=1,FILL=NULL
+         MFLD  SEL0002,LTH=1,FILL=NULL
+         MFLD  SEL0003,LTH=1,FILL=NULL
+         MFLD  SEL0004,LTH=1,FILL=NULL
+         MFLD  SEL0005,LTH=1,FILL=NULL
+         MFLD  SEL0006,LTH=1,FILL=NULL
+         MFLD  SEL0007,LTH=1,FILL=NULL
+         MFLD  SEL0008,LTH=1,FILL=NULL
+         MFLD  SEL0009,LTH=1,FILL=NULL
+         MFLD  SEL0010,LTH=1,FILL=NULL
+         MSGEND
+         END

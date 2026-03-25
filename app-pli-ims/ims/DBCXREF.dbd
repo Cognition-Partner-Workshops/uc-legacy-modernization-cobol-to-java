@@ -1,0 +1,43 @@
+***********************************************************************
+* Copyright Amazon.com, Inc. or its affiliates.
+* All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+* either express or implied. See the License for the specific
+* language governing permissions and limitations under the License
+***********************************************************************
+*    DBD for Card Cross-Reference File (CCXREF)
+*    Original CICS VSAM KSDS: AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS
+*    Primary Key: XREF-CARD-NUM (16 bytes, character)
+*    Secondary Index on XREF-ACCT-ID for account-based lookups
+*    Record length: 50 bytes
+***********************************************************************
+         TITLE   'ASSEMBLE OF DBDNAME=DBCXREF'
+       DBD     NAME=DBCXREF,ACCESS=(HIDAM,VSAM),PASSWD=NO,             C
+               EXIT=(*,KEY,DATA,NOPATH,(NOCASCADE),LOG),               C
+               VERSION=
+***********************************************************************
+*        DATASET GROUP NUMBER 1                                       *
+***********************************************************************
+DSG001 DATASET DD1=DDCXREF,SIZE=(4096),SCAN=3
+***********************************************************************
+*        SEGMENT NUMBER 1 - ROOT, CARD CROSS-REFERENCE RECORD        *
+***********************************************************************
+       SEGM    NAME=XREFSEG0,PARENT=0,BYTES=50,RULES=(,HERE),         X
+               POINTER=(TWINBWD)
+       FIELD   NAME=(XREFCARD,SEQ,U),START=1,BYTES=16,TYPE=C
+       FIELD   NAME=(XREFACCT),START=26,BYTES=11,TYPE=C
+       LCHILD  NAME=(XREFINDX,DBCXRIDX),                               X
+               POINTER=INDX
+***********************************************************************
+       DBDGEN
+       FINISH
+       END

@@ -1,0 +1,266 @@
+***********************************************************************
+* Copyright Amazon.com, Inc. or its affiliates.
+* All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+* either express or implied. See the License for the specific
+* language governing permissions and limitations under the License
+***********************************************************************
+*    IMS SYSGEN Macros for CardDemo Application
+*    Converted from CICS CSD (CARDDEMO.CSD)
+*
+*    Maps CICS transaction IDs to IMS transaction codes:
+*      CC00 -> CC00  (Signon)
+*      CM00 -> CM00  (Main Menu)
+*      CA00 -> CA00  (Admin Menu)
+*      CAVW -> CAVW  (Account View)
+*      CAUP -> CAUP  (Account Update)
+*      CCLI -> CCLI  (Card List)
+*      CCDL -> CCDL  (Card View/Search)
+*      CCUP -> CCUP  (Card Update)
+*      CT00 -> CT00  (Transaction List)
+*      CT01 -> CT01  (Transaction View)
+*      CT02 -> CT02  (Transaction Add)
+*      CR00 -> CR00  (Transaction Reports)
+*      CB00 -> CB00  (Bill Payment)
+*      CU00 -> CU00  (User List)
+*      CU01 -> CU01  (User Add)
+*      CU02 -> CU02  (User Update)
+*      CU03 -> CU03  (User Delete)
+***********************************************************************
+*
+*-----------------------------------------------------------------*
+*    ONLINE APPLICATION DEFINITIONS                                *
+*-----------------------------------------------------------------*
+*
+***********************************************************************
+*    SIGNON - Entry point for the CardDemo application               *
+***********************************************************************
+         APPLCTN PSB=PCOSGN00,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CC00,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=NO,RECOVER=YES,                                    X
+               SPA=(128,FIXED)
+*
+***********************************************************************
+*    MAIN MENU - Regular user menu                                   *
+***********************************************************************
+         APPLCTN PSB=PCOMEN01,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CM00,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=NO,RECOVER=YES,                                    X
+               SPA=(128,FIXED)
+*
+***********************************************************************
+*    ADMIN MENU - Administrator menu                                 *
+***********************************************************************
+         APPLCTN PSB=PCOADM01,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CA00,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=NO,RECOVER=YES,                                    X
+               SPA=(128,FIXED)
+*
+***********************************************************************
+*    ACCOUNT VIEW                                                    *
+***********************************************************************
+         APPLCTN PSB=PCOACTVW,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CAVW,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=YES,RECOVER=YES,                                   X
+               SPA=(256,FIXED)
+*
+***********************************************************************
+*    ACCOUNT UPDATE                                                  *
+***********************************************************************
+         APPLCTN PSB=PCOACTUP,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CAUP,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=NO,RECOVER=YES,                                    X
+               SPA=(256,FIXED)
+*
+***********************************************************************
+*    CREDIT CARD LIST                                                *
+***********************************************************************
+         APPLCTN PSB=PCOCRDLI,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CCLI,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=YES,RECOVER=YES,                                   X
+               SPA=(256,FIXED)
+*
+***********************************************************************
+*    CREDIT CARD VIEW/SEARCH                                         *
+***********************************************************************
+         APPLCTN PSB=PCOCRDSL,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CCDL,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=YES,RECOVER=YES,                                   X
+               SPA=(256,FIXED)
+*
+***********************************************************************
+*    CREDIT CARD UPDATE                                              *
+***********************************************************************
+         APPLCTN PSB=PCOCRDUP,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CCUP,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=NO,RECOVER=YES,                                    X
+               SPA=(256,FIXED)
+*
+***********************************************************************
+*    TRANSACTION LIST                                                *
+***********************************************************************
+         APPLCTN PSB=PCOTRN00,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CT00,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=YES,RECOVER=YES,                                   X
+               SPA=(256,FIXED)
+*
+***********************************************************************
+*    TRANSACTION VIEW                                                *
+***********************************************************************
+         APPLCTN PSB=PCOTRN01,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CT01,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=YES,RECOVER=YES,                                   X
+               SPA=(256,FIXED)
+*
+***********************************************************************
+*    TRANSACTION ADD                                                 *
+***********************************************************************
+         APPLCTN PSB=PCOTRN02,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CT02,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=NO,RECOVER=YES,                                    X
+               SPA=(256,FIXED)
+*
+***********************************************************************
+*    TRANSACTION REPORTS                                             *
+***********************************************************************
+         APPLCTN PSB=PCORPT00,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CR00,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=YES,RECOVER=YES,                                   X
+               SPA=(128,FIXED)
+*
+***********************************************************************
+*    BILL PAYMENT                                                    *
+***********************************************************************
+         APPLCTN PSB=PCOBIL00,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CB00,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=NO,RECOVER=YES,                                    X
+               SPA=(256,FIXED)
+*
+***********************************************************************
+*    USER LIST (Admin)                                               *
+***********************************************************************
+         APPLCTN PSB=PCOUSR00,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CU00,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=YES,RECOVER=YES,                                   X
+               SPA=(128,FIXED)
+*
+***********************************************************************
+*    USER ADD (Admin)                                                *
+***********************************************************************
+         APPLCTN PSB=PCOUSR01,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CU01,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=NO,RECOVER=YES,                                    X
+               SPA=(128,FIXED)
+*
+***********************************************************************
+*    USER UPDATE (Admin)                                             *
+***********************************************************************
+         APPLCTN PSB=PCOUSR02,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CU02,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=NO,RECOVER=YES,                                    X
+               SPA=(128,FIXED)
+*
+***********************************************************************
+*    USER DELETE (Admin)                                             *
+***********************************************************************
+         APPLCTN PSB=PCOUSR03,PGMTYPE=TP,LANG=PLI,                    X
+               SCHDTYP=PARALLEL,RESIDENT=NO
+         TRANSACT CODE=CU03,PRTY=(7,10,2),MODE=SNGL,                  X
+               MSGTYPE=(SNGLSEG,NONRESPONSE),                         X
+               INQ=NO,RECOVER=YES,                                    X
+               SPA=(128,FIXED)
+*
+*-----------------------------------------------------------------*
+*    BATCH APPLICATION DEFINITIONS                                 *
+*-----------------------------------------------------------------*
+*
+***********************************************************************
+*    BATCH - Transaction Posting                                     *
+***********************************************************************
+         APPLCTN PSB=PCBTRN02,PGMTYPE=BATCH,LANG=PLI,                 X
+               SCHDTYP=SERIAL
+*
+***********************************************************************
+*    BATCH - Interest Calculation                                    *
+***********************************************************************
+         APPLCTN PSB=PCBACT04,PGMTYPE=BATCH,LANG=PLI,                 X
+               SCHDTYP=SERIAL
+*
+***********************************************************************
+*    BATCH - Statement Generation                                    *
+***********************************************************************
+         APPLCTN PSB=PCBSTM03,PGMTYPE=BATCH,LANG=PLI,                 X
+               SCHDTYP=SERIAL
+*
+***********************************************************************
+*    BATCH - Transaction Report                                      *
+***********************************************************************
+         APPLCTN PSB=PCBTRN03,PGMTYPE=BATCH,LANG=PLI,                 X
+               SCHDTYP=SERIAL
+*
+***********************************************************************
+*    BATCH - Data Export                                              *
+***********************************************************************
+         APPLCTN PSB=PCBEXPT,PGMTYPE=BATCH,LANG=PLI,                  X
+               SCHDTYP=SERIAL
+*
+***********************************************************************
+*    BATCH - Data Import                                             *
+***********************************************************************
+         APPLCTN PSB=PCBIMPT,PGMTYPE=BATCH,LANG=PLI,                  X
+               SCHDTYP=SERIAL
+*
+*-----------------------------------------------------------------*
+*    DATABASE DEFINITIONS                                          *
+*-----------------------------------------------------------------*
+*
+         DATABASE DBD=DBUSRSEC,ACCESS=UP
+         DATABASE DBD=DBACCTDT,ACCESS=UP
+         DATABASE DBD=DBCARDDT,ACCESS=UP
+         DATABASE DBD=DBCUSTDT,ACCESS=UP
+         DATABASE DBD=DBTRANSC,ACCESS=UP
+         DATABASE DBD=DBCXREF,ACCESS=UP
+         DATABASE DBD=DBCXRIDX,ACCESS=UP
+*
+         END
