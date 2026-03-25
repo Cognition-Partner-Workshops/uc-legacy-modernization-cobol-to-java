@@ -16,6 +16,7 @@ import com.cardemo.repository.TransactionCategoryBalanceRepository;
 import com.cardemo.repository.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,7 +65,7 @@ public class InterestCalculatorService {
     public int calculateInterest() {
         log.info("START OF EXECUTION OF PROGRAM CBACT04C (InterestCalculator)");
 
-        List<TransactionCategoryBalanceRecord> catBalRecords = tcatBalRepository.findAll();
+        List<TransactionCategoryBalanceRecord> catBalRecords = tcatBalRepository.findAll(Sort.by("trancatAcctId", "trancatTypeCd", "trancatCd"));
         int recordCount = 0;
         long lastAcctNum = -1;
         BigDecimal totalInterest = BigDecimal.ZERO;
