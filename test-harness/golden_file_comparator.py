@@ -218,27 +218,61 @@ def compare_records(expected: dict, actual: dict, record_index: int) -> list[Fie
     return diffs
 
 
+def _make_composite_key(record: dict, fields: list[str]) -> str | None:
+    """Build a composite key by joining multiple field values with '|'.
+
+    Returns None if any required field is missing from the record.
+    """
+    parts = []
+    for f in fields:
+        if f not in record:
+            return None
+        parts.append(str(record[f]))
+    return "|".join(parts)
+
+
 def find_record_key(record: dict, entity_type: str) -> str | None:
     """Extract a natural key from a record based on entity type.
 
     Used to match records between expected and actual by business key
-    rather than position.
+    rather than position.  Supports composite keys for entities whose
+    primary key spans multiple fields.
     """
-    key_map = {
+    # Composite keys: each entry is a list of field-name lists.
+    # The first list whose fields are all present wins.
+    composite_key_map: dict[str, list[list[str]]] = {
+        "discgrp": [
+            ["DIS-ACCT-GROUP-ID", "DIS-TRAN-TYPE-CD", "DIS-TRAN-CAT-CD"],
+            ["dis_acct_group_id", "dis_tran_type_cd", "dis_tran_cat_cd"],
+        ],
+        "tcatbal": [
+            ["TRANCAT-ACCT-ID", "TRANCAT-TYPE-CD", "TRANCAT-CD"],
+            ["trancat_acct_id", "trancat_type_cd", "trancat_cd"],
+        ],
+        "trancatg": [
+            ["TRAN-TYPE-CD", "TRAN-CAT-CD"],
+            ["tran_type_cd", "tran_cat_cd"],
+        ],
+    }
+
+    if entity_type in composite_key_map:
+        for field_set in composite_key_map[entity_type]:
+            key = _make_composite_key(record, field_set)
+            if key is not None:
+                return key
+
+    # Simple (single-field) keys
+    simple_key_map = {
         "account": ["ACCT-ID", "acct_id"],
         "card": ["CARD-NUM", "card_num"],
         "cardxref": ["XREF-CARD-NUM", "xref_card_num", "card_num"],
         "customer": ["CUST-ID", "cust_id"],
         "transaction": ["TRAN-ID", "tran_id", "DALYTRAN-ID", "dalytran_id"],
         "dailytran": ["DALYTRAN-ID", "dalytran_id", "TRAN-ID", "tran_id"],
-        "discgrp": ["DIS-ACCT-GROUP-ID", "dis_acct_group_id"],
-        "tcatbal": ["TRANCAT-ACCT-ID", "trancat_acct_id"],
-        "trancatg": ["TRAN-TYPE-CD", "tran_type_cd"],
         "trantype": ["TRAN-TYPE", "tran_type"],
     }
 
-    possible_keys = key_map.get(entity_type, [])
-    for key_field in possible_keys:
+    for key_field in simple_key_map.get(entity_type, []):
         if key_field in record:
             return str(record[key_field])
 

@@ -216,9 +216,49 @@ def compare_single_record(cobol_rec: dict, java_rec: dict,
     return divergences
 
 
+def _make_composite_key(record: dict, fields: list[str]) -> str | None:
+    """Build a composite key by joining multiple field values with '|'.
+
+    Returns None if any required field is missing from the record.
+    """
+    parts = []
+    for f in fields:
+        if f not in record:
+            return None
+        parts.append(str(record[f]))
+    return "|".join(parts)
+
+
 def find_key_value(record: dict, entity: str) -> str:
-    """Extract a natural key from a record for matching."""
-    key_candidates = {
+    """Extract a natural key from a record for matching.
+
+    Supports composite keys for entities whose primary key spans
+    multiple fields (discgrp, tcatbal, trancatg).
+    """
+    # Composite keys: each entry is a list of field-name lists.
+    composite_key_map: dict[str, list[list[str]]] = {
+        "discgrp": [
+            ["DIS-ACCT-GROUP-ID", "DIS-TRAN-TYPE-CD", "DIS-TRAN-CAT-CD"],
+            ["dis_acct_group_id", "dis_tran_type_cd", "dis_tran_cat_cd"],
+        ],
+        "tcatbal": [
+            ["TRANCAT-ACCT-ID", "TRANCAT-TYPE-CD", "TRANCAT-CD"],
+            ["trancat_acct_id", "trancat_type_cd", "trancat_cd"],
+        ],
+        "trancatg": [
+            ["TRAN-TYPE-CD", "TRAN-CAT-CD"],
+            ["tran_type_cd", "tran_cat_cd"],
+        ],
+    }
+
+    if entity in composite_key_map:
+        for field_set in composite_key_map[entity]:
+            key = _make_composite_key(record, field_set)
+            if key is not None:
+                return key
+
+    # Simple (single-field) keys
+    simple_key_candidates = {
         "account": ["ACCT-ID", "acct_id", "accountId"],
         "card": ["CARD-NUM", "card_num", "cardNumber"],
         "customer": ["CUST-ID", "cust_id", "customerId"],
@@ -226,10 +266,9 @@ def find_key_value(record: dict, entity: str) -> str:
         "dailytran": ["DALYTRAN-ID", "tran_id"],
         "cardxref": ["XREF-CARD-NUM", "card_num"],
         "trantype": ["TRAN-TYPE", "tran_type"],
-        "trancatg": ["TRAN-TYPE-CD", "tran_type_cd"],
     }
 
-    for key_field in key_candidates.get(entity, []):
+    for key_field in simple_key_candidates.get(entity, []):
         if key_field in record:
             return str(record[key_field])
 
