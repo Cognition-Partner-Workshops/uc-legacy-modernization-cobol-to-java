@@ -38,7 +38,7 @@ Each module is scored on four dimensions (1–5 scale):
 
 ## Detailed Module Assessments
 
-### 1. COACTUPC — Account Update (Rank 1, Score 4.65)
+### 1. COACTUPC — Account Update (Rank 1, Score 4.80)
 
 **Why it's #1**: Largest program in the entire codebase at 4,237 lines. Handles full CRUD on both account and customer master records with extensive field-level validation, date editing, and BMS screen attribute manipulation.
 
@@ -63,7 +63,7 @@ Each module is scored on four dimensions (1–5 scale):
 
 ---
 
-### 2. CBTRN02C — Transaction Posting Engine (Rank 2, Score 4.25)
+### 2. CBTRN02C — Transaction Posting Engine (Rank 2, Score 4.30)
 
 **Why it's #2**: Core batch posting engine that processes all daily transactions. Updates multiple VSAM files in a single batch run with complex validation and rejection logic.
 
@@ -112,7 +112,7 @@ Each module is scored on four dimensions (1–5 scale):
 
 ---
 
-### 4. CBACT04C — Interest Calculation (Rank 4, Score 4.00)
+### 4. CBACT04C — Interest Calculation (Rank 4, Score 4.05)
 
 **Why it's #4**: Financial calculation engine that computes interest on all accounts based on disclosure group rates and transaction category balances. Directly impacts account balances.
 
@@ -137,7 +137,7 @@ Each module is scored on four dimensions (1–5 scale):
 
 ---
 
-### 5. COCRDLIC — Credit Card List (Rank 5, Score 3.90)
+### 5. COCRDLIC — Credit Card List (Rank 5, Score 3.95)
 
 **Why it's #5**: Complex browse/pagination program with VSAM STARTBR/READNEXT/READPREV operations, dual selection modes (view/update), and multi-row screen handling.
 
@@ -161,7 +161,7 @@ Each module is scored on four dimensions (1–5 scale):
 
 ---
 
-### 6. COCRDUPC — Credit Card Update (Rank 6, Score 3.85)
+### 6. COCRDUPC — Credit Card Update (Rank 6, Score 3.75)
 
 **Why it's #6**: Card update program with field-level validation, date editing, and VSAM REWRITE operations. Shares patterns with COACTUPC but focused on card entity.
 
@@ -184,7 +184,7 @@ Each module is scored on four dimensions (1–5 scale):
 
 ---
 
-### 7. COBIL00C — Bill Payment (Rank 7, Score 3.80)
+### 7. COBIL00C — Bill Payment (Rank 7, Score 3.75)
 
 **Why it's #7**: Financial transaction program that reads account balance, creates a payment transaction, and zeroes out the balance. Accesses 3 VSAM files with mixed read/write operations.
 
@@ -231,7 +231,7 @@ Each module is scored on four dimensions (1–5 scale):
 
 ---
 
-### 9. COTRN02C — Transaction Add (Rank 9, Score 3.45)
+### 9. COTRN02C — Transaction Add (Rank 9, Score 3.50)
 
 **Why it's #9**: Online transaction creation with date validation, cross-reference lookup, sequential ID generation, and VSAM write.
 
