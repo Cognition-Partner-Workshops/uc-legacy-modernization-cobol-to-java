@@ -102,27 +102,7 @@ Each module was scored across three dimensions on a 1&ndash;10 scale:
 
 ---
 
-### Rank 5: COCRDLIC &mdash; Credit Card List (Online)
-
-| Metric | Value | Notes |
-|---|---|---|
-| **Lines of Code** | **1,459** | |
-| **CICS Commands** | 18 | Highest CICS command count |
-| **Copybook Includes** | 14 | Including CSSTRPFY (string utilities) |
-| **BMS Map** | COCRDLI | Scrollable list with array-based screen |
-
-| Dimension | Score | Rationale |
-|---|---|---|
-| Complexity | **9** | 18 CICS commands including STARTBR, READNEXT, READPREV for bidirectional browsing. Array-based screen handling with VARYING loops. Context-sensitive behavior (admin vs. regular user paths). Forward and backward pagination logic. |
-| Risk | **6** | Read-only &mdash; no data mutation. However, incorrect filtering could expose cards from other accounts (authorization logic). Role-based access control embedded in program logic. |
-| Business Impact | **7** | Entry point for all card-related operations. Navigation hub that dispatches to COCRDSLC (view) and COCRDUPC (update). |
-| **Composite** | **7.55** | |
-
-**Modernization Recommendation:** Convert to a paginated REST API + UI component. Extract the role-based filtering into a dedicated authorization service. The bidirectional browse maps to SQL OFFSET/LIMIT with sort direction.
-
----
-
-### Rank 6: COCRDUPC &mdash; Credit Card Update (Online)
+### Rank 5: COCRDUPC &mdash; Credit Card Update (Online)
 
 | Metric | Value | Notes |
 |---|---|---|
@@ -142,27 +122,27 @@ Each module was scored across three dimensions on a 1&ndash;10 scale:
 
 ---
 
-### Rank 7: CBTRN03C &mdash; Transaction Detail Report (Batch)
+### Rank 6: COCRDLIC &mdash; Credit Card List (Online)
 
 | Metric | Value | Notes |
 |---|---|---|
-| **Lines of Code** | **649** | |
-| **Files Accessed** | 6 files | TRANSACT(R), REPORT(W), XREF(R), TRANTYPE(R), TRANCATG(R), DATEPARM(R) |
-| **Copybook Includes** | 5 | CVTRA05Y, CVACT03Y, CVTRA03Y, CVTRA04Y, CVTRA07Y |
-| **JCL Job** | TRANREPT | End of batch cycle |
+| **Lines of Code** | **1,459** | |
+| **CICS Commands** | 18 | Highest CICS command count |
+| **Copybook Includes** | 14 | Including CSSTRPFY (string utilities) |
+| **BMS Map** | COCRDLI | Scrollable list with array-based screen |
 
 | Dimension | Score | Rationale |
 |---|---|---|
-| Complexity | **7** | 6 file handles with multi-file lookups (transaction &rarr; cross-ref &rarr; type &rarr; category). Page-break logic with running totals at page, account, and grand total levels. Date range parameter processing. |
-| Risk | **6** | Read-only on source data. Report accuracy depends on correct lookups across 4 reference files. Incorrect totals could mislead business decisions. |
-| Business Impact | **7** | Primary management reporting output. Used for daily transaction reconciliation and audit. |
-| **Composite** | **6.75** | |
+| Complexity | **9** | 18 CICS commands including STARTBR, READNEXT, READPREV for bidirectional browsing. Array-based screen handling with VARYING loops. Context-sensitive behavior (admin vs. regular user paths). Forward and backward pagination logic. |
+| Risk | **6** | Read-only &mdash; no data mutation. However, incorrect filtering could expose cards from other accounts (authorization logic). Role-based access control embedded in program logic. |
+| Business Impact | **7** | Entry point for all card-related operations. Navigation hub that dispatches to COCRDSLC (view) and COCRDUPC (update). |
+| **Composite** | **7.55** | |
 
-**Modernization Recommendation:** Replace with a parameterized SQL query + reporting framework. The multi-level total logic maps to SQL GROUP BY ROLLUP.
+**Modernization Recommendation:** Convert to a paginated REST API + UI component. Extract the role-based filtering into a dedicated authorization service. The bidirectional browse maps to SQL OFFSET/LIMIT with sort direction.
 
 ---
 
-### Rank 8: COTRN02C &mdash; Transaction Add (Online)
+### Rank 7: COTRN02C &mdash; Transaction Add (Online)
 
 | Metric | Value | Notes |
 |---|---|---|
@@ -179,6 +159,26 @@ Each module was scored across three dimensions on a 1&ndash;10 scale:
 | **Composite** | **7.25** | |
 
 **Modernization Recommendation:** Implement as a REST POST endpoint with request validation. Transaction ID generation should use database sequences instead of the STARTBR/READPREV pattern. Add idempotency keys.
+
+---
+
+### Rank 8: CBTRN03C &mdash; Transaction Detail Report (Batch)
+
+| Metric | Value | Notes |
+|---|---|---|
+| **Lines of Code** | **649** | |
+| **Files Accessed** | 6 files | TRANSACT(R), REPORT(W), XREF(R), TRANTYPE(R), TRANCATG(R), DATEPARM(R) |
+| **Copybook Includes** | 5 | CVTRA05Y, CVACT03Y, CVTRA03Y, CVTRA04Y, CVTRA07Y |
+| **JCL Job** | TRANREPT | End of batch cycle |
+
+| Dimension | Score | Rationale |
+|---|---|---|
+| Complexity | **7** | 6 file handles with multi-file lookups (transaction &rarr; cross-ref &rarr; type &rarr; category). Page-break logic with running totals at page, account, and grand total levels. Date range parameter processing. |
+| Risk | **6** | Read-only on source data. Report accuracy depends on correct lookups across 4 reference files. Incorrect totals could mislead business decisions. |
+| Business Impact | **7** | Primary management reporting output. Used for daily transaction reconciliation and audit. |
+| **Composite** | **6.75** | |
+
+**Modernization Recommendation:** Replace with a parameterized SQL query + reporting framework. The multi-level total logic maps to SQL GROUP BY ROLLUP.
 
 ---
 
@@ -229,10 +229,10 @@ Each module was scored across three dimensions on a 1&ndash;10 scale:
 | 2 | **CBTRN02C** | Batch | 731 | 8 | 10 | 10 | **9.20** | Phase 2 (high risk) |
 | 3 | **CBACT04C** | Batch | 652 | 8 | 10 | 9 | **8.95** | Phase 2 (high risk) |
 | 4 | **CBSTM03A** | Batch | 924 | 9 | 7 | 8 | **8.15** | Phase 2 (medium risk) |
-| 5 | **COCRDLIC** | Online | 1,459 | 9 | 6 | 7 | **7.55** | Phase 1 (read-only) |
-| 6 | **COCRDUPC** | Online | 1,560 | 8 | 8 | 7 | **7.70** | Phase 2 (high risk) |
-| 7 | **CBTRN03C** | Batch | 649 | 7 | 6 | 7 | **6.75** | Phase 1 (reporting) |
-| 8 | **COTRN02C** | Online | 783 | 7 | 8 | 7 | **7.25** | Phase 2 (writes) |
+| 5 | **COCRDUPC** | Online | 1,560 | 8 | 8 | 7 | **7.70** | Phase 2 (high risk) |
+| 6 | **COCRDLIC** | Online | 1,459 | 9 | 6 | 7 | **7.55** | Phase 1 (read-only) |
+| 7 | **COTRN02C** | Online | 783 | 7 | 8 | 7 | **7.25** | Phase 2 (writes) |
+| 8 | **CBTRN03C** | Batch | 649 | 7 | 6 | 7 | **6.75** | Phase 1 (reporting) |
 | 9 | **COACTVWC** | Online | 941 | 7 | 5 | 7 | **6.35** | Phase 1 (read-only) |
 | 10 | **COTRTLIC** | Online/DB2 | 2,098 | 8 | 5 | 5 | **6.25** | Phase 1 (proof of concept) |
 
