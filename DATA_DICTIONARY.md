@@ -67,7 +67,7 @@
 | 12 | CUST-PHONE-NUM-2 | `X(15)` | Alpha | 15 | Secondary phone number |
 | 13 | CUST-SSN | `9(09)` | Numeric | 9 | Social Security Number |
 | 14 | CUST-GOVT-ISSUED-ID | `X(20)` | Alpha | 20 | Government-issued ID number |
-| 15 | CUST-DOB-YYYYMMDD | `X(10)` | Date String | 10 | Date of birth |
+| 15 | CUST-DOB-YYYY-MM-DD | `X(10)` | Date String | 10 | Date of birth |
 | 16 | CUST-EFT-ACCOUNT-ID | `X(10)` | Alpha | 10 | EFT/ACH account for bill payment |
 | 17 | CUST-PRI-CARD-HOLDER-IND | `X(01)` | Alpha | 1 | Primary cardholder indicator (Y/N) |
 | 18 | CUST-FICO-CREDIT-SCORE | `9(03)` | Numeric | 3 | FICO credit score |
@@ -262,17 +262,99 @@
 
 ## 14. Export/Import Record
 
-**Source Copybook:** `CVEXPORT.cpy` | **Purpose:** Multi-record migration file
+**Source Copybook:** `CVEXPORT.cpy` | **Total Record Length:** 500 bytes | **Purpose:** Multi-record branch migration file
+
+### 14a. Header Fields (common to all record types)
 
 | # | Field Name | PIC Clause | Type | Length | Business Description |
 |---|------------|-----------|------|--------|---------------------|
-| 1 | EXP-RECORD-TYPE | `X(01)` | Alpha | 1 | Record type identifier (C=Customer, A=Account, X=Xref, T=Transaction, R=Card) |
-| 2 | EXP-CUST-ID | `9(09)` | Numeric | 9 | Customer ID |
-| 3 | EXP-ACCT-ID | `9(11)` | Numeric | 11 | Account ID |
-| 4 | EXP-CARD-NUM | `X(16)` | Alpha | 16 | Card number |
-| 5 | (Union fields vary by record type) | Various | -- | -- | Remaining fields depend on EXP-RECORD-TYPE |
+| 1 | EXPORT-REC-TYPE | `X(1)` | Alpha | 1 | Record type (C=Customer, A=Account, X=Xref, T=Transaction, R=Card) |
+| 2 | EXPORT-TIMESTAMP | `X(26)` | Timestamp | 26 | Export timestamp (REDEFINES into EXPORT-DATE X(10) + separator + EXPORT-TIME X(15)) |
+| 3 | EXPORT-SEQUENCE-NUM | `9(9) COMP` | Binary | 4 | Sequence number within export run |
+| 4 | EXPORT-BRANCH-ID | `X(4)` | Alpha | 4 | Originating branch identifier |
+| 5 | EXPORT-REGION-CODE | `X(5)` | Alpha | 5 | Region code |
+| 6 | EXPORT-RECORD-DATA | `X(460)` | Group | 460 | Record-type-specific data (REDEFINES below) |
 
-**Purpose:** Single file containing interleaved customer, account, card, xref, and transaction records for data migration between systems.
+### 14b. Customer Record (EXPORT-CUSTOMER-DATA REDEFINES EXPORT-RECORD-DATA)
+
+| # | Field Name | PIC Clause | Type | Bytes | Business Description |
+|---|------------|-----------|------|-------|---------------------|
+| 1 | EXP-CUST-ID | `9(09) COMP` | Binary | 4 | Customer ID |
+| 2 | EXP-CUST-FIRST-NAME | `X(25)` | Alpha | 25 | First name |
+| 3 | EXP-CUST-MIDDLE-NAME | `X(25)` | Alpha | 25 | Middle name |
+| 4 | EXP-CUST-LAST-NAME | `X(25)` | Alpha | 25 | Last name |
+| 5 | EXP-CUST-ADDR-LINE (x3) | `X(50)` | Alpha | 150 | Address lines (OCCURS 3 TIMES) |
+| 6 | EXP-CUST-ADDR-STATE-CD | `X(02)` | Alpha | 2 | State code |
+| 7 | EXP-CUST-ADDR-COUNTRY-CD | `X(03)` | Alpha | 3 | Country code |
+| 8 | EXP-CUST-ADDR-ZIP | `X(10)` | Alpha | 10 | ZIP / postal code |
+| 9 | EXP-CUST-PHONE-NUM (x2) | `X(15)` | Alpha | 30 | Phone numbers (OCCURS 2 TIMES) |
+| 10 | EXP-CUST-SSN | `9(09)` | Numeric | 9 | Social Security Number |
+| 11 | EXP-CUST-GOVT-ISSUED-ID | `X(20)` | Alpha | 20 | Government-issued ID |
+| 12 | EXP-CUST-DOB-YYYY-MM-DD | `X(10)` | Date String | 10 | Date of birth |
+| 13 | EXP-CUST-EFT-ACCOUNT-ID | `X(10)` | Alpha | 10 | EFT/ACH account |
+| 14 | EXP-CUST-PRI-CARD-HOLDER-IND | `X(01)` | Alpha | 1 | Primary cardholder indicator |
+| 15 | EXP-CUST-FICO-CREDIT-SCORE | `9(03) COMP-3` | Packed | 2 | FICO credit score |
+| 16 | FILLER | `X(134)` | Filler | 134 | Reserved |
+
+### 14c. Account Record (EXPORT-ACCOUNT-DATA REDEFINES EXPORT-RECORD-DATA)
+
+| # | Field Name | PIC Clause | Type | Bytes | Business Description |
+|---|------------|-----------|------|-------|---------------------|
+| 1 | EXP-ACCT-ID | `9(11)` | Numeric | 11 | Account ID |
+| 2 | EXP-ACCT-ACTIVE-STATUS | `X(01)` | Alpha | 1 | Active status |
+| 3 | EXP-ACCT-CURR-BAL | `S9(10)V99 COMP-3` | Packed | 7 | Current balance |
+| 4 | EXP-ACCT-CREDIT-LIMIT | `S9(10)V99` | Signed Display | 13 | Credit limit |
+| 5 | EXP-ACCT-CASH-CREDIT-LIMIT | `S9(10)V99 COMP-3` | Packed | 7 | Cash credit limit |
+| 6 | EXP-ACCT-OPEN-DATE | `X(10)` | Date String | 10 | Account open date |
+| 7 | EXP-ACCT-EXPIRAION-DATE | `X(10)` | Date String | 10 | Account expiration date |
+| 8 | EXP-ACCT-REISSUE-DATE | `X(10)` | Date String | 10 | Reissue date |
+| 9 | EXP-ACCT-CURR-CYC-CREDIT | `S9(10)V99` | Signed Display | 13 | Current cycle credit |
+| 10 | EXP-ACCT-CURR-CYC-DEBIT | `S9(10)V99 COMP` | Binary | 8 | Current cycle debit |
+| 11 | EXP-ACCT-ADDR-ZIP | `X(10)` | Alpha | 10 | Account ZIP code |
+| 12 | EXP-ACCT-GROUP-ID | `X(10)` | Alpha | 10 | Account group ID |
+| 13 | FILLER | `X(352)` | Filler | 352 | Reserved |
+
+### 14d. Transaction Record (EXPORT-TRANSACTION-DATA REDEFINES EXPORT-RECORD-DATA)
+
+| # | Field Name | PIC Clause | Type | Bytes | Business Description |
+|---|------------|-----------|------|-------|---------------------|
+| 1 | EXP-TRAN-ID | `X(16)` | Alpha | 16 | Transaction ID |
+| 2 | EXP-TRAN-TYPE-CD | `X(02)` | Alpha | 2 | Transaction type code |
+| 3 | EXP-TRAN-CAT-CD | `9(04)` | Numeric | 4 | Transaction category code |
+| 4 | EXP-TRAN-SOURCE | `X(10)` | Alpha | 10 | Transaction source |
+| 5 | EXP-TRAN-DESC | `X(100)` | Alpha | 100 | Transaction description |
+| 6 | EXP-TRAN-AMT | `S9(09)V99 COMP-3` | Packed | 6 | Transaction amount |
+| 7 | EXP-TRAN-MERCHANT-ID | `9(09) COMP` | Binary | 4 | Merchant ID |
+| 8 | EXP-TRAN-MERCHANT-NAME | `X(50)` | Alpha | 50 | Merchant name |
+| 9 | EXP-TRAN-MERCHANT-CITY | `X(50)` | Alpha | 50 | Merchant city |
+| 10 | EXP-TRAN-MERCHANT-ZIP | `X(10)` | Alpha | 10 | Merchant ZIP code |
+| 11 | EXP-TRAN-CARD-NUM | `X(16)` | Alpha | 16 | Card number |
+| 12 | EXP-TRAN-ORIG-TS | `X(26)` | Timestamp | 26 | Origination timestamp |
+| 13 | EXP-TRAN-PROC-TS | `X(26)` | Timestamp | 26 | Processing timestamp |
+| 14 | FILLER | `X(140)` | Filler | 140 | Reserved |
+
+### 14e. Card Cross-Reference (EXPORT-CARD-XREF-DATA REDEFINES EXPORT-RECORD-DATA)
+
+| # | Field Name | PIC Clause | Type | Bytes | Business Description |
+|---|------------|-----------|------|-------|---------------------|
+| 1 | EXP-XREF-CARD-NUM | `X(16)` | Alpha | 16 | Card number |
+| 2 | EXP-XREF-CUST-ID | `9(09)` | Numeric | 9 | Customer ID |
+| 3 | EXP-XREF-ACCT-ID | `9(11) COMP` | Binary | 4 | Account ID |
+| 4 | FILLER | `X(427)` | Filler | 427 | Reserved |
+
+### 14f. Card Record (EXPORT-CARD-DATA REDEFINES EXPORT-RECORD-DATA)
+
+| # | Field Name | PIC Clause | Type | Bytes | Business Description |
+|---|------------|-----------|------|-------|---------------------|
+| 1 | EXP-CARD-NUM | `X(16)` | Alpha | 16 | Card number |
+| 2 | EXP-CARD-ACCT-ID | `9(11) COMP` | Binary | 4 | Account ID |
+| 3 | EXP-CARD-CVV-CD | `9(03) COMP` | Binary | 2 | Card CVV code |
+| 4 | EXP-CARD-EMBOSSED-NAME | `X(50)` | Alpha | 50 | Embossed name |
+| 5 | EXP-CARD-EXPIRAION-DATE | `X(10)` | Date String | 10 | Card expiration date |
+| 6 | EXP-CARD-ACTIVE-STATUS | `X(01)` | Alpha | 1 | Card active status |
+| 7 | FILLER | `X(373)` | Filler | 373 | Reserved |
+
+**Note:** Numeric fields use mixed storage formats -- `COMP` (binary), `COMP-3` (packed decimal), and DISPLAY (character). Byte lengths for COMP/COMP-3 fields differ from digit counts (e.g., `9(09) COMP` = 4 bytes, `S9(10)V99 COMP-3` = 7 bytes). This is critical for correct byte-level data mapping during Java migration.
 
 ---
 

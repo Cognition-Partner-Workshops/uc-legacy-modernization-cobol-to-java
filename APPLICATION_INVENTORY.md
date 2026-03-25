@@ -41,7 +41,7 @@
 | 30 | **CBIMPORT.cbl** | 487 | Batch | -- | Import customer data from branch migration export with validation | EXPFILE (R), CUSTOUT/ACCTOUT/XREFOUT/TRNXOUT/CARDOUT/ERROUT (W) | Data Migration |
 | 31 | **COBSWAIT.cbl** | 41 | Batch Util | -- | Wait utility -- calls ASM MVSWAIT with centisecond parameter | -- | Utility |
 
-**Subtotals:** 19,269 LOC across 31 programs (17 Online CICS + 12 Batch + 2 Subroutines)
+**Subtotals:** 20,650 LOC across 31 programs (17 Online CICS + 12 Batch + 2 Subroutines)
 
 ---
 
@@ -265,7 +265,7 @@
 | Metric | Count |
 |--------|-------|
 | **Total COBOL Programs** | 44 (31 core + 13 optional) |
-| **Total LOC (COBOL)** | ~28,794 |
+| **Total LOC (COBOL)** | ~30,175 |
 | **Online CICS Programs** | 22 |
 | **Batch Programs** | 18 |
 | **Subroutine/Utility Programs** | 4 |
