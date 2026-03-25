@@ -133,7 +133,7 @@
      WS_VALID = 'Y';
 
      /* Verify card exists in cross-reference */
-     XREF_SSA = 'CXREFSEG(CARDNUM =' || DALYTRAN_CARD_NUM || ')';
+     XREF_SSA = 'XREFSEG0(CARDNUM =' || DALYTRAN_CARD_NUM || ')';
      CALL PLITDLI(GU, DB_XREF_PTR, CARD_XREF_RECORD, XREF_SSA);
 
      IF XREF_STATUS ^= '  ' THEN DO;
@@ -142,7 +142,7 @@
      END;
 
      /* Verify account exists and is active */
-     ACCT_SSA = 'ACCTSEG (ACCTID  =' || XREF_ACCT_ID || ')';
+     ACCT_SSA = 'ACCTSEG0(ACCTID  =' || XREF_ACCT_ID || ')';
      CALL PLITDLI(GU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
 
      IF ACCT_STATUS ^= '  ' THEN DO;
@@ -182,11 +182,11 @@
      TRAN_PROC_TS      = DALYTRAN_PROC_TS;
 
      /* Insert into transaction database */
-     TRAN_SSA = 'TRANSEG ';
+     TRAN_SSA = 'TRANSEG0';
      CALL PLITDLI(ISRT, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
 
      /* Update account balance */
-     ACCT_SSA = 'ACCTSEG (ACCTID  =' || XREF_ACCT_ID || ')';
+     ACCT_SSA = 'ACCTSEG0(ACCTID  =' || XREF_ACCT_ID || ')';
      CALL PLITDLI(GHU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
 
      IF ACCT_STATUS = '  ' THEN DO;

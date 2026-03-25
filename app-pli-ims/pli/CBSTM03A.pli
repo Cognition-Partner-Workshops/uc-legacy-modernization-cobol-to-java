@@ -85,7 +85,7 @@
    OPEN FILE(STATEMENT_FILE);
 
    /* Iterate through all accounts */
-   ACCT_SSA = 'ACCTSEG ';
+   ACCT_SSA = 'ACCTSEG0';
    CALL PLITDLI(GU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
 
    DO WHILE(ACCT_STATUS = '  ');
@@ -93,16 +93,16 @@
 
      IF ACCT_ACTIVE_STATUS = 'Y' THEN DO;
        /* Get card number for this account */
-       XREF_SSA = 'CXREFSEG(ACCTID  =' || ACCT_ID || ')';
+       XREF_SSA = 'XREFSEG0(ACCTID  =' || ACCT_ID || ')';
        CALL PLITDLI(GU, DB_XREF_PTR, CARD_XREF_RECORD, XREF_SSA);
 
        IF XREF_STATUS = '  ' THEN DO;
          /* Get customer info */
-         CUST_SSA = 'CUSTSEG (CUSTID  =' || XREF_CUST_ID || ')';
+         CUST_SSA = 'CUSTSEG0(CUSTID  =' || XREF_CUST_ID || ')';
          CALL PLITDLI(GU, DB_CUST_PTR, CUSTOMER_RECORD, CUST_SSA);
 
          /* Get transactions for this card */
-         TRAN_SSA = 'TRANSEG (CARDNUM =' || XREF_CARD_NUM || ')';
+         TRAN_SSA = 'TRANSEG0(CARDNUM =' || XREF_CARD_NUM || ')';
          CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
 
          DO WHILE(TRAN_STATUS = '  ');

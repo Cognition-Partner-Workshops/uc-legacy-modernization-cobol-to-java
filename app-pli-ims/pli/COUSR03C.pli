@@ -46,6 +46,7 @@
    %INCLUDE CSMSG01Y;
    %INCLUDE CSUSR01Y;
 
+   %INCLUDE CSUTIL01Y;
    DCL 1 INPUT_MSG,
          2 LL           FIXED BIN(15),
          2 ZZ           FIXED BIN(15),
@@ -111,7 +112,7 @@
    /* DISPLAY_USER                                                   */
    /******************************************************************/
    DISPLAY_USER: PROC;
-     USRSEC_SSA = 'USRSEG  (USRID   =' || IN_USERID || ')';
+     USRSEC_SSA = 'USRSEG0 (USRID   =' || IN_USERID || ')';
      CALL PLITDLI(GU, DB_USRSEC_PTR, SEC_USER_DATA, USRSEC_SSA);
 
      IF USRSEC_STATUS = '  ' THEN DO;
@@ -145,7 +146,7 @@
      END;
 
      /* Read with hold for delete */
-     USRSEC_SSA = 'USRSEG  (USRID   =' || IN_USERID || ')';
+     USRSEC_SSA = 'USRSEG0 (USRID   =' || IN_USERID || ')';
      CALL PLITDLI(GHU, DB_USRSEC_PTR, SEC_USER_DATA, USRSEC_SSA);
 
      IF USRSEC_STATUS ^= '  ' THEN DO;
@@ -181,20 +182,4 @@
      IO_MOD = 'COUSR03';
      CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
    END SEND_MAP;
-
-   POPULATE_HEADER_INFO: PROC;
-     DCL CURRENT_TS CHAR(17);
-     CURRENT_TS = DATETIME();
-     OUT_TRNNAME = WS_TRANID;
-     OUT_TITLE01 = CCDA_TITLE01;
-     OUT_TITLE02 = CCDA_TITLE02;
-     OUT_PGMNAME = WS_PGMNAME;
-     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 3, 2);
-     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 13, 2);
-   END POPULATE_HEADER_INFO;
-
  END COUSR03C;

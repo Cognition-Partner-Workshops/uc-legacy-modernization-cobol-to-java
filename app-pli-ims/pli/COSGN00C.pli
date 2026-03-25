@@ -60,6 +60,7 @@
    %INCLUDE CSMSG01Y;
    %INCLUDE CSUSR01Y;
 
+   %INCLUDE CSUTIL01Y;
    /* MFS Input/Output message structures */
    DCL 1 INPUT_MSG,
          2 LL           FIXED BIN(15),
@@ -158,28 +159,12 @@
    /******************************************************************/
    /* POPULATE_HEADER_INFO - Set common header fields                */
    /******************************************************************/
-   POPULATE_HEADER_INFO: PROC;
-     DCL CURRENT_TS CHAR(17);
-     CURRENT_TS = DATETIME();
-
-     OUT_TRNNAME = WS_TRANID;
-     OUT_TITLE01 = CCDA_TITLE01;
-     OUT_TITLE02 = CCDA_TITLE02;
-     OUT_PGMNAME = WS_PGMNAME;
-     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 3, 2);
-     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 13, 2);
-   END POPULATE_HEADER_INFO;
-
    /******************************************************************/
    /* READ_USER_SEC_FILE - Read user security record via IMS DL/I   */
    /******************************************************************/
    READ_USER_SEC_FILE: PROC;
      /* Build qualified SSA for user security segment */
-     USRSEC_SSA = 'USRSEG  (USRID   =' || WS_USER_ID || ')';
+     USRSEC_SSA = 'USRSEG0 (USRID   =' || WS_USER_ID || ')';
 
      CALL PLITDLI(GU, DB_USRSEC_PTR, SEC_USER_DATA, USRSEC_SSA);
 

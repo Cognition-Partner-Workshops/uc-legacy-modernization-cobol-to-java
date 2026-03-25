@@ -67,6 +67,7 @@
    %INCLUDE CVTRA03Y;
    %INCLUDE CVTRA04Y;
 
+   %INCLUDE CSUTIL01Y;
    DCL 1 INPUT_MSG,
          2 LL           FIXED BIN(15),
          2 ZZ           FIXED BIN(15),
@@ -130,7 +131,7 @@
    END;
 
    /* Read transaction record */
-   TRAN_SSA = 'TRANSEG (TRANID  =' || IN_TRANID || ')';
+   TRAN_SSA = 'TRANSEG0(TRANID  =' || IN_TRANID || ')';
    CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
 
    IF TRAN_DBSTAT = '  ' THEN DO;
@@ -178,20 +179,4 @@
      IO_MOD = 'COTRN01';
      CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
    END SEND_MAP;
-
-   POPULATE_HEADER_INFO: PROC;
-     DCL CURRENT_TS CHAR(17);
-     CURRENT_TS = DATETIME();
-     OUT_TRNNAME = WS_TRANID;
-     OUT_TITLE01 = CCDA_TITLE01;
-     OUT_TITLE02 = CCDA_TITLE02;
-     OUT_PGMNAME = WS_PGMNAME;
-     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 3, 2);
-     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 13, 2);
-   END POPULATE_HEADER_INFO;
-
  END COTRN01C;

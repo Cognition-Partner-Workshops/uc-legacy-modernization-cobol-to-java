@@ -76,6 +76,7 @@
    %INCLUDE CVACT01Y;
    %INCLUDE CVACT03Y;
 
+   %INCLUDE CSUTIL01Y;
    DCL 1 INPUT_MSG,
          2 LL           FIXED BIN(15),
          2 ZZ           FIXED BIN(15),
@@ -231,7 +232,7 @@
      CALL SET_TIMESTAMPS;
 
      /* Insert new transaction */
-     TRAN_SSA = 'TRANSEG ';
+     TRAN_SSA = 'TRANSEG0';
      CALL PLITDLI(ISRT, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
 
      IF TRAN_DBSTAT = '  ' THEN
@@ -247,9 +248,23 @@
    /* GENERATE_TRAN_ID                                               */
    /******************************************************************/
    GENERATE_TRAN_ID: PROC;
-     /* Read last transaction to determine next ID */
-     /* In IMS, we navigate to last segment and increment */
-     WS_TRAN_ID_NUM = WS_TRAN_ID_NUM + 1;
+     /* Generate unique transaction ID using timestamp + terminal */
+     /* Navigate to last segment in DB to find highest existing ID */
+     DCL WS_HIGH_KEY CHAR(16) INIT((16)'9');
+     DCL WS_LAST_TRAN_ID PIC '(16)9' INIT(0);
+     DCL TRAN_LAST_SSA CHAR(50);
+
+     TRAN_LAST_SSA = 'TRANSEG0(TRANID  =' || WS_HIGH_KEY || ')';
+     CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, TRAN_LAST_SSA);
+
+     IF TRAN_DBSTAT = '  ' THEN
+       WS_LAST_TRAN_ID = TRAN_ID;
+     ELSE DO;
+       /* No existing transactions or GE - start from 0 */
+       WS_LAST_TRAN_ID = 0;
+     END;
+
+     WS_TRAN_ID_NUM = WS_LAST_TRAN_ID + 1;
    END GENERATE_TRAN_ID;
 
    /******************************************************************/
@@ -275,20 +290,4 @@
      IO_MOD = 'COTRN02';
      CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
    END SEND_MAP;
-
-   POPULATE_HEADER_INFO: PROC;
-     DCL CURRENT_TS CHAR(17);
-     CURRENT_TS = DATETIME();
-     OUT_TRNNAME = WS_TRANID;
-     OUT_TITLE01 = CCDA_TITLE01;
-     OUT_TITLE02 = CCDA_TITLE02;
-     OUT_PGMNAME = WS_PGMNAME;
-     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 3, 2);
-     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 13, 2);
-   END POPULATE_HEADER_INFO;
-
  END COTRN02C;

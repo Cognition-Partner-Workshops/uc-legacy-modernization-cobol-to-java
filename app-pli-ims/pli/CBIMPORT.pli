@@ -100,7 +100,7 @@
      SELECT(EXPORT_REC_TYPE);
        WHEN('A') DO;
          ACCOUNT_RECORD = EXPORT_REC_DATA;
-         SEGMENT_SSA = 'ACCTSEG ';
+         SEGMENT_SSA = 'ACCTSEG0';
          CALL PLITDLI(ISRT, DB_ACCT_PTR,
                       ACCOUNT_RECORD, SEGMENT_SSA);
          IF A_STATUS = '  ' THEN
@@ -110,7 +110,7 @@
        END;
        WHEN('C') DO;
          CUSTOMER_RECORD = EXPORT_REC_DATA;
-         SEGMENT_SSA = 'CUSTSEG ';
+         SEGMENT_SSA = 'CUSTSEG0';
          CALL PLITDLI(ISRT, DB_CUST_PTR,
                       CUSTOMER_RECORD, SEGMENT_SSA);
          IF C_STATUS = '  ' THEN
@@ -120,7 +120,7 @@
        END;
        WHEN('D') DO;
          CARD_RECORD = EXPORT_REC_DATA;
-         SEGMENT_SSA = 'CARDSEG ';
+         SEGMENT_SSA = 'CARDSEG0';
          CALL PLITDLI(ISRT, DB_CARD_PTR,
                       CARD_RECORD, SEGMENT_SSA);
          IF D_STATUS = '  ' THEN
@@ -130,7 +130,7 @@
        END;
        WHEN('X') DO;
          CARD_XREF_RECORD = EXPORT_REC_DATA;
-         SEGMENT_SSA = 'CXREFSEG';
+         SEGMENT_SSA = 'XREFSEG0';
          CALL PLITDLI(ISRT, DB_CXREF_PTR,
                       CARD_XREF_RECORD, SEGMENT_SSA);
          IF X_STATUS = '  ' THEN
@@ -140,7 +140,7 @@
        END;
        WHEN('T') DO;
          TRAN_RECORD = EXPORT_REC_DATA;
-         SEGMENT_SSA = 'TRANSEG ';
+         SEGMENT_SSA = 'TRANSEG0';
          CALL PLITDLI(ISRT, DB_TRAN_PTR,
                       TRAN_RECORD, SEGMENT_SSA);
          IF T_STATUS = '  ' THEN

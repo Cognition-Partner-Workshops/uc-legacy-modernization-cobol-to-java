@@ -120,7 +120,7 @@
    /* EXPORT_ACCOUNTS                                                */
    /******************************************************************/
    EXPORT_ACCOUNTS: PROC;
-     UNQUAL_SSA = 'ACCTSEG ';
+     UNQUAL_SSA = 'ACCTSEG0';
      CALL PLITDLI(GU, DB_ACCT_PTR, ACCOUNT_RECORD, UNQUAL_SSA);
 
      DO WHILE(A_STATUS = '  ');
@@ -139,7 +139,7 @@
    /* EXPORT_CUSTOMERS                                               */
    /******************************************************************/
    EXPORT_CUSTOMERS: PROC;
-     UNQUAL_SSA = 'CUSTSEG ';
+     UNQUAL_SSA = 'CUSTSEG0';
      CALL PLITDLI(GU, DB_CUST_PTR, CUSTOMER_RECORD, UNQUAL_SSA);
 
      DO WHILE(C_STATUS = '  ');
@@ -158,7 +158,7 @@
    /* EXPORT_CARDS                                                   */
    /******************************************************************/
    EXPORT_CARDS: PROC;
-     UNQUAL_SSA = 'CARDSEG ';
+     UNQUAL_SSA = 'CARDSEG0';
      CALL PLITDLI(GU, DB_CARD_PTR, CARD_RECORD, UNQUAL_SSA);
 
      DO WHILE(D_STATUS = '  ');
@@ -177,7 +177,7 @@
    /* EXPORT_XREFS                                                   */
    /******************************************************************/
    EXPORT_XREFS: PROC;
-     UNQUAL_SSA = 'CXREFSEG';
+     UNQUAL_SSA = 'XREFSEG0';
      CALL PLITDLI(GU, DB_CXREF_PTR, CARD_XREF_RECORD, UNQUAL_SSA);
 
      DO WHILE(X_STATUS = '  ');
@@ -196,7 +196,7 @@
    /* EXPORT_TRANSACTIONS                                            */
    /******************************************************************/
    EXPORT_TRANSACTIONS: PROC;
-     UNQUAL_SSA = 'TRANSEG ';
+     UNQUAL_SSA = 'TRANSEG0';
      CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, UNQUAL_SSA);
 
      DO WHILE(T_STATUS = '  ');

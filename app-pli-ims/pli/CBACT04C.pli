@@ -108,11 +108,11 @@
        WS_LAST_ACCT_NUM = TRANCAT_ACCT_ID;
 
        /* Read account data */
-       ACCT_SSA = 'ACCTSEG (ACCTID  =' || TRANCAT_ACCT_ID || ')';
+       ACCT_SSA = 'ACCTSEG0(ACCTID  =' || TRANCAT_ACCT_ID || ')';
        CALL PLITDLI(GU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
 
        /* Read xref for card number */
-       XREF_SSA = 'CXREFSEG(ACCTID  =' || TRANCAT_ACCT_ID || ')';
+       XREF_SSA = 'XREFSEG0(ACCTID  =' || TRANCAT_ACCT_ID || ')';
        CALL PLITDLI(GU, DB_XREF_PTR, CARD_XREF_RECORD, XREF_SSA);
      END;
 
@@ -165,7 +165,7 @@
    /******************************************************************/
    UPDATE_ACCOUNT: PROC;
      /* Re-read account with hold for update */
-     ACCT_SSA = 'ACCTSEG (ACCTID  =' || WS_LAST_ACCT_NUM || ')';
+     ACCT_SSA = 'ACCTSEG0(ACCTID  =' || WS_LAST_ACCT_NUM || ')';
      CALL PLITDLI(GHU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
 
      IF ACCT_STATUS = '  ' THEN DO;

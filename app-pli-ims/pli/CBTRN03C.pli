@@ -63,7 +63,7 @@
    OPEN FILE(REPORT_FILE);
 
    /* Read first transaction */
-   TRAN_SSA = 'TRANSEG ';
+   TRAN_SSA = 'TRANSEG0';
    CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
 
    DO WHILE(TRAN_STATUS = '  ');

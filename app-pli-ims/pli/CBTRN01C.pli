@@ -71,7 +71,7 @@
      TRAN_PROC_TS      = DALYTRAN_PROC_TS;
 
      /* Insert into master transaction DB */
-     TRAN_SSA = 'TRANSEG ';
+     TRAN_SSA = 'TRANSEG0';
      CALL PLITDLI(ISRT, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
 
      IF TRAN_STATUS = '  ' THEN

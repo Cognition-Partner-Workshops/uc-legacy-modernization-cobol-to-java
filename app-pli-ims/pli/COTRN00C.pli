@@ -54,6 +54,7 @@
    %INCLUDE CVTRA05Y;
    %INCLUDE CVACT03Y;
 
+   %INCLUDE CSUTIL01Y;
    DCL 1 INPUT_MSG,
          2 LL           FIXED BIN(15),
          2 ZZ           FIXED BIN(15),
@@ -137,7 +138,7 @@
      /* List transactions */
      IF IN_ACCTID ^= ' ' THEN DO;
        /* Get card number from account via xref */
-       CXREF_SSA = 'CXREFSEG(ACCTID  =' || IN_ACCTID || ')';
+       CXREF_SSA = 'XREFSEG0(ACCTID  =' || IN_ACCTID || ')';
        CALL PLITDLI(GU, DB_CXREF_PTR, CARD_XREF_RECORD, CXREF_SSA);
        IF DB_CXREF->CXREF_STATUS = '  ' THEN
          IN_CARDNUM = XREF_CARD_NUM;
@@ -164,7 +165,7 @@
    LIST_TRANSACTIONS: PROC;
      DCL TRAN_COUNT FIXED BIN(15) INIT(0);
 
-     TRAN_SSA = 'TRANSEG (CARDNUM =' || IN_CARDNUM || ')';
+     TRAN_SSA = 'TRANSEG0(CARDNUM =' || IN_CARDNUM || ')';
      CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
 
      DO WHILE(TRAN_STATUS = '  ' & TRAN_COUNT < MAX_TRANS);
@@ -193,20 +194,4 @@
      IO_MOD = 'COTRN00';
      CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
    END SEND_MAP;
-
-   POPULATE_HEADER_INFO: PROC;
-     DCL CURRENT_TS CHAR(17);
-     CURRENT_TS = DATETIME();
-     OUT_TRNNAME = WS_TRANID;
-     OUT_TITLE01 = CCDA_TITLE01;
-     OUT_TITLE02 = CCDA_TITLE02;
-     OUT_PGMNAME = WS_PGMNAME;
-     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 3, 2);
-     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 13, 2);
-   END POPULATE_HEADER_INFO;
-
  END COTRN00C;

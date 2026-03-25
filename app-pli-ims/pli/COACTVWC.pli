@@ -88,6 +88,7 @@
    %INCLUDE CVACT03Y;
    %INCLUDE CVCUS01Y;
 
+   %INCLUDE CSUTIL01Y;
    DCL 1 INPUT_MSG,
          2 LL           FIXED BIN(15),
          2 ZZ           FIXED BIN(15),
@@ -198,7 +199,7 @@
    /* READ_ACCT - Read account record via IMS DL/I                  */
    /******************************************************************/
    READ_ACCT: PROC;
-     ACCT_SSA = 'ACCTSEG (ACCTID  =' || IN_ACCTID || ')';
+     ACCT_SSA = 'ACCTSEG0(ACCTID  =' || IN_ACCTID || ')';
 
      CALL PLITDLI(GU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
 
@@ -233,7 +234,7 @@
    /******************************************************************/
    READ_CUST: PROC;
      /* First read XREF to get customer ID */
-     CXREF_SSA = 'CXREFSEG(ACCTID  =' || IN_ACCTID || ')';
+     CXREF_SSA = 'XREFSEG0(ACCTID  =' || IN_ACCTID || ')';
 
      CALL PLITDLI(GU, DB_CXREF_PTR, CARD_XREF_RECORD, CXREF_SSA);
 
@@ -245,7 +246,7 @@
      END;
 
      /* Now read customer by customer ID */
-     CUST_SSA = 'CUSTSEG (CUSTID  =' || XREF_CUST_ID || ')';
+     CUST_SSA = 'CUSTSEG0(CUSTID  =' || XREF_CUST_ID || ')';
 
      CALL PLITDLI(GU, DB_CUST_PTR, CUSTOMER_RECORD, CUST_SSA);
 
@@ -285,19 +286,4 @@
    /******************************************************************/
    /* POPULATE_HEADER_INFO                                           */
    /******************************************************************/
-   POPULATE_HEADER_INFO: PROC;
-     DCL CURRENT_TS CHAR(17);
-     CURRENT_TS = DATETIME();
-     OUT_TRNNAME = WS_TRANID;
-     OUT_TITLE01 = CCDA_TITLE01;
-     OUT_TITLE02 = CCDA_TITLE02;
-     OUT_PGMNAME = WS_PGMNAME;
-     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 3, 2);
-     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 13, 2);
-   END POPULATE_HEADER_INFO;
-
  END COACTVWC;

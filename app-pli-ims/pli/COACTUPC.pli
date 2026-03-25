@@ -80,6 +80,7 @@
    %INCLUDE CSUTLDWY;
    %INCLUDE CSLKPCDY;
 
+   %INCLUDE CSUTIL01Y;
    DCL 1 INPUT_MSG,
          2 LL           FIXED BIN(15),
          2 ZZ           FIXED BIN(15),
@@ -196,7 +197,7 @@
      END;
 
      /* Read account with hold for update */
-     ACCT_SSA = 'ACCTSEG (ACCTID  =' || IN_ACCTID || ')';
+     ACCT_SSA = 'ACCTSEG0(ACCTID  =' || IN_ACCTID || ')';
      CALL PLITDLI(GHU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
 
      IF ACCT_STATUS ^= '  ' THEN DO;
@@ -226,11 +227,11 @@
 
      /* Read customer for update if customer fields changed */
      IF WS_DATA_CHANGED = 'Y' THEN DO;
-       CXREF_SSA = 'CXREFSEG(ACCTID  =' || IN_ACCTID || ')';
+       CXREF_SSA = 'XREFSEG0(ACCTID  =' || IN_ACCTID || ')';
        CALL PLITDLI(GU, DB_CXREF_PTR, CARD_XREF_RECORD, CXREF_SSA);
 
        IF CXREF_STATUS = '  ' THEN DO;
-         CUST_SSA = 'CUSTSEG (CUSTID  =' || XREF_CUST_ID || ')';
+         CUST_SSA = 'CUSTSEG0(CUSTID  =' || XREF_CUST_ID || ')';
          CALL PLITDLI(GHU, DB_CUST_PTR, CUSTOMER_RECORD, CUST_SSA);
 
          IF CUST_STATUS = '  ' THEN DO;
@@ -288,19 +289,4 @@
    /******************************************************************/
    /* POPULATE_HEADER_INFO                                           */
    /******************************************************************/
-   POPULATE_HEADER_INFO: PROC;
-     DCL CURRENT_TS CHAR(17);
-     CURRENT_TS = DATETIME();
-     OUT_TRNNAME = WS_TRANID;
-     OUT_TITLE01 = CCDA_TITLE01;
-     OUT_TITLE02 = CCDA_TITLE02;
-     OUT_PGMNAME = WS_PGMNAME;
-     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
-                   SUBSTR(CURRENT_TS, 3, 2);
-     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
-                   SUBSTR(CURRENT_TS, 13, 2);
-   END POPULATE_HEADER_INFO;
-
  END COACTUPC;
