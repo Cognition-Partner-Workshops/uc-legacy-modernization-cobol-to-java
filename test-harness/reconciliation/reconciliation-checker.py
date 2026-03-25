@@ -52,7 +52,7 @@ class ReconciliationReport:
 # Payroll Reconciliation
 # ---------------------------------------------------------------------------
 
-def reconcile_payroll(data: dict) -> list[ReconciliationFailure]:
+def reconcile_payroll(data: dict) -> tuple[list[ReconciliationFailure], int]:
     """Validate payroll totals balance correctly.
 
     Checks:
@@ -61,8 +61,12 @@ def reconcile_payroll(data: dict) -> list[ReconciliationFailure]:
         3. For each employee: gross - deductions == net
         4. total_gross - total_deductions == total_net
         5. Employee count matches the number of pay stubs
+
+    Returns:
+        (failures, check_count) — the list of failures and total checks run.
     """
     failures: list[ReconciliationFailure] = []
+    check_count = 0
 
     for step in data.get("steps", []):
         output = step.get("output", {})
@@ -77,6 +81,7 @@ def reconcile_payroll(data: dict) -> list[ReconciliationFailure]:
 
         # Check 1 & 2: Sum of individual pays == reported totals
         if employee_pays and total_gross is not None:
+            check_count += 1
             calc_gross = sum(ep.get("gross_pay", 0) for ep in employee_pays)
             diff = abs(calc_gross - total_gross)
             if diff > FINANCIAL_TOLERANCE:
@@ -90,6 +95,7 @@ def reconcile_payroll(data: dict) -> list[ReconciliationFailure]:
                 ))
 
         if employee_pays and total_net is not None:
+            check_count += 1
             calc_net = sum(ep.get("net_pay", 0) for ep in employee_pays)
             diff = abs(calc_net - total_net)
             if diff > FINANCIAL_TOLERANCE:
@@ -104,6 +110,7 @@ def reconcile_payroll(data: dict) -> list[ReconciliationFailure]:
 
         # Check 3: Per-employee gross - deductions == net
         for ep in employee_pays:
+            check_count += 1
             emp_id = ep.get("emp_id", "?")
             ep_gross = ep.get("gross_pay", 0)
             ep_deductions = ep.get("total_deductions", 0)
@@ -128,6 +135,7 @@ def reconcile_payroll(data: dict) -> list[ReconciliationFailure]:
         # Check 4: total_gross - total_deductions == total_net
         if (total_gross is not None and total_deductions is not None
                 and total_net is not None):
+            check_count += 1
             expected_total_net = total_gross - total_deductions
             diff = abs(expected_total_net - total_net)
             if diff > FINANCIAL_TOLERANCE:
@@ -145,6 +153,7 @@ def reconcile_payroll(data: dict) -> list[ReconciliationFailure]:
 
         # Check 5: Employee count matches number of pay stubs
         if reported_count is not None and employee_pays:
+            check_count += 1
             actual_count = len(employee_pays)
             if actual_count != reported_count:
                 failures.append(ReconciliationFailure(
@@ -182,6 +191,7 @@ def reconcile_payroll(data: dict) -> list[ReconciliationFailure]:
                 )
             )
             if has_components and ep_gross > 0:
+                check_count += 1
                 diff = abs(component_sum - ep_gross)
                 if diff > FINANCIAL_TOLERANCE:
                     failures.append(ReconciliationFailure(
@@ -196,22 +206,26 @@ def reconcile_payroll(data: dict) -> list[ReconciliationFailure]:
                         ),
                     ))
 
-    return failures
+    return failures, check_count
 
 
 # ---------------------------------------------------------------------------
 # Leave Reconciliation
 # ---------------------------------------------------------------------------
 
-def reconcile_leave(data: dict) -> list[ReconciliationFailure]:
+def reconcile_leave(data: dict) -> tuple[list[ReconciliationFailure], int]:
     """Validate leave balances sum correctly.
 
     Checks:
         1. used + remaining == total_entitled for each leave type
         2. Leave request days match (end_date - start_date + 1 == total_days)
         3. Balance changes after approval/cancellation are consistent
+
+    Returns:
+        (failures, check_count) — the list of failures and total checks run.
     """
     failures: list[ReconciliationFailure] = []
+    check_count = 0
 
     for step in data.get("steps", []):
         output = step.get("output", {})
@@ -220,6 +234,7 @@ def reconcile_leave(data: dict) -> list[ReconciliationFailure]:
         # Check balances
         balances = output.get("balances", [])
         for bal in balances:
+            check_count += 1
             leave_type = bal.get("leave_type", "?")
             total = bal.get("total_entitled", 0)
             used = bal.get("used", 0)
@@ -243,6 +258,7 @@ def reconcile_leave(data: dict) -> list[ReconciliationFailure]:
         remaining = output.get("remaining")
         if (total_entitled is not None and used is not None
                 and remaining is not None):
+            check_count += 1
             if total_entitled != used + remaining:
                 failures.append(ReconciliationFailure(
                     module="leave",
@@ -260,6 +276,7 @@ def reconcile_leave(data: dict) -> list[ReconciliationFailure]:
         end_date = output.get("end_date")
         total_days = output.get("total_days")
         if start_date and end_date and total_days is not None:
+            check_count += 1
             try:
                 from datetime import date as dt_date
                 sd = dt_date.fromisoformat(str(start_date))
@@ -289,7 +306,7 @@ def reconcile_leave(data: dict) -> list[ReconciliationFailure]:
             except (ValueError, TypeError):
                 pass  # Skip date parsing errors
 
-    return failures
+    return failures, check_count
 
 
 # ---------------------------------------------------------------------------
@@ -432,17 +449,15 @@ def reconcile_results(results_dir: Path) -> ReconciliationReport:
         module = data.get("module", "unknown")
 
         if module == "payroll":
-            failures = reconcile_payroll(data)
+            failures, checks_run = reconcile_payroll(data)
             report.failures.extend(failures)
-            checks_run = max(len(data.get("steps", [])), 1)
             report.total_checks += checks_run
             report.failed += len(failures)
             report.passed += checks_run - len(failures)
 
         elif module == "leave":
-            failures = reconcile_leave(data)
+            failures, checks_run = reconcile_leave(data)
             report.failures.extend(failures)
-            checks_run = max(len(data.get("steps", [])), 1)
             report.total_checks += checks_run
             report.failed += len(failures)
             report.passed += checks_run - len(failures)

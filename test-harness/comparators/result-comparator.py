@@ -157,6 +157,14 @@ def compare_values(
     Returns:
         (status, message) tuple
     """
+    # Handle None / missing
+    if legacy is None and modern is None:
+        return "MATCH", ""
+    if legacy is None:
+        return "MISSING_LEGACY", "Field missing from legacy output"
+    if modern is None:
+        return "MISSING_MODERN", "Field missing from modern output"
+
     # Wildcard matching
     if wildcard or field_name in WILDCARD_FIELDS:
         if isinstance(legacy, str) and (
@@ -165,14 +173,6 @@ def compare_values(
             if match_wildcard(legacy, str(modern)):
                 return "WILDCARD", f"Pattern '{legacy}' matched '{modern}'"
             return "MISMATCH", f"Pattern '{legacy}' did not match '{modern}'"
-
-    # Handle None / missing
-    if legacy is None and modern is None:
-        return "MATCH", ""
-    if legacy is None:
-        return "MISSING_LEGACY", "Field missing from legacy output"
-    if modern is None:
-        return "MISSING_MODERN", "Field missing from modern output"
 
     # Comparison operator expressions (e.g. "> 0", ">= 5")
     if isinstance(legacy, str):
