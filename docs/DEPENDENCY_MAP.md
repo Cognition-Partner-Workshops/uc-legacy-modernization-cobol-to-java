@@ -314,8 +314,8 @@ Which copybooks are included by which programs (based on COPY statements and dat
 | `COTTL01Y` (Title/Header) | All online CICS programs with screen output |
 | `CSDAT01Y` (Date/Time) | All online CICS programs (timestamp display) |
 | `CSSTRPFY` (PFKey Storage) | All online CICS programs (function key handling) |
-| `CSUTLDWY` (Date Validation WS) | COACTUPC, COCRDUPC, COTRN02C, CORPT00C |
-| `CSUTLDPY` (Date Validation Logic) | COACTUPC, COCRDUPC, COTRN02C, CORPT00C |
+| `CSUTLDWY` (Date Validation WS) | COACTUPC, COTRN02C, CORPT00C |
+| `CSUTLDPY` (Date Validation Logic) | COACTUPC, COTRN02C, CORPT00C |
 | `CSLKPCDY` (Lookup Codes) | COACTUPC (phone, state, zip validation) |
 | `CSMSG01Y` (Common Messages) | All online CICS programs |
 | `CSMSG02Y` (Abend Data) | All batch programs (abend handling) |

@@ -240,7 +240,7 @@ Based on the hotspot analysis, the recommended migration sequence balances risk 
 |---|---|---|
 | 1a | `COSGN00C` | Security foundation. Small (260 lines) but critical. Establishes authentication framework (JWT/OAuth2), password hashing, session management. All other modules depend on auth. |
 | 1b | `CSUSR01Y` + `COCOM01Y` | Data model foundation. Define User and COMMAREA as Java POJOs/DTOs. Used by every online program. |
-| 1c | `CSUTLDTC` | Shared utility. Date validation used by COTRN02C, CORPT00C, COACTUPC, COCRDUPC. Build as reusable Java service. |
+| 1c | `CSUTLDTC` | Shared utility. Date validation called by COTRN02C and CORPT00C. COACTUPC uses inline date validation via CSUTLDPY/CSUTLDWY copybooks. Build as reusable Java service. |
 
 ### Phase 2: Core Data (Weeks 5-8)
 
