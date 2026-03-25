@@ -464,6 +464,20 @@
                WS-CARD-RECORDS-IMPORTED +
                WS-UNKNOWN-RECORD-TYPE-COUNT
            
+           IF WS-ERROR-RECORDS-WRITTEN > 0
+               MOVE 'N' TO WS-VALIDATION-PASSED
+               DISPLAY 'CBIMPORT: VALIDATION WARNING - '
+                   'Errors encountered during import: '
+                   WS-ERROR-RECORDS-WRITTEN
+           END-IF
+           
+           IF WS-UNKNOWN-RECORD-TYPE-COUNT > 0
+               MOVE 'N' TO WS-VALIDATION-PASSED
+               DISPLAY 'CBIMPORT: VALIDATION WARNING - '
+                   'Unknown record types found: '
+                   WS-UNKNOWN-RECORD-TYPE-COUNT
+           END-IF
+           
            IF WS-COMPUTED-TOTAL NOT = WS-TOTAL-RECORDS-READ
                MOVE 'N' TO WS-VALIDATION-PASSED
                MOVE FUNCTION CURRENT-DATE TO ERR-TIMESTAMP
@@ -477,20 +491,6 @@
                    WS-TOTAL-RECORDS-READ
                    ' Computed='
                    WS-COMPUTED-TOTAL
-           END-IF
-           
-           IF WS-ERROR-RECORDS-WRITTEN > 0
-               MOVE 'N' TO WS-VALIDATION-PASSED
-               DISPLAY 'CBIMPORT: VALIDATION WARNING - '
-                   'Errors encountered during import: '
-                   WS-ERROR-RECORDS-WRITTEN
-           END-IF
-           
-           IF WS-UNKNOWN-RECORD-TYPE-COUNT > 0
-               MOVE 'N' TO WS-VALIDATION-PASSED
-               DISPLAY 'CBIMPORT: VALIDATION WARNING - '
-                   'Unknown record types found: '
-                   WS-UNKNOWN-RECORD-TYPE-COUNT
            END-IF
            
            IF VALIDATION-OK
