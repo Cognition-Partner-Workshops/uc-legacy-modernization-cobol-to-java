@@ -106,8 +106,8 @@ and aggregate totals are preserved after migration.
 | R-01 | Every card references an existing account | `carddata` -> `acctdata` |
 | R-02 | Every cross-reference links a valid card, customer, and account | `cardxref` -> `carddata`, `custdata`, `acctdata` |
 | R-03 | Every daily transaction references a valid card number | `dailytran` -> `carddata` |
-| R-04 | Transaction category balances sum to account current balance | `tcatbal` -> `acctdata` |
-| R-05 | Disclosure group entries reference valid account groups and transaction types | `discgrp` -> `acctdata`, `trantype` |
+| R-04 | Transaction category balance records reference valid accounts | `tcatbal` -> `acctdata` |
+| R-05 | Disclosure group transaction types are valid and account groups reference existing disclosure groups | `discgrp` -> `trantype`, `acctdata` -> `discgrp` |
 | R-06 | Transaction category codes exist in the category master | `dailytran` -> `trancatg` |
 | R-07 | Transaction type codes exist in the type master | `dailytran` -> `trantype` |
 | R-08 | Record counts are preserved across migration | all files |
