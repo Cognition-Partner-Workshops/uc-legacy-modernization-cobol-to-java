@@ -47,7 +47,7 @@ Each module is scored on four dimensions (1-5 scale, 5 = highest risk/priority):
 | Integration Risk | **5** | Reads DALYTRAN (sequential) + CARDXREF + ACCTDATA (KSDS). Writes to TRANSACT + updates ACCTDATA + TCATBALF. Writes rejects to DALYREJS. 6 file dependencies. |
 | Data Sensitivity | **5** | Posts financial transactions to master files. Updates account balances. Creates permanent financial records. A bug here means incorrect account balances across the system. |
 | Business Impact | **5** | Central to the nightly batch cycle. POSTTRAN job must succeed or the entire downstream pipeline (interest calc, statements, reports) fails. |
-| **Composite Score** | **4.75** | |
+| **Composite Score** | **4.70** | |
 
 **Modernization Risks:**
 - Must preserve exact decimal arithmetic (COMP-3 packed decimal → Java BigDecimal)
@@ -67,7 +67,7 @@ Each module is scored on four dimensions (1-5 scale, 5 = highest risk/priority):
 | Integration Risk | **4** | Accesses 5 VSAM files: ACCTDATA (read/rewrite), CARDXREF (read via AIX), DISCGRP (read), TCATBALF (read/rewrite), SYSTRAN (write). Uses alternate index path. |
 | Data Sensitivity | **5** | Calculates and applies interest to customer accounts. Directly impacts statement amounts and customer billing. Financial regulatory implications. |
 | Business Impact | **5** | Interest revenue is core to credit card business. Incorrect calculations = financial loss or regulatory violations. |
-| **Composite Score** | **4.55** | |
+| **Composite Score** | **4.45** | |
 
 **Modernization Risks:**
 - Interest calculation formulas must be validated with precision testing (rounding differences between COBOL COMP-3 and Java BigDecimal)
@@ -87,7 +87,7 @@ Each module is scored on four dimensions (1-5 scale, 5 = highest risk/priority):
 | Integration Risk | **4** | 12 EXEC CICS commands. Reads/rewrites CARDDATA VSAM. Cross-references ACCTDATA, CUSTDATA, CARDXREF. 15 copybooks. |
 | Data Sensitivity | **5** | Handles PCI-sensitive card data: card numbers, CVV codes, expiration dates. Card activation/deactivation. |
 | Business Impact | **4** | Card management is essential for customer operations. Card status changes affect transaction authorization. |
-| **Composite Score** | **4.25** | |
+| **Composite Score** | **4.20** | |
 
 **Modernization Risks:**
 - PCI DSS compliance requirements for card data handling in Java
@@ -146,7 +146,7 @@ Each module is scored on four dimensions (1-5 scale, 5 = highest risk/priority):
 | Integration Risk | **4** | 11 EXEC CICS commands (3 READ, 1 WRITE, 1 STARTBR). Accesses TRANSACT (write), ACCTDATA (read), CARDXREF (read). Calls CSUTLDTC subroutine. |
 | Data Sensitivity | **5** | Creates new financial transaction records. Directly affects account balances when posted. |
 | Business Impact | **4** | Transaction entry is a core business function. Used for manual transaction adjustments. |
-| **Composite Score** | **3.95** | |
+| **Composite Score** | **3.90** | |
 
 **Modernization Risks:**
 - Transaction ID generation (sequential within VSAM) must be replaced with database sequence or UUID
@@ -157,7 +157,26 @@ Each module is scored on four dimensions (1-5 scale, 5 = highest risk/priority):
 
 ---
 
-### #8: COSGN00C -- Signon / Authentication (Online)
+### #8: COBIL00C -- Bill Payment (Online)
+
+| Dimension | Score | Rationale |
+|---|---|---|
+| Code Complexity | **3** | 572 lines. Bill payment logic with full-balance and partial payment options. |
+| Integration Risk | **3** | 13 EXEC CICS commands (3 READ, 1 WRITE, 1 REWRITE, 1 STARTBR). Accesses ACCTDATA, CARDXREF, TRANSACT. |
+| Data Sensitivity | **5** | Processes financial payments. Reduces account balances. Creates payment transaction records. |
+| Business Impact | **4** | Direct revenue impact -- bill payments reduce outstanding balances. Customer-facing payment function. |
+| **Composite Score** | **3.65** | |
+
+**Modernization Risks:**
+- Payment amount validation (cannot exceed balance, minimum payment rules)
+- Atomicity: balance update + transaction creation must be in same transaction
+- Payment confirmation should generate receipt/acknowledgment in modern system
+
+**Recommended Approach:** `BillPaymentService` with `@Transactional`. Idempotency keys for payment deduplication. Event publishing for payment confirmation notifications.
+
+---
+
+### #9: COSGN00C -- Signon / Authentication (Online)
 
 | Dimension | Score | Rationale |
 |---|---|---|
@@ -165,7 +184,7 @@ Each module is scored on four dimensions (1-5 scale, 5 = highest risk/priority):
 | Integration Risk | **3** | 10 EXEC CICS commands (1 READ, 2 XCTL, 2 RETURN). Reads USRSEC VSAM. Routes to COMEN01C or COADM01C based on user type. |
 | Data Sensitivity | **5** | Authentication gateway for the entire application. Stores passwords in plaintext. Determines admin vs. user access. |
 | Business Impact | **5** | Single point of entry. If broken, entire application is inaccessible. Security vulnerability with plaintext passwords. |
-| **Composite Score** | **3.75** | |
+| **Composite Score** | **3.60** | |
 
 **Modernization Risks:**
 - Plaintext password storage must be replaced with BCrypt hashing
@@ -177,7 +196,7 @@ Each module is scored on four dimensions (1-5 scale, 5 = highest risk/priority):
 
 ---
 
-### #9: CBTRN03C -- Transaction Detail Report (Batch)
+### #10: CBTRN03C -- Transaction Detail Report (Batch)
 
 | Dimension | Score | Rationale |
 |---|---|---|
@@ -196,39 +215,20 @@ Each module is scored on four dimensions (1-5 scale, 5 = highest risk/priority):
 
 ---
 
-### #10: COBIL00C -- Bill Payment (Online)
-
-| Dimension | Score | Rationale |
-|---|---|---|
-| Code Complexity | **3** | 572 lines. Bill payment logic with full-balance and partial payment options. |
-| Integration Risk | **3** | 13 EXEC CICS commands (3 READ, 1 WRITE, 1 REWRITE, 1 STARTBR). Accesses ACCTDATA, CARDXREF, TRANSACT. |
-| Data Sensitivity | **5** | Processes financial payments. Reduces account balances. Creates payment transaction records. |
-| Business Impact | **4** | Direct revenue impact -- bill payments reduce outstanding balances. Customer-facing payment function. |
-| **Composite Score** | **3.70** | |
-
-**Modernization Risks:**
-- Payment amount validation (cannot exceed balance, minimum payment rules)
-- Atomicity: balance update + transaction creation must be in same transaction
-- Payment confirmation should generate receipt/acknowledgment in modern system
-
-**Recommended Approach:** `BillPaymentService` with `@Transactional`. Idempotency keys for payment deduplication. Event publishing for payment confirmation notifications.
-
----
-
 ## Summary Ranking
 
 | Rank | Module | Type | Lines | Composite Score | Key Risk |
 |---|---|---|---|---|---|
 | 1 | **COACTUPC** | Online | 4,236 | 5.00 | Largest program, financial mutations |
-| 2 | **CBTRN02C** | Batch | 731 | 4.75 | Central pipeline, 6-file dependencies |
-| 3 | **CBACT04C** | Batch | 652 | 4.55 | Interest calculations, regulatory |
-| 4 | **COCRDUPC** | Online | 1,560 | 4.25 | PCI card data, complex validation |
+| 2 | **CBTRN02C** | Batch | 731 | 4.70 | Central pipeline, 6-file dependencies |
+| 3 | **CBACT04C** | Batch | 652 | 4.45 | Interest calculations, regulatory |
+| 4 | **COCRDUPC** | Online | 1,560 | 4.20 | PCI card data, complex validation |
 | 5 | **COCRDLIC** | Online | 1,459 | 4.00 | Browse pagination, navigation hub |
 | 6 | **CBSTM03A/B** | Batch | 1,154 | 4.00 | ALTER/GO TO, dual output format |
-| 7 | **COTRN02C** | Online | 783 | 3.95 | Transaction creation, ID generation |
-| 8 | **COSGN00C** | Online | 260 | 3.75 | Security gateway, plaintext passwords |
-| 9 | **CBTRN03C** | Batch | 649 | 3.55 | Complex reporting, multi-file joins |
-| 10 | **COBIL00C** | Online | 572 | 3.70 | Payment processing, atomicity |
+| 7 | **COTRN02C** | Online | 783 | 3.90 | Transaction creation, ID generation |
+| 8 | **COBIL00C** | Online | 572 | 3.65 | Payment processing, atomicity |
+| 9 | **COSGN00C** | Online | 260 | 3.60 | Security gateway, plaintext passwords |
+| 10 | **CBTRN03C** | Batch | 649 | 3.55 | Complex reporting, multi-file joins |
 
 ---
 
