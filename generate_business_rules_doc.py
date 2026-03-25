@@ -37,9 +37,12 @@ def set_cell_shading(cell, color_hex):
 def set_table_borders(table):
     """Apply borders to all cells of a table."""
     tbl = table._tbl
-    tbl_pr = tbl.tblPr if tbl.tblPr is not None else parse_xml(
-        f'<w:tblPr {nsdecls("w")}/>'
-    )
+    tbl_pr = tbl.tblPr
+    if tbl_pr is None:
+        tbl_pr = parse_xml(
+            f'<w:tblPr {nsdecls("w")}/>'
+        )
+        tbl.insert(0, tbl_pr)
     borders = parse_xml(
         f'<w:tblBorders {nsdecls("w")}>'
         '  <w:top w:val="single" w:sz="4" w:space="0" w:color="000000"/>'
