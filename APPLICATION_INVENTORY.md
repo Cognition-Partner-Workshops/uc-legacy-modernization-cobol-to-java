@@ -105,11 +105,11 @@
 
 | # | Copybook | Lines | Business Entity | Description |
 |---|----------|------:|-----------------|-------------|
-| 1 | CVACT01Y.cpy | 23 | Account | Account master record (300 bytes) |
-| 2 | CVACT02Y.cpy | 16 | Card | Card master record (150 bytes) |
-| 3 | CVACT03Y.cpy | 10 | Cross-Reference | Card-to-account cross-reference |
-| 4 | CVCUS01Y.cpy | 43 | Customer | Customer master record (500 bytes) |
-| 5 | CVCRD01Y.cpy | 14 | Card | Card cross-reference data |
+| 1 | CVACT01Y.cpy | 20 | Account | Account master record (300 bytes) |
+| 2 | CVACT02Y.cpy | 14 | Card | Card master record (150 bytes) |
+| 3 | CVACT03Y.cpy | 11 | Cross-Reference | Card-to-account cross-reference |
+| 4 | CVCUS01Y.cpy | 26 | Customer | Customer master record (500 bytes) |
+| 5 | CVCRD01Y.cpy | 46 | Card | Card cross-reference data |
 | 6 | CVTRA01Y.cpy | 13 | Transaction Category Balance | Category-level balance record |
 | 7 | CVTRA02Y.cpy | 13 | Discount Group | Discount/interest rate grouping |
 | 8 | CVTRA03Y.cpy | 10 | Transaction Type | Transaction type code + description |
@@ -117,22 +117,22 @@
 | 10 | CVTRA05Y.cpy | 21 | Transaction | Online transaction record (350 bytes) |
 | 11 | CVTRA06Y.cpy | 21 | Daily Transaction | Daily transaction record |
 | 12 | CVTRA07Y.cpy | 73 | Transaction Report | Report layout and formatting |
-| 13 | CVEXPORT.cpy | 100 | Export Record | Unified export record with all entity types |
-| 14 | CSUSR01Y.cpy | 11 | User Security | User ID, name, password, type |
-| 15 | COCOM01Y.cpy | 55 | Common Area | COMMAREA for CICS program communication |
-| 16 | COMEN02Y.cpy | 30 | Menu Definition | Menu options and navigation targets |
-| 17 | COADM02Y.cpy | 30 | Admin Menu | Admin menu options |
-| 18 | COTTL01Y.cpy | 15 | Title/Header | Screen title and header definitions |
-| 19 | CSDAT01Y.cpy | 10 | Date Work Area | Date formatting work fields |
-| 20 | CSMSG01Y.cpy | 10 | Message Area | User message display area |
-| 21 | CSMSG02Y.cpy | 10 | Message Area 2 | Extended message area |
-| 22 | CSSETATY.cpy | 10 | Set Attribute | Field attribute setting helper |
-| 23 | CSSTRPFY.cpy | 8 | String Prefix | String manipulation helper |
-| 24 | CSLKPCDY.cpy | 8 | Lookup Code | Code lookup helper |
-| 25 | CSUTLDPY.cpy | 8 | Utility Display | Utility display helper |
-| 26 | CSUTLDWY.cpy | 8 | Utility Work | Utility work area |
-| 27 | CODATECN.cpy | 10 | Date Conversion | Date conversion record for assembler call |
-| 28 | CUSTREC.cpy | 15 | Customer (Statement) | Customer record used in statement generation |
+| 13 | CVEXPORT.cpy | 103 | Export Record | Unified export record with all entity types |
+| 14 | CSUSR01Y.cpy | 26 | User Security | User ID, name, password, type |
+| 15 | COCOM01Y.cpy | 47 | Common Area | COMMAREA for CICS program communication |
+| 16 | COMEN02Y.cpy | 101 | Menu Definition | Menu options and navigation targets |
+| 17 | COADM02Y.cpy | 62 | Admin Menu | Admin menu options |
+| 18 | COTTL01Y.cpy | 27 | Title/Header | Screen title and header definitions |
+| 19 | CSDAT01Y.cpy | 58 | Date Work Area | Date formatting work fields |
+| 20 | CSMSG01Y.cpy | 24 | Message Area | User message display area |
+| 21 | CSMSG02Y.cpy | 35 | Message Area 2 | Extended message area |
+| 22 | CSSETATY.cpy | 30 | Set Attribute | Field attribute setting helper |
+| 23 | CSSTRPFY.cpy | 85 | String Prefix | String manipulation helper |
+| 24 | CSLKPCDY.cpy | 1,318 | Lookup Code | US phone area code + state code lookup tables |
+| 25 | CSUTLDPY.cpy | 375 | Utility Display | Display formatting and validation utility |
+| 26 | CSUTLDWY.cpy | 89 | Utility Work | Date editing and validation work area |
+| 27 | CODATECN.cpy | 52 | Date Conversion | Date conversion record for assembler call |
+| 28 | CUSTREC.cpy | 26 | Customer (Statement) | Customer record used in statement generation |
 | 29 | COSTM01.CPY | 38 | Statement Transaction | Transaction record for statement processing |
 | 30 | UNUSED1Y.cpy | 10 | (Unused) | Placeholder / deprecated record |
 
@@ -289,7 +289,7 @@ Each BMS map generates a corresponding copybook containing symbolic field defini
 |----------|------:|------------:|
 | Core COBOL Programs | 31 | 20,650 |
 | Optional Module Programs | 13 | 9,145 |
-| Copybooks (data) | 30 | ~600 |
+| Copybooks (data) | 30 | 2,786 |
 | BMS-Generated Copybooks | 17 | ~2,500 |
 | BMS Screen Maps | 17 | ~4,500 |
 | JCL Batch Jobs | 38 | ~2,200 |
