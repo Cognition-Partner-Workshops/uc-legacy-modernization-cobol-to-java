@@ -43,14 +43,14 @@ Each module is scored across three dimensions on a 1–10 scale:
 
 | Rank | Module | LOC | IF | EVAL | PERF | CCI | Complexity | Risk | Biz Impact | **Composite** |
 |------|--------|-----|-----|------|------|------|-----------|------|-----------|---------------|
-| **1** | **COACTUPC.cbl** | 4,236 | 168 | 20 | 64 | 6.9 | **10** | **9** | **9** | **9.45** |
-| **2** | **CBTRN02C.cbl** | 731 | 93 | 0 | 61 | 21.1 | **9** | **10** | **10** | **9.60** |
+| **1** | **CBTRN02C.cbl** | 731 | 93 | 0 | 61 | 21.1 | **9** | **10** | **10** | **9.60** |
+| **2** | **COACTUPC.cbl** | 4,236 | 168 | 20 | 64 | 6.9 | **10** | **9** | **9** | **9.40** |
 | **3** | **CBACT04C.cbl** | 652 | 86 | 0 | 56 | 21.8 | **8** | **9** | **10** | **8.85** |
-| **4** | **COCRDLIC.cbl** | 1,459 | 122 | 18 | 34 | 14.4 | **8** | **7** | **7** | **7.40** |
-| **5** | **COCRDUPC.cbl** | 1,560 | 148 | 16 | 26 | 14.3 | **8** | **7** | **7** | **7.40** |
-| **6** | **CBSTM03A.CBL** | 924 | 15 | 9 | 29 | 7.7 | **7** | **8** | **8** | **7.60** |
-| **7** | **CBTRN03C.cbl** | 649 | 75 | 4 | 72 | 24.8 | **8** | **6** | **7** | **7.05** |
-| **8** | **COTRN02C.cbl** | 783 | 14 | 26 | 61 | 19.5 | **7** | **7** | **8** | **7.25** |
+| **4** | **CBSTM03A.CBL** | 924 | 15 | 9 | 29 | 7.7 | **7** | **8** | **8** | **7.60** |
+| **5** | **COCRDLIC.cbl** | 1,459 | 122 | 18 | 34 | 14.4 | **8** | **7** | **7** | **7.40** |
+| **6** | **COCRDUPC.cbl** | 1,560 | 148 | 16 | 26 | 14.3 | **8** | **7** | **7** | **7.40** |
+| **7** | **COTRN02C.cbl** | 783 | 14 | 26 | 61 | 19.5 | **7** | **7** | **8** | **7.25** |
+| **8** | **CBTRN03C.cbl** | 649 | 75 | 4 | 72 | 24.8 | **8** | **6** | **7** | **7.05** |
 | **9** | **CBEXPORT.cbl** | 582 | 16 | 0 | 45 | 10.5 | **6** | **7** | **6** | **6.35** |
 | **10** | **COUSR00C.cbl** | 695 | 25 | 16 | 41 | 14.5 | **6** | **7** | **6** | **6.35** |
 
@@ -58,7 +58,38 @@ Each module is scored across three dimensions on a 1–10 scale:
 
 ## 3. Detailed Module Profiles
 
-### Rank 1: COACTUPC.cbl — Account Update (Online)
+### Rank 1: CBTRN02C.cbl — Transaction Posting (Batch)
+
+| Attribute | Detail |
+|-----------|--------|
+| **Lines of Code** | 731 |
+| **Domain** | Transaction Management — Core Batch Posting |
+| **JCL Job** | POSTTRAN.jcl |
+| **Complexity Score** | 9/10 |
+| **Risk Score** | 10/10 |
+| **Business Impact** | 10/10 |
+| **Composite Score** | **9.60** |
+
+**Why it's a hotspot:**
+- **Core financial process:** This is the single most business-critical batch program. It posts daily transactions to the master file and updates account balances. Any bug here directly impacts customer accounts.
+- **5-file fan-out:** Reads Daily Transactions, Account, Card XREF, Category Balance; writes to Transaction Master and updates Account balances. This is the highest data coupling in the batch subsystem.
+- **High density:** 93 IF statements + 61 PERFORMs in only 731 lines gives a CCI of 21.1 — the second-highest complexity density.
+- **Financial accuracy:** Balance updates must be ACID-compliant. The COBOL COMPUTE statements with PIC S9(10)V99 require exact decimal arithmetic in Java (BigDecimal).
+- **Batch SLA:** Runs nightly in the critical path. Any performance regression impacts the entire batch window.
+
+**Migration risks:**
+- Transaction atomicity across 5 files must be preserved (COBOL has no explicit transaction management; VSAM provides record-level locking)
+- Decimal arithmetic precision must be exactly preserved (no floating-point)
+- Error handling via CEE3ABD (abnormal termination) must map to Java exception handling + rollback
+
+**Recommended approach:**
+- Map to a Spring Batch job with chunk-oriented processing
+- Use `BigDecimal` for all monetary fields with `RoundingMode.HALF_UP`
+- Implement database transactions spanning all 5 tables with proper rollback
+
+---
+
+### Rank 2: COACTUPC.cbl — Account Update (Online)
 
 | Attribute | Detail |
 |-----------|--------|
@@ -69,7 +100,7 @@ Each module is scored across three dimensions on a 1–10 scale:
 | **Complexity Score** | 10/10 |
 | **Risk Score** | 9/10 |
 | **Business Impact** | 9/10 |
-| **Composite Score** | **9.45** |
+| **Composite Score** | **9.40** |
 
 **Why it's a hotspot:**
 - **Massive size:** At 4,236 lines, it is 2.7× larger than the next biggest program. This single module represents ~20% of all online program code.
@@ -88,37 +119,6 @@ Each module is scored across three dimensions on a 1–10 scale:
 - Decompose into AccountUpdateController + AccountValidationService + AccountDataService
 - Extract the CSLKPCDY lookup table into a database reference table or enum
 - Convert CSUTLDPY date validation into a reusable Java DateValidator class
-
----
-
-### Rank 2: CBTRN02C.cbl — Transaction Posting (Batch)
-
-| Attribute | Detail |
-|-----------|--------|
-| **Lines of Code** | 731 |
-| **Domain** | Transaction Management — Core Batch Posting |
-| **JCL Job** | POSTTRAN.jcl |
-| **Complexity Score** | 9/10 |
-| **Risk Score** | 10/10 |
-| **Business Impact** | 10/10 |
-| **Composite Score** | **9.60** (highest risk × impact) |
-
-**Why it's a hotspot:**
-- **Core financial process:** This is the single most business-critical batch program. It posts daily transactions to the master file and updates account balances. Any bug here directly impacts customer accounts.
-- **5-file fan-out:** Reads Daily Transactions, Account, Card XREF, Category Balance; writes to Transaction Master and updates Account balances. This is the highest data coupling in the batch subsystem.
-- **High density:** 93 IF statements + 61 PERFORMs in only 731 lines gives a CCI of 21.1 — the second-highest complexity density.
-- **Financial accuracy:** Balance updates must be ACID-compliant. The COBOL COMPUTE statements with PIC S9(10)V99 require exact decimal arithmetic in Java (BigDecimal).
-- **Batch SLA:** Runs nightly in the critical path. Any performance regression impacts the entire batch window.
-
-**Migration risks:**
-- Transaction atomicity across 5 files must be preserved (COBOL has no explicit transaction management; VSAM provides record-level locking)
-- Decimal arithmetic precision must be exactly preserved (no floating-point)
-- Error handling via CEE3ABD (abnormal termination) must map to Java exception handling + rollback
-
-**Recommended approach:**
-- Map to a Spring Batch job with chunk-oriented processing
-- Use `BigDecimal` for all monetary fields with `RoundingMode.HALF_UP`
-- Implement database transactions spanning all 5 tables with proper rollback
 
 ---
 
@@ -152,54 +152,7 @@ Each module is scored across three dimensions on a 1–10 scale:
 
 ---
 
-### Rank 4: COCRDLIC.cbl — Credit Card List (Online)
-
-| Attribute | Detail |
-|-----------|--------|
-| **Lines of Code** | 1,459 |
-| **Domain** | Card Management — List/Browse |
-| **CICS Transaction** | CC01 |
-| **Complexity Score** | 8/10 |
-| **Risk Score** | 7/10 |
-| **Business Impact** | 7/10 |
-| **Composite Score** | **7.40** |
-
-**Why it's a hotspot:**
-- **Browse logic complexity:** 122 IF + 18 EVALUATE + STARTBR/READNEXT/READPREV VSAM browse operations with forward/backward paging.
-- **Multi-target navigation:** XCTLs to 3 different programs (COMEN01C, COCRDSLC, COCRDUPC) depending on user action.
-- **VSAM browse state management:** Maintains browse position across screen interactions using COMMAREA — this stateful pattern doesn't map naturally to stateless REST.
-
-**Migration risks:**
-- VSAM STARTBR/READNEXT pagination must be converted to SQL OFFSET/LIMIT or cursor-based pagination
-- The stateful browse position stored in COMMAREA needs a server-side session or token-based approach
-
----
-
-### Rank 5: COCRDUPC.cbl — Credit Card Update (Online)
-
-| Attribute | Detail |
-|-----------|--------|
-| **Lines of Code** | 1,560 |
-| **Domain** | Card Management — Update |
-| **CICS Transaction** | CC03 |
-| **Complexity Score** | 8/10 |
-| **Risk Score** | 7/10 |
-| **Business Impact** | 7/10 |
-| **Composite Score** | **7.40** |
-
-**Why it's a hotspot:**
-- **Highest IF density among online programs:** 148 IF statements for field-level validation.
-- **16 EVALUATE blocks:** Multi-way decision logic for update scenarios.
-- **COPY REPLACING patterns:** Uses CSSETATY and CSSTRPFY with REPLACING, expanding the effective codebase significantly.
-- **Sensitive data:** Updates card numbers, CVV, expiration dates — PCI-DSS implications.
-
-**Migration risks:**
-- PCI-DSS compliance requires card data encryption in the modernized system
-- Validation logic must be extracted and unit-tested independently
-
----
-
-### Rank 6: CBSTM03A.CBL — Statement Generation (Batch)
+### Rank 4: CBSTM03A.CBL — Statement Generation (Batch)
 
 | Attribute | Detail |
 |-----------|--------|
@@ -223,27 +176,54 @@ Each module is scored across three dimensions on a 1–10 scale:
 
 ---
 
-### Rank 7: CBTRN03C.cbl — Transaction Report (Batch)
+### Rank 5: COCRDLIC.cbl — Credit Card List (Online)
 
 | Attribute | Detail |
 |-----------|--------|
-| **Lines of Code** | 649 |
-| **Domain** | Reporting — Daily Transaction Report |
-| **JCL Job** | TRANREPT.jcl |
+| **Lines of Code** | 1,459 |
+| **Domain** | Card Management — List/Browse |
+| **CICS Transaction** | CC01 |
 | **Complexity Score** | 8/10 |
-| **Risk Score** | 6/10 |
+| **Risk Score** | 7/10 |
 | **Business Impact** | 7/10 |
-| **Composite Score** | **7.05** |
+| **Composite Score** | **7.40** |
 
 **Why it's a hotspot:**
-- **Highest CCI in codebase:** 75 IFs + 4 EVALUATEs + 72 PERFORMs in 649 lines = CCI of 24.8. Extremely dense control flow.
-- **Multi-level report breaks:** Account-level subtotals, page totals, and grand totals using control-break logic.
-- **4-file lookups:** Reads Transactions, Transaction Types, Transaction Categories for description enrichment.
-- **CVTRA07Y report layout:** Complex print formatting with edited numeric fields (PIC +ZZZ,ZZZ,ZZZ.ZZ).
+- **Browse logic complexity:** 122 IF + 18 EVALUATE + STARTBR/READNEXT/READPREV VSAM browse operations with forward/backward paging.
+- **Multi-target navigation:** XCTLs to 3 different programs (COMEN01C, COCRDSLC, COCRDUPC) depending on user action.
+- **VSAM browse state management:** Maintains browse position across screen interactions using COMMAREA — this stateful pattern doesn't map naturally to stateless REST.
+
+**Migration risks:**
+- VSAM STARTBR/READNEXT pagination must be converted to SQL OFFSET/LIMIT or cursor-based pagination
+- The stateful browse position stored in COMMAREA needs a server-side session or token-based approach
 
 ---
 
-### Rank 8: COTRN02C.cbl — Transaction Add (Online)
+### Rank 6: COCRDUPC.cbl — Credit Card Update (Online)
+
+| Attribute | Detail |
+|-----------|--------|
+| **Lines of Code** | 1,560 |
+| **Domain** | Card Management — Update |
+| **CICS Transaction** | CC03 |
+| **Complexity Score** | 8/10 |
+| **Risk Score** | 7/10 |
+| **Business Impact** | 7/10 |
+| **Composite Score** | **7.40** |
+
+**Why it's a hotspot:**
+- **Highest IF density among online programs:** 148 IF statements for field-level validation.
+- **16 EVALUATE blocks:** Multi-way decision logic for update scenarios.
+- **COPY REPLACING patterns:** Uses CSSETATY and CSSTRPFY with REPLACING, expanding the effective codebase significantly.
+- **Sensitive data:** Updates card numbers, CVV, expiration dates — PCI-DSS implications.
+
+**Migration risks:**
+- PCI-DSS compliance requires card data encryption in the modernized system
+- Validation logic must be extracted and unit-tested independently
+
+---
+
+### Rank 7: COTRN02C.cbl — Transaction Add (Online)
 
 | Attribute | Detail |
 |-----------|--------|
@@ -261,6 +241,26 @@ Each module is scored across three dimensions on a 1–10 scale:
 - **Cross-file validation:** Reads Account and Card XREF to validate the transaction before writing.
 - **VSAM WRITE + browse:** Generates transaction ID via STARTBR/READPREV to find the next available key, then WRITEs the new record.
 - **Direct financial impact:** Every transaction added here affects account balances in the next batch cycle.
+
+---
+
+### Rank 8: CBTRN03C.cbl — Transaction Report (Batch)
+
+| Attribute | Detail |
+|-----------|--------|
+| **Lines of Code** | 649 |
+| **Domain** | Reporting — Daily Transaction Report |
+| **JCL Job** | TRANREPT.jcl |
+| **Complexity Score** | 8/10 |
+| **Risk Score** | 6/10 |
+| **Business Impact** | 7/10 |
+| **Composite Score** | **7.05** |
+
+**Why it's a hotspot:**
+- **Highest CCI in codebase:** 75 IFs + 4 EVALUATEs + 72 PERFORMs in 649 lines = CCI of 24.8. Extremely dense control flow.
+- **Multi-level report breaks:** Account-level subtotals, page totals, and grand totals using control-break logic.
+- **4-file lookups:** Reads Transactions, Transaction Types, Transaction Categories for description enrichment.
+- **CVTRA07Y report layout:** Complex print formatting with edited numeric fields (PIC +ZZZ,ZZZ,ZZZ.ZZ).
 
 ---
 
@@ -313,12 +313,12 @@ Each module is scored across three dimensions on a 1–10 scale:
 ```
                     LOW Business Impact    MED Business Impact    HIGH Business Impact
                     ─────────────────────  ─────────────────────  ─────────────────────
-HIGH Complexity  │  CBTRN03C (7.05)       COCRDLIC (7.40)        COACTUPC (9.45)
-                 │                         COCRDUPC (7.40)
+HIGH Complexity  │  CBTRN03C (7.05)       COCRDLIC (7.40)        CBTRN02C (9.60)
+                 │                         COCRDUPC (7.40)        COACTUPC (9.40)
+                 │                                                CBACT04C (8.85)
                  │
 MED Complexity   │  COUSR00C (6.35)       COTRN02C (7.25)        CBSTM03A (7.60)
-                 │  CBEXPORT (6.35)                               CBTRN02C (9.60)
-                 │                                                CBACT04C (8.85)
+                 │  CBEXPORT (6.35)
                  │
 LOW Complexity   │  (remaining programs)   COBSWAIT, CSUTLDTC    COSGN00C (auth entry)
                  │                         CBACT01-03C            COMEN01C (router)
@@ -339,9 +339,9 @@ LOW Complexity   │  (remaining programs)   COBSWAIT, CSUTLDTC    COSGN00C (aut
 
 ### 5.1 Immediate Actions
 
-1. **CBTRN02C + CBACT04C (Rank 2-3):** Create exhaustive test data with known COBOL outputs. These financial calculation programs require penny-level accuracy validation before any migration begins.
+1. **CBTRN02C (Rank 1) + CBACT04C (Rank 3):** Create exhaustive test data with known COBOL outputs. These financial calculation programs require penny-level accuracy validation before any migration begins.
 
-2. **COACTUPC (Rank 1):** Begin decomposition analysis immediately. At 4,236 lines, this monolith should be split into 3-4 Java classes during migration. Map out all validation rules as a pre-migration artifact.
+2. **COACTUPC (Rank 2):** Begin decomposition analysis immediately. At 4,236 lines, this monolith should be split into 3-4 Java classes during migration. Map out all validation rules as a pre-migration artifact.
 
 3. **Password Security (CSUSR01Y):** Flag SEC-USR-PWD (plain text, 8 chars) for immediate remediation in the modernized system. Implement bcrypt hashing + minimum password complexity.
 
