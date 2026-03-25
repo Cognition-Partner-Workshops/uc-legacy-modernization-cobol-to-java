@@ -39,12 +39,12 @@ Each module is scored on four dimensions (1-10 scale), then weighted to produce 
 | **2** | **CBTRN02C** | 731 | 8 | 10 | 10 | 7 | **8.80** | Transaction Posting |
 | **3** | **CBACT04C** | 652 | 8 | 9 | 10 | 6 | **8.35** | Interest Calculation |
 | **4** | **CBSTM03A** | 924 | 8 | 8 | 8 | 7 | **7.80** | Statement Generation |
-| **5** | **COCRDLIC** | 1,460 | 9 | 6 | 7 | 8 | **7.50** | Card List |
+| **5** | **COCRDLIC** | 1,460 | 9 | 6 | 7 | 8 | **7.55** | Card List |
 | **6** | **COCRDUPC** | 1,560 | 9 | 7 | 7 | 6 | **7.40** | Card Update |
-| **7** | **COSGN00C** | 261 | 4 | 7 | 10 | 9 | **7.30** | Sign-on / Auth |
-| **8** | **COTRN02C** | 783 | 7 | 7 | 8 | 6 | **7.10** | Transaction Add |
+| **7** | **COSGN00C** | 261 | 4 | 7 | 10 | 9 | **7.25** | Sign-on / Auth |
+| **8** | **COTRN02C** | 783 | 7 | 7 | 8 | 6 | **7.05** | Transaction Add |
 | **9** | **CBTRN03C** | 649 | 7 | 7 | 7 | 5 | **6.60** | Transaction Report |
-| **10** | **COMEN01C** | 309 | 4 | 3 | 9 | 10 | **6.30** | Main Menu / Router |
+| **10** | **COMEN01C** | 309 | 4 | 3 | 9 | 10 | **6.20** | Main Menu / Router |
 
 ---
 
@@ -268,12 +268,12 @@ Each module is scored on four dimensions (1-10 scale), then weighted to produce 
 |---|---|---|
 | Lines of Code | 649 | Medium batch program |
 | Control Flow Density | 151 statements | High for its size |
-| VSAM Files Accessed | 4 (DALYTRAN R, TRANSACT R, XREFFILE R, TRANTYPE R, TRANCATG R) | High read fan-out |
+| VSAM Files Accessed | 4 (TRANSACT R, XREFFILE R, TRANTYPE R, TRANCATG R) | High read fan-out |
 | Report Logic | Page breaks, subtotals, grand totals, date-range filtering | Complex report formatting |
 
 **Why It's #9:**
 - Generates the Daily Transaction Report — a key operational and audit artifact.
-- Reads across 5 files to assemble report data with type and category descriptions.
+- Reads across 4 files to assemble report data with type and category descriptions.
 - Contains complex report formatting: page headers, account subtotals, page totals, grand totals.
 - Uses CVTRA07Y report structures for formatted output.
 - Report accuracy is critical for reconciliation and audit compliance.
@@ -285,7 +285,7 @@ Each module is scored on four dimensions (1-10 scale), then weighted to produce 
 
 ---
 
-### #10 — COMEN01C (Main Menu / Router) — Score: 6.30
+### #10 — COMEN01C (Main Menu / Router) — Score: 6.20
 
 **Location:** `app/cbl/COMEN01C.cbl` (309 lines)
 
