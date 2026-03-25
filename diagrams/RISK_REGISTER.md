@@ -457,9 +457,9 @@ quadrantChart
 ```mermaid
 pie title Risk Distribution by Rating
     "Critical (16-25)" : 3
-    "High (10-15)" : 7
-    "Medium (5-9)" : 3
-    "Low (1-4)" : 2
+    "High (10-15)" : 9
+    "Medium (5-9)" : 2
+    "Low (1-4)" : 1
 ```
 
 | Rating | Risks | Action Required |
