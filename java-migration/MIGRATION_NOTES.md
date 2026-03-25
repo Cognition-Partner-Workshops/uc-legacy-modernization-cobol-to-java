@@ -102,7 +102,7 @@ CBACT01C calls the assembler program `COBDATFT` to convert dates between formats
 
 COBOL `INITIALIZE ARR-ARRAY-REC` zeros all numeric fields and spaces all alphanumeric fields.
 
-**Decision**: The `ArrayRecord.initialized()` factory method creates an array record with all `BalanceEntry` values set to `BigDecimal.ZERO`, matching COBOL INITIALIZE behavior.
+**Decision**: The `ArrayRecord.of(acctId, entries...)` varargs factory creates an immutable array record, auto-padding unfilled slots with `BigDecimal.ZERO` to match COBOL INITIALIZE behavior. The record stores an unmodifiable `List<BalanceEntry>` via `List.copyOf()`.
 
 ### 8. Error Handling: Abend → Exception
 
