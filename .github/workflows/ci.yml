@@ -64,7 +64,7 @@ jobs:
           echo "=== COBOL Syntax Check ==="
           success=0
           fail=0
-          for src in app/cbl/*.cbl; do
+          for src in app/cbl/*.cbl app/cbl/*.CBL; do
             filename=$(basename "$src")
             if cobc -fsyntax-only -I app/cpy -I app/cpy-bms "$src" 2>/dev/null; then
               echo "PASS: $filename"
@@ -123,7 +123,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy FS Scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
