@@ -28,9 +28,9 @@
                10  WS-AVAIL-CREDIT    PIC S9(10)V99.
                10  WS-ACCT-STATUS     PIC X(10).
 
-       01  WS-DISPLAY-BALANCE         PIC Z(9)9.99.
-       01  WS-DISPLAY-CREDIT          PIC Z(9)9.99.
-       01  WS-DISPLAY-AVAILABLE       PIC Z(9)9.99.
+       01  WS-DISPLAY-BALANCE         PIC -(9)9.99.
+       01  WS-DISPLAY-CREDIT          PIC -(9)9.99.
+       01  WS-DISPLAY-AVAILABLE       PIC -(9)9.99.
 
        PROCEDURE DIVISION.
        0000-MAIN-PROCESS.
