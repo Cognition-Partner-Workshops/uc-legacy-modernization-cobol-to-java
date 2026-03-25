@@ -47,31 +47,53 @@ Each program is scored on three weighted dimensions:
 
 ---
 
-### Rank #2: COCRDLIC — Credit Card List (Online CICS)
+### Rank #2: CBTRN02C — Transaction Posting (Batch)
 
 | Metric | Value | Assessment |
 |--------|-------|------------|
-| **Lines of Code** | **1,460** | Second-largest online program |
-| **PERFORM statements** | 34 | Moderate |
-| **IF statements** | 122 | Very high conditional logic |
-| **EVALUATE statements** | 18 | Complex decision trees |
-| **CICS commands** | 18 | Highest CICS command count |
-| **Datasets accessed** | CARDDAT (R), CARDAIX (R) | Card file browsing |
-| **Complexity Score** | **8** | |
-| **Risk Score** | **7** | |
-| **Business Impact Score** | **8** | |
-| **Overall Score** | **7.7** | |
+| **Lines of Code** | **731** | Large batch program |
+| **PERFORM statements** | 61 | High procedural complexity |
+| **IF statements** | 93 | High conditional logic |
+| **Datasets accessed** | DALYTRAN (R), XREFFILE (R), ACCTFILE (R/W), TRANFILE (W), DALYREJS (W), TCATBALF (W) | 6 datasets, 4 writable |
+| **Complexity Score** | **7** | |
+| **Risk Score** | **10** | |
+| **Business Impact Score** | **10** | |
+| **Overall Score** | **8.8** | |
 
-**Why #2:** Complex pagination logic with CICS BROWSE operations (STARTBR/READNEXT/READPREV/ENDBR), 7-row selection array with S/U action codes, and transfer control to both card detail and card update programs. The 18 EVALUATE blocks handle multiple navigation states. High IF count reflects extensive input validation and filter logic.
+**Why #2:** This is the core financial posting engine. It reads daily transactions, validates them against cross-references and accounts, posts to the transaction master, updates account balances, maintains category balances, and writes rejected transactions. Writing to 4 datasets in a single batch run makes it the highest-coupling batch program. A bug here directly corrupts financial records across multiple files.
 
 **Modernization Recommendation:**
-- Convert CICS BROWSE to paginated database query (Spring Data JPA)
-- Replace selection array with REST endpoint + list UI component
-- Priority: **High** — central navigation hub for card management
+- Convert to Spring Batch job with transactional integrity (database transactions instead of VSAM)
+- Implement compensating transactions for rollback capability
+- Add comprehensive audit logging
+- Priority: **Critical** — financial data integrity depends on this program
 
 ---
 
-### Rank #3: COCRDUPC — Credit Card Update (Online CICS)
+### Rank #3: CBACT04C — Interest Calculation (Batch)
+
+| Metric | Value | Assessment |
+|--------|-------|------------|
+| **Lines of Code** | **652** | Moderate-large batch |
+| **PERFORM statements** | 56 | High |
+| **IF statements** | 86 | Very high |
+| **Datasets accessed** | XREFFILE (R), ACCTFILE (R/W), DISCGRP (R), TRANSACT (R), TCATBALF (R/W) | 5 datasets, 2 writable |
+| **Complexity Score** | **7** | |
+| **Risk Score** | **9** | |
+| **Business Impact Score** | **10** | |
+| **Overall Score** | **8.5** | |
+
+**Why #3:** Calculates interest charges on all accounts based on disclosure group rates and category balances. Financial calculation logic with 86 IF statements indicates complex business rules around rate tiers, balance categories, and accrual periods. Incorrect interest calculation has direct regulatory and financial consequences.
+
+**Modernization Recommendation:**
+- Convert to a dedicated Interest Calculation Service with extensive unit tests
+- Externalize rate tables from VSAM to database with admin UI
+- Implement calculation audit trail
+- Priority: **Critical** — regulatory and financial accuracy required
+
+---
+
+### Rank #4: COCRDUPC — Credit Card Update (Online CICS)
 
 | Metric | Value | Assessment |
 |--------|-------|------------|
@@ -86,7 +108,7 @@ Each program is scored on three weighted dimensions:
 | **Business Impact Score** | **8** | |
 | **Overall Score** | **8.0** | |
 
-**Why #3:** Modifies card data directly (status, embossed name, expiry dates). High IF count (148) indicates extensive field validation. Combined with 16 EVALUATE blocks for state management, this program has significant cyclomatic complexity. Card data changes have security implications (CVV, status, names).
+**Why #4:** Modifies card data directly (status, embossed name, expiry dates). High IF count (148) indicates extensive field validation. Combined with 16 EVALUATE blocks for state management, this program has significant cyclomatic complexity. Card data changes have security implications (CVV, status, names).
 
 **Modernization Recommendation:**
 - Extract validation logic into a Card Validation Service
@@ -95,79 +117,7 @@ Each program is scored on three weighted dimensions:
 
 ---
 
-### Rank #4: COACTVWC — Account View (Online CICS)
-
-| Metric | Value | Assessment |
-|--------|-------|------------|
-| **Lines of Code** | **942** | Large program |
-| **PERFORM statements** | 21 | Moderate |
-| **IF statements** | 57 | Moderate-high |
-| **EVALUATE statements** | 10 | Complex state handling |
-| **CICS commands** | 15 | High CICS interaction |
-| **Datasets accessed** | ACCTDAT (R), CUSTDAT (R), CXACAIX (R) | 3 datasets, read-only |
-| **Complexity Score** | **7** | |
-| **Risk Score** | **5** | |
-| **Business Impact Score** | **8** | |
-| **Overall Score** | **6.7** | |
-
-**Why #4:** Reads from 3 VSAM datasets (account, customer, cross-reference) to display a composite account view. The 15 CICS commands include multiple READ operations with error handling. While read-only (lower risk), it is the primary account inquiry screen and a gateway to account update. Its composite data retrieval pattern makes it a good candidate for a query/read-model service.
-
-**Modernization Recommendation:**
-- Convert to Account Query Service (read-only)
-- Use a single JOIN query replacing 3 separate VSAM READs
-- Priority: **High** — most-used inquiry screen
-
----
-
-### Rank #5: CBTRN02C — Transaction Posting (Batch)
-
-| Metric | Value | Assessment |
-|--------|-------|------------|
-| **Lines of Code** | **731** | Large batch program |
-| **PERFORM statements** | 61 | High procedural complexity |
-| **IF statements** | 93 | High conditional logic |
-| **Datasets accessed** | DALYTRAN (R), XREFFILE (R), ACCTFILE (R/W), TRANFILE (W), DALYREJS (W), TCATBALF (W) | 6 datasets, 4 writable |
-| **Complexity Score** | **7** | |
-| **Risk Score** | **10** | |
-| **Business Impact Score** | **10** | |
-| **Overall Score** | **8.8** | |
-
-**Why #5 (but highest risk):** This is the core financial posting engine. It reads daily transactions, validates them against cross-references and accounts, posts to the transaction master, updates account balances, maintains category balances, and writes rejected transactions. Writing to 4 datasets in a single batch run makes it the highest-coupling batch program. A bug here directly corrupts financial records across multiple files.
-
-**Modernization Recommendation:**
-- Convert to Spring Batch job with transactional integrity (database transactions instead of VSAM)
-- Implement compensating transactions for rollback capability
-- Add comprehensive audit logging
-- Priority: **Critical** — financial data integrity depends on this program
-
----
-
-### Rank #6: CBSTM03A — Statement Generation (Batch)
-
-| Metric | Value | Assessment |
-|--------|-------|------------|
-| **Lines of Code** | **924** | Large batch program |
-| **PERFORM statements** | 29 | Moderate |
-| **IF statements** | 15 | Low-moderate |
-| **EVALUATE statements** | 5 | Moderate |
-| **Datasets accessed** | TRNXFILE, XREFFILE, CUSTFILE, ACCTFILE (via CBSTM03B), STMTFILE (W), HTMLFILE (W) | Multiple input, 2 output |
-| **CALL statements** | 13 (to CBSTM03B) | Tight coupling with sub-program |
-| **Complexity Score** | **7** | |
-| **Risk Score** | **7** | |
-| **Business Impact Score** | **9** | |
-| **Overall Score** | **7.6** | |
-
-**Why #6:** Generates customer-facing account statements in both text and HTML format. The 13 CALL invocations to CBSTM03B create a tightly coupled pair that must be modernized together. Reads from 4 VSAM files via its sub-program. Statement generation is a high-visibility customer deliverable — errors appear directly on customer bills.
-
-**Modernization Recommendation:**
-- Merge CBSTM03A and CBSTM03B into a single Statement Generation Service
-- Replace text/HTML output with a template engine (Thymeleaf/Jasper)
-- Convert to Spring Batch with chunk-oriented processing
-- Priority: **High** — customer-facing output
-
----
-
-### Rank #7: COTRN02C — Transaction Add (Online CICS)
+### Rank #5: COTRN02C — Transaction Add (Online CICS)
 
 | Metric | Value | Assessment |
 |--------|-------|------------|
@@ -183,7 +133,7 @@ Each program is scored on three weighted dimensions:
 | **Business Impact Score** | **9** | |
 | **Overall Score** | **7.9** | |
 
-**Why #7:** Creates new transaction records — the primary data entry point for the online system. Validates card/account existence across multiple datasets before writing. Calls CSUTLDTC for date validation. Writing to the TRANSACT master is a critical financial operation. High PERFORM count (61) indicates many procedural steps in the add workflow.
+**Why #5:** Creates new transaction records — the primary data entry point for the online system. Validates card/account existence across multiple datasets before writing. Calls CSUTLDTC for date validation. Writing to the TRANSACT master is a critical financial operation. High PERFORM count (61) indicates many procedural steps in the add workflow.
 
 **Modernization Recommendation:**
 - Convert to Transaction Creation REST endpoint
@@ -193,54 +143,80 @@ Each program is scored on three weighted dimensions:
 
 ---
 
-### Rank #8: CBACT04C — Interest Calculation (Batch)
+### Rank #6: COCRDLIC — Credit Card List (Online CICS)
 
 | Metric | Value | Assessment |
 |--------|-------|------------|
-| **Lines of Code** | **652** | Moderate-large batch |
-| **PERFORM statements** | 56 | High |
-| **IF statements** | 86 | Very high |
-| **Datasets accessed** | XREFFILE (R), ACCTFILE (R/W), DISCGRP (R), TRANSACT (R), TCATBALF (R/W) | 5 datasets, 2 writable |
+| **Lines of Code** | **1,460** | Second-largest online program |
+| **PERFORM statements** | 34 | Moderate |
+| **IF statements** | 122 | Very high conditional logic |
+| **EVALUATE statements** | 18 | Complex decision trees |
+| **CICS commands** | 18 | Highest CICS command count |
+| **Datasets accessed** | CARDDAT (R), CARDAIX (R) | Card file browsing |
+| **Complexity Score** | **8** | |
+| **Risk Score** | **7** | |
+| **Business Impact Score** | **8** | |
+| **Overall Score** | **7.7** | |
+
+**Why #6:** Complex pagination logic with CICS BROWSE operations (STARTBR/READNEXT/READPREV/ENDBR), 7-row selection array with S/U action codes, and transfer control to both card detail and card update programs. The 18 EVALUATE blocks handle multiple navigation states. High IF count reflects extensive input validation and filter logic.
+
+**Modernization Recommendation:**
+- Convert CICS BROWSE to paginated database query (Spring Data JPA)
+- Replace selection array with REST endpoint + list UI component
+- Priority: **High** — central navigation hub for card management
+
+---
+
+### Rank #7: CBSTM03A — Statement Generation (Batch)
+
+| Metric | Value | Assessment |
+|--------|-------|------------|
+| **Lines of Code** | **924** | Large batch program |
+| **PERFORM statements** | 29 | Moderate |
+| **IF statements** | 15 | Low-moderate |
+| **EVALUATE statements** | 5 | Moderate |
+| **Datasets accessed** | TRNXFILE, XREFFILE, CUSTFILE, ACCTFILE (via CBSTM03B), STMTFILE (W), HTMLFILE (W) | Multiple input, 2 output |
+| **CALL statements** | 13 (to CBSTM03B) | Tight coupling with sub-program |
 | **Complexity Score** | **7** | |
-| **Risk Score** | **9** | |
-| **Business Impact Score** | **10** | |
-| **Overall Score** | **8.5** | |
+| **Risk Score** | **7** | |
+| **Business Impact Score** | **9** | |
+| **Overall Score** | **7.6** | |
 
-**Why #8 (but very high business impact):** Calculates interest charges on all accounts based on disclosure group rates and category balances. Financial calculation logic with 86 IF statements indicates complex business rules around rate tiers, balance categories, and accrual periods. Incorrect interest calculation has direct regulatory and financial consequences.
+**Why #7:** Generates customer-facing account statements in both text and HTML format. The 13 CALL invocations to CBSTM03B create a tightly coupled pair that must be modernized together. Reads from 4 VSAM files via its sub-program. Statement generation is a high-visibility customer deliverable — errors appear directly on customer bills.
 
 **Modernization Recommendation:**
-- Convert to a dedicated Interest Calculation Service with extensive unit tests
-- Externalize rate tables from VSAM to database with admin UI
-- Implement calculation audit trail
-- Priority: **Critical** — regulatory and financial accuracy required
+- Merge CBSTM03A and CBSTM03B into a single Statement Generation Service
+- Replace text/HTML output with a template engine (Thymeleaf/Jasper)
+- Convert to Spring Batch with chunk-oriented processing
+- Priority: **High** — customer-facing output
 
 ---
 
-### Rank #9: COTRN00C — Transaction List (Online CICS)
+### Rank #8: COACTVWC — Account View (Online CICS)
 
 | Metric | Value | Assessment |
 |--------|-------|------------|
-| **Lines of Code** | **699** | Moderate program |
-| **PERFORM statements** | 43 | Moderate-high |
-| **IF statements** | 26 | Moderate |
-| **EVALUATE statements** | 8 | Moderate |
-| **CICS commands** | 10 | Moderate |
-| **Datasets accessed** | TRANSACT (R) | 1 dataset, read-only |
-| **Complexity Score** | **6** | |
-| **Risk Score** | **4** | |
-| **Business Impact Score** | **7** | |
-| **Overall Score** | **5.7** | |
+| **Lines of Code** | **942** | Large program |
+| **PERFORM statements** | 21 | Moderate |
+| **IF statements** | 57 | Moderate-high |
+| **EVALUATE statements** | 10 | Complex state handling |
+| **CICS commands** | 15 | High CICS interaction |
+| **Datasets accessed** | ACCTDAT (R), CUSTDAT (R), CXACAIX (R) | 3 datasets, read-only |
+| **Complexity Score** | **7** | |
+| **Risk Score** | **5** | |
+| **Business Impact Score** | **8** | |
+| **Overall Score** | **6.7** | |
 
-**Why #9:** Primary transaction inquiry screen with CICS BROWSE pagination. Moderate complexity from pagination state management (forward/backward/filter). While read-only and lower risk, it is the most frequently used screen for transaction monitoring and serves as the navigation hub to transaction view and add screens.
+**Why #8:** Reads from 3 VSAM datasets (account, customer, cross-reference) to display a composite account view. The 15 CICS commands include multiple READ operations with error handling. While read-only (lower risk), it is the primary account inquiry screen and a gateway to account update. Its composite data retrieval pattern makes it a good candidate for a query/read-model service.
 
 **Modernization Recommendation:**
-- Convert to paginated REST query endpoint with filtering
-- Replace CICS BROWSE with database pagination (LIMIT/OFFSET or cursor-based)
-- Priority: **Medium** — frequently used but read-only
+- Convert to Account Query Service (read-only)
+- Use a single JOIN query replacing 3 separate VSAM READs
+- Priority: **High** — most-used inquiry screen
 
 ---
 
-### Rank #10: CORPT00C — Transaction Reports (Online CICS)
+### Rank #9: CORPT00C — Transaction Reports (Online CICS)
 
 | Metric | Value | Assessment |
 |--------|-------|------------|
@@ -256,12 +232,36 @@ Each program is scored on three weighted dimensions:
 | **Business Impact Score** | **8** | |
 | **Overall Score** | **5.9** | |
 
-**Why #10:** Submits batch report jobs from the CICS online interface — a bridge between online and batch processing. Calls CSUTLDTC for date range validation. Report generation is a key business deliverable for management and regulatory compliance. The online-to-batch submission pattern requires careful modernization to avoid breaking the reporting pipeline.
+**Why #9:** Submits batch report jobs from the CICS online interface — a bridge between online and batch processing. Calls CSUTLDTC for date range validation. Report generation is a key business deliverable for management and regulatory compliance. The online-to-batch submission pattern requires careful modernization to avoid breaking the reporting pipeline.
 
 **Modernization Recommendation:**
 - Replace CICS-submitted batch with Spring Batch triggered via REST API
 - Implement async report generation with status polling
 - Priority: **Medium** — important but lower technical complexity
+
+---
+
+### Rank #10: COTRN00C — Transaction List (Online CICS)
+
+| Metric | Value | Assessment |
+|--------|-------|------------|
+| **Lines of Code** | **699** | Moderate program |
+| **PERFORM statements** | 43 | Moderate-high |
+| **IF statements** | 26 | Moderate |
+| **EVALUATE statements** | 8 | Moderate |
+| **CICS commands** | 10 | Moderate |
+| **Datasets accessed** | TRANSACT (R) | 1 dataset, read-only |
+| **Complexity Score** | **6** | |
+| **Risk Score** | **4** | |
+| **Business Impact Score** | **7** | |
+| **Overall Score** | **5.7** | |
+
+**Why #10:** Primary transaction inquiry screen with CICS BROWSE pagination. Moderate complexity from pagination state management (forward/backward/filter). While read-only and lower risk, it is the most frequently used screen for transaction monitoring and serves as the navigation hub to transaction view and add screens.
+
+**Modernization Recommendation:**
+- Convert to paginated REST query endpoint with filtering
+- Replace CICS BROWSE with database pagination (LIMIT/OFFSET or cursor-based)
+- Priority: **Medium** — frequently used but read-only
 
 ---
 
