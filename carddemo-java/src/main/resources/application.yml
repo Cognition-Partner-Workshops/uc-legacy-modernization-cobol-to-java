@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: carddemo
+
+  # Default profile uses H2 for easy local development
+  datasource:
+    url: jdbc:h2:mem:carddemo;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+# JWT Configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:change-me-in-production-must-be-at-least-256-bits}
+    expiration-ms: 86400000
+
+# Server
+server:
+  port: 8080
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+# Logging
+logging:
+  level:
+    com.carddemo: INFO
+    org.springframework.batch: INFO
+
+---
+# PostgreSQL profile
+spring:
+  config:
+    activate:
+      on-profile: postgres
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/carddemo}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:carddemo_user}
+    password: ${DB_PASSWORD:}
+
+  h2:
+    console:
+      enabled: false
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
