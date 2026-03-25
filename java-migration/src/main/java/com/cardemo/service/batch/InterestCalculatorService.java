@@ -107,7 +107,8 @@ public class InterestCalculatorService {
 
             // Compute monthly interest: balance * (rate / 1200)
             BigDecimal monthlyRate = interestRate.divide(BigDecimal.valueOf(1200), 10, RoundingMode.HALF_UP);
-            BigDecimal monthlyInterest = catBal.getTranCatBal().multiply(monthlyRate)
+            BigDecimal catBalance = catBal.getTranCatBal() != null ? catBal.getTranCatBal() : BigDecimal.ZERO;
+            BigDecimal monthlyInterest = catBalance.multiply(monthlyRate)
                     .setScale(2, RoundingMode.HALF_UP);
 
             totalInterest = totalInterest.add(monthlyInterest);
@@ -135,7 +136,8 @@ public class InterestCalculatorService {
         Optional<AccountRecord> acctOpt = accountRepository.findById(acctId);
         if (acctOpt.isPresent()) {
             AccountRecord account = acctOpt.get();
-            BigDecimal newBalance = account.getAcctCurrBal().add(totalInterest);
+            BigDecimal currentBal = account.getAcctCurrBal() != null ? account.getAcctCurrBal() : BigDecimal.ZERO;
+            BigDecimal newBalance = currentBal.add(totalInterest);
             account.setAcctCurrBal(newBalance);
             account.setAcctCurrCycCredit(BigDecimal.ZERO);
             account.setAcctCurrCycDebit(BigDecimal.ZERO);
