@@ -4,27 +4,10 @@ Reconciliation test suite.
 Validates cross-entity data integrity invariants using the golden files.
 """
 
-from pathlib import Path
-
 import pytest
 
 from reconciliation import ReconciliationRunner, format_reconciliation_report
-
-REPO_ROOT = Path(__file__).resolve().parent.parent
-GOLDEN_DIR = REPO_ROOT / "golden-files"
-
-# Expected record counts from legacy data
-EXPECTED_COUNTS = {
-    "acctdata": 50,
-    "carddata": 50,
-    "custdata": 50,
-    "cardxref": 50,
-    "dailytran": 300,
-    "trantype": 7,
-    "trancatg": 18,
-    "tcatbal": 50,
-    "discgrp": 51,
-}
+from conftest import GOLDEN_DIR, EXPECTED_COUNTS
 
 
 @pytest.fixture

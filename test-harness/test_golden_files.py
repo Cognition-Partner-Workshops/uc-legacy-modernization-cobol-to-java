@@ -14,23 +14,7 @@ import pytest
 
 from copybook_parser import LAYOUT_REGISTRY, parse_file
 from comparator import ComparisonConfig, RecordComparator
-
-REPO_ROOT = Path(__file__).resolve().parent.parent
-GOLDEN_DIR = REPO_ROOT / "golden-files"
-DATA_DIR = REPO_ROOT / "app" / "data" / "ASCII"
-
-# Expected record counts from the legacy data files
-EXPECTED_COUNTS = {
-    "acctdata": 50,
-    "carddata": 50,
-    "custdata": 50,
-    "cardxref": 50,
-    "dailytran": 300,
-    "trantype": 7,
-    "trancatg": 18,
-    "tcatbal": 50,
-    "discgrp": 51,
-}
+from conftest import GOLDEN_DIR, DATA_DIR, EXPECTED_COUNTS
 
 
 @pytest.fixture

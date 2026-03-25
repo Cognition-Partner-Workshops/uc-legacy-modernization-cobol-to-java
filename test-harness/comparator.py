@@ -42,12 +42,14 @@ class ComparisonConfig:
         self,
         numeric_tolerance: float = 0.01,
         ignore_fields: list[str] | None = None,
+        numeric_fields: set[str] | None = None,
         timestamp_format_only: bool = True,
         strip_strings: bool = True,
         case_sensitive: bool = True,
     ):
         self.numeric_tolerance = numeric_tolerance
         self.ignore_fields = set(ignore_fields or [])
+        self.numeric_fields = numeric_fields
         self.timestamp_format_only = timestamp_format_only
         self.strip_strings = strip_strings
         self.case_sensitive = case_sensitive
@@ -197,8 +199,16 @@ class RecordComparator:
                     ))
                 continue
 
-            # Numeric fields: compare with tolerance
-            if isinstance(exp_val, (int, float)) or _looks_numeric(exp_val):
+            # Numeric fields: compare with tolerance.
+            # Use explicit numeric_fields set if provided; otherwise fall back
+            # to Python type check only (int/float).  We intentionally do NOT
+            # use the _looks_numeric heuristic by default because all-digit
+            # string fields (card numbers, government IDs, zip codes) would
+            # be compared as numbers, silently stripping leading zeros.
+            is_numeric = isinstance(exp_val, (int, float))
+            if not is_numeric and self.config.numeric_fields is not None:
+                is_numeric = field in self.config.numeric_fields
+            if is_numeric:
                 diff = self._compare_numeric(exp_val, act_val, field)
                 if diff:
                     diffs.append(diff)
