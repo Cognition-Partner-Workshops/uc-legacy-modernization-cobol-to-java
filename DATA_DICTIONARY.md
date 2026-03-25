@@ -23,8 +23,9 @@
 | 8 | `ACCT-REISSUE-DATE` | `X(10)` | Date String | 10 | Reissue Date | Last card reissue date |
 | 9 | `ACCT-CURR-CYC-CREDIT` | `S9(10)V99` | Signed Decimal | 12.2 | Cycle Credits | Credits posted in current billing cycle |
 | 10 | `ACCT-CURR-CYC-DEBIT` | `S9(10)V99` | Signed Decimal | 12.2 | Cycle Debits | Debits posted in current billing cycle |
-| 11 | `ACCT-GROUP-ID` | `X(10)` | Alpha | 10 | Account Group | Account group/portfolio classification |
-| 12 | `FILLER` | `X(178)` | — | 178 | Reserved | Future expansion space |
+| 11 | `ACCT-ADDR-ZIP` | `X(10)` | Alpha | 10 | Account ZIP Code | Postal/ZIP code associated with account |
+| 12 | `ACCT-GROUP-ID` | `X(10)` | Alpha | 10 | Account Group | Account group/portfolio classification |
+| 13 | `FILLER` | `X(178)` | — | 178 | Reserved | Future expansion space |
 
 **Java Mapping Target:** `Account.java` (JPA Entity → `ACCOUNT` table)
 
