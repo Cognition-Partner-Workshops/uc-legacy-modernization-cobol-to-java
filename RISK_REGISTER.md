@@ -446,7 +446,7 @@ This document catalogues the top risks associated with modernizing the CardDemo 
 ### Risk Heat Map
 
 ```
-Impact  5 |  R-06,R-12,R-15|  R-01         |
+Impact  5 |  R-06,R-12,R-15|               |  R-01
         4 |        R-08    |  R-03,R-04    |  R-02
           |                |  R-10         |
         3 |                |  R-07,R-09    |  R-05
