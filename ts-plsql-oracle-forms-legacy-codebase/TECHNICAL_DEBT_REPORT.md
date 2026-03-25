@@ -6,8 +6,8 @@
 > **Schema**: `HRMS` on Oracle Database 19c
 > **Platform**: Oracle Forms 12c, Oracle WebLogic 12c
 > **Assessment Date**: 2026-03-25
-> **Total Findings**: 34
-> **Critical**: 7 | **High**: 10 | **Medium**: 11 | **Low**: 6
+> **Total Findings**: 42
+> **Critical**: 6 | **High**: 13 | **Medium**: 18 | **Low**: 5
 
 ---
 
@@ -621,6 +621,6 @@ CONFIG-05/06, ARCH-04/05, DEAD-02.
 |-------|---------|----------|
 | Phase 1 (Immediate) | 7 | 13-19 |
 | Phase 2 (Current Cycle) | 12 | 20-32 |
-| Phase 3 (Next Sprint) | 15 | 15-25 |
+| Phase 3 (Next Sprint) | 18 | 15-25 |
 | Phase 4 (Backlog) | 5 | 3-5 |
-| **Total** | **39** | **51-81 person-days** |
+| **Total** | **42** | **51-81 person-days** |

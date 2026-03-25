@@ -60,7 +60,7 @@ Located in `forms/libraries/`
 
 | # | File | Library Name | Lines | Functions/Procedures | Purpose |
 |---|------|-------------|-------|---------------------|---------|
-| 1 | `HRMS_COMMON_LIB.pll.sql` | HRMS_COMMON_LIB | 152 | 6: `handle_error`, `toolbar_save`, `toolbar_query`, `format_date`, `get_current_user`, `check_session`, `refresh_lov` | Shared error handling, toolbar actions, date formatting, session management, LOV refresh |
+| 1 | `HRMS_COMMON_LIB.pll.sql` | HRMS_COMMON_LIB | 152 | 7: `handle_error`, `toolbar_save`, `toolbar_query`, `format_date`, `get_current_user`, `check_session`, `refresh_lov` | Shared error handling, toolbar actions, date formatting, session management, LOV refresh |
 | 2 | `HRMS_VALIDATION_LIB.pll.sql` | HRMS_VALIDATION_LIB | 136 | 5: `validate_email`, `validate_phone`, `validate_ssn`, `validate_date_not_future`, `validate_salary_range` | Client-side field validation (attached to HRMS_EMPLOYEE) |
 
 ---
