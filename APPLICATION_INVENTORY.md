@@ -105,7 +105,7 @@ These programs run as batch jobs via JCL.
 | 2 | CVACT02Y | 150 bytes | Card data record | Card |
 | 3 | CVACT03Y | 50 bytes | Card cross-reference record | Card-Account Link |
 | 4 | CVCUS01Y | 500 bytes | Customer data record | Customer |
-| 5 | CVCRD01Y | 50 bytes | Card/account cross-reference (alternate) | Card |
+| 5 | CVCRD01Y | ~213 bytes | Online program work area (CC-WORK-AREAS) | Navigation/State |
 | 6 | CVTRA01Y | 50 bytes | Transaction category balance | Transaction Balance |
 | 7 | CVTRA02Y | 50 bytes | Disclosure group record | Disclosure/Interest |
 | 8 | CVTRA03Y | 60 bytes | Transaction type record | Reference Data |

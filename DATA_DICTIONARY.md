@@ -79,7 +79,7 @@ This document extracts every business data entity from the CardDemo copybook PIC
 | 12 | CUST-PHONE-NUM-2 | `X(15)` | Alpha | 15 | Secondary phone |
 | 13 | CUST-SSN | `9(09)` | Numeric | 9 | Social Security Number (PII) |
 | 14 | CUST-GOVT-ISSUED-ID | `X(20)` | Alpha | 20 | Government-issued ID |
-| 15 | CUST-DOB-YYYYMMDD | `X(10)` | Date String | 10 | Date of birth |
+| 15 | CUST-DOB-YYYY-MM-DD | `X(10)` | Date String | 10 | Date of birth |
 | 16 | CUST-EFT-ACCOUNT-ID | `X(10)` | Alpha | 10 | EFT/bank account ID |
 | 17 | CUST-PRI-CARD-HOLDER-IND | `X(01)` | Alpha | 1 | Primary card holder flag |
 | 18 | CUST-FICO-CREDIT-SCORE | `9(03)` | Numeric | 3 | FICO credit score |
@@ -87,7 +87,7 @@ This document extracts every business data entity from the CardDemo copybook PIC
 
 **Modernization Target:** `Customer` JPA entity / `customers` table
 
-> **PII Warning:** Fields CUST-SSN, CUST-DOB-YYYYMMDD, and CUST-GOVT-ISSUED-ID contain personally identifiable information requiring encryption at rest in the target system.
+> **PII Warning:** Fields CUST-SSN, CUST-DOB-YYYY-MM-DD, and CUST-GOVT-ISSUED-ID contain personally identifiable information requiring encryption at rest in the target system.
 
 ---
 
@@ -109,19 +109,24 @@ This document extracts every business data entity from the CardDemo copybook PIC
 
 ---
 
-## 5. Card/Account Cross-Reference - Alternate (`CVCRD01Y.cpy`)
+## 5. Online Program Work Area (`CVCRD01Y.cpy`)
 
-**Record Length:** 50 bytes | **Key:** Account ID + Card Number
-**Business Purpose:** Alternate view of card-to-account mapping, keyed by account.
+**Structure:** `CC-WORK-AREAS` | **Used By:** COACTUPC, COACTVWC, COCRDLIC, COCRDSLC, COCRDUPC
+**Business Purpose:** Shared communication/work area for online CICS programs. Carries navigation state (next program, mapset, map), AID key identification, error/return messages, and current entity IDs between screen interactions.
 
 | # | Field Name | PIC Clause | Type | Size | Business Description |
 |---|-----------|-----------|------|------|---------------------|
-| 1 | FD-ACCT-ID | `9(11)` | Numeric | 11 | Account identifier |
-| 2 | FD-CARD-NUM | `X(16)` | Alpha | 16 | Card number |
-| 3 | FD-CUST-ID | `9(09)` | Numeric | 9 | Customer identifier |
-| 4 | FILLER | `X(14)` | Filler | 14 | Reserved space |
+| 1 | CCARD-AID | `X(5)` | Alpha | 5 | AID key pressed (ENTER, CLEAR, PFK01-12, PA1-2) |
+| 2 | CCARD-NEXT-PROG | `X(8)` | Alpha | 8 | Next program to XCTL to |
+| 3 | CCARD-NEXT-MAPSET | `X(7)` | Alpha | 7 | Next BMS mapset name |
+| 4 | CCARD-NEXT-MAP | `X(7)` | Alpha | 7 | Next BMS map name |
+| 5 | CCARD-ERROR-MSG | `X(75)` | Alpha | 75 | Error message for screen display |
+| 6 | CCARD-RETURN-MSG | `X(75)` | Alpha | 75 | Return/info message for screen display |
+| 7 | CC-ACCT-ID | `X(11)` | Alpha | 11 | Current account ID context |
+| 8 | CC-CARD-NUM | `X(16)` | Alpha | 16 | Current card number context |
+| 9 | CC-CUST-ID | `X(09)` | Alpha | 9 | Current customer ID context |
 
-**Modernization Target:** Can be eliminated; represented as a JPA relationship query
+**Modernization Target:** Replace with Spring MVC session attributes, controller state, or SPA client-side state management. AID key mapping becomes UI event handling.
 
 ---
 
