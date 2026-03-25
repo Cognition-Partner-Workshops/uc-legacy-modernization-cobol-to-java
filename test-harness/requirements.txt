@@ -1,0 +1,3 @@
+# Migration Test Harness Dependencies
+# All modules use Python standard library only -- no external packages required.
+# This file exists for documentation and future extensibility.

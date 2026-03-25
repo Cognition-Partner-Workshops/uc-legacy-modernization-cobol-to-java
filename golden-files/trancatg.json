@@ -1,0 +1,121 @@
+{
+  "_metadata": {
+    "source_file": "trancatg.txt",
+    "copybook_layout": [
+      {
+        "name": "tran_type_cd",
+        "length": 2,
+        "type": "text"
+      },
+      {
+        "name": "tran_cat_cd",
+        "length": 4,
+        "type": "numeric"
+      },
+      {
+        "name": "tran_cat_type_desc",
+        "length": 50,
+        "type": "text"
+      },
+      {
+        "name": "filler",
+        "length": 4,
+        "type": "filler"
+      }
+    ],
+    "record_length": 60,
+    "record_count": 18
+  },
+  "transaction_categories": [
+    {
+      "tran_type_cd": "01",
+      "tran_cat_cd": 1,
+      "tran_cat_type_desc": "Regular Sales Draft"
+    },
+    {
+      "tran_type_cd": "01",
+      "tran_cat_cd": 2,
+      "tran_cat_type_desc": "Regular Cash Advance"
+    },
+    {
+      "tran_type_cd": "01",
+      "tran_cat_cd": 3,
+      "tran_cat_type_desc": "Convenience Check Debit"
+    },
+    {
+      "tran_type_cd": "01",
+      "tran_cat_cd": 4,
+      "tran_cat_type_desc": "ATM Cash Advance"
+    },
+    {
+      "tran_type_cd": "01",
+      "tran_cat_cd": 5,
+      "tran_cat_type_desc": "Interest Amount"
+    },
+    {
+      "tran_type_cd": "02",
+      "tran_cat_cd": 1,
+      "tran_cat_type_desc": "Cash payment"
+    },
+    {
+      "tran_type_cd": "02",
+      "tran_cat_cd": 2,
+      "tran_cat_type_desc": "Electronic payment"
+    },
+    {
+      "tran_type_cd": "02",
+      "tran_cat_cd": 3,
+      "tran_cat_type_desc": "Check payment"
+    },
+    {
+      "tran_type_cd": "03",
+      "tran_cat_cd": 1,
+      "tran_cat_type_desc": "Credit to Account"
+    },
+    {
+      "tran_type_cd": "03",
+      "tran_cat_cd": 2,
+      "tran_cat_type_desc": "Credit to Purchase balance"
+    },
+    {
+      "tran_type_cd": "03",
+      "tran_cat_cd": 3,
+      "tran_cat_type_desc": "Credit to Cash balance"
+    },
+    {
+      "tran_type_cd": "04",
+      "tran_cat_cd": 1,
+      "tran_cat_type_desc": "Zero dollar authorization"
+    },
+    {
+      "tran_type_cd": "04",
+      "tran_cat_cd": 2,
+      "tran_cat_type_desc": "Online purchase authorization"
+    },
+    {
+      "tran_type_cd": "04",
+      "tran_cat_cd": 3,
+      "tran_cat_type_desc": "Travel booking authorization"
+    },
+    {
+      "tran_type_cd": "05",
+      "tran_cat_cd": 1,
+      "tran_cat_type_desc": "Refund credit"
+    },
+    {
+      "tran_type_cd": "06",
+      "tran_cat_cd": 1,
+      "tran_cat_type_desc": "Fraud reversal"
+    },
+    {
+      "tran_type_cd": "06",
+      "tran_cat_cd": 2,
+      "tran_cat_type_desc": "Non-fraud reversal"
+    },
+    {
+      "tran_type_cd": "07",
+      "tran_cat_cd": 1,
+      "tran_cat_type_desc": "Sales draft credit adjustment"
+    }
+  ]
+}

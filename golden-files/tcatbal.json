@@ -1,0 +1,336 @@
+{
+  "_metadata": {
+    "source_file": "tcatbal.txt",
+    "copybook_layout": [
+      {
+        "name": "trancat_acct_id",
+        "length": 11,
+        "type": "numeric"
+      },
+      {
+        "name": "trancat_type_cd",
+        "length": 2,
+        "type": "text"
+      },
+      {
+        "name": "trancat_cd",
+        "length": 4,
+        "type": "numeric"
+      },
+      {
+        "name": "tran_cat_bal",
+        "length": 11,
+        "type": "signed"
+      },
+      {
+        "name": "filler",
+        "length": 22,
+        "type": "filler"
+      }
+    ],
+    "record_length": 50,
+    "record_count": 50
+  },
+  "tran_category_balances": [
+    {
+      "trancat_acct_id": 1,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 2,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 3,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 4,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 5,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 6,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 7,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 8,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 9,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 10,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 11,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 12,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 13,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 14,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 15,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 16,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 17,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 18,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 19,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 20,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 21,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 22,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 23,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 24,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 25,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 26,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 27,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 28,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 29,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 30,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 31,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 32,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 33,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 34,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 35,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 36,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 37,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 38,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 39,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 40,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 41,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 42,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 43,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 44,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 45,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 46,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 47,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 48,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 49,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    },
+    {
+      "trancat_acct_id": 50,
+      "trancat_type_cd": "01",
+      "trancat_cd": 1,
+      "tran_cat_bal": "0.00"
+    }
+  ]
+}

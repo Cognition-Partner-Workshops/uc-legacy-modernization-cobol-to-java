@@ -1,0 +1,54 @@
+{
+  "_metadata": {
+    "source_file": "trantype.txt",
+    "copybook_layout": [
+      {
+        "name": "tran_type",
+        "length": 2,
+        "type": "text"
+      },
+      {
+        "name": "tran_type_desc",
+        "length": 50,
+        "type": "text"
+      },
+      {
+        "name": "filler",
+        "length": 8,
+        "type": "filler"
+      }
+    ],
+    "record_length": 60,
+    "record_count": 7
+  },
+  "transaction_types": [
+    {
+      "tran_type": "01",
+      "tran_type_desc": "Purchase"
+    },
+    {
+      "tran_type": "02",
+      "tran_type_desc": "Payment"
+    },
+    {
+      "tran_type": "03",
+      "tran_type_desc": "Credit"
+    },
+    {
+      "tran_type": "04",
+      "tran_type_desc": "Authorization"
+    },
+    {
+      "tran_type": "05",
+      "tran_type_desc": "Refund"
+    },
+    {
+      "tran_type": "06",
+      "tran_type_desc": "Reversal"
+    },
+    {
+      "tran_type": "07",
+      "tran_type_desc": "Adjustment"
+    }
+  ]
+}

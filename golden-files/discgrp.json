@@ -1,0 +1,342 @@
+{
+  "_metadata": {
+    "source_file": "discgrp.txt",
+    "copybook_layout": [
+      {
+        "name": "dis_acct_group_id",
+        "length": 10,
+        "type": "text"
+      },
+      {
+        "name": "dis_tran_type_cd",
+        "length": 2,
+        "type": "text"
+      },
+      {
+        "name": "dis_tran_cat_cd",
+        "length": 4,
+        "type": "numeric"
+      },
+      {
+        "name": "dis_int_rate",
+        "length": 6,
+        "type": "signed_4v2"
+      },
+      {
+        "name": "filler",
+        "length": 28,
+        "type": "filler"
+      }
+    ],
+    "record_length": 50,
+    "record_count": 51
+  },
+  "disclosure_groups": [
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "25.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "25.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 4,
+      "dis_int_rate": "25.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "02",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "02",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "02",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "03",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "03",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "03",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "04",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "04",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "04",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "05",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "06",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "06",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "A000000000",
+      "dis_tran_type_cd": "07",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "25.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "25.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 4,
+      "dis_int_rate": "25.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "02",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "02",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "02",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "03",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "03",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "03",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "04",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "04",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "04",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "05",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "06",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "06",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "15.00"
+    },
+    {
+      "dis_acct_group_id": "DEFAULT",
+      "dis_tran_type_cd": "07",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "01",
+      "dis_tran_cat_cd": 4,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "02",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "02",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "02",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "03",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "03",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "03",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "04",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "04",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "04",
+      "dis_tran_cat_cd": 3,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "05",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "06",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "06",
+      "dis_tran_cat_cd": 2,
+      "dis_int_rate": "0.00"
+    },
+    {
+      "dis_acct_group_id": "ZEROAPR",
+      "dis_tran_type_cd": "07",
+      "dis_tran_cat_cd": 1,
+      "dis_int_rate": "0.00"
+    }
+  ]
+}
