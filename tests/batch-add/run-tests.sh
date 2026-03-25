@@ -21,8 +21,7 @@ mkdir -p "$BUILD_DIR"
 
 # --- Compile ---
 echo "=== Compiling ADD2NUMS.cbl ==="
-cobc -x -o "$BUILD_DIR/ADD2NUMS" "$SRC_DIR/ADD2NUMS.cbl"
-if [ $? -ne 0 ]; then
+if ! cobc -x -o "$BUILD_DIR/ADD2NUMS" "$SRC_DIR/ADD2NUMS.cbl"; then
     echo "FATAL: Compilation failed"
     exit 1
 fi
