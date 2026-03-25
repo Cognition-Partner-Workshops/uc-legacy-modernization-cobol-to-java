@@ -1,0 +1,294 @@
+ /*********************************************************************/
+ /* Program     : COTRN02C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS PL/I Program                                    */
+ /* Function    : Add (post) a new transaction                        */
+ /* Converted from COBOL/CICS: app/cbl/COTRN02C.cbl                  */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ COTRN02C: PROC(IO_PCB_PTR, ALT_PCB_PTR,
+                 DB_TRAN_PTR, DB_CARD_PTR,
+                 DB_ACCT_PTR, DB_TTYP_PTR,
+                 DB_TCAT_PTR, DB_CXREF_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR    POINTER;
+   DCL ALT_PCB_PTR   POINTER;
+   DCL DB_TRAN_PTR   POINTER;
+   DCL DB_CARD_PTR   POINTER;
+   DCL DB_ACCT_PTR   POINTER;
+   DCL DB_TTYP_PTR   POINTER;
+   DCL DB_TCAT_PTR   POINTER;
+   DCL DB_CXREF_PTR  POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2),  2 IO_DATE  FIXED BIN(31),
+         2 IO_TIME     FIXED BIN(31), 2 IO_SEQ FIXED BIN(31),
+         2 IO_MOD      CHAR(8);
+
+   DCL 1 ALT_PCB BASED(ALT_PCB_PTR),
+         2 ALT_DEST    CHAR(8),  2 ALT_RESV  CHAR(2),
+         2 ALT_STATUS  CHAR(2);
+
+   DCL 1 DB_TRAN BASED(DB_TRAN_PTR),
+         2 TRAN_DBNAME  CHAR(8),  2 TRAN_LEVEL  CHAR(2),
+         2 TRAN_DBSTAT  CHAR(2),  2 TRAN_PROC   CHAR(4),
+         2 TRAN_RESV    FIXED BIN(31),
+         2 TRAN_SEGNAME CHAR(8),  2 TRAN_KEYLEN FIXED BIN(31),
+         2 TRAN_SENSEG  FIXED BIN(31),
+         2 TRAN_KEYVAL  CHAR(256);
+
+   DCL 1 DB_TTYP BASED(DB_TTYP_PTR),
+         2 TTYP_DBNAME  CHAR(8),  2 TTYP_LEVEL  CHAR(2),
+         2 TTYP_STATUS  CHAR(2),  2 TTYP_PROC   CHAR(4),
+         2 TTYP_RESV    FIXED BIN(31),
+         2 TTYP_SEGNAME CHAR(8),  2 TTYP_KEYLEN FIXED BIN(31),
+         2 TTYP_SENSEG  FIXED BIN(31),
+         2 TTYP_KEYVAL  CHAR(256);
+
+   DCL 1 DB_TCAT BASED(DB_TCAT_PTR),
+         2 TCAT_DBNAME  CHAR(8),  2 TCAT_LEVEL  CHAR(2),
+         2 TCAT_STATUS  CHAR(2),  2 TCAT_PROC   CHAR(4),
+         2 TCAT_RESV    FIXED BIN(31),
+         2 TCAT_SEGNAME CHAR(8),  2 TCAT_KEYLEN FIXED BIN(31),
+         2 TCAT_SENSEG  FIXED BIN(31),
+         2 TCAT_KEYVAL  CHAR(256);
+
+   DCL WS_PGMNAME     CHAR(8) INIT('COTRN02C');
+   DCL WS_TRANID      CHAR(4) INIT('CT02');
+   DCL WS_ERR_FLG      CHAR(1) INIT('N');
+   DCL WS_RETURN_MSG   CHAR(75) INIT(' ');
+   DCL WS_CONFIRM      CHAR(1) INIT('N');
+   DCL WS_TRAN_ID_NUM  PIC '(16)9' INIT(0);
+
+   %INCLUDE COCOM01Y;
+   %INCLUDE CVCRD01Y;
+   %INCLUDE COTTL01Y;
+   %INCLUDE CSDAT01Y;
+   %INCLUDE CSMSG01Y;
+   %INCLUDE CVTRA05Y;
+   %INCLUDE CVTRA03Y;
+   %INCLUDE CVTRA04Y;
+   %INCLUDE CVACT01Y;
+   %INCLUDE CVACT03Y;
+
+   DCL 1 INPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 TRANCODE     CHAR(8),
+         2 IN_CARDNUM   CHAR(16),
+         2 IN_TTYPE     CHAR(2),
+         2 IN_TCAT      CHAR(4),
+         2 IN_TSOURCE   CHAR(10),
+         2 IN_TDESC     CHAR(100),
+         2 IN_TAMT      CHAR(12),
+         2 IN_MERCHID   CHAR(9),
+         2 IN_MERCHNAME CHAR(50),
+         2 IN_MERCHCITY CHAR(50),
+         2 IN_MERCHZIP  CHAR(10),
+         2 IN_CONFIRM   CHAR(1),
+         2 IN_COMMAREA  CHAR(LENGTH(CARDDEMO_COMMAREA));
+
+   DCL 1 OUTPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 OUT_TRNNAME  CHAR(4),
+         2 OUT_TITLE01  CHAR(40),
+         2 OUT_CURDATE  CHAR(8),
+         2 OUT_PGMNAME  CHAR(8),
+         2 OUT_TITLE02  CHAR(40),
+         2 OUT_CURTIME  CHAR(8),
+         2 OUT_CARDNUM  CHAR(16),
+         2 OUT_TTYPE    CHAR(2),
+         2 OUT_TTYPEDESC CHAR(50),
+         2 OUT_TCAT     CHAR(4),
+         2 OUT_TCATDESC CHAR(50),
+         2 OUT_TSOURCE  CHAR(10),
+         2 OUT_TDESC    CHAR(100),
+         2 OUT_TAMT     CHAR(12),
+         2 OUT_MERCHID  CHAR(9),
+         2 OUT_MERCHNAME CHAR(50),
+         2 OUT_MERCHCITY CHAR(50),
+         2 OUT_MERCHZIP CHAR(10),
+         2 OUT_CONFIRM  CHAR(1),
+         2 OUT_INFOMSG  CHAR(40),
+         2 OUT_ERRMSG   CHAR(78);
+
+   DCL TRAN_SSA CHAR(50);
+   DCL TTYP_SSA CHAR(50);
+   DCL TCAT_SSA CHAR(50);
+   DCL CXREF_SSA CHAR(50);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GHU  CHAR(4) INIT('GHU ');
+   DCL GN   CHAR(4) INIT('GN  ');
+   DCL GNP  CHAR(4) INIT('GNP ');
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL REPL CHAR(4) INIT('REPL');
+   DCL CHNG CHAR(4) INIT('CHNG');
+   DCL PURG CHAR(4) INIT('PURG');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   WS_ERR_FLG = 'N';
+   WS_RETURN_MSG = ' ';
+
+   CALL PLITDLI(GU, IO_PCB_PTR, INPUT_MSG);
+   CARDDEMO_COMMAREA = IN_COMMAREA;
+
+   IF CDEMO_PGM_CONTEXT = '0' THEN DO;
+     CDEMO_PGM_CONTEXT = '1';
+     OUT_INFOMSG = 'Enter transaction details';
+     CALL SEND_MAP;
+   END;
+   ELSE DO;
+     CALL PROCESS_ADD;
+   END;
+
+   RETURN;
+
+   /******************************************************************/
+   /* PROCESS_ADD                                                    */
+   /******************************************************************/
+   PROCESS_ADD: PROC;
+     /* Validate required fields */
+     IF IN_CARDNUM = ' ' THEN DO;
+       WS_RETURN_MSG = 'Card Number is required';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     IF IN_TTYPE = ' ' THEN DO;
+       WS_RETURN_MSG = 'Transaction type is required';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     IF IN_TCAT = ' ' THEN DO;
+       WS_RETURN_MSG = 'Transaction category is required';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     IF IN_TAMT = ' ' THEN DO;
+       WS_RETURN_MSG = 'Transaction amount is required';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     IF IN_CONFIRM ^= 'Y' & IN_CONFIRM ^= 'y' THEN DO;
+       /* Validate type and category exist */
+       TTYP_SSA = 'TTYPSEG (TTYPCD  =' || IN_TTYPE || ')';
+       CALL PLITDLI(GU, DB_TTYP_PTR, TRAN_TYPE_RECORD, TTYP_SSA);
+       IF TTYP_STATUS = '  ' THEN
+         OUT_TTYPEDESC = TRAN_TYPE_DESC;
+       ELSE DO;
+         WS_RETURN_MSG = 'Invalid transaction type code';
+         CALL SEND_MAP;
+         RETURN;
+       END;
+
+       TCAT_SSA = 'TCATSEG (TTYPCD  =' || IN_TTYPE ||
+                            'TCATCD  =' || IN_TCAT || ')';
+       CALL PLITDLI(GU, DB_TCAT_PTR, TRAN_CAT_RECORD, TCAT_SSA);
+       IF TCAT_STATUS = '  ' THEN
+         OUT_TCATDESC = TRAN_CAT_TYPE_DESC;
+       ELSE DO;
+         WS_RETURN_MSG = 'Invalid transaction category code';
+         CALL SEND_MAP;
+         RETURN;
+       END;
+
+       WS_RETURN_MSG = 'Confirm transaction with Y';
+       OUT_CONFIRM = ' ';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     /* Generate next transaction ID */
+     CALL GENERATE_TRAN_ID;
+
+     /* Build new transaction record */
+     TRAN_ID = WS_TRAN_ID_NUM;
+     TRAN_TYPE_CD = IN_TTYPE;
+     TRAN_CAT_CD = IN_TCAT;
+     TRAN_SOURCE = IN_TSOURCE;
+     TRAN_DESC = IN_TDESC;
+     TRAN_AMT = IN_TAMT;
+     TRAN_MERCHANT_ID = IN_MERCHID;
+     TRAN_MERCHANT_NAME = IN_MERCHNAME;
+     TRAN_MERCHANT_CITY = IN_MERCHCITY;
+     TRAN_MERCHANT_ZIP = IN_MERCHZIP;
+     TRAN_CARD_NUM = IN_CARDNUM;
+
+     /* Set timestamps */
+     CALL SET_TIMESTAMPS;
+
+     /* Insert new transaction */
+     TRAN_SSA = 'TRANSEG ';
+     CALL PLITDLI(ISRT, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
+
+     IF TRAN_DBSTAT = '  ' THEN
+       WS_RETURN_MSG = 'Transaction added successfully. ID: ' ||
+                        TRAN_ID;
+     ELSE
+       WS_RETURN_MSG = 'Error adding transaction';
+
+     CALL SEND_MAP;
+   END PROCESS_ADD;
+
+   /******************************************************************/
+   /* GENERATE_TRAN_ID                                               */
+   /******************************************************************/
+   GENERATE_TRAN_ID: PROC;
+     /* Read last transaction to determine next ID */
+     /* In IMS, we navigate to last segment and increment */
+     WS_TRAN_ID_NUM = WS_TRAN_ID_NUM + 1;
+   END GENERATE_TRAN_ID;
+
+   /******************************************************************/
+   /* SET_TIMESTAMPS                                                 */
+   /******************************************************************/
+   SET_TIMESTAMPS: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     TRAN_ORIG_TS = SUBSTR(CURRENT_TS, 1, 4) || '-' ||
+                    SUBSTR(CURRENT_TS, 5, 2) || '-' ||
+                    SUBSTR(CURRENT_TS, 7, 2) || '-' ||
+                    SUBSTR(CURRENT_TS, 9, 2) || '.' ||
+                    SUBSTR(CURRENT_TS, 11, 2) || '.' ||
+                    SUBSTR(CURRENT_TS, 13, 2) || '.000000';
+     TRAN_PROC_TS = TRAN_ORIG_TS;
+   END SET_TIMESTAMPS;
+
+   SEND_MAP: PROC;
+     CALL POPULATE_HEADER_INFO;
+     OUT_ERRMSG = WS_RETURN_MSG;
+     OUTPUT_MSG.LL = SIZE(OUTPUT_MSG);
+     OUTPUT_MSG.ZZ = 0;
+     IO_MOD = 'COTRN02';
+     CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
+   END SEND_MAP;
+
+   POPULATE_HEADER_INFO: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     OUT_TRNNAME = WS_TRANID;
+     OUT_TITLE01 = CCDA_TITLE01;
+     OUT_TITLE02 = CCDA_TITLE02;
+     OUT_PGMNAME = WS_PGMNAME;
+     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 3, 2);
+     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 13, 2);
+   END POPULATE_HEADER_INFO;
+
+ END COTRN02C;

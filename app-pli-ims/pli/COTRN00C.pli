@@ -1,0 +1,212 @@
+ /*********************************************************************/
+ /* Program     : COTRN00C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS PL/I Program                                    */
+ /* Function    : Transaction List display                            */
+ /* Converted from COBOL/CICS: app/cbl/COTRN00C.cbl                  */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ COTRN00C: PROC(IO_PCB_PTR, ALT_PCB_PTR,
+                 DB_TRAN_PTR, DB_CARD_PTR,
+                 DB_CXREF_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR    POINTER;
+   DCL ALT_PCB_PTR   POINTER;
+   DCL DB_TRAN_PTR   POINTER;
+   DCL DB_CARD_PTR   POINTER;
+   DCL DB_CXREF_PTR  POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2),  2 IO_DATE  FIXED BIN(31),
+         2 IO_TIME     FIXED BIN(31), 2 IO_SEQ FIXED BIN(31),
+         2 IO_MOD      CHAR(8);
+
+   DCL 1 ALT_PCB BASED(ALT_PCB_PTR),
+         2 ALT_DEST    CHAR(8),  2 ALT_RESV  CHAR(2),
+         2 ALT_STATUS  CHAR(2);
+
+   DCL 1 DB_TRAN BASED(DB_TRAN_PTR),
+         2 TRAN_DBNAME  CHAR(8),  2 TRAN_LEVEL  CHAR(2),
+         2 TRAN_STATUS  CHAR(2),  2 TRAN_PROC   CHAR(4),
+         2 TRAN_RESV    FIXED BIN(31),
+         2 TRAN_SEGNAME CHAR(8),  2 TRAN_KEYLEN FIXED BIN(31),
+         2 TRAN_SENSEG  FIXED BIN(31),
+         2 TRAN_KEYVAL  CHAR(256);
+
+   DCL WS_PGMNAME     CHAR(8) INIT('COTRN00C');
+   DCL WS_TRANID      CHAR(4) INIT('CT00');
+   DCL WS_MESSAGE      CHAR(80) INIT(' ');
+   DCL WS_ERR_FLG      CHAR(1) INIT('N');
+   DCL WS_RETURN_MSG   CHAR(75) INIT(' ');
+   DCL WS_IDX          FIXED BIN(15);
+   DCL MAX_TRANS       FIXED BIN(15) INIT(10);
+
+   %INCLUDE COCOM01Y;
+   %INCLUDE CVCRD01Y;
+   %INCLUDE COTTL01Y;
+   %INCLUDE CSDAT01Y;
+   %INCLUDE CSMSG01Y;
+   %INCLUDE CVTRA05Y;
+   %INCLUDE CVACT03Y;
+
+   DCL 1 INPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 TRANCODE     CHAR(8),
+         2 IN_ACCTID    CHAR(11),
+         2 IN_CARDNUM   CHAR(16),
+         2 IN_TRANID    CHAR(16),
+         2 IN_SEL(10)   CHAR(1),
+         2 IN_COMMAREA  CHAR(LENGTH(CARDDEMO_COMMAREA));
+
+   DCL 1 OUTPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 OUT_TRNNAME  CHAR(4),
+         2 OUT_TITLE01  CHAR(40),
+         2 OUT_CURDATE  CHAR(8),
+         2 OUT_PGMNAME  CHAR(8),
+         2 OUT_TITLE02  CHAR(40),
+         2 OUT_CURTIME  CHAR(8),
+         2 OUT_ACCTID   CHAR(11),
+         2 OUT_CARDNUM  CHAR(16),
+         2 OUT_TRANS(10),
+           3 OUT_SEL    CHAR(1),
+           3 OUT_TID    CHAR(16),
+           3 OUT_TTYP   CHAR(2),
+           3 OUT_TCAT   CHAR(4),
+           3 OUT_TSRC   CHAR(10),
+           3 OUT_TAMT   CHAR(12),
+         2 OUT_INFOMSG  CHAR(40),
+         2 OUT_ERRMSG   CHAR(78);
+
+   DCL TRAN_SSA CHAR(60);
+   DCL CXREF_SSA CHAR(50);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GN   CHAR(4) INIT('GN  ');
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL CHNG CHAR(4) INIT('CHNG');
+   DCL PURG CHAR(4) INIT('PURG');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   WS_ERR_FLG = 'N';
+   WS_RETURN_MSG = ' ';
+
+   CALL PLITDLI(GU, IO_PCB_PTR, INPUT_MSG);
+   CARDDEMO_COMMAREA = IN_COMMAREA;
+
+   IF CDEMO_PGM_CONTEXT = '0' THEN DO;
+     CDEMO_PGM_CONTEXT = '1';
+     OUT_INFOMSG = 'Enter Account ID or Card Number to list';
+     CALL SEND_MAP;
+   END;
+   ELSE DO;
+     CALL PROCESS_INPUTS;
+   END;
+
+   RETURN;
+
+   /******************************************************************/
+   /* PROCESS_INPUTS                                                 */
+   /******************************************************************/
+   PROCESS_INPUTS: PROC;
+     /* Check for transaction selection */
+     DO WS_IDX = 1 TO MAX_TRANS;
+       IF IN_SEL(WS_IDX) = 'S' | IN_SEL(WS_IDX) = 's' THEN DO;
+         CDEMO_TRAN_ID = OUT_TID(WS_IDX);
+         CDEMO_FROM_TRANID = WS_TRANID;
+         CDEMO_FROM_PROGRAM = WS_PGMNAME;
+         CDEMO_PGM_CONTEXT = '0';
+         /* Switch to transaction view */
+         CALL PLITDLI(CHNG, ALT_PCB_PTR, 'CT01');
+         CALL PLITDLI(ISRT, ALT_PCB_PTR, CARDDEMO_COMMAREA);
+         CALL PLITDLI(PURG, ALT_PCB_PTR);
+         RETURN;
+       END;
+     END;
+
+     /* List transactions */
+     IF IN_ACCTID ^= ' ' THEN DO;
+       /* Get card number from account via xref */
+       CXREF_SSA = 'CXREFSEG(ACCTID  =' || IN_ACCTID || ')';
+       CALL PLITDLI(GU, DB_CXREF_PTR, CARD_XREF_RECORD, CXREF_SSA);
+       IF DB_CXREF->CXREF_STATUS = '  ' THEN
+         IN_CARDNUM = XREF_CARD_NUM;
+       ELSE DO;
+         WS_RETURN_MSG = 'Account not found in cross-reference';
+         CALL SEND_MAP;
+         RETURN;
+       END;
+     END;
+
+     IF IN_CARDNUM ^= ' ' THEN DO;
+       CALL LIST_TRANSACTIONS;
+     END;
+     ELSE DO;
+       WS_RETURN_MSG = 'Please enter Account ID or Card Number';
+     END;
+
+     CALL SEND_MAP;
+   END PROCESS_INPUTS;
+
+   /******************************************************************/
+   /* LIST_TRANSACTIONS                                              */
+   /******************************************************************/
+   LIST_TRANSACTIONS: PROC;
+     DCL TRAN_COUNT FIXED BIN(15) INIT(0);
+
+     TRAN_SSA = 'TRANSEG (CARDNUM =' || IN_CARDNUM || ')';
+     CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
+
+     DO WHILE(TRAN_STATUS = '  ' & TRAN_COUNT < MAX_TRANS);
+       TRAN_COUNT = TRAN_COUNT + 1;
+       OUT_SEL(TRAN_COUNT)  = ' ';
+       OUT_TID(TRAN_COUNT)  = TRAN_ID;
+       OUT_TTYP(TRAN_COUNT) = TRAN_TYPE_CD;
+       OUT_TCAT(TRAN_COUNT) = TRAN_CAT_CD;
+       OUT_TSRC(TRAN_COUNT) = TRAN_SOURCE;
+       OUT_TAMT(TRAN_COUNT) = TRAN_AMT;
+
+       CALL PLITDLI(GN, DB_TRAN_PTR, TRAN_RECORD);
+     END;
+
+     IF TRAN_COUNT = 0 THEN
+       WS_RETURN_MSG = 'No transactions found';
+     ELSE
+       OUT_INFOMSG = 'Select transaction for details (S)';
+   END LIST_TRANSACTIONS;
+
+   SEND_MAP: PROC;
+     CALL POPULATE_HEADER_INFO;
+     OUT_ERRMSG = WS_RETURN_MSG;
+     OUTPUT_MSG.LL = SIZE(OUTPUT_MSG);
+     OUTPUT_MSG.ZZ = 0;
+     IO_MOD = 'COTRN00';
+     CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
+   END SEND_MAP;
+
+   POPULATE_HEADER_INFO: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     OUT_TRNNAME = WS_TRANID;
+     OUT_TITLE01 = CCDA_TITLE01;
+     OUT_TITLE02 = CCDA_TITLE02;
+     OUT_PGMNAME = WS_PGMNAME;
+     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 3, 2);
+     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 13, 2);
+   END POPULATE_HEADER_INFO;
+
+ END COTRN00C;

@@ -1,0 +1,141 @@
+ /*********************************************************************/
+ /* Program     : CBSTM03B.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS Batch PL/I Program (BMP)                        */
+ /* Function    : Statement Generation - Print Statements             */
+ /* Converted from COBOL batch: app/cbl/CBSTM03B.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CBSTM03B: PROC OPTIONS(MAIN);
+
+   /* This is a pure file-based batch program - no IMS DL/I */
+   DCL STATEMENT_FILE FILE RECORD INPUT ENV(FB RECSIZE(350));
+   DCL REPORT_FILE    FILE PRINT ENV(FB RECSIZE(132));
+
+   %INCLUDE COSTM01;
+   %INCLUDE CVTRA07Y;
+
+   DCL WS_RECORD_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_PAGE_COUNT    FIXED BIN(31) INIT(0);
+   DCL WS_LINE_COUNT    FIXED BIN(31) INIT(0);
+   DCL WS_LINES_PER_PAGE FIXED BIN(15) INIT(55);
+   DCL WS_LAST_CARD     CHAR(16) INIT(' ');
+   DCL WS_CARD_TOTAL    FIXED DEC(15,2) INIT(0);
+   DCL WS_GRAND_TOTAL   FIXED DEC(15,2) INIT(0);
+   DCL WS_FIRST_REC     CHAR(1) INIT('Y');
+   DCL WS_EOF           CHAR(1) INIT('N');
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM CBSTM03B');
+
+   ON ENDFILE(STATEMENT_FILE) WS_EOF = 'Y';
+
+   OPEN FILE(STATEMENT_FILE);
+   OPEN FILE(REPORT_FILE);
+
+   READ FILE(STATEMENT_FILE) INTO(TRNX_RECORD);
+
+   DO WHILE(WS_EOF = 'N');
+     WS_RECORD_COUNT = WS_RECORD_COUNT + 1;
+
+     IF WS_FIRST_REC = 'Y' THEN DO;
+       CALL PRINT_STATEMENT_HEADER;
+       WS_LAST_CARD = TRNX_CARD_NUM;
+       WS_FIRST_REC = 'N';
+     END;
+
+     IF TRNX_CARD_NUM ^= WS_LAST_CARD THEN DO;
+       CALL PRINT_CARD_TOTALS;
+       WS_CARD_TOTAL = 0;
+       WS_LAST_CARD = TRNX_CARD_NUM;
+       CALL PRINT_STATEMENT_HEADER;
+     END;
+
+     IF WS_LINE_COUNT >= WS_LINES_PER_PAGE THEN DO;
+       CALL PRINT_STATEMENT_HEADER;
+     END;
+
+     CALL PRINT_STATEMENT_LINE;
+     WS_CARD_TOTAL = WS_CARD_TOTAL + TRNX_TRAN_AMT;
+     WS_GRAND_TOTAL = WS_GRAND_TOTAL + TRNX_TRAN_AMT;
+
+     READ FILE(STATEMENT_FILE) INTO(TRNX_RECORD);
+   END;
+
+   IF WS_FIRST_REC ^= 'Y' THEN DO;
+     CALL PRINT_CARD_TOTALS;
+     CALL PRINT_GRAND_TOTALS;
+   END;
+
+   CLOSE FILE(STATEMENT_FILE);
+   CLOSE FILE(REPORT_FILE);
+
+   PUT SKIP LIST('RECORDS PROCESSED: ' || WS_RECORD_COUNT);
+   PUT SKIP LIST('PAGES PRINTED:     ' || WS_PAGE_COUNT);
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM CBSTM03B');
+
+   RETURN;
+
+   /******************************************************************/
+   /* PRINT_STATEMENT_HEADER                                         */
+   /******************************************************************/
+   PRINT_STATEMENT_HEADER: PROC;
+     WS_PAGE_COUNT = WS_PAGE_COUNT + 1;
+     WS_LINE_COUNT = 0;
+
+     PUT FILE(REPORT_FILE) PAGE EDIT
+       ('CARDDEMO STATEMENT', 'CARD: ', TRNX_CARD_NUM,
+        'PAGE:', WS_PAGE_COUNT)
+       (A, COL(40), A, A(16), COL(110), A, F(5));
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       (REPEAT('-', 131)) (A);
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       ('TRAN ID', 'TYPE', 'CAT', 'SOURCE',
+        'DESCRIPTION', 'AMOUNT', 'DATE')
+       (A(16), X(1), A(2), X(1), A(4), X(1), A(10), X(1),
+        A(50), X(1), A(12), X(1), A(26));
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       (REPEAT('-', 131)) (A);
+     WS_LINE_COUNT = 4;
+   END PRINT_STATEMENT_HEADER;
+
+   /******************************************************************/
+   /* PRINT_STATEMENT_LINE                                           */
+   /******************************************************************/
+   PRINT_STATEMENT_LINE: PROC;
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       (TRNX_TRAN_ID, TRNX_TRAN_TYPE_CD, TRNX_TRAN_CAT_CD,
+        TRNX_TRAN_SOURCE, TRNX_TRAN_DESC,
+        TRNX_TRAN_AMT, TRNX_TRAN_ORIG_TS)
+       (A(16), X(1), A(2), X(1), A(4), X(1), A(10), X(1),
+        A(50), X(1), A(12), X(1), A(26));
+     WS_LINE_COUNT = WS_LINE_COUNT + 1;
+   END PRINT_STATEMENT_LINE;
+
+   /******************************************************************/
+   /* PRINT_CARD_TOTALS                                              */
+   /******************************************************************/
+   PRINT_CARD_TOTALS: PROC;
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       (REPEAT('-', 131)) (A);
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       ('CARD TOTAL:', WS_CARD_TOTAL) (A, COL(90), F(15,2));
+   END PRINT_CARD_TOTALS;
+
+   /******************************************************************/
+   /* PRINT_GRAND_TOTALS                                             */
+   /******************************************************************/
+   PRINT_GRAND_TOTALS: PROC;
+     PUT FILE(REPORT_FILE) SKIP(2) EDIT
+       (REPEAT('=', 131)) (A);
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       ('GRAND TOTAL:', WS_GRAND_TOTAL) (A, COL(90), F(15,2));
+   END PRINT_GRAND_TOTALS;
+
+ END CBSTM03B;

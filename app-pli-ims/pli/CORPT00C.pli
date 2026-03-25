@@ -1,0 +1,149 @@
+ /*********************************************************************/
+ /* Program     : CORPT00C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS PL/I Program                                    */
+ /* Function    : Transaction Report request                          */
+ /* Converted from COBOL/CICS: app/cbl/CORPT00C.cbl                  */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CORPT00C: PROC(IO_PCB_PTR, ALT_PCB_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR    POINTER;
+   DCL ALT_PCB_PTR   POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2),  2 IO_DATE  FIXED BIN(31),
+         2 IO_TIME     FIXED BIN(31), 2 IO_SEQ FIXED BIN(31),
+         2 IO_MOD      CHAR(8);
+
+   DCL 1 ALT_PCB BASED(ALT_PCB_PTR),
+         2 ALT_DEST    CHAR(8),  2 ALT_RESV  CHAR(2),
+         2 ALT_STATUS  CHAR(2);
+
+   DCL WS_PGMNAME     CHAR(8) INIT('CORPT00C');
+   DCL WS_TRANID      CHAR(4) INIT('CR00');
+   DCL WS_ERR_FLG      CHAR(1) INIT('N');
+   DCL WS_RETURN_MSG   CHAR(75) INIT(' ');
+
+   %INCLUDE COCOM01Y;
+   %INCLUDE COTTL01Y;
+   %INCLUDE CSDAT01Y;
+   %INCLUDE CSMSG01Y;
+
+   DCL 1 INPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 TRANCODE     CHAR(8),
+         2 IN_MONTHLY   CHAR(1),
+         2 IN_YEARLY    CHAR(1),
+         2 IN_CUSTOM    CHAR(1),
+         2 IN_STARTDT   CHAR(10),
+         2 IN_ENDDT     CHAR(10),
+         2 IN_CONFIRM   CHAR(1),
+         2 IN_COMMAREA  CHAR(LENGTH(CARDDEMO_COMMAREA));
+
+   DCL 1 OUTPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 OUT_TRNNAME  CHAR(4),
+         2 OUT_TITLE01  CHAR(40),
+         2 OUT_CURDATE  CHAR(8),
+         2 OUT_PGMNAME  CHAR(8),
+         2 OUT_TITLE02  CHAR(40),
+         2 OUT_CURTIME  CHAR(8),
+         2 OUT_MONTHLY  CHAR(1),
+         2 OUT_YEARLY   CHAR(1),
+         2 OUT_CUSTOM   CHAR(1),
+         2 OUT_STARTDT  CHAR(10),
+         2 OUT_ENDDT    CHAR(10),
+         2 OUT_CONFIRM  CHAR(1),
+         2 OUT_INFOMSG  CHAR(40),
+         2 OUT_ERRMSG   CHAR(78);
+
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL CHNG CHAR(4) INIT('CHNG');
+   DCL PURG CHAR(4) INIT('PURG');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   WS_ERR_FLG = 'N';
+   WS_RETURN_MSG = ' ';
+
+   CALL PLITDLI(GU, IO_PCB_PTR, INPUT_MSG);
+   CARDDEMO_COMMAREA = IN_COMMAREA;
+
+   IF CDEMO_PGM_CONTEXT = '0' THEN DO;
+     CDEMO_PGM_CONTEXT = '1';
+     OUT_INFOMSG = 'Select report type and confirm';
+     CALL SEND_MAP;
+   END;
+   ELSE DO;
+     CALL PROCESS_REPORT_REQUEST;
+   END;
+
+   RETURN;
+
+   /******************************************************************/
+   /* PROCESS_REPORT_REQUEST                                         */
+   /******************************************************************/
+   PROCESS_REPORT_REQUEST: PROC;
+     IF IN_MONTHLY ^= 'Y' & IN_YEARLY ^= 'Y' &
+        IN_CUSTOM ^= 'Y' THEN DO;
+       WS_RETURN_MSG = 'Please select a report type (Y)';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     IF IN_CUSTOM = 'Y' THEN DO;
+       IF IN_STARTDT = ' ' | IN_ENDDT = ' ' THEN DO;
+         WS_RETURN_MSG = 'Start and End dates required for custom';
+         CALL SEND_MAP;
+         RETURN;
+       END;
+     END;
+
+     IF IN_CONFIRM ^= 'Y' & IN_CONFIRM ^= 'y' THEN DO;
+       WS_RETURN_MSG = 'Confirm report request with Y';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     /* Report request confirmed - submit batch job */
+     /* In IMS, this would trigger an IMS BMP or submit JCL */
+     WS_RETURN_MSG = 'Report request submitted successfully';
+     CALL SEND_MAP;
+   END PROCESS_REPORT_REQUEST;
+
+   SEND_MAP: PROC;
+     CALL POPULATE_HEADER_INFO;
+     OUT_ERRMSG = WS_RETURN_MSG;
+     OUTPUT_MSG.LL = SIZE(OUTPUT_MSG);
+     OUTPUT_MSG.ZZ = 0;
+     IO_MOD = 'CORPT00';
+     CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
+   END SEND_MAP;
+
+   POPULATE_HEADER_INFO: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     OUT_TRNNAME = WS_TRANID;
+     OUT_TITLE01 = CCDA_TITLE01;
+     OUT_TITLE02 = CCDA_TITLE02;
+     OUT_PGMNAME = WS_PGMNAME;
+     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 3, 2);
+     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 13, 2);
+   END POPULATE_HEADER_INFO;
+
+ END CORPT00C;

@@ -1,0 +1,77 @@
+ /*********************************************************************/
+ /* Program     : CBCUS01C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS Batch PL/I Program (BMP)                        */
+ /* Function    : Customer Data Refresh - Load customer master        */
+ /* Converted from COBOL batch: app/cbl/CBCUS01C.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CBCUS01C: PROC(IO_PCB_PTR, DB_CUST_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR     POINTER;
+   DCL DB_CUST_PTR    POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2);
+
+   DCL 1 DB_CUST BASED(DB_CUST_PTR),
+         2 CUST_DBNAME  CHAR(8),  2 CUST_LEVEL  CHAR(2),
+         2 CUST_STATUS  CHAR(2),  2 CUST_PROC   CHAR(4),
+         2 CUST_RESV    FIXED BIN(31),
+         2 CUST_SEGNAME CHAR(8),  2 CUST_KEYLEN FIXED BIN(31),
+         2 CUST_SENSEG  FIXED BIN(31),
+         2 CUST_KEYVAL  CHAR(256);
+
+   DCL CUSTDATA_FILE FILE RECORD INPUT ENV(FB RECSIZE(500));
+
+   %INCLUDE CVCUS01Y;
+
+   DCL WS_RECORD_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_LOADED_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_EOF           CHAR(1) INIT('N');
+
+   DCL CUST_SSA CHAR(40);
+
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM CBCUS01C');
+
+   ON ENDFILE(CUSTDATA_FILE) WS_EOF = 'Y';
+
+   OPEN FILE(CUSTDATA_FILE);
+
+   READ FILE(CUSTDATA_FILE) INTO(CUSTOMER_RECORD);
+
+   DO WHILE(WS_EOF = 'N');
+     WS_RECORD_COUNT = WS_RECORD_COUNT + 1;
+
+     CUST_SSA = 'CUSTSEG ';
+     CALL PLITDLI(ISRT, DB_CUST_PTR, CUSTOMER_RECORD, CUST_SSA);
+
+     IF CUST_STATUS = '  ' THEN
+       WS_LOADED_COUNT = WS_LOADED_COUNT + 1;
+     ELSE
+       PUT SKIP LIST('ERROR LOADING CUSTOMER: ' || CUST_ID ||
+                     ' STATUS: ' || CUST_STATUS);
+
+     READ FILE(CUSTDATA_FILE) INTO(CUSTOMER_RECORD);
+   END;
+
+   CLOSE FILE(CUSTDATA_FILE);
+
+   PUT SKIP LIST('RECORDS READ:   ' || WS_RECORD_COUNT);
+   PUT SKIP LIST('RECORDS LOADED: ' || WS_LOADED_COUNT);
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM CBCUS01C');
+
+   RETURN;
+
+ END CBCUS01C;

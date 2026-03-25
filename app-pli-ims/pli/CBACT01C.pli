@@ -1,0 +1,77 @@
+ /*********************************************************************/
+ /* Program     : CBACT01C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS Batch PL/I Program (BMP)                        */
+ /* Function    : Account Data Refresh - Load account master          */
+ /* Converted from COBOL batch: app/cbl/CBACT01C.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CBACT01C: PROC(IO_PCB_PTR, DB_ACCT_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR     POINTER;
+   DCL DB_ACCT_PTR    POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2);
+
+   DCL 1 DB_ACCT BASED(DB_ACCT_PTR),
+         2 ACCT_DBNAME  CHAR(8),  2 ACCT_LEVEL  CHAR(2),
+         2 ACCT_STATUS  CHAR(2),  2 ACCT_PROC   CHAR(4),
+         2 ACCT_RESV    FIXED BIN(31),
+         2 ACCT_SEGNAME CHAR(8),  2 ACCT_KEYLEN FIXED BIN(31),
+         2 ACCT_SENSEG  FIXED BIN(31),
+         2 ACCT_KEYVAL  CHAR(256);
+
+   DCL ACCTDATA_FILE FILE RECORD INPUT ENV(FB RECSIZE(300));
+
+   %INCLUDE CVACT01Y;
+
+   DCL WS_RECORD_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_LOADED_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_EOF           CHAR(1) INIT('N');
+
+   DCL ACCT_SSA CHAR(40);
+
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM CBACT01C');
+
+   ON ENDFILE(ACCTDATA_FILE) WS_EOF = 'Y';
+
+   OPEN FILE(ACCTDATA_FILE);
+
+   READ FILE(ACCTDATA_FILE) INTO(ACCOUNT_RECORD);
+
+   DO WHILE(WS_EOF = 'N');
+     WS_RECORD_COUNT = WS_RECORD_COUNT + 1;
+
+     ACCT_SSA = 'ACCTSEG ';
+     CALL PLITDLI(ISRT, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
+
+     IF ACCT_STATUS = '  ' THEN
+       WS_LOADED_COUNT = WS_LOADED_COUNT + 1;
+     ELSE
+       PUT SKIP LIST('ERROR LOADING ACCT: ' || ACCT_ID ||
+                     ' STATUS: ' || ACCT_STATUS);
+
+     READ FILE(ACCTDATA_FILE) INTO(ACCOUNT_RECORD);
+   END;
+
+   CLOSE FILE(ACCTDATA_FILE);
+
+   PUT SKIP LIST('RECORDS READ:   ' || WS_RECORD_COUNT);
+   PUT SKIP LIST('RECORDS LOADED: ' || WS_LOADED_COUNT);
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM CBACT01C');
+
+   RETURN;
+
+ END CBACT01C;

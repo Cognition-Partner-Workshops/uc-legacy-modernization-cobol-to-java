@@ -1,0 +1,58 @@
+ /*********************************************************************/
+ /* Program     : COBSWAIT.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : Batch PL/I Utility Program                          */
+ /* Function    : Wait/delay utility for batch job scheduling         */
+ /* Converted from COBOL batch: app/cbl/COBSWAIT.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ COBSWAIT: PROC OPTIONS(MAIN);
+
+   /* This program provides a configurable wait/delay for batch     */
+   /* job scheduling. Reads wait duration from SYSIN or uses        */
+   /* default of 5 seconds.                                          */
+
+   DCL SYSIN_FILE FILE INPUT;
+
+   DCL WS_WAIT_SECONDS FIXED BIN(31) INIT(5);
+   DCL WS_INPUT_REC    CHAR(80) INIT(' ');
+   DCL WS_EOF          CHAR(1) INIT('N');
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM COBSWAIT');
+
+   /* Try to read wait time from SYSIN */
+   ON ENDFILE(SYSIN_FILE) WS_EOF = 'Y';
+   ON UNDEFINEDFILE(SYSIN_FILE) GO TO USE_DEFAULT;
+
+   OPEN FILE(SYSIN_FILE);
+   READ FILE(SYSIN_FILE) INTO(WS_INPUT_REC);
+
+   IF WS_EOF = 'N' THEN DO;
+     WS_WAIT_SECONDS = WS_INPUT_REC;
+   END;
+
+   CLOSE FILE(SYSIN_FILE);
+   GO TO DO_WAIT;
+
+   USE_DEFAULT:
+   PUT SKIP LIST('Using default wait time: 5 seconds');
+
+   DO_WAIT:
+   PUT SKIP LIST('Waiting for ' || WS_WAIT_SECONDS || ' seconds...');
+
+   /* PL/I delay - uses DELAY built-in (milliseconds) */
+   CALL DELAY(WS_WAIT_SECONDS * 1000);
+
+   PUT SKIP LIST('Wait complete.');
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM COBSWAIT');
+
+   RETURN;
+
+ END COBSWAIT;

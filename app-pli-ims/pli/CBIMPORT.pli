@@ -1,0 +1,173 @@
+ /*********************************************************************/
+ /* Program     : CBIMPORT.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS Batch PL/I Program (BMP)                        */
+ /* Function    : Import data from sequential export file             */
+ /* Converted from COBOL batch: app/cbl/CBIMPORT.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CBIMPORT: PROC(IO_PCB_PTR, DB_ACCT_PTR, DB_CUST_PTR,
+                 DB_CARD_PTR, DB_CXREF_PTR, DB_TRAN_PTR)
+                 OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR     POINTER;
+   DCL DB_ACCT_PTR    POINTER;
+   DCL DB_CUST_PTR    POINTER;
+   DCL DB_CARD_PTR    POINTER;
+   DCL DB_CXREF_PTR   POINTER;
+   DCL DB_TRAN_PTR    POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2);
+
+   DCL 1 DB_ACCT BASED(DB_ACCT_PTR),
+         2 A_DBNAME CHAR(8), 2 A_LEVEL CHAR(2),
+         2 A_STATUS CHAR(2), 2 A_PROC  CHAR(4),
+         2 A_RESV   FIXED BIN(31), 2 A_SEGNAME CHAR(8),
+         2 A_KEYLEN FIXED BIN(31), 2 A_SENSEG  FIXED BIN(31),
+         2 A_KEYVAL CHAR(256);
+
+   DCL 1 DB_CUST BASED(DB_CUST_PTR),
+         2 C_DBNAME CHAR(8), 2 C_LEVEL CHAR(2),
+         2 C_STATUS CHAR(2), 2 C_PROC  CHAR(4),
+         2 C_RESV   FIXED BIN(31), 2 C_SEGNAME CHAR(8),
+         2 C_KEYLEN FIXED BIN(31), 2 C_SENSEG  FIXED BIN(31),
+         2 C_KEYVAL CHAR(256);
+
+   DCL 1 DB_CARD BASED(DB_CARD_PTR),
+         2 D_DBNAME CHAR(8), 2 D_LEVEL CHAR(2),
+         2 D_STATUS CHAR(2), 2 D_PROC  CHAR(4),
+         2 D_RESV   FIXED BIN(31), 2 D_SEGNAME CHAR(8),
+         2 D_KEYLEN FIXED BIN(31), 2 D_SENSEG  FIXED BIN(31),
+         2 D_KEYVAL CHAR(256);
+
+   DCL 1 DB_CXREF BASED(DB_CXREF_PTR),
+         2 X_DBNAME CHAR(8), 2 X_LEVEL CHAR(2),
+         2 X_STATUS CHAR(2), 2 X_PROC  CHAR(4),
+         2 X_RESV   FIXED BIN(31), 2 X_SEGNAME CHAR(8),
+         2 X_KEYLEN FIXED BIN(31), 2 X_SENSEG  FIXED BIN(31),
+         2 X_KEYVAL CHAR(256);
+
+   DCL 1 DB_TRAN BASED(DB_TRAN_PTR),
+         2 T_DBNAME CHAR(8), 2 T_LEVEL CHAR(2),
+         2 T_STATUS CHAR(2), 2 T_PROC  CHAR(4),
+         2 T_RESV   FIXED BIN(31), 2 T_SEGNAME CHAR(8),
+         2 T_KEYLEN FIXED BIN(31), 2 T_SENSEG  FIXED BIN(31),
+         2 T_KEYVAL CHAR(256);
+
+   DCL IMPORT_FILE FILE RECORD INPUT ENV(FB RECSIZE(500));
+
+   %INCLUDE CVEXPORT;
+   %INCLUDE CVACT01Y;
+   %INCLUDE CVCUS01Y;
+   %INCLUDE CVACT02Y;
+   %INCLUDE CVACT03Y;
+   %INCLUDE CVTRA05Y;
+
+   DCL WS_RECORD_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_ACCT_COUNT    FIXED BIN(31) INIT(0);
+   DCL WS_CUST_COUNT    FIXED BIN(31) INIT(0);
+   DCL WS_CARD_COUNT    FIXED BIN(31) INIT(0);
+   DCL WS_XREF_COUNT    FIXED BIN(31) INIT(0);
+   DCL WS_TRAN_COUNT    FIXED BIN(31) INIT(0);
+   DCL WS_ERROR_COUNT   FIXED BIN(31) INIT(0);
+   DCL WS_EOF           CHAR(1) INIT('N');
+
+   DCL SEGMENT_SSA CHAR(10);
+
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM CBIMPORT');
+
+   ON ENDFILE(IMPORT_FILE) WS_EOF = 'Y';
+
+   OPEN FILE(IMPORT_FILE);
+
+   READ FILE(IMPORT_FILE) INTO(EXPORT_RECORD);
+
+   DO WHILE(WS_EOF = 'N');
+     WS_RECORD_COUNT = WS_RECORD_COUNT + 1;
+
+     SELECT(EXPORT_REC_TYPE);
+       WHEN('A') DO;
+         ACCOUNT_RECORD = EXPORT_REC_DATA;
+         SEGMENT_SSA = 'ACCTSEG ';
+         CALL PLITDLI(ISRT, DB_ACCT_PTR,
+                      ACCOUNT_RECORD, SEGMENT_SSA);
+         IF A_STATUS = '  ' THEN
+           WS_ACCT_COUNT = WS_ACCT_COUNT + 1;
+         ELSE
+           WS_ERROR_COUNT = WS_ERROR_COUNT + 1;
+       END;
+       WHEN('C') DO;
+         CUSTOMER_RECORD = EXPORT_REC_DATA;
+         SEGMENT_SSA = 'CUSTSEG ';
+         CALL PLITDLI(ISRT, DB_CUST_PTR,
+                      CUSTOMER_RECORD, SEGMENT_SSA);
+         IF C_STATUS = '  ' THEN
+           WS_CUST_COUNT = WS_CUST_COUNT + 1;
+         ELSE
+           WS_ERROR_COUNT = WS_ERROR_COUNT + 1;
+       END;
+       WHEN('D') DO;
+         CARD_RECORD = EXPORT_REC_DATA;
+         SEGMENT_SSA = 'CARDSEG ';
+         CALL PLITDLI(ISRT, DB_CARD_PTR,
+                      CARD_RECORD, SEGMENT_SSA);
+         IF D_STATUS = '  ' THEN
+           WS_CARD_COUNT = WS_CARD_COUNT + 1;
+         ELSE
+           WS_ERROR_COUNT = WS_ERROR_COUNT + 1;
+       END;
+       WHEN('X') DO;
+         CARD_XREF_RECORD = EXPORT_REC_DATA;
+         SEGMENT_SSA = 'CXREFSEG';
+         CALL PLITDLI(ISRT, DB_CXREF_PTR,
+                      CARD_XREF_RECORD, SEGMENT_SSA);
+         IF X_STATUS = '  ' THEN
+           WS_XREF_COUNT = WS_XREF_COUNT + 1;
+         ELSE
+           WS_ERROR_COUNT = WS_ERROR_COUNT + 1;
+       END;
+       WHEN('T') DO;
+         TRAN_RECORD = EXPORT_REC_DATA;
+         SEGMENT_SSA = 'TRANSEG ';
+         CALL PLITDLI(ISRT, DB_TRAN_PTR,
+                      TRAN_RECORD, SEGMENT_SSA);
+         IF T_STATUS = '  ' THEN
+           WS_TRAN_COUNT = WS_TRAN_COUNT + 1;
+         ELSE
+           WS_ERROR_COUNT = WS_ERROR_COUNT + 1;
+       END;
+       OTHERWISE DO;
+         PUT SKIP LIST('UNKNOWN RECORD TYPE: ' || EXPORT_REC_TYPE);
+         WS_ERROR_COUNT = WS_ERROR_COUNT + 1;
+       END;
+     END;
+
+     READ FILE(IMPORT_FILE) INTO(EXPORT_RECORD);
+   END;
+
+   CLOSE FILE(IMPORT_FILE);
+
+   PUT SKIP LIST('TOTAL RECORDS:   ' || WS_RECORD_COUNT);
+   PUT SKIP LIST('ACCOUNTS:        ' || WS_ACCT_COUNT);
+   PUT SKIP LIST('CUSTOMERS:       ' || WS_CUST_COUNT);
+   PUT SKIP LIST('CARDS:           ' || WS_CARD_COUNT);
+   PUT SKIP LIST('XREFS:           ' || WS_XREF_COUNT);
+   PUT SKIP LIST('TRANSACTIONS:    ' || WS_TRAN_COUNT);
+   PUT SKIP LIST('ERRORS:          ' || WS_ERROR_COUNT);
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM CBIMPORT');
+
+   RETURN;
+
+ END CBIMPORT;

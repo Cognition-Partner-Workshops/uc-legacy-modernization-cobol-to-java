@@ -1,0 +1,241 @@
+ /*********************************************************************/
+ /* Program     : CBTRN02C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS Batch PL/I Program (BMP)                        */
+ /* Function    : Daily Transaction Posting                           */
+ /* Converted from COBOL batch: app/cbl/CBTRN02C.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CBTRN02C: PROC(IO_PCB_PTR, DB_TRAN_PTR, DB_XREF_PTR,
+                 DB_ACCT_PTR, DB_TCATBAL_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR     POINTER;
+   DCL DB_TRAN_PTR    POINTER;
+   DCL DB_XREF_PTR    POINTER;
+   DCL DB_ACCT_PTR    POINTER;
+   DCL DB_TCATBAL_PTR POINTER;
+
+   /* IO PCB for batch status */
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2);
+
+   /* DB PCB Masks */
+   DCL 1 DB_TRAN BASED(DB_TRAN_PTR),
+         2 TRAN_DBNAME  CHAR(8),  2 TRAN_LEVEL  CHAR(2),
+         2 TRAN_STATUS  CHAR(2),  2 TRAN_PROC   CHAR(4),
+         2 TRAN_RESV    FIXED BIN(31),
+         2 TRAN_SEGNAME CHAR(8),  2 TRAN_KEYLEN FIXED BIN(31),
+         2 TRAN_SENSEG  FIXED BIN(31),
+         2 TRAN_KEYVAL  CHAR(256);
+
+   DCL 1 DB_XREF BASED(DB_XREF_PTR),
+         2 XREF_DBNAME  CHAR(8),  2 XREF_LEVEL  CHAR(2),
+         2 XREF_STATUS  CHAR(2),  2 XREF_PROC   CHAR(4),
+         2 XREF_RESV    FIXED BIN(31),
+         2 XREF_SEGNAME CHAR(8),  2 XREF_KEYLEN FIXED BIN(31),
+         2 XREF_SENSEG  FIXED BIN(31),
+         2 XREF_KEYVAL  CHAR(256);
+
+   DCL 1 DB_ACCT BASED(DB_ACCT_PTR),
+         2 ACCT_DBNAME  CHAR(8),  2 ACCT_LEVEL  CHAR(2),
+         2 ACCT_STATUS  CHAR(2),  2 ACCT_PROC   CHAR(4),
+         2 ACCT_RESV    FIXED BIN(31),
+         2 ACCT_SEGNAME CHAR(8),  2 ACCT_KEYLEN FIXED BIN(31),
+         2 ACCT_SENSEG  FIXED BIN(31),
+         2 ACCT_KEYVAL  CHAR(256);
+
+   DCL 1 DB_TCATBAL BASED(DB_TCATBAL_PTR),
+         2 TCATBAL_DBNAME CHAR(8),  2 TCATBAL_LEVEL  CHAR(2),
+         2 TCATBAL_STATUS CHAR(2),  2 TCATBAL_PROC   CHAR(4),
+         2 TCATBAL_RESV   FIXED BIN(31),
+         2 TCATBAL_SEGNAME CHAR(8), 2 TCATBAL_KEYLEN FIXED BIN(31),
+         2 TCATBAL_SENSEG  FIXED BIN(31),
+         2 TCATBAL_KEYVAL  CHAR(256);
+
+   /* File declarations for daily transactions and rejects */
+   DCL DALYTRAN_FILE FILE RECORD INPUT ENV(FB RECSIZE(350));
+   DCL DALYREJS_FILE FILE RECORD OUTPUT ENV(FB RECSIZE(350));
+
+   %INCLUDE CVTRA06Y;
+   %INCLUDE CVTRA05Y;
+   %INCLUDE CVACT03Y;
+   %INCLUDE CVACT01Y;
+   %INCLUDE CVTRA01Y;
+
+   DCL WS_RETURN_CODE   FIXED BIN(31) INIT(0);
+   DCL WS_RECORD_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_REJECT_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_POSTED_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_EOF           CHAR(1) INIT('N');
+   DCL WS_VALID         CHAR(1);
+
+   DCL TRAN_SSA   CHAR(50);
+   DCL XREF_SSA   CHAR(50);
+   DCL ACCT_SSA   CHAR(40);
+   DCL TCATBAL_SSA CHAR(60);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GHU  CHAR(4) INIT('GHU ');
+   DCL GN   CHAR(4) INIT('GN  ');
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL REPL CHAR(4) INIT('REPL');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM CBTRN02C');
+
+   ON ENDFILE(DALYTRAN_FILE) WS_EOF = 'Y';
+
+   OPEN FILE(DALYTRAN_FILE);
+   OPEN FILE(DALYREJS_FILE);
+
+   READ FILE(DALYTRAN_FILE) INTO(DALYTRAN_RECORD);
+
+   DO WHILE(WS_EOF = 'N');
+     WS_RECORD_COUNT = WS_RECORD_COUNT + 1;
+
+     /* Validate the transaction */
+     CALL VALIDATE_TRANSACTION;
+
+     IF WS_VALID = 'Y' THEN DO;
+       CALL POST_TRANSACTION;
+       WS_POSTED_COUNT = WS_POSTED_COUNT + 1;
+     END;
+     ELSE DO;
+       CALL WRITE_REJECT;
+       WS_REJECT_COUNT = WS_REJECT_COUNT + 1;
+     END;
+
+     READ FILE(DALYTRAN_FILE) INTO(DALYTRAN_RECORD);
+   END;
+
+   CLOSE FILE(DALYTRAN_FILE);
+   CLOSE FILE(DALYREJS_FILE);
+
+   PUT SKIP LIST('RECORDS READ:    ' || WS_RECORD_COUNT);
+   PUT SKIP LIST('RECORDS POSTED:  ' || WS_POSTED_COUNT);
+   PUT SKIP LIST('RECORDS REJECTED:' || WS_REJECT_COUNT);
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM CBTRN02C');
+
+   RETURN;
+
+   /******************************************************************/
+   /* VALIDATE_TRANSACTION                                           */
+   /******************************************************************/
+   VALIDATE_TRANSACTION: PROC;
+     WS_VALID = 'Y';
+
+     /* Verify card exists in cross-reference */
+     XREF_SSA = 'CXREFSEG(CARDNUM =' || DALYTRAN_CARD_NUM || ')';
+     CALL PLITDLI(GU, DB_XREF_PTR, CARD_XREF_RECORD, XREF_SSA);
+
+     IF XREF_STATUS ^= '  ' THEN DO;
+       WS_VALID = 'N';
+       RETURN;
+     END;
+
+     /* Verify account exists and is active */
+     ACCT_SSA = 'ACCTSEG (ACCTID  =' || XREF_ACCT_ID || ')';
+     CALL PLITDLI(GU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
+
+     IF ACCT_STATUS ^= '  ' THEN DO;
+       WS_VALID = 'N';
+       RETURN;
+     END;
+
+     IF ACCT_ACTIVE_STATUS ^= 'Y' THEN DO;
+       WS_VALID = 'N';
+       RETURN;
+     END;
+
+     /* Check transaction amount is valid */
+     IF DALYTRAN_AMT <= 0 THEN DO;
+       WS_VALID = 'N';
+       RETURN;
+     END;
+   END VALIDATE_TRANSACTION;
+
+   /******************************************************************/
+   /* POST_TRANSACTION                                               */
+   /******************************************************************/
+   POST_TRANSACTION: PROC;
+     /* Copy daily transaction to main transaction record */
+     TRAN_ID           = DALYTRAN_ID;
+     TRAN_TYPE_CD      = DALYTRAN_TYPE_CD;
+     TRAN_CAT_CD       = DALYTRAN_CAT_CD;
+     TRAN_SOURCE       = DALYTRAN_SOURCE;
+     TRAN_DESC         = DALYTRAN_DESC;
+     TRAN_AMT          = DALYTRAN_AMT;
+     TRAN_MERCHANT_ID  = DALYTRAN_MERCHANT_ID;
+     TRAN_MERCHANT_NAME = DALYTRAN_MERCHANT_NAME;
+     TRAN_MERCHANT_CITY = DALYTRAN_MERCHANT_CITY;
+     TRAN_MERCHANT_ZIP = DALYTRAN_MERCHANT_ZIP;
+     TRAN_CARD_NUM     = DALYTRAN_CARD_NUM;
+     TRAN_ORIG_TS      = DALYTRAN_ORIG_TS;
+     TRAN_PROC_TS      = DALYTRAN_PROC_TS;
+
+     /* Insert into transaction database */
+     TRAN_SSA = 'TRANSEG ';
+     CALL PLITDLI(ISRT, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
+
+     /* Update account balance */
+     ACCT_SSA = 'ACCTSEG (ACCTID  =' || XREF_ACCT_ID || ')';
+     CALL PLITDLI(GHU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
+
+     IF ACCT_STATUS = '  ' THEN DO;
+       ACCT_CURR_BAL = ACCT_CURR_BAL + DALYTRAN_AMT;
+       IF DALYTRAN_AMT > 0 THEN
+         ACCT_CURR_CYC_DEBIT = ACCT_CURR_CYC_DEBIT + DALYTRAN_AMT;
+       ELSE
+         ACCT_CURR_CYC_CREDIT = ACCT_CURR_CYC_CREDIT - DALYTRAN_AMT;
+
+       CALL PLITDLI(REPL, DB_ACCT_PTR, ACCOUNT_RECORD);
+     END;
+
+     /* Update category balance */
+     CALL UPDATE_CATEGORY_BALANCE;
+   END POST_TRANSACTION;
+
+   /******************************************************************/
+   /* UPDATE_CATEGORY_BALANCE                                        */
+   /******************************************************************/
+   UPDATE_CATEGORY_BALANCE: PROC;
+     TCATBAL_SSA = 'TCATSEG (ACCTID  =' || XREF_ACCT_ID ||
+                             'TTYPCD  =' || DALYTRAN_TYPE_CD ||
+                             'TCATCD  =' || DALYTRAN_CAT_CD || ')';
+
+     CALL PLITDLI(GHU, DB_TCATBAL_PTR,
+                  TRAN_CAT_BAL_RECORD, TCATBAL_SSA);
+
+     IF TCATBAL_STATUS = '  ' THEN DO;
+       /* Update existing balance */
+       TRAN_CAT_BAL = TRAN_CAT_BAL + DALYTRAN_AMT;
+       CALL PLITDLI(REPL, DB_TCATBAL_PTR, TRAN_CAT_BAL_RECORD);
+     END;
+     ELSE DO;
+       /* Insert new category balance */
+       TRANCAT_ACCT_ID  = XREF_ACCT_ID;
+       TRANCAT_TYPE_CD  = DALYTRAN_TYPE_CD;
+       TRANCAT_CD       = DALYTRAN_CAT_CD;
+       TRAN_CAT_BAL     = DALYTRAN_AMT;
+       TCATBAL_SSA = 'TCATSEG ';
+       CALL PLITDLI(ISRT, DB_TCATBAL_PTR,
+                    TRAN_CAT_BAL_RECORD, TCATBAL_SSA);
+     END;
+   END UPDATE_CATEGORY_BALANCE;
+
+   /******************************************************************/
+   /* WRITE_REJECT                                                   */
+   /******************************************************************/
+   WRITE_REJECT: PROC;
+     WRITE FILE(DALYREJS_FILE) FROM(DALYTRAN_RECORD);
+   END WRITE_REJECT;
+
+ END CBTRN02C;

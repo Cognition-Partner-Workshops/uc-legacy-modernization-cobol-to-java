@@ -1,0 +1,77 @@
+ /*********************************************************************/
+ /* Program     : CBACT03C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS Batch PL/I Program (BMP)                        */
+ /* Function    : Card Cross-Reference Data Refresh                   */
+ /* Converted from COBOL batch: app/cbl/CBACT03C.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CBACT03C: PROC(IO_PCB_PTR, DB_CXREF_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR     POINTER;
+   DCL DB_CXREF_PTR   POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2);
+
+   DCL 1 DB_CXREF BASED(DB_CXREF_PTR),
+         2 CXREF_DBNAME  CHAR(8),  2 CXREF_LEVEL  CHAR(2),
+         2 CXREF_STATUS  CHAR(2),  2 CXREF_PROC   CHAR(4),
+         2 CXREF_RESV    FIXED BIN(31),
+         2 CXREF_SEGNAME CHAR(8),  2 CXREF_KEYLEN FIXED BIN(31),
+         2 CXREF_SENSEG  FIXED BIN(31),
+         2 CXREF_KEYVAL  CHAR(256);
+
+   DCL XREFDATA_FILE FILE RECORD INPUT ENV(FB RECSIZE(50));
+
+   %INCLUDE CVACT03Y;
+
+   DCL WS_RECORD_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_LOADED_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_EOF           CHAR(1) INIT('N');
+
+   DCL CXREF_SSA CHAR(40);
+
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM CBACT03C');
+
+   ON ENDFILE(XREFDATA_FILE) WS_EOF = 'Y';
+
+   OPEN FILE(XREFDATA_FILE);
+
+   READ FILE(XREFDATA_FILE) INTO(CARD_XREF_RECORD);
+
+   DO WHILE(WS_EOF = 'N');
+     WS_RECORD_COUNT = WS_RECORD_COUNT + 1;
+
+     CXREF_SSA = 'CXREFSEG';
+     CALL PLITDLI(ISRT, DB_CXREF_PTR, CARD_XREF_RECORD, CXREF_SSA);
+
+     IF CXREF_STATUS = '  ' THEN
+       WS_LOADED_COUNT = WS_LOADED_COUNT + 1;
+     ELSE
+       PUT SKIP LIST('ERROR LOADING XREF: ' || XREF_CARD_NUM ||
+                     ' STATUS: ' || CXREF_STATUS);
+
+     READ FILE(XREFDATA_FILE) INTO(CARD_XREF_RECORD);
+   END;
+
+   CLOSE FILE(XREFDATA_FILE);
+
+   PUT SKIP LIST('RECORDS READ:   ' || WS_RECORD_COUNT);
+   PUT SKIP LIST('RECORDS LOADED: ' || WS_LOADED_COUNT);
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM CBACT03C');
+
+   RETURN;
+
+ END CBACT03C;

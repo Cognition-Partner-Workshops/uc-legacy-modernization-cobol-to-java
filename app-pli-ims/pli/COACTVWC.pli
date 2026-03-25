@@ -1,0 +1,303 @@
+ /*********************************************************************/
+ /* Program     : COACTVWC.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS PL/I Program                                    */
+ /* Function    : Accept and process Account View request             */
+ /* Converted from COBOL/CICS: app/cbl/COACTVWC.cbl                  */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ COACTVWC: PROC(IO_PCB_PTR, ALT_PCB_PTR,
+                 DB_ACCT_PTR, DB_CARD_PTR,
+                 DB_CUST_PTR, DB_CXREF_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR    POINTER;
+   DCL ALT_PCB_PTR   POINTER;
+   DCL DB_ACCT_PTR   POINTER;
+   DCL DB_CARD_PTR   POINTER;
+   DCL DB_CUST_PTR   POINTER;
+   DCL DB_CXREF_PTR  POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),
+         2 IO_RESV     CHAR(2),
+         2 IO_STATUS   CHAR(2),
+         2 IO_DATE     FIXED BIN(31),
+         2 IO_TIME     FIXED BIN(31),
+         2 IO_SEQ      FIXED BIN(31),
+         2 IO_MOD      CHAR(8);
+
+   DCL 1 ALT_PCB BASED(ALT_PCB_PTR),
+         2 ALT_DEST    CHAR(8),
+         2 ALT_RESV    CHAR(2),
+         2 ALT_STATUS  CHAR(2);
+
+   /* DB PCB Masks */
+   DCL 1 DB_ACCT BASED(DB_ACCT_PTR),
+         2 ACCT_DBNAME  CHAR(8),
+         2 ACCT_LEVEL   CHAR(2),
+         2 ACCT_STATUS  CHAR(2),
+         2 ACCT_PROC    CHAR(4),
+         2 ACCT_RESV    FIXED BIN(31),
+         2 ACCT_SEGNAME CHAR(8),
+         2 ACCT_KEYLEN  FIXED BIN(31),
+         2 ACCT_SENSEG  FIXED BIN(31),
+         2 ACCT_KEYVAL  CHAR(256);
+
+   DCL 1 DB_CUST BASED(DB_CUST_PTR),
+         2 CUST_DBNAME  CHAR(8),
+         2 CUST_LEVEL   CHAR(2),
+         2 CUST_STATUS  CHAR(2),
+         2 CUST_PROC    CHAR(4),
+         2 CUST_RESV    FIXED BIN(31),
+         2 CUST_SEGNAME CHAR(8),
+         2 CUST_KEYLEN  FIXED BIN(31),
+         2 CUST_SENSEG  FIXED BIN(31),
+         2 CUST_KEYVAL  CHAR(256);
+
+   DCL 1 DB_CXREF BASED(DB_CXREF_PTR),
+         2 CXREF_DBNAME  CHAR(8),
+         2 CXREF_LEVEL   CHAR(2),
+         2 CXREF_STATUS  CHAR(2),
+         2 CXREF_PROC    CHAR(4),
+         2 CXREF_RESV    FIXED BIN(31),
+         2 CXREF_SEGNAME CHAR(8),
+         2 CXREF_KEYLEN  FIXED BIN(31),
+         2 CXREF_SENSEG  FIXED BIN(31),
+         2 CXREF_KEYVAL  CHAR(256);
+
+   /* Working Storage */
+   DCL WS_PGMNAME     CHAR(8) INIT('COACTVWC');
+   DCL WS_TRANID      CHAR(4) INIT('CAVW');
+   DCL WS_MESSAGE      CHAR(80) INIT(' ');
+   DCL WS_ERR_FLG      CHAR(1) INIT('N');
+   DCL WS_RETURN_MSG   CHAR(75) INIT(' ');
+
+   %INCLUDE COCOM01Y;
+   %INCLUDE CVCRD01Y;
+   %INCLUDE COTTL01Y;
+   %INCLUDE CSDAT01Y;
+   %INCLUDE CSMSG01Y;
+   %INCLUDE CSMSG02Y;
+   %INCLUDE CSUSR01Y;
+   %INCLUDE CVACT01Y;
+   %INCLUDE CVACT02Y;
+   %INCLUDE CVACT03Y;
+   %INCLUDE CVCUS01Y;
+
+   DCL 1 INPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 TRANCODE     CHAR(8),
+         2 IN_ACCTID    CHAR(11),
+         2 IN_COMMAREA  CHAR(LENGTH(CARDDEMO_COMMAREA));
+
+   DCL 1 OUTPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 OUT_TRNNAME  CHAR(4),
+         2 OUT_TITLE01  CHAR(40),
+         2 OUT_CURDATE  CHAR(8),
+         2 OUT_PGMNAME  CHAR(8),
+         2 OUT_TITLE02  CHAR(40),
+         2 OUT_CURTIME  CHAR(8),
+         2 OUT_ACCTID   CHAR(11),
+         2 OUT_STATUS   CHAR(1),
+         2 OUT_CURBAL   CHAR(14),
+         2 OUT_CREDLIM  CHAR(14),
+         2 OUT_CASHLIM  CHAR(14),
+         2 OUT_OPENDT   CHAR(10),
+         2 OUT_EXPDT    CHAR(10),
+         2 OUT_REISSDT  CHAR(10),
+         2 OUT_CYCCRED  CHAR(14),
+         2 OUT_CYCDEB   CHAR(14),
+         2 OUT_GRPID    CHAR(10),
+         2 OUT_CUSTID   CHAR(9),
+         2 OUT_FNAME    CHAR(25),
+         2 OUT_MNAME    CHAR(25),
+         2 OUT_LNAME    CHAR(25),
+         2 OUT_ADDR1    CHAR(50),
+         2 OUT_ADDR2    CHAR(50),
+         2 OUT_ADDR3    CHAR(50),
+         2 OUT_STCD     CHAR(2),
+         2 OUT_CNTRYCD  CHAR(3),
+         2 OUT_ZIP      CHAR(10),
+         2 OUT_PHONE1   CHAR(15),
+         2 OUT_PHONE2   CHAR(15),
+         2 OUT_FICOSCORE CHAR(3),
+         2 OUT_INFOMSG  CHAR(40),
+         2 OUT_ERRMSG   CHAR(78);
+
+   DCL ACCT_SSA CHAR(40);
+   DCL CXREF_SSA CHAR(50);
+   DCL CUST_SSA CHAR(40);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GHU  CHAR(4) INIT('GHU ');
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL CHNG CHAR(4) INIT('CHNG');
+   DCL PURG CHAR(4) INIT('PURG');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   WS_ERR_FLG = 'N';
+   WS_MESSAGE = ' ';
+   WS_RETURN_MSG = ' ';
+
+   CALL PLITDLI(GU, IO_PCB_PTR, INPUT_MSG);
+
+   CARDDEMO_COMMAREA = IN_COMMAREA;
+
+   IF CDEMO_PGM_CONTEXT = '0' THEN DO;
+     CDEMO_PGM_CONTEXT = '1';
+     OUT_INFOMSG = 'Enter or update id of account to display';
+     CALL SEND_MAP;
+   END;
+   ELSE DO;
+     CALL PROCESS_INPUTS;
+   END;
+
+   RETURN;
+
+   /******************************************************************/
+   /* PROCESS_INPUTS                                                 */
+   /******************************************************************/
+   PROCESS_INPUTS: PROC;
+     IF IN_ACCTID = ' ' | IN_ACCTID = '' THEN DO;
+       WS_ERR_FLG = 'Y';
+       WS_RETURN_MSG = 'Account number not provided';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     IF VERIFY(IN_ACCTID, '0123456789 ') ^= 0 THEN DO;
+       WS_ERR_FLG = 'Y';
+       WS_RETURN_MSG = 'Account number must be a non zero 11 digit number';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     /* Read account from IMS DB */
+     CALL READ_ACCT;
+
+     IF WS_ERR_FLG ^= 'Y' THEN DO;
+       /* Read customer data */
+       CALL READ_CUST;
+     END;
+
+     OUT_INFOMSG = 'Displaying details of given Account';
+     CALL SEND_MAP;
+   END PROCESS_INPUTS;
+
+   /******************************************************************/
+   /* READ_ACCT - Read account record via IMS DL/I                  */
+   /******************************************************************/
+   READ_ACCT: PROC;
+     ACCT_SSA = 'ACCTSEG (ACCTID  =' || IN_ACCTID || ')';
+
+     CALL PLITDLI(GU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
+
+     SELECT(ACCT_STATUS);
+       WHEN('  ') DO;
+         OUT_ACCTID  = ACCT_ID;
+         OUT_STATUS  = ACCT_ACTIVE_STATUS;
+         OUT_CURBAL  = ACCT_CURR_BAL;
+         OUT_CREDLIM = ACCT_CREDIT_LIMIT;
+         OUT_CASHLIM = ACCT_CASH_CREDIT_LIMIT;
+         OUT_OPENDT  = ACCT_OPEN_DATE;
+         OUT_EXPDT   = ACCT_EXPIRAION_DATE;
+         OUT_REISSDT = ACCT_REISSUE_DATE;
+         OUT_CYCCRED = ACCT_CURR_CYC_CREDIT;
+         OUT_CYCDEB  = ACCT_CURR_CYC_DEBIT;
+         OUT_GRPID   = ACCT_GROUP_ID;
+       END;
+       WHEN('GE') DO;
+         WS_ERR_FLG = 'Y';
+         WS_RETURN_MSG =
+           'Did not find this account in account master file';
+       END;
+       OTHERWISE DO;
+         WS_ERR_FLG = 'Y';
+         WS_RETURN_MSG = 'Error reading account master file';
+       END;
+     END;
+   END READ_ACCT;
+
+   /******************************************************************/
+   /* READ_CUST - Read customer record via card xref then customer  */
+   /******************************************************************/
+   READ_CUST: PROC;
+     /* First read XREF to get customer ID */
+     CXREF_SSA = 'CXREFSEG(ACCTID  =' || IN_ACCTID || ')';
+
+     CALL PLITDLI(GU, DB_CXREF_PTR, CARD_XREF_RECORD, CXREF_SSA);
+
+     IF CXREF_STATUS ^= '  ' THEN DO;
+       WS_ERR_FLG = 'Y';
+       WS_RETURN_MSG =
+         'Did not find this account in account card xref file';
+       RETURN;
+     END;
+
+     /* Now read customer by customer ID */
+     CUST_SSA = 'CUSTSEG (CUSTID  =' || XREF_CUST_ID || ')';
+
+     CALL PLITDLI(GU, DB_CUST_PTR, CUSTOMER_RECORD, CUST_SSA);
+
+     IF CUST_STATUS = '  ' THEN DO;
+       OUT_CUSTID   = CUST_ID;
+       OUT_FNAME    = CUST_FIRST_NAME;
+       OUT_MNAME    = CUST_MIDDLE_NAME;
+       OUT_LNAME    = CUST_LAST_NAME;
+       OUT_ADDR1    = CUST_ADDR_LINE_1;
+       OUT_ADDR2    = CUST_ADDR_LINE_2;
+       OUT_ADDR3    = CUST_ADDR_LINE_3;
+       OUT_STCD     = CUST_ADDR_STATE_CD;
+       OUT_CNTRYCD  = CUST_ADDR_COUNTRY_CD;
+       OUT_ZIP      = CUST_ADDR_ZIP;
+       OUT_PHONE1   = CUST_PHONE_NUM_1;
+       OUT_PHONE2   = CUST_PHONE_NUM_2;
+       OUT_FICOSCORE = CUST_FICO_CREDIT_SCORE;
+     END;
+     ELSE DO;
+       WS_RETURN_MSG =
+         'Did not find associated customer in master file';
+     END;
+   END READ_CUST;
+
+   /******************************************************************/
+   /* SEND_MAP - Send output to terminal via IMS                    */
+   /******************************************************************/
+   SEND_MAP: PROC;
+     CALL POPULATE_HEADER_INFO;
+     OUT_ERRMSG = WS_RETURN_MSG;
+     OUTPUT_MSG.LL = SIZE(OUTPUT_MSG);
+     OUTPUT_MSG.ZZ = 0;
+     IO_MOD = 'COACTVW';
+     CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
+   END SEND_MAP;
+
+   /******************************************************************/
+   /* POPULATE_HEADER_INFO                                           */
+   /******************************************************************/
+   POPULATE_HEADER_INFO: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     OUT_TRNNAME = WS_TRANID;
+     OUT_TITLE01 = CCDA_TITLE01;
+     OUT_TITLE02 = CCDA_TITLE02;
+     OUT_PGMNAME = WS_PGMNAME;
+     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 3, 2);
+     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 13, 2);
+   END POPULATE_HEADER_INFO;
+
+ END COACTVWC;

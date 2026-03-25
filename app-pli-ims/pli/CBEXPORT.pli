@@ -1,0 +1,214 @@
+ /*********************************************************************/
+ /* Program     : CBEXPORT.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS Batch PL/I Program (BMP)                        */
+ /* Function    : Export all data to sequential file                  */
+ /* Converted from COBOL batch: app/cbl/CBEXPORT.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CBEXPORT: PROC(IO_PCB_PTR, DB_ACCT_PTR, DB_CUST_PTR,
+                 DB_CARD_PTR, DB_CXREF_PTR, DB_TRAN_PTR)
+                 OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR     POINTER;
+   DCL DB_ACCT_PTR    POINTER;
+   DCL DB_CUST_PTR    POINTER;
+   DCL DB_CARD_PTR    POINTER;
+   DCL DB_CXREF_PTR   POINTER;
+   DCL DB_TRAN_PTR    POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2);
+
+   /* DB PCB Masks - common structure for all databases */
+   DCL 1 DB_ACCT BASED(DB_ACCT_PTR),
+         2 A_DBNAME CHAR(8), 2 A_LEVEL CHAR(2),
+         2 A_STATUS CHAR(2), 2 A_PROC  CHAR(4),
+         2 A_RESV   FIXED BIN(31), 2 A_SEGNAME CHAR(8),
+         2 A_KEYLEN FIXED BIN(31), 2 A_SENSEG  FIXED BIN(31),
+         2 A_KEYVAL CHAR(256);
+
+   DCL 1 DB_CUST BASED(DB_CUST_PTR),
+         2 C_DBNAME CHAR(8), 2 C_LEVEL CHAR(2),
+         2 C_STATUS CHAR(2), 2 C_PROC  CHAR(4),
+         2 C_RESV   FIXED BIN(31), 2 C_SEGNAME CHAR(8),
+         2 C_KEYLEN FIXED BIN(31), 2 C_SENSEG  FIXED BIN(31),
+         2 C_KEYVAL CHAR(256);
+
+   DCL 1 DB_CARD BASED(DB_CARD_PTR),
+         2 D_DBNAME CHAR(8), 2 D_LEVEL CHAR(2),
+         2 D_STATUS CHAR(2), 2 D_PROC  CHAR(4),
+         2 D_RESV   FIXED BIN(31), 2 D_SEGNAME CHAR(8),
+         2 D_KEYLEN FIXED BIN(31), 2 D_SENSEG  FIXED BIN(31),
+         2 D_KEYVAL CHAR(256);
+
+   DCL 1 DB_CXREF BASED(DB_CXREF_PTR),
+         2 X_DBNAME CHAR(8), 2 X_LEVEL CHAR(2),
+         2 X_STATUS CHAR(2), 2 X_PROC  CHAR(4),
+         2 X_RESV   FIXED BIN(31), 2 X_SEGNAME CHAR(8),
+         2 X_KEYLEN FIXED BIN(31), 2 X_SENSEG  FIXED BIN(31),
+         2 X_KEYVAL CHAR(256);
+
+   DCL 1 DB_TRAN BASED(DB_TRAN_PTR),
+         2 T_DBNAME CHAR(8), 2 T_LEVEL CHAR(2),
+         2 T_STATUS CHAR(2), 2 T_PROC  CHAR(4),
+         2 T_RESV   FIXED BIN(31), 2 T_SEGNAME CHAR(8),
+         2 T_KEYLEN FIXED BIN(31), 2 T_SENSEG  FIXED BIN(31),
+         2 T_KEYVAL CHAR(256);
+
+   DCL EXPORT_FILE FILE RECORD OUTPUT ENV(FB RECSIZE(500));
+
+   %INCLUDE CVEXPORT;
+   %INCLUDE CVACT01Y;
+   %INCLUDE CVCUS01Y;
+   %INCLUDE CVACT02Y;
+   %INCLUDE CVACT03Y;
+   %INCLUDE CVTRA05Y;
+
+   DCL WS_ACCT_COUNT   FIXED BIN(31) INIT(0);
+   DCL WS_CUST_COUNT   FIXED BIN(31) INIT(0);
+   DCL WS_CARD_COUNT   FIXED BIN(31) INIT(0);
+   DCL WS_XREF_COUNT   FIXED BIN(31) INIT(0);
+   DCL WS_TRAN_COUNT   FIXED BIN(31) INIT(0);
+   DCL WS_SEQ_NUM      FIXED BIN(31) INIT(0);
+
+   DCL UNQUAL_SSA CHAR(10);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GN   CHAR(4) INIT('GN  ');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM CBEXPORT');
+
+   OPEN FILE(EXPORT_FILE);
+
+   /* Export Accounts */
+   CALL EXPORT_ACCOUNTS;
+
+   /* Export Customers */
+   CALL EXPORT_CUSTOMERS;
+
+   /* Export Cards */
+   CALL EXPORT_CARDS;
+
+   /* Export Cross-References */
+   CALL EXPORT_XREFS;
+
+   /* Export Transactions */
+   CALL EXPORT_TRANSACTIONS;
+
+   CLOSE FILE(EXPORT_FILE);
+
+   PUT SKIP LIST('ACCOUNTS EXPORTED:  ' || WS_ACCT_COUNT);
+   PUT SKIP LIST('CUSTOMERS EXPORTED: ' || WS_CUST_COUNT);
+   PUT SKIP LIST('CARDS EXPORTED:     ' || WS_CARD_COUNT);
+   PUT SKIP LIST('XREFS EXPORTED:     ' || WS_XREF_COUNT);
+   PUT SKIP LIST('TRANS EXPORTED:     ' || WS_TRAN_COUNT);
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM CBEXPORT');
+
+   RETURN;
+
+   /******************************************************************/
+   /* EXPORT_ACCOUNTS                                                */
+   /******************************************************************/
+   EXPORT_ACCOUNTS: PROC;
+     UNQUAL_SSA = 'ACCTSEG ';
+     CALL PLITDLI(GU, DB_ACCT_PTR, ACCOUNT_RECORD, UNQUAL_SSA);
+
+     DO WHILE(A_STATUS = '  ');
+       WS_SEQ_NUM = WS_SEQ_NUM + 1;
+       EXPORT_REC_TYPE = 'A';
+       EXPORT_SEQ_NUM = WS_SEQ_NUM;
+       EXPORT_REC_DATA = ACCOUNT_RECORD;
+       WRITE FILE(EXPORT_FILE) FROM(EXPORT_RECORD);
+       WS_ACCT_COUNT = WS_ACCT_COUNT + 1;
+
+       CALL PLITDLI(GN, DB_ACCT_PTR, ACCOUNT_RECORD);
+     END;
+   END EXPORT_ACCOUNTS;
+
+   /******************************************************************/
+   /* EXPORT_CUSTOMERS                                               */
+   /******************************************************************/
+   EXPORT_CUSTOMERS: PROC;
+     UNQUAL_SSA = 'CUSTSEG ';
+     CALL PLITDLI(GU, DB_CUST_PTR, CUSTOMER_RECORD, UNQUAL_SSA);
+
+     DO WHILE(C_STATUS = '  ');
+       WS_SEQ_NUM = WS_SEQ_NUM + 1;
+       EXPORT_REC_TYPE = 'C';
+       EXPORT_SEQ_NUM = WS_SEQ_NUM;
+       EXPORT_REC_DATA = CUSTOMER_RECORD;
+       WRITE FILE(EXPORT_FILE) FROM(EXPORT_RECORD);
+       WS_CUST_COUNT = WS_CUST_COUNT + 1;
+
+       CALL PLITDLI(GN, DB_CUST_PTR, CUSTOMER_RECORD);
+     END;
+   END EXPORT_CUSTOMERS;
+
+   /******************************************************************/
+   /* EXPORT_CARDS                                                   */
+   /******************************************************************/
+   EXPORT_CARDS: PROC;
+     UNQUAL_SSA = 'CARDSEG ';
+     CALL PLITDLI(GU, DB_CARD_PTR, CARD_RECORD, UNQUAL_SSA);
+
+     DO WHILE(D_STATUS = '  ');
+       WS_SEQ_NUM = WS_SEQ_NUM + 1;
+       EXPORT_REC_TYPE = 'D';
+       EXPORT_SEQ_NUM = WS_SEQ_NUM;
+       EXPORT_REC_DATA = CARD_RECORD;
+       WRITE FILE(EXPORT_FILE) FROM(EXPORT_RECORD);
+       WS_CARD_COUNT = WS_CARD_COUNT + 1;
+
+       CALL PLITDLI(GN, DB_CARD_PTR, CARD_RECORD);
+     END;
+   END EXPORT_CARDS;
+
+   /******************************************************************/
+   /* EXPORT_XREFS                                                   */
+   /******************************************************************/
+   EXPORT_XREFS: PROC;
+     UNQUAL_SSA = 'CXREFSEG';
+     CALL PLITDLI(GU, DB_CXREF_PTR, CARD_XREF_RECORD, UNQUAL_SSA);
+
+     DO WHILE(X_STATUS = '  ');
+       WS_SEQ_NUM = WS_SEQ_NUM + 1;
+       EXPORT_REC_TYPE = 'X';
+       EXPORT_SEQ_NUM = WS_SEQ_NUM;
+       EXPORT_REC_DATA = CARD_XREF_RECORD;
+       WRITE FILE(EXPORT_FILE) FROM(EXPORT_RECORD);
+       WS_XREF_COUNT = WS_XREF_COUNT + 1;
+
+       CALL PLITDLI(GN, DB_CXREF_PTR, CARD_XREF_RECORD);
+     END;
+   END EXPORT_XREFS;
+
+   /******************************************************************/
+   /* EXPORT_TRANSACTIONS                                            */
+   /******************************************************************/
+   EXPORT_TRANSACTIONS: PROC;
+     UNQUAL_SSA = 'TRANSEG ';
+     CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, UNQUAL_SSA);
+
+     DO WHILE(T_STATUS = '  ');
+       WS_SEQ_NUM = WS_SEQ_NUM + 1;
+       EXPORT_REC_TYPE = 'T';
+       EXPORT_SEQ_NUM = WS_SEQ_NUM;
+       EXPORT_REC_DATA = TRAN_RECORD;
+       WRITE FILE(EXPORT_FILE) FROM(EXPORT_RECORD);
+       WS_TRAN_COUNT = WS_TRAN_COUNT + 1;
+
+       CALL PLITDLI(GN, DB_TRAN_PTR, TRAN_RECORD);
+     END;
+   END EXPORT_TRANSACTIONS;
+
+ END CBEXPORT;

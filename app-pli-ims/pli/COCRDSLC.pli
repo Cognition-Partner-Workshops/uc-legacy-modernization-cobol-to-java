@@ -1,0 +1,166 @@
+ /*********************************************************************/
+ /* Program     : COCRDSLC.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS PL/I Program                                    */
+ /* Function    : Credit Card Detail View                             */
+ /* Converted from COBOL/CICS: app/cbl/COCRDSLC.cbl                  */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ COCRDSLC: PROC(IO_PCB_PTR, ALT_PCB_PTR,
+                 DB_ACCT_PTR, DB_CARD_PTR,
+                 DB_CUST_PTR, DB_CXREF_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR    POINTER;
+   DCL ALT_PCB_PTR   POINTER;
+   DCL DB_ACCT_PTR   POINTER;
+   DCL DB_CARD_PTR   POINTER;
+   DCL DB_CUST_PTR   POINTER;
+   DCL DB_CXREF_PTR  POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2),  2 IO_DATE  FIXED BIN(31),
+         2 IO_TIME     FIXED BIN(31), 2 IO_SEQ FIXED BIN(31),
+         2 IO_MOD      CHAR(8);
+
+   DCL 1 ALT_PCB BASED(ALT_PCB_PTR),
+         2 ALT_DEST    CHAR(8),  2 ALT_RESV  CHAR(2),
+         2 ALT_STATUS  CHAR(2);
+
+   DCL 1 DB_CARD BASED(DB_CARD_PTR),
+         2 CARD_DBNAME  CHAR(8),  2 CARD_LEVEL  CHAR(2),
+         2 CARD_DBSTAT  CHAR(2),  2 CARD_PROC   CHAR(4),
+         2 CARD_RESV    FIXED BIN(31),
+         2 CARD_SEGNAME CHAR(8),  2 CARD_KEYLEN FIXED BIN(31),
+         2 CARD_SENSEG  FIXED BIN(31),
+         2 CARD_KEYVAL  CHAR(256);
+
+   DCL 1 DB_CXREF BASED(DB_CXREF_PTR),
+         2 CXREF_DBNAME  CHAR(8),  2 CXREF_LEVEL  CHAR(2),
+         2 CXREF_STATUS  CHAR(2),  2 CXREF_PROC   CHAR(4),
+         2 CXREF_RESV    FIXED BIN(31),
+         2 CXREF_SEGNAME CHAR(8),  2 CXREF_KEYLEN FIXED BIN(31),
+         2 CXREF_SENSEG  FIXED BIN(31),
+         2 CXREF_KEYVAL  CHAR(256);
+
+   DCL WS_PGMNAME     CHAR(8) INIT('COCRDSLC');
+   DCL WS_TRANID      CHAR(4) INIT('CCDL');
+   DCL WS_RETURN_MSG   CHAR(75) INIT(' ');
+
+   %INCLUDE COCOM01Y;
+   %INCLUDE CVCRD01Y;
+   %INCLUDE COTTL01Y;
+   %INCLUDE CSDAT01Y;
+   %INCLUDE CSMSG01Y;
+   %INCLUDE CSMSG02Y;
+   %INCLUDE CVACT02Y;
+   %INCLUDE CVACT03Y;
+
+   DCL 1 INPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 TRANCODE     CHAR(8),
+         2 IN_CARDNUM   CHAR(16),
+         2 IN_COMMAREA  CHAR(LENGTH(CARDDEMO_COMMAREA));
+
+   DCL 1 OUTPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 OUT_TRNNAME  CHAR(4),
+         2 OUT_TITLE01  CHAR(40),
+         2 OUT_CURDATE  CHAR(8),
+         2 OUT_PGMNAME  CHAR(8),
+         2 OUT_TITLE02  CHAR(40),
+         2 OUT_CURTIME  CHAR(8),
+         2 OUT_CARDNUM  CHAR(16),
+         2 OUT_ACCTID   CHAR(11),
+         2 OUT_CVV      CHAR(3),
+         2 OUT_EMBNAME  CHAR(50),
+         2 OUT_EXPDT    CHAR(10),
+         2 OUT_STATUS   CHAR(1),
+         2 OUT_CUSTID   CHAR(9),
+         2 OUT_INFOMSG  CHAR(40),
+         2 OUT_ERRMSG   CHAR(78);
+
+   DCL CARD_SSA CHAR(50);
+   DCL CXREF_SSA CHAR(50);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL CHNG CHAR(4) INIT('CHNG');
+   DCL PURG CHAR(4) INIT('PURG');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   WS_RETURN_MSG = ' ';
+
+   CALL PLITDLI(GU, IO_PCB_PTR, INPUT_MSG);
+   CARDDEMO_COMMAREA = IN_COMMAREA;
+
+   IF CDEMO_CARD_NUM ^= '' & CDEMO_CARD_NUM ^= ' ' THEN
+     IN_CARDNUM = CDEMO_CARD_NUM;
+
+   IF IN_CARDNUM = ' ' | IN_CARDNUM = '' THEN DO;
+     OUT_INFOMSG = 'Enter Card Number to view';
+     CALL SEND_MAP;
+     RETURN;
+   END;
+
+   /* Read card record */
+   CARD_SSA = 'CARDSEG (CARDNUM =' || IN_CARDNUM || ')';
+   CALL PLITDLI(GU, DB_CARD_PTR, CARD_RECORD, CARD_SSA);
+
+   IF CARD_DBSTAT = '  ' THEN DO;
+     OUT_CARDNUM = CARD_NUM;
+     OUT_ACCTID  = CARD_ACCT_ID;
+     OUT_CVV     = CARD_CVV_CD;
+     OUT_EMBNAME = CARD_EMBOSSED_NAME;
+     OUT_EXPDT   = CARD_EXPIRAION_DATE;
+     OUT_STATUS  = CARD_ACTIVE_STATUS;
+
+     /* Get customer ID from xref */
+     CXREF_SSA = 'CXREFSEG(CARDNUM =' || IN_CARDNUM || ')';
+     CALL PLITDLI(GU, DB_CXREF_PTR, CARD_XREF_RECORD, CXREF_SSA);
+     IF CXREF_STATUS = '  ' THEN
+       OUT_CUSTID = XREF_CUST_ID;
+
+     OUT_INFOMSG = 'Card details displayed';
+   END;
+   ELSE DO;
+     WS_RETURN_MSG = 'Card not found';
+   END;
+
+   CALL SEND_MAP;
+   RETURN;
+
+   SEND_MAP: PROC;
+     CALL POPULATE_HEADER_INFO;
+     OUT_ERRMSG = WS_RETURN_MSG;
+     OUTPUT_MSG.LL = SIZE(OUTPUT_MSG);
+     OUTPUT_MSG.ZZ = 0;
+     IO_MOD = 'COCRDSL';
+     CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
+   END SEND_MAP;
+
+   POPULATE_HEADER_INFO: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     OUT_TRNNAME = WS_TRANID;
+     OUT_TITLE01 = CCDA_TITLE01;
+     OUT_TITLE02 = CCDA_TITLE02;
+     OUT_PGMNAME = WS_PGMNAME;
+     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 3, 2);
+     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 13, 2);
+   END POPULATE_HEADER_INFO;
+
+ END COCRDSLC;

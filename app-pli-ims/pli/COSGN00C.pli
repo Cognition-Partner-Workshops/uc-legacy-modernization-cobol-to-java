@@ -1,0 +1,228 @@
+ /*********************************************************************/
+ /* Program     : COSGN00C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS PL/I Program                                    */
+ /* Function    : Signon Screen for the CardDemo Application          */
+ /* Converted from COBOL/CICS: app/cbl/COSGN00C.cbl                  */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ COSGN00C: PROC(IO_PCB_PTR, ALT_PCB_PTR, DB_USRSEC_PTR) OPTIONS(MAIN);
+
+   /* PCB Pointers */
+   DCL IO_PCB_PTR    POINTER;
+   DCL ALT_PCB_PTR   POINTER;
+   DCL DB_USRSEC_PTR POINTER;
+
+   /* IO PCB Mask */
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),
+         2 IO_RESV     CHAR(2),
+         2 IO_STATUS   CHAR(2),
+         2 IO_DATE     FIXED BIN(31),
+         2 IO_TIME     FIXED BIN(31),
+         2 IO_SEQ      FIXED BIN(31),
+         2 IO_MOD      CHAR(8);
+
+   /* ALT PCB Mask */
+   DCL 1 ALT_PCB BASED(ALT_PCB_PTR),
+         2 ALT_DEST    CHAR(8),
+         2 ALT_RESV    CHAR(2),
+         2 ALT_STATUS  CHAR(2);
+
+   /* DB PCB Mask for User Security */
+   DCL 1 DB_USRSEC BASED(DB_USRSEC_PTR),
+         2 USRSEC_DBNAME  CHAR(8),
+         2 USRSEC_LEVEL   CHAR(2),
+         2 USRSEC_STATUS  CHAR(2),
+         2 USRSEC_PROC    CHAR(4),
+         2 USRSEC_RESV    FIXED BIN(31),
+         2 USRSEC_SEGNAME CHAR(8),
+         2 USRSEC_KEYLEN  FIXED BIN(31),
+         2 USRSEC_SENSEG  FIXED BIN(31),
+         2 USRSEC_KEYVAL  CHAR(256);
+
+   /* Working Storage */
+   DCL WS_PGMNAME     CHAR(8) INIT('COSGN00C');
+   DCL WS_TRANID      CHAR(4) INIT('CC00');
+   DCL WS_MESSAGE      CHAR(80) INIT(' ');
+   DCL WS_ERR_FLG      CHAR(1) INIT('N');
+   DCL WS_USER_ID      CHAR(8);
+   DCL WS_USER_PWD     CHAR(8);
+
+   /* Include members */
+   %INCLUDE COCOM01Y;
+   %INCLUDE COTTL01Y;
+   %INCLUDE CSDAT01Y;
+   %INCLUDE CSMSG01Y;
+   %INCLUDE CSUSR01Y;
+
+   /* MFS Input/Output message structures */
+   DCL 1 INPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 TRANCODE     CHAR(8),
+         2 IN_USERID    CHAR(8),
+         2 IN_PASSWD    CHAR(8);
+
+   DCL 1 OUTPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 OUT_TRNNAME  CHAR(4),
+         2 OUT_TITLE01  CHAR(40),
+         2 OUT_CURDATE  CHAR(8),
+         2 OUT_PGMNAME  CHAR(8),
+         2 OUT_TITLE02  CHAR(40),
+         2 OUT_CURTIME  CHAR(8),
+         2 OUT_USERID   CHAR(8),
+         2 OUT_PASSWD   CHAR(8),
+         2 OUT_ERRMSG   CHAR(78);
+
+   /* SSA for User Security DB */
+   DCL USRSEC_SSA CHAR(29);
+
+   /* IMS DL/I call functions */
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GHU  CHAR(4) INIT('GHU ');
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL CHNG CHAR(4) INIT('CHNG');
+   DCL PURG CHAR(4) INIT('PURG');
+
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+
+   WS_ERR_FLG = 'N';
+   WS_MESSAGE = ' ';
+
+   /* Get input message from terminal */
+   CALL PLITDLI(GU, IO_PCB_PTR, INPUT_MSG);
+
+   IF IO_STATUS = '  ' | IO_STATUS = 'QC' THEN DO;
+     /* First time entry - send signon screen */
+     IF IO_STATUS = 'QC' THEN DO;
+       CALL SEND_SIGNON_SCREEN;
+       RETURN;
+     END;
+
+     /* Process input */
+     IF IN_USERID = ' ' | IN_USERID = '' THEN DO;
+       WS_ERR_FLG = 'Y';
+       WS_MESSAGE = 'Please enter User ID ...';
+       CALL SEND_SIGNON_SCREEN;
+     END;
+     ELSE IF IN_PASSWD = ' ' | IN_PASSWD = '' THEN DO;
+       WS_ERR_FLG = 'Y';
+       WS_MESSAGE = 'Please enter Password ...';
+       CALL SEND_SIGNON_SCREEN;
+     END;
+     ELSE DO;
+       WS_USER_ID = TRANSLATE(IN_USERID,
+         'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+         'abcdefghijklmnopqrstuvwxyz');
+       WS_USER_PWD = TRANSLATE(IN_PASSWD,
+         'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+         'abcdefghijklmnopqrstuvwxyz');
+       CDEMO_USER_ID = WS_USER_ID;
+       CALL READ_USER_SEC_FILE;
+     END;
+   END;
+   ELSE DO;
+     WS_ERR_FLG = 'Y';
+     WS_MESSAGE = 'IMS communication error';
+     CALL SEND_SIGNON_SCREEN;
+   END;
+
+   RETURN;
+
+   /******************************************************************/
+   /* SEND_SIGNON_SCREEN - Send the signon screen to the terminal   */
+   /******************************************************************/
+   SEND_SIGNON_SCREEN: PROC;
+     CALL POPULATE_HEADER_INFO;
+     OUT_ERRMSG = WS_MESSAGE;
+     OUTPUT_MSG.LL = SIZE(OUTPUT_MSG);
+     OUTPUT_MSG.ZZ = 0;
+
+     /* Set MFS MOD name for output formatting */
+     IO_MOD = 'COSGN00';
+
+     CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
+   END SEND_SIGNON_SCREEN;
+
+   /******************************************************************/
+   /* POPULATE_HEADER_INFO - Set common header fields                */
+   /******************************************************************/
+   POPULATE_HEADER_INFO: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+
+     OUT_TRNNAME = WS_TRANID;
+     OUT_TITLE01 = CCDA_TITLE01;
+     OUT_TITLE02 = CCDA_TITLE02;
+     OUT_PGMNAME = WS_PGMNAME;
+     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 3, 2);
+     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 13, 2);
+   END POPULATE_HEADER_INFO;
+
+   /******************************************************************/
+   /* READ_USER_SEC_FILE - Read user security record via IMS DL/I   */
+   /******************************************************************/
+   READ_USER_SEC_FILE: PROC;
+     /* Build qualified SSA for user security segment */
+     USRSEC_SSA = 'USRSEG  (USRID   =' || WS_USER_ID || ')';
+
+     CALL PLITDLI(GU, DB_USRSEC_PTR, SEC_USER_DATA, USRSEC_SSA);
+
+     SELECT(USRSEC_STATUS);
+       WHEN('  ') DO;
+         /* Record found - verify password */
+         IF SEC_USR_PWD = WS_USER_PWD THEN DO;
+           CDEMO_FROM_TRANID = WS_TRANID;
+           CDEMO_FROM_PROGRAM = WS_PGMNAME;
+           CDEMO_USER_ID = WS_USER_ID;
+           CDEMO_USER_TYPE = SEC_USR_TYPE;
+           CDEMO_PGM_CONTEXT = '0';
+
+           /* Switch to appropriate menu based on user type */
+           IF CDEMO_USER_TYPE = CDEMO_USRTYP_ADMIN THEN DO;
+             /* CHNG ALT PCB to admin menu transaction */
+             CALL PLITDLI(CHNG, ALT_PCB_PTR, 'CA00');
+             CALL PLITDLI(ISRT, ALT_PCB_PTR, CARDDEMO_COMMAREA);
+             CALL PLITDLI(PURG, ALT_PCB_PTR);
+           END;
+           ELSE DO;
+             /* CHNG ALT PCB to main menu transaction */
+             CALL PLITDLI(CHNG, ALT_PCB_PTR, 'CM00');
+             CALL PLITDLI(ISRT, ALT_PCB_PTR, CARDDEMO_COMMAREA);
+             CALL PLITDLI(PURG, ALT_PCB_PTR);
+           END;
+         END;
+         ELSE DO;
+           WS_MESSAGE = 'Wrong Password. Try again ...';
+           CALL SEND_SIGNON_SCREEN;
+         END;
+       END;
+       WHEN('GE') DO;
+         WS_ERR_FLG = 'Y';
+         WS_MESSAGE = 'User not found. Try again ...';
+         CALL SEND_SIGNON_SCREEN;
+       END;
+       OTHERWISE DO;
+         WS_ERR_FLG = 'Y';
+         WS_MESSAGE = 'Unable to verify the User ...';
+         CALL SEND_SIGNON_SCREEN;
+       END;
+     END;
+   END READ_USER_SEC_FILE;
+
+ END COSGN00C;

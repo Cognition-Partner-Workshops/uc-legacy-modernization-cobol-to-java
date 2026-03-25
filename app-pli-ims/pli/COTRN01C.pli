@@ -1,0 +1,197 @@
+ /*********************************************************************/
+ /* Program     : COTRN01C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS PL/I Program                                    */
+ /* Function    : Transaction Detail View                             */
+ /* Converted from COBOL/CICS: app/cbl/COTRN01C.cbl                  */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ COTRN01C: PROC(IO_PCB_PTR, ALT_PCB_PTR,
+                 DB_TRAN_PTR, DB_TTYP_PTR,
+                 DB_TCAT_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR    POINTER;
+   DCL ALT_PCB_PTR   POINTER;
+   DCL DB_TRAN_PTR   POINTER;
+   DCL DB_TTYP_PTR   POINTER;
+   DCL DB_TCAT_PTR   POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2),  2 IO_DATE  FIXED BIN(31),
+         2 IO_TIME     FIXED BIN(31), 2 IO_SEQ FIXED BIN(31),
+         2 IO_MOD      CHAR(8);
+
+   DCL 1 ALT_PCB BASED(ALT_PCB_PTR),
+         2 ALT_DEST    CHAR(8),  2 ALT_RESV  CHAR(2),
+         2 ALT_STATUS  CHAR(2);
+
+   DCL 1 DB_TRAN BASED(DB_TRAN_PTR),
+         2 TRAN_DBNAME  CHAR(8),  2 TRAN_LEVEL  CHAR(2),
+         2 TRAN_DBSTAT  CHAR(2),  2 TRAN_PROC   CHAR(4),
+         2 TRAN_RESV    FIXED BIN(31),
+         2 TRAN_SEGNAME CHAR(8),  2 TRAN_KEYLEN FIXED BIN(31),
+         2 TRAN_SENSEG  FIXED BIN(31),
+         2 TRAN_KEYVAL  CHAR(256);
+
+   DCL 1 DB_TTYP BASED(DB_TTYP_PTR),
+         2 TTYP_DBNAME  CHAR(8),  2 TTYP_LEVEL  CHAR(2),
+         2 TTYP_STATUS  CHAR(2),  2 TTYP_PROC   CHAR(4),
+         2 TTYP_RESV    FIXED BIN(31),
+         2 TTYP_SEGNAME CHAR(8),  2 TTYP_KEYLEN FIXED BIN(31),
+         2 TTYP_SENSEG  FIXED BIN(31),
+         2 TTYP_KEYVAL  CHAR(256);
+
+   DCL 1 DB_TCAT BASED(DB_TCAT_PTR),
+         2 TCAT_DBNAME  CHAR(8),  2 TCAT_LEVEL  CHAR(2),
+         2 TCAT_STATUS  CHAR(2),  2 TCAT_PROC   CHAR(4),
+         2 TCAT_RESV    FIXED BIN(31),
+         2 TCAT_SEGNAME CHAR(8),  2 TCAT_KEYLEN FIXED BIN(31),
+         2 TCAT_SENSEG  FIXED BIN(31),
+         2 TCAT_KEYVAL  CHAR(256);
+
+   DCL WS_PGMNAME     CHAR(8) INIT('COTRN01C');
+   DCL WS_TRANID      CHAR(4) INIT('CT01');
+   DCL WS_RETURN_MSG   CHAR(75) INIT(' ');
+
+   %INCLUDE COCOM01Y;
+   %INCLUDE CVCRD01Y;
+   %INCLUDE COTTL01Y;
+   %INCLUDE CSDAT01Y;
+   %INCLUDE CSMSG01Y;
+   %INCLUDE CVTRA05Y;
+   %INCLUDE CVTRA03Y;
+   %INCLUDE CVTRA04Y;
+
+   DCL 1 INPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 TRANCODE     CHAR(8),
+         2 IN_TRANID    CHAR(16),
+         2 IN_COMMAREA  CHAR(LENGTH(CARDDEMO_COMMAREA));
+
+   DCL 1 OUTPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 OUT_TRNNAME  CHAR(4),
+         2 OUT_TITLE01  CHAR(40),
+         2 OUT_CURDATE  CHAR(8),
+         2 OUT_PGMNAME  CHAR(8),
+         2 OUT_TITLE02  CHAR(40),
+         2 OUT_CURTIME  CHAR(8),
+         2 OUT_TRANID   CHAR(16),
+         2 OUT_TTYPE    CHAR(2),
+         2 OUT_TTYPEDESC CHAR(50),
+         2 OUT_TCAT     CHAR(4),
+         2 OUT_TCATDESC CHAR(50),
+         2 OUT_TSOURCE  CHAR(10),
+         2 OUT_TDESC    CHAR(100),
+         2 OUT_TAMT     CHAR(12),
+         2 OUT_TMERCHID CHAR(9),
+         2 OUT_TMERCHNAME CHAR(50),
+         2 OUT_TMERCHCITY CHAR(50),
+         2 OUT_TMERCHZIP CHAR(10),
+         2 OUT_TCARDNUM CHAR(16),
+         2 OUT_TORIGTS  CHAR(26),
+         2 OUT_TPROCTS  CHAR(26),
+         2 OUT_INFOMSG  CHAR(40),
+         2 OUT_ERRMSG   CHAR(78);
+
+   DCL TRAN_SSA CHAR(50);
+   DCL TTYP_SSA CHAR(50);
+   DCL TCAT_SSA CHAR(50);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL CHNG CHAR(4) INIT('CHNG');
+   DCL PURG CHAR(4) INIT('PURG');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   WS_RETURN_MSG = ' ';
+
+   CALL PLITDLI(GU, IO_PCB_PTR, INPUT_MSG);
+   CARDDEMO_COMMAREA = IN_COMMAREA;
+
+   /* If transaction ID passed from calling program */
+   IF CDEMO_TRAN_ID ^= '' & CDEMO_TRAN_ID ^= ' ' THEN
+     IN_TRANID = CDEMO_TRAN_ID;
+
+   IF IN_TRANID = ' ' THEN DO;
+     OUT_INFOMSG = 'Enter Transaction ID to view';
+     CALL SEND_MAP;
+     RETURN;
+   END;
+
+   /* Read transaction record */
+   TRAN_SSA = 'TRANSEG (TRANID  =' || IN_TRANID || ')';
+   CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
+
+   IF TRAN_DBSTAT = '  ' THEN DO;
+     OUT_TRANID    = TRAN_ID;
+     OUT_TTYPE     = TRAN_TYPE_CD;
+     OUT_TCAT      = TRAN_CAT_CD;
+     OUT_TSOURCE   = TRAN_SOURCE;
+     OUT_TDESC     = TRAN_DESC;
+     OUT_TAMT      = TRAN_AMT;
+     OUT_TMERCHID  = TRAN_MERCHANT_ID;
+     OUT_TMERCHNAME = TRAN_MERCHANT_NAME;
+     OUT_TMERCHCITY = TRAN_MERCHANT_CITY;
+     OUT_TMERCHZIP = TRAN_MERCHANT_ZIP;
+     OUT_TCARDNUM  = TRAN_CARD_NUM;
+     OUT_TORIGTS   = TRAN_ORIG_TS;
+     OUT_TPROCTS   = TRAN_PROC_TS;
+
+     /* Lookup transaction type description */
+     TTYP_SSA = 'TTYPSEG (TTYPCD  =' || TRAN_TYPE_CD || ')';
+     CALL PLITDLI(GU, DB_TTYP_PTR, TRAN_TYPE_RECORD, TTYP_SSA);
+     IF TTYP_STATUS = '  ' THEN
+       OUT_TTYPEDESC = TRAN_TYPE_DESC;
+
+     /* Lookup transaction category description */
+     TCAT_SSA = 'TCATSEG (TTYPCD  =' || TRAN_TYPE_CD ||
+                          'TCATCD  =' || TRAN_CAT_CD || ')';
+     CALL PLITDLI(GU, DB_TCAT_PTR, TRAN_CAT_RECORD, TCAT_SSA);
+     IF TCAT_STATUS = '  ' THEN
+       OUT_TCATDESC = TRAN_CAT_TYPE_DESC;
+
+     OUT_INFOMSG = 'Transaction details displayed';
+   END;
+   ELSE DO;
+     WS_RETURN_MSG = 'Transaction not found';
+   END;
+
+   CALL SEND_MAP;
+   RETURN;
+
+   SEND_MAP: PROC;
+     CALL POPULATE_HEADER_INFO;
+     OUT_ERRMSG = WS_RETURN_MSG;
+     OUTPUT_MSG.LL = SIZE(OUTPUT_MSG);
+     OUTPUT_MSG.ZZ = 0;
+     IO_MOD = 'COTRN01';
+     CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
+   END SEND_MAP;
+
+   POPULATE_HEADER_INFO: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     OUT_TRNNAME = WS_TRANID;
+     OUT_TITLE01 = CCDA_TITLE01;
+     OUT_TITLE02 = CCDA_TITLE02;
+     OUT_PGMNAME = WS_PGMNAME;
+     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 3, 2);
+     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 13, 2);
+   END POPULATE_HEADER_INFO;
+
+ END COTRN01C;

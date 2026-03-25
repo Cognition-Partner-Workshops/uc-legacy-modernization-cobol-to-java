@@ -1,0 +1,93 @@
+ /*********************************************************************/
+ /* Program     : CBTRN01C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS Batch PL/I Program (BMP)                        */
+ /* Function    : Combine Daily Transactions into Master              */
+ /* Converted from COBOL batch: app/cbl/CBTRN01C.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CBTRN01C: PROC(IO_PCB_PTR, DB_TRAN_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR     POINTER;
+   DCL DB_TRAN_PTR    POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2);
+
+   DCL 1 DB_TRAN BASED(DB_TRAN_PTR),
+         2 TRAN_DBNAME  CHAR(8),  2 TRAN_LEVEL  CHAR(2),
+         2 TRAN_STATUS  CHAR(2),  2 TRAN_PROC   CHAR(4),
+         2 TRAN_RESV    FIXED BIN(31),
+         2 TRAN_SEGNAME CHAR(8),  2 TRAN_KEYLEN FIXED BIN(31),
+         2 TRAN_SENSEG  FIXED BIN(31),
+         2 TRAN_KEYVAL  CHAR(256);
+
+   DCL DALYTRAN_FILE FILE RECORD INPUT ENV(FB RECSIZE(350));
+
+   %INCLUDE CVTRA06Y;
+   %INCLUDE CVTRA05Y;
+
+   DCL WS_RECORD_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_WRITTEN_COUNT FIXED BIN(31) INIT(0);
+   DCL WS_EOF           CHAR(1) INIT('N');
+
+   DCL TRAN_SSA CHAR(50);
+
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM CBTRN01C');
+
+   ON ENDFILE(DALYTRAN_FILE) WS_EOF = 'Y';
+
+   OPEN FILE(DALYTRAN_FILE);
+
+   READ FILE(DALYTRAN_FILE) INTO(DALYTRAN_RECORD);
+
+   DO WHILE(WS_EOF = 'N');
+     WS_RECORD_COUNT = WS_RECORD_COUNT + 1;
+
+     /* Copy daily transaction fields to master transaction */
+     TRAN_ID           = DALYTRAN_ID;
+     TRAN_TYPE_CD      = DALYTRAN_TYPE_CD;
+     TRAN_CAT_CD       = DALYTRAN_CAT_CD;
+     TRAN_SOURCE       = DALYTRAN_SOURCE;
+     TRAN_DESC         = DALYTRAN_DESC;
+     TRAN_AMT          = DALYTRAN_AMT;
+     TRAN_MERCHANT_ID  = DALYTRAN_MERCHANT_ID;
+     TRAN_MERCHANT_NAME = DALYTRAN_MERCHANT_NAME;
+     TRAN_MERCHANT_CITY = DALYTRAN_MERCHANT_CITY;
+     TRAN_MERCHANT_ZIP = DALYTRAN_MERCHANT_ZIP;
+     TRAN_CARD_NUM     = DALYTRAN_CARD_NUM;
+     TRAN_ORIG_TS      = DALYTRAN_ORIG_TS;
+     TRAN_PROC_TS      = DALYTRAN_PROC_TS;
+
+     /* Insert into master transaction DB */
+     TRAN_SSA = 'TRANSEG ';
+     CALL PLITDLI(ISRT, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
+
+     IF TRAN_STATUS = '  ' THEN
+       WS_WRITTEN_COUNT = WS_WRITTEN_COUNT + 1;
+     ELSE
+       PUT SKIP LIST('ERROR INSERTING TRAN: ' || TRAN_ID);
+
+     READ FILE(DALYTRAN_FILE) INTO(DALYTRAN_RECORD);
+   END;
+
+   CLOSE FILE(DALYTRAN_FILE);
+
+   PUT SKIP LIST('RECORDS READ:    ' || WS_RECORD_COUNT);
+   PUT SKIP LIST('RECORDS WRITTEN: ' || WS_WRITTEN_COUNT);
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM CBTRN01C');
+
+   RETURN;
+
+ END CBTRN01C;

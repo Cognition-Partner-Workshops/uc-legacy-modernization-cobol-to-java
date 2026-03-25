@@ -1,0 +1,142 @@
+ /*********************************************************************/
+ /* Program     : CBSTM03A.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS Batch PL/I Program (BMP)                        */
+ /* Function    : Statement Generation - Account Selection            */
+ /* Converted from COBOL batch: app/cbl/CBSTM03A.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CBSTM03A: PROC(IO_PCB_PTR, DB_ACCT_PTR, DB_XREF_PTR,
+                 DB_TRAN_PTR, DB_CUST_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR     POINTER;
+   DCL DB_ACCT_PTR    POINTER;
+   DCL DB_XREF_PTR    POINTER;
+   DCL DB_TRAN_PTR    POINTER;
+   DCL DB_CUST_PTR    POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2);
+
+   DCL 1 DB_ACCT BASED(DB_ACCT_PTR),
+         2 ACCT_DBNAME  CHAR(8),  2 ACCT_LEVEL  CHAR(2),
+         2 ACCT_STATUS  CHAR(2),  2 ACCT_PROC   CHAR(4),
+         2 ACCT_RESV    FIXED BIN(31),
+         2 ACCT_SEGNAME CHAR(8),  2 ACCT_KEYLEN FIXED BIN(31),
+         2 ACCT_SENSEG  FIXED BIN(31),
+         2 ACCT_KEYVAL  CHAR(256);
+
+   DCL 1 DB_XREF BASED(DB_XREF_PTR),
+         2 XREF_DBNAME  CHAR(8),  2 XREF_LEVEL  CHAR(2),
+         2 XREF_STATUS  CHAR(2),  2 XREF_PROC   CHAR(4),
+         2 XREF_RESV    FIXED BIN(31),
+         2 XREF_SEGNAME CHAR(8),  2 XREF_KEYLEN FIXED BIN(31),
+         2 XREF_SENSEG  FIXED BIN(31),
+         2 XREF_KEYVAL  CHAR(256);
+
+   DCL 1 DB_TRAN BASED(DB_TRAN_PTR),
+         2 TRAN_DBNAME  CHAR(8),  2 TRAN_LEVEL  CHAR(2),
+         2 TRAN_STATUS  CHAR(2),  2 TRAN_PROC   CHAR(4),
+         2 TRAN_RESV    FIXED BIN(31),
+         2 TRAN_SEGNAME CHAR(8),  2 TRAN_KEYLEN FIXED BIN(31),
+         2 TRAN_SENSEG  FIXED BIN(31),
+         2 TRAN_KEYVAL  CHAR(256);
+
+   DCL 1 DB_CUST BASED(DB_CUST_PTR),
+         2 CUST_DBNAME  CHAR(8),  2 CUST_LEVEL  CHAR(2),
+         2 CUST_STATUS  CHAR(2),  2 CUST_PROC   CHAR(4),
+         2 CUST_RESV    FIXED BIN(31),
+         2 CUST_SEGNAME CHAR(8),  2 CUST_KEYLEN FIXED BIN(31),
+         2 CUST_SENSEG  FIXED BIN(31),
+         2 CUST_KEYVAL  CHAR(256);
+
+   DCL STATEMENT_FILE FILE RECORD OUTPUT ENV(FB RECSIZE(350));
+
+   %INCLUDE CVACT01Y;
+   %INCLUDE CVACT02Y;
+   %INCLUDE CVACT03Y;
+   %INCLUDE CVTRA05Y;
+   %INCLUDE CVCUS01Y;
+   %INCLUDE COSTM01;
+
+   DCL WS_ACCT_COUNT   FIXED BIN(31) INIT(0);
+   DCL WS_TRAN_COUNT   FIXED BIN(31) INIT(0);
+   DCL WS_STMT_COUNT   FIXED BIN(31) INIT(0);
+
+   DCL ACCT_SSA CHAR(40);
+   DCL XREF_SSA CHAR(50);
+   DCL TRAN_SSA CHAR(50);
+   DCL CUST_SSA CHAR(40);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GN   CHAR(4) INIT('GN  ');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM CBSTM03A');
+
+   OPEN FILE(STATEMENT_FILE);
+
+   /* Iterate through all accounts */
+   ACCT_SSA = 'ACCTSEG ';
+   CALL PLITDLI(GU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
+
+   DO WHILE(ACCT_STATUS = '  ');
+     WS_ACCT_COUNT = WS_ACCT_COUNT + 1;
+
+     IF ACCT_ACTIVE_STATUS = 'Y' THEN DO;
+       /* Get card number for this account */
+       XREF_SSA = 'CXREFSEG(ACCTID  =' || ACCT_ID || ')';
+       CALL PLITDLI(GU, DB_XREF_PTR, CARD_XREF_RECORD, XREF_SSA);
+
+       IF XREF_STATUS = '  ' THEN DO;
+         /* Get customer info */
+         CUST_SSA = 'CUSTSEG (CUSTID  =' || XREF_CUST_ID || ')';
+         CALL PLITDLI(GU, DB_CUST_PTR, CUSTOMER_RECORD, CUST_SSA);
+
+         /* Get transactions for this card */
+         TRAN_SSA = 'TRANSEG (CARDNUM =' || XREF_CARD_NUM || ')';
+         CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
+
+         DO WHILE(TRAN_STATUS = '  ');
+           WS_TRAN_COUNT = WS_TRAN_COUNT + 1;
+
+           /* Build statement record */
+           TRNX_CARD_NUM = TRAN_CARD_NUM;
+           TRNX_TRAN_ID  = TRAN_ID;
+           TRNX_TRAN_TYPE_CD = TRAN_TYPE_CD;
+           TRNX_TRAN_CAT_CD  = TRAN_CAT_CD;
+           TRNX_TRAN_SOURCE  = TRAN_SOURCE;
+           TRNX_TRAN_DESC    = TRAN_DESC;
+           TRNX_TRAN_AMT     = TRAN_AMT;
+           TRNX_TRAN_ORIG_TS = TRAN_ORIG_TS;
+
+           WRITE FILE(STATEMENT_FILE) FROM(TRNX_RECORD);
+           WS_STMT_COUNT = WS_STMT_COUNT + 1;
+
+           CALL PLITDLI(GN, DB_TRAN_PTR, TRAN_RECORD);
+         END;
+       END;
+     END;
+
+     /* Read next account */
+     CALL PLITDLI(GN, DB_ACCT_PTR, ACCOUNT_RECORD);
+   END;
+
+   CLOSE FILE(STATEMENT_FILE);
+
+   PUT SKIP LIST('ACCOUNTS PROCESSED: ' || WS_ACCT_COUNT);
+   PUT SKIP LIST('TRANS PROCESSED:    ' || WS_TRAN_COUNT);
+   PUT SKIP LIST('STATEMENTS WRITTEN: ' || WS_STMT_COUNT);
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM CBSTM03A');
+
+   RETURN;
+
+ END CBSTM03A;

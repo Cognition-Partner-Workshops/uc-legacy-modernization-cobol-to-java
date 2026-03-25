@@ -1,0 +1,271 @@
+ /*********************************************************************/
+ /* Program     : COBIL00C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS PL/I Program                                    */
+ /* Function    : Bill Payment - Pay account balance in full          */
+ /* Converted from COBOL/CICS: app/cbl/COBIL00C.cbl                  */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ COBIL00C: PROC(IO_PCB_PTR, ALT_PCB_PTR,
+                 DB_ACCT_PTR, DB_TRAN_PTR,
+                 DB_CXREF_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR    POINTER;
+   DCL ALT_PCB_PTR   POINTER;
+   DCL DB_ACCT_PTR   POINTER;
+   DCL DB_TRAN_PTR   POINTER;
+   DCL DB_CXREF_PTR  POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2),  2 IO_DATE  FIXED BIN(31),
+         2 IO_TIME     FIXED BIN(31), 2 IO_SEQ FIXED BIN(31),
+         2 IO_MOD      CHAR(8);
+
+   DCL 1 ALT_PCB BASED(ALT_PCB_PTR),
+         2 ALT_DEST    CHAR(8),  2 ALT_RESV  CHAR(2),
+         2 ALT_STATUS  CHAR(2);
+
+   DCL 1 DB_ACCT BASED(DB_ACCT_PTR),
+         2 ACCT_DBNAME  CHAR(8),  2 ACCT_LEVEL  CHAR(2),
+         2 ACCT_DBSTAT  CHAR(2),  2 ACCT_PROC   CHAR(4),
+         2 ACCT_RESV    FIXED BIN(31),
+         2 ACCT_SEGNAME CHAR(8),  2 ACCT_KEYLEN FIXED BIN(31),
+         2 ACCT_SENSEG  FIXED BIN(31),
+         2 ACCT_KEYVAL  CHAR(256);
+
+   DCL 1 DB_TRAN BASED(DB_TRAN_PTR),
+         2 TRAN_DBNAME  CHAR(8),  2 TRAN_LEVEL  CHAR(2),
+         2 TRAN_DBSTAT  CHAR(2),  2 TRAN_PROC   CHAR(4),
+         2 TRAN_RESV    FIXED BIN(31),
+         2 TRAN_SEGNAME CHAR(8),  2 TRAN_KEYLEN FIXED BIN(31),
+         2 TRAN_SENSEG  FIXED BIN(31),
+         2 TRAN_KEYVAL  CHAR(256);
+
+   DCL 1 DB_CXREF BASED(DB_CXREF_PTR),
+         2 CXREF_DBNAME  CHAR(8),  2 CXREF_LEVEL  CHAR(2),
+         2 CXREF_STATUS  CHAR(2),  2 CXREF_PROC   CHAR(4),
+         2 CXREF_RESV    FIXED BIN(31),
+         2 CXREF_SEGNAME CHAR(8),  2 CXREF_KEYLEN FIXED BIN(31),
+         2 CXREF_SENSEG  FIXED BIN(31),
+         2 CXREF_KEYVAL  CHAR(256);
+
+   DCL WS_PGMNAME     CHAR(8) INIT('COBIL00C');
+   DCL WS_TRANID      CHAR(4) INIT('CB00');
+   DCL WS_ERR_FLG      CHAR(1) INIT('N');
+   DCL WS_RETURN_MSG   CHAR(75) INIT(' ');
+   DCL WS_CONF_PAY     CHAR(1) INIT('N');
+   DCL WS_TRAN_ID_NUM  FIXED DEC(16) INIT(0);
+
+   %INCLUDE COCOM01Y;
+   %INCLUDE COTTL01Y;
+   %INCLUDE CSDAT01Y;
+   %INCLUDE CSMSG01Y;
+   %INCLUDE CVACT01Y;
+   %INCLUDE CVACT03Y;
+   %INCLUDE CVTRA05Y;
+
+   DCL 1 INPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 TRANCODE     CHAR(8),
+         2 IN_ACCTID    CHAR(11),
+         2 IN_CONFIRM   CHAR(1),
+         2 IN_COMMAREA  CHAR(LENGTH(CARDDEMO_COMMAREA));
+
+   DCL 1 OUTPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 OUT_TRNNAME  CHAR(4),
+         2 OUT_TITLE01  CHAR(40),
+         2 OUT_CURDATE  CHAR(8),
+         2 OUT_PGMNAME  CHAR(8),
+         2 OUT_TITLE02  CHAR(40),
+         2 OUT_CURTIME  CHAR(8),
+         2 OUT_ACCTID   CHAR(11),
+         2 OUT_CURBAL   CHAR(14),
+         2 OUT_CONFIRM  CHAR(1),
+         2 OUT_INFOMSG  CHAR(40),
+         2 OUT_ERRMSG   CHAR(78);
+
+   DCL ACCT_SSA  CHAR(40);
+   DCL TRAN_SSA  CHAR(50);
+   DCL CXREF_SSA CHAR(50);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GHU  CHAR(4) INIT('GHU ');
+   DCL GNP  CHAR(4) INIT('GNP ');
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL REPL CHAR(4) INIT('REPL');
+   DCL CHNG CHAR(4) INIT('CHNG');
+   DCL PURG CHAR(4) INIT('PURG');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   WS_ERR_FLG = 'N';
+   WS_RETURN_MSG = ' ';
+
+   CALL PLITDLI(GU, IO_PCB_PTR, INPUT_MSG);
+   CARDDEMO_COMMAREA = IN_COMMAREA;
+
+   IF CDEMO_PGM_CONTEXT = '0' THEN DO;
+     CDEMO_PGM_CONTEXT = '1';
+     OUT_INFOMSG = 'Enter Account ID for bill payment';
+     CALL SEND_MAP;
+   END;
+   ELSE DO;
+     CALL PROCESS_ENTER_KEY;
+   END;
+
+   RETURN;
+
+   /******************************************************************/
+   /* PROCESS_ENTER_KEY                                              */
+   /******************************************************************/
+   PROCESS_ENTER_KEY: PROC;
+     IF IN_ACCTID = ' ' | IN_ACCTID = '' THEN DO;
+       WS_ERR_FLG = 'Y';
+       WS_RETURN_MSG = 'Acct ID can NOT be empty...';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     ACCT_ID = IN_ACCTID;
+     XREF_ACCT_ID = IN_ACCTID;
+
+     SELECT(IN_CONFIRM);
+       WHEN('Y', 'y') DO;
+         WS_CONF_PAY = 'Y';
+         CALL READ_ACCTDAT;
+       END;
+       WHEN('N', 'n') DO;
+         WS_RETURN_MSG = 'Payment cancelled';
+         CALL SEND_MAP;
+         RETURN;
+       END;
+       WHEN(' ', '') DO;
+         CALL READ_ACCTDAT;
+       END;
+       OTHERWISE DO;
+         WS_ERR_FLG = 'Y';
+         WS_RETURN_MSG = 'Invalid value. Valid values are (Y/N)...';
+         CALL SEND_MAP;
+         RETURN;
+       END;
+     END;
+
+     IF WS_ERR_FLG = 'Y' THEN RETURN;
+
+     OUT_CURBAL = ACCT_CURR_BAL;
+
+     IF ACCT_CURR_BAL <= 0 THEN DO;
+       WS_ERR_FLG = 'Y';
+       WS_RETURN_MSG = 'You have nothing to pay...';
+       CALL SEND_MAP;
+       RETURN;
+     END;
+
+     IF WS_CONF_PAY = 'Y' THEN DO;
+       /* Get card number from xref for the transaction */
+       CXREF_SSA = 'CXREFSEG(ACCTID  =' || IN_ACCTID || ')';
+       CALL PLITDLI(GU, DB_CXREF_PTR, CARD_XREF_RECORD, CXREF_SSA);
+
+       /* Create bill payment transaction */
+       TRAN_ID = WS_TRAN_ID_NUM + 1;
+       TRAN_TYPE_CD = '02';
+       TRAN_CAT_CD = 2;
+       TRAN_SOURCE = 'POS TERM';
+       TRAN_DESC = 'BILL PAYMENT - ONLINE';
+       TRAN_AMT = ACCT_CURR_BAL;
+       TRAN_CARD_NUM = XREF_CARD_NUM;
+       TRAN_MERCHANT_ID = 999999999;
+       TRAN_MERCHANT_NAME = 'BILL PAYMENT';
+       TRAN_MERCHANT_CITY = 'N/A';
+       TRAN_MERCHANT_ZIP = 'N/A';
+       CALL SET_TIMESTAMPS;
+
+       /* Insert the transaction */
+       TRAN_SSA = 'TRANSEG ';
+       CALL PLITDLI(ISRT, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
+
+       /* Update account balance */
+       ACCT_CURR_BAL = ACCT_CURR_BAL - TRAN_AMT;
+       CALL PLITDLI(REPL, DB_ACCT_PTR, ACCOUNT_RECORD);
+
+       WS_RETURN_MSG = 'Bill payment processed successfully';
+     END;
+     ELSE DO;
+       WS_RETURN_MSG = 'Confirm to make a bill payment...';
+     END;
+
+     CALL SEND_MAP;
+   END PROCESS_ENTER_KEY;
+
+   /******************************************************************/
+   /* READ_ACCTDAT - Read account with hold for update               */
+   /******************************************************************/
+   READ_ACCTDAT: PROC;
+     ACCT_SSA = 'ACCTSEG (ACCTID  =' || IN_ACCTID || ')';
+     CALL PLITDLI(GHU, DB_ACCT_PTR, ACCOUNT_RECORD, ACCT_SSA);
+
+     SELECT(ACCT_DBSTAT);
+       WHEN('  ') ; /* OK */
+       WHEN('GE') DO;
+         WS_ERR_FLG = 'Y';
+         WS_RETURN_MSG = 'Account ID NOT found...';
+         CALL SEND_MAP;
+       END;
+       OTHERWISE DO;
+         WS_ERR_FLG = 'Y';
+         WS_RETURN_MSG = 'Unable to lookup Account...';
+         CALL SEND_MAP;
+       END;
+     END;
+   END READ_ACCTDAT;
+
+   /******************************************************************/
+   /* SET_TIMESTAMPS                                                 */
+   /******************************************************************/
+   SET_TIMESTAMPS: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     TRAN_ORIG_TS = SUBSTR(CURRENT_TS, 1, 4) || '-' ||
+                    SUBSTR(CURRENT_TS, 5, 2) || '-' ||
+                    SUBSTR(CURRENT_TS, 7, 2) || '-' ||
+                    SUBSTR(CURRENT_TS, 9, 2) || '.' ||
+                    SUBSTR(CURRENT_TS, 11, 2) || '.' ||
+                    SUBSTR(CURRENT_TS, 13, 2) || '.000000';
+     TRAN_PROC_TS = TRAN_ORIG_TS;
+   END SET_TIMESTAMPS;
+
+   SEND_MAP: PROC;
+     CALL POPULATE_HEADER_INFO;
+     OUT_ERRMSG = WS_RETURN_MSG;
+     OUTPUT_MSG.LL = SIZE(OUTPUT_MSG);
+     OUTPUT_MSG.ZZ = 0;
+     IO_MOD = 'COBIL00';
+     CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
+   END SEND_MAP;
+
+   POPULATE_HEADER_INFO: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     OUT_TRNNAME = WS_TRANID;
+     OUT_TITLE01 = CCDA_TITLE01;
+     OUT_TITLE02 = CCDA_TITLE02;
+     OUT_PGMNAME = WS_PGMNAME;
+     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 3, 2);
+     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 13, 2);
+   END POPULATE_HEADER_INFO;
+
+ END COBIL00C;

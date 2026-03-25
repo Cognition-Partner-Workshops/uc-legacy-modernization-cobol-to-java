@@ -1,0 +1,186 @@
+ /*********************************************************************/
+ /* Program     : CBTRN03C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS Batch PL/I Program (BMP)                        */
+ /* Function    : Transaction Report Generator                        */
+ /* Converted from COBOL batch: app/cbl/CBTRN03C.cbl                 */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ CBTRN03C: PROC(IO_PCB_PTR, DB_TRAN_PTR, DB_XREF_PTR,
+                 DB_TTYP_PTR, DB_TCAT_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR     POINTER;
+   DCL DB_TRAN_PTR    POINTER;
+   DCL DB_XREF_PTR    POINTER;
+   DCL DB_TTYP_PTR    POINTER;
+   DCL DB_TCAT_PTR    POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2);
+
+   DCL 1 DB_TRAN BASED(DB_TRAN_PTR),
+         2 TRAN_DBNAME  CHAR(8),  2 TRAN_LEVEL  CHAR(2),
+         2 TRAN_STATUS  CHAR(2),  2 TRAN_PROC   CHAR(4),
+         2 TRAN_RESV    FIXED BIN(31),
+         2 TRAN_SEGNAME CHAR(8),  2 TRAN_KEYLEN FIXED BIN(31),
+         2 TRAN_SENSEG  FIXED BIN(31),
+         2 TRAN_KEYVAL  CHAR(256);
+
+   DCL REPORT_FILE FILE PRINT ENV(FB RECSIZE(132));
+
+   %INCLUDE CVTRA05Y;
+   %INCLUDE CVTRA03Y;
+   %INCLUDE CVTRA04Y;
+   %INCLUDE CVTRA07Y;
+   %INCLUDE CVACT03Y;
+
+   DCL WS_RECORD_COUNT  FIXED BIN(31) INIT(0);
+   DCL WS_PAGE_COUNT    FIXED BIN(31) INIT(0);
+   DCL WS_LINE_COUNT    FIXED BIN(31) INIT(0);
+   DCL WS_LINES_PER_PAGE FIXED BIN(15) INIT(55);
+   DCL WS_PAGE_TOTAL    FIXED DEC(15,2) INIT(0);
+   DCL WS_ACCT_TOTAL    FIXED DEC(15,2) INIT(0);
+   DCL WS_GRAND_TOTAL   FIXED DEC(15,2) INIT(0);
+   DCL WS_LAST_ACCT     CHAR(11) INIT(' ');
+   DCL WS_FIRST_REC     CHAR(1) INIT('Y');
+
+   DCL TRAN_SSA CHAR(50);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GN   CHAR(4) INIT('GN  ');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   PUT SKIP LIST('START OF EXECUTION OF PROGRAM CBTRN03C');
+
+   OPEN FILE(REPORT_FILE);
+
+   /* Read first transaction */
+   TRAN_SSA = 'TRANSEG ';
+   CALL PLITDLI(GU, DB_TRAN_PTR, TRAN_RECORD, TRAN_SSA);
+
+   DO WHILE(TRAN_STATUS = '  ');
+     WS_RECORD_COUNT = WS_RECORD_COUNT + 1;
+
+     /* Check for page break or new account */
+     IF WS_FIRST_REC = 'Y' THEN DO;
+       CALL PRINT_REPORT_HEADER;
+       WS_LAST_ACCT = TRAN_CARD_NUM;
+       WS_FIRST_REC = 'N';
+     END;
+
+     IF TRAN_CARD_NUM ^= WS_LAST_ACCT THEN DO;
+       CALL PRINT_ACCT_TOTALS;
+       WS_ACCT_TOTAL = 0;
+       WS_LAST_ACCT = TRAN_CARD_NUM;
+       CALL PRINT_REPORT_HEADER;
+     END;
+
+     IF WS_LINE_COUNT >= WS_LINES_PER_PAGE THEN DO;
+       CALL PRINT_PAGE_TOTALS;
+       WS_PAGE_TOTAL = 0;
+       CALL PRINT_REPORT_HEADER;
+     END;
+
+     /* Print transaction detail line */
+     CALL PRINT_DETAIL_LINE;
+
+     WS_PAGE_TOTAL = WS_PAGE_TOTAL + TRAN_AMT;
+     WS_ACCT_TOTAL = WS_ACCT_TOTAL + TRAN_AMT;
+     WS_GRAND_TOTAL = WS_GRAND_TOTAL + TRAN_AMT;
+
+     /* Read next transaction */
+     CALL PLITDLI(GN, DB_TRAN_PTR, TRAN_RECORD);
+   END;
+
+   /* Print final totals */
+   IF WS_FIRST_REC ^= 'Y' THEN DO;
+     CALL PRINT_ACCT_TOTALS;
+     CALL PRINT_GRAND_TOTALS;
+   END;
+
+   CLOSE FILE(REPORT_FILE);
+
+   PUT SKIP LIST('RECORDS PROCESSED: ' || WS_RECORD_COUNT);
+   PUT SKIP LIST('PAGES PRINTED:     ' || WS_PAGE_COUNT);
+   PUT SKIP LIST('END OF EXECUTION OF PROGRAM CBTRN03C');
+
+   RETURN;
+
+   /******************************************************************/
+   /* PRINT_REPORT_HEADER                                            */
+   /******************************************************************/
+   PRINT_REPORT_HEADER: PROC;
+     WS_PAGE_COUNT = WS_PAGE_COUNT + 1;
+     WS_LINE_COUNT = 0;
+
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       ('CARDDEMO TRANSACTION REPORT',
+        'PAGE:', WS_PAGE_COUNT)
+       (A, COL(100), A, F(5));
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       (REPEAT('-', 131)) (A);
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       ('TRAN ID', 'TYPE', 'CAT', 'SOURCE',
+        'DESCRIPTION', 'AMOUNT', 'CARD NUMBER',
+        'TIMESTAMP')
+       (A(16), X(1), A(4), X(1), A(4), X(1), A(10), X(1),
+        A(50), X(1), A(12), X(1), A(16), X(1), A(26));
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       (REPEAT('-', 131)) (A);
+     WS_LINE_COUNT = 4;
+   END PRINT_REPORT_HEADER;
+
+   /******************************************************************/
+   /* PRINT_DETAIL_LINE                                              */
+   /******************************************************************/
+   PRINT_DETAIL_LINE: PROC;
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       (TRAN_ID, TRAN_TYPE_CD, TRAN_CAT_CD, TRAN_SOURCE,
+        TRAN_DESC, TRAN_AMT, TRAN_CARD_NUM, TRAN_ORIG_TS)
+       (A(16), X(1), A(2), X(3), A(4), X(1), A(10), X(1),
+        A(50), X(1), A(12), X(1), A(16), X(1), A(26));
+     WS_LINE_COUNT = WS_LINE_COUNT + 1;
+   END PRINT_DETAIL_LINE;
+
+   /******************************************************************/
+   /* PRINT_PAGE_TOTALS                                              */
+   /******************************************************************/
+   PRINT_PAGE_TOTALS: PROC;
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       (REPEAT('-', 131)) (A);
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       ('PAGE TOTAL:', WS_PAGE_TOTAL) (A, COL(90), F(15,2));
+   END PRINT_PAGE_TOTALS;
+
+   /******************************************************************/
+   /* PRINT_ACCT_TOTALS                                              */
+   /******************************************************************/
+   PRINT_ACCT_TOTALS: PROC;
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       (REPEAT('-', 131)) (A);
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       ('ACCOUNT TOTAL FOR ', WS_LAST_ACCT, ':', WS_ACCT_TOTAL)
+       (A, A(16), A, COL(90), F(15,2));
+   END PRINT_ACCT_TOTALS;
+
+   /******************************************************************/
+   /* PRINT_GRAND_TOTALS                                             */
+   /******************************************************************/
+   PRINT_GRAND_TOTALS: PROC;
+     PUT FILE(REPORT_FILE) SKIP(2) EDIT
+       (REPEAT('=', 131)) (A);
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       ('GRAND TOTAL:', WS_GRAND_TOTAL) (A, COL(90), F(15,2));
+     PUT FILE(REPORT_FILE) SKIP EDIT
+       (REPEAT('=', 131)) (A);
+   END PRINT_GRAND_TOTALS;
+
+ END CBTRN03C;

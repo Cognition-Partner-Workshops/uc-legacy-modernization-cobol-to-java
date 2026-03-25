@@ -1,0 +1,208 @@
+ /*********************************************************************/
+ /* Program     : COUSR00C.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS PL/I Program                                    */
+ /* Function    : User List / Search                                  */
+ /* Converted from COBOL/CICS: app/cbl/COUSR00C.cbl                  */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ COUSR00C: PROC(IO_PCB_PTR, ALT_PCB_PTR,
+                 DB_USRSEC_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR    POINTER;
+   DCL ALT_PCB_PTR   POINTER;
+   DCL DB_USRSEC_PTR POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2),  2 IO_DATE  FIXED BIN(31),
+         2 IO_TIME     FIXED BIN(31), 2 IO_SEQ FIXED BIN(31),
+         2 IO_MOD      CHAR(8);
+
+   DCL 1 ALT_PCB BASED(ALT_PCB_PTR),
+         2 ALT_DEST    CHAR(8),  2 ALT_RESV  CHAR(2),
+         2 ALT_STATUS  CHAR(2);
+
+   DCL 1 DB_USRSEC BASED(DB_USRSEC_PTR),
+         2 USRSEC_DBNAME  CHAR(8),  2 USRSEC_LEVEL  CHAR(2),
+         2 USRSEC_STATUS  CHAR(2),  2 USRSEC_PROC   CHAR(4),
+         2 USRSEC_RESV    FIXED BIN(31),
+         2 USRSEC_SEGNAME CHAR(8),  2 USRSEC_KEYLEN FIXED BIN(31),
+         2 USRSEC_SENSEG  FIXED BIN(31),
+         2 USRSEC_KEYVAL  CHAR(256);
+
+   DCL WS_PGMNAME     CHAR(8) INIT('COUSR00C');
+   DCL WS_TRANID      CHAR(4) INIT('CU00');
+   DCL WS_ERR_FLG      CHAR(1) INIT('N');
+   DCL WS_RETURN_MSG   CHAR(75) INIT(' ');
+   DCL WS_IDX          FIXED BIN(15);
+   DCL MAX_USERS       FIXED BIN(15) INIT(10);
+
+   %INCLUDE COCOM01Y;
+   %INCLUDE COTTL01Y;
+   %INCLUDE CSDAT01Y;
+   %INCLUDE CSMSG01Y;
+   %INCLUDE CSUSR01Y;
+
+   DCL 1 INPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 TRANCODE     CHAR(8),
+         2 IN_USERID    CHAR(8),
+         2 IN_SEL(10)   CHAR(1),
+         2 IN_ACTION    CHAR(1),
+         2 IN_COMMAREA  CHAR(LENGTH(CARDDEMO_COMMAREA));
+
+   DCL 1 OUTPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 OUT_TRNNAME  CHAR(4),
+         2 OUT_TITLE01  CHAR(40),
+         2 OUT_CURDATE  CHAR(8),
+         2 OUT_PGMNAME  CHAR(8),
+         2 OUT_TITLE02  CHAR(40),
+         2 OUT_CURTIME  CHAR(8),
+         2 OUT_USERID   CHAR(8),
+         2 OUT_USERS(10),
+           3 OUT_SEL    CHAR(1),
+           3 OUT_UID    CHAR(8),
+           3 OUT_FNAME  CHAR(20),
+           3 OUT_LNAME  CHAR(20),
+           3 OUT_UTYPE  CHAR(1),
+         2 OUT_INFOMSG  CHAR(40),
+         2 OUT_ERRMSG   CHAR(78);
+
+   DCL USRSEC_SSA CHAR(40);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GN   CHAR(4) INIT('GN  ');
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL CHNG CHAR(4) INIT('CHNG');
+   DCL PURG CHAR(4) INIT('PURG');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   WS_ERR_FLG = 'N';
+   WS_RETURN_MSG = ' ';
+
+   CALL PLITDLI(GU, IO_PCB_PTR, INPUT_MSG);
+   CARDDEMO_COMMAREA = IN_COMMAREA;
+
+   IF CDEMO_PGM_CONTEXT = '0' THEN DO;
+     CDEMO_PGM_CONTEXT = '1';
+     CALL LIST_USERS;
+     CALL SEND_MAP;
+   END;
+   ELSE DO;
+     CALL PROCESS_INPUTS;
+   END;
+
+   RETURN;
+
+   /******************************************************************/
+   /* PROCESS_INPUTS                                                 */
+   /******************************************************************/
+   PROCESS_INPUTS: PROC;
+     /* Check for user selection */
+     DO WS_IDX = 1 TO MAX_USERS;
+       IF IN_SEL(WS_IDX) = 'U' | IN_SEL(WS_IDX) = 'u' THEN DO;
+         /* Update user - switch to COUSR02C */
+         CDEMO_USER_ID = OUT_UID(WS_IDX);
+         CDEMO_FROM_TRANID = WS_TRANID;
+         CDEMO_FROM_PROGRAM = WS_PGMNAME;
+         CDEMO_PGM_CONTEXT = '0';
+         CALL PLITDLI(CHNG, ALT_PCB_PTR, 'CU02');
+         CALL PLITDLI(ISRT, ALT_PCB_PTR, CARDDEMO_COMMAREA);
+         CALL PLITDLI(PURG, ALT_PCB_PTR);
+         RETURN;
+       END;
+       IF IN_SEL(WS_IDX) = 'D' | IN_SEL(WS_IDX) = 'd' THEN DO;
+         /* Delete user - switch to COUSR03C */
+         CDEMO_USER_ID = OUT_UID(WS_IDX);
+         CDEMO_FROM_TRANID = WS_TRANID;
+         CDEMO_FROM_PROGRAM = WS_PGMNAME;
+         CDEMO_PGM_CONTEXT = '0';
+         CALL PLITDLI(CHNG, ALT_PCB_PTR, 'CU03');
+         CALL PLITDLI(ISRT, ALT_PCB_PTR, CARDDEMO_COMMAREA);
+         CALL PLITDLI(PURG, ALT_PCB_PTR);
+         RETURN;
+       END;
+     END;
+
+     /* Check for Add action */
+     IF IN_ACTION = 'A' | IN_ACTION = 'a' THEN DO;
+       CDEMO_FROM_TRANID = WS_TRANID;
+       CDEMO_FROM_PROGRAM = WS_PGMNAME;
+       CDEMO_PGM_CONTEXT = '0';
+       CALL PLITDLI(CHNG, ALT_PCB_PTR, 'CU01');
+       CALL PLITDLI(ISRT, ALT_PCB_PTR, CARDDEMO_COMMAREA);
+       CALL PLITDLI(PURG, ALT_PCB_PTR);
+       RETURN;
+     END;
+
+     /* Otherwise refresh list */
+     CALL LIST_USERS;
+     CALL SEND_MAP;
+   END PROCESS_INPUTS;
+
+   /******************************************************************/
+   /* LIST_USERS                                                     */
+   /******************************************************************/
+   LIST_USERS: PROC;
+     DCL USER_COUNT FIXED BIN(15) INIT(0);
+
+     IF IN_USERID ^= ' ' & IN_USERID ^= '' THEN
+       USRSEC_SSA = 'USRSEG  (USRID   >=' || IN_USERID || ')';
+     ELSE
+       USRSEC_SSA = 'USRSEG  ';
+
+     CALL PLITDLI(GU, DB_USRSEC_PTR, SEC_USER_DATA, USRSEC_SSA);
+
+     DO WHILE(USRSEC_STATUS = '  ' & USER_COUNT < MAX_USERS);
+       USER_COUNT = USER_COUNT + 1;
+       OUT_SEL(USER_COUNT)   = ' ';
+       OUT_UID(USER_COUNT)   = SEC_USR_ID;
+       OUT_FNAME(USER_COUNT) = SEC_USR_FNAME;
+       OUT_LNAME(USER_COUNT) = SEC_USR_LNAME;
+       OUT_UTYPE(USER_COUNT) = SEC_USR_TYPE;
+
+       CALL PLITDLI(GN, DB_USRSEC_PTR, SEC_USER_DATA);
+     END;
+
+     IF USER_COUNT = 0 THEN
+       WS_RETURN_MSG = 'No users found';
+     ELSE
+       OUT_INFOMSG = 'U=Update D=Delete A=Add new user';
+   END LIST_USERS;
+
+   SEND_MAP: PROC;
+     CALL POPULATE_HEADER_INFO;
+     OUT_ERRMSG = WS_RETURN_MSG;
+     OUTPUT_MSG.LL = SIZE(OUTPUT_MSG);
+     OUTPUT_MSG.ZZ = 0;
+     IO_MOD = 'COUSR00';
+     CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
+   END SEND_MAP;
+
+   POPULATE_HEADER_INFO: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     OUT_TRNNAME = WS_TRANID;
+     OUT_TITLE01 = CCDA_TITLE01;
+     OUT_TITLE02 = CCDA_TITLE02;
+     OUT_PGMNAME = WS_PGMNAME;
+     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 3, 2);
+     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 13, 2);
+   END POPULATE_HEADER_INFO;
+
+ END COUSR00C;

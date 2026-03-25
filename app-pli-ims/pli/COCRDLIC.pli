@@ -1,0 +1,231 @@
+ /*********************************************************************/
+ /* Program     : COCRDLIC.PLI                                        */
+ /* Application : CardDemo                                            */
+ /* Type        : IMS PL/I Program                                    */
+ /* Function    : Credit Card List display                            */
+ /* Converted from COBOL/CICS: app/cbl/COCRDLIC.cbl                  */
+ /*********************************************************************/
+ /* Copyright Amazon.com, Inc. or its affiliates.                     */
+ /* All Rights Reserved.                                              */
+ /* Licensed under the Apache License, Version 2.0                    */
+ /*********************************************************************/
+
+ COCRDLIC: PROC(IO_PCB_PTR, ALT_PCB_PTR,
+                 DB_ACCT_PTR, DB_CARD_PTR,
+                 DB_CXREF_PTR) OPTIONS(MAIN);
+
+   DCL IO_PCB_PTR    POINTER;
+   DCL ALT_PCB_PTR   POINTER;
+   DCL DB_ACCT_PTR   POINTER;
+   DCL DB_CARD_PTR   POINTER;
+   DCL DB_CXREF_PTR  POINTER;
+
+   DCL 1 IO_PCB BASED(IO_PCB_PTR),
+         2 IO_LTERM    CHAR(8),  2 IO_RESV  CHAR(2),
+         2 IO_STATUS   CHAR(2),  2 IO_DATE  FIXED BIN(31),
+         2 IO_TIME     FIXED BIN(31), 2 IO_SEQ FIXED BIN(31),
+         2 IO_MOD      CHAR(8);
+
+   DCL 1 ALT_PCB BASED(ALT_PCB_PTR),
+         2 ALT_DEST    CHAR(8),  2 ALT_RESV  CHAR(2),
+         2 ALT_STATUS  CHAR(2);
+
+   DCL 1 DB_CARD BASED(DB_CARD_PTR),
+         2 CARD_DBNAME  CHAR(8),  2 CARD_LEVEL  CHAR(2),
+         2 CARD_DBSTAT  CHAR(2),  2 CARD_PROC   CHAR(4),
+         2 CARD_RESV    FIXED BIN(31),
+         2 CARD_SEGNAME CHAR(8),  2 CARD_KEYLEN FIXED BIN(31),
+         2 CARD_SENSEG  FIXED BIN(31),
+         2 CARD_KEYVAL  CHAR(256);
+
+   DCL WS_PGMNAME     CHAR(8) INIT('COCRDLIC');
+   DCL WS_TRANID      CHAR(4) INIT('CCLI');
+   DCL WS_MESSAGE      CHAR(80) INIT(' ');
+   DCL WS_ERR_FLG      CHAR(1) INIT('N');
+   DCL WS_RETURN_MSG   CHAR(75) INIT(' ');
+   DCL WS_IDX          FIXED BIN(15);
+   DCL MAX_CARDS       FIXED BIN(15) INIT(7);
+
+   %INCLUDE COCOM01Y;
+   %INCLUDE CVCRD01Y;
+   %INCLUDE COTTL01Y;
+   %INCLUDE CSDAT01Y;
+   %INCLUDE CSMSG01Y;
+   %INCLUDE CSMSG02Y;
+   %INCLUDE CVACT02Y;
+   %INCLUDE CVACT03Y;
+
+   DCL 1 INPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 TRANCODE     CHAR(8),
+         2 IN_ACCTID    CHAR(11),
+         2 IN_CARDNUM   CHAR(16),
+         2 IN_SEL(7)    CHAR(1),
+         2 IN_COMMAREA  CHAR(LENGTH(CARDDEMO_COMMAREA));
+
+   DCL 1 CARD_LIST_ENTRY,
+         2 CL_CARDNUM   CHAR(16),
+         2 CL_ACCTID    CHAR(11),
+         2 CL_STATUS    CHAR(1),
+         2 CL_EXPDT     CHAR(10),
+         2 CL_NAME      CHAR(50);
+
+   DCL 1 OUTPUT_MSG,
+         2 LL           FIXED BIN(15),
+         2 ZZ           FIXED BIN(15),
+         2 OUT_TRNNAME  CHAR(4),
+         2 OUT_TITLE01  CHAR(40),
+         2 OUT_CURDATE  CHAR(8),
+         2 OUT_PGMNAME  CHAR(8),
+         2 OUT_TITLE02  CHAR(40),
+         2 OUT_CURTIME  CHAR(8),
+         2 OUT_ACCTID   CHAR(11),
+         2 OUT_CARDNUM  CHAR(16),
+         2 OUT_CARDS(7),
+           3 OUT_SEL    CHAR(1),
+           3 OUT_CRDNUM CHAR(16),
+           3 OUT_CRDACT CHAR(11),
+           3 OUT_CRDSTS CHAR(1),
+           3 OUT_CRDEXP CHAR(10),
+           3 OUT_CRDNAM CHAR(25),
+         2 OUT_INFOMSG  CHAR(40),
+         2 OUT_ERRMSG   CHAR(78);
+
+   DCL CARD_SSA CHAR(50);
+
+   DCL GU   CHAR(4) INIT('GU  ');
+   DCL GN   CHAR(4) INIT('GN  ');
+   DCL GHN  CHAR(4) INIT('GHN ');
+   DCL ISRT CHAR(4) INIT('ISRT');
+   DCL CHNG CHAR(4) INIT('CHNG');
+   DCL PURG CHAR(4) INIT('PURG');
+   DCL PLITDLI EXTERNAL ENTRY OPTIONS(ASM INTER);
+
+   /******************************************************************/
+   /* MAIN PROCESSING                                                */
+   /******************************************************************/
+   WS_ERR_FLG = 'N';
+   WS_RETURN_MSG = ' ';
+
+   CALL PLITDLI(GU, IO_PCB_PTR, INPUT_MSG);
+   CARDDEMO_COMMAREA = IN_COMMAREA;
+
+   IF CDEMO_PGM_CONTEXT = '0' THEN DO;
+     CDEMO_PGM_CONTEXT = '1';
+     OUT_INFOMSG = 'Enter Account ID or Card Number to search';
+     CALL SEND_MAP;
+   END;
+   ELSE DO;
+     CALL PROCESS_INPUTS;
+   END;
+
+   RETURN;
+
+   /******************************************************************/
+   /* PROCESS_INPUTS                                                 */
+   /******************************************************************/
+   PROCESS_INPUTS: PROC;
+     /* Check if a card was selected for detail view */
+     DO WS_IDX = 1 TO MAX_CARDS;
+       IF IN_SEL(WS_IDX) = 'S' | IN_SEL(WS_IDX) = 's' THEN DO;
+         CDEMO_CARD_NUM = OUT_CRDNUM(WS_IDX);
+         CDEMO_FROM_TRANID = WS_TRANID;
+         CDEMO_FROM_PROGRAM = WS_PGMNAME;
+         CDEMO_PGM_CONTEXT = '0';
+         CALL PLITDLI(CHNG, ALT_PCB_PTR, 'CCDL');
+         CALL PLITDLI(ISRT, ALT_PCB_PTR, CARDDEMO_COMMAREA);
+         CALL PLITDLI(PURG, ALT_PCB_PTR);
+         RETURN;
+       END;
+     END;
+
+     /* List cards for the given account */
+     IF IN_ACCTID ^= ' ' THEN DO;
+       CALL LIST_CARDS_BY_ACCT;
+     END;
+     ELSE IF IN_CARDNUM ^= ' ' THEN DO;
+       CALL LIST_CARD_BY_NUM;
+     END;
+     ELSE DO;
+       WS_RETURN_MSG = 'Please enter Account ID or Card Number';
+     END;
+
+     CALL SEND_MAP;
+   END PROCESS_INPUTS;
+
+   /******************************************************************/
+   /* LIST_CARDS_BY_ACCT                                             */
+   /******************************************************************/
+   LIST_CARDS_BY_ACCT: PROC;
+     DCL CARD_COUNT FIXED BIN(15) INIT(0);
+
+     /* Position and read cards for this account */
+     CARD_SSA = 'CARDSEG (ACCTID  =' || IN_ACCTID || ')';
+
+     CALL PLITDLI(GU, DB_CARD_PTR, CARD_RECORD, CARD_SSA);
+
+     DO WHILE(CARD_DBSTAT = '  ' & CARD_COUNT < MAX_CARDS);
+       CARD_COUNT = CARD_COUNT + 1;
+       OUT_SEL(CARD_COUNT) = ' ';
+       OUT_CRDNUM(CARD_COUNT) = CARD_NUM;
+       OUT_CRDACT(CARD_COUNT) = CARD_ACCT_ID;
+       OUT_CRDSTS(CARD_COUNT) = CARD_ACTIVE_STATUS;
+       OUT_CRDEXP(CARD_COUNT) = CARD_EXPIRAION_DATE;
+       OUT_CRDNAM(CARD_COUNT) = SUBSTR(CARD_EMBOSSED_NAME, 1, 25);
+
+       CALL PLITDLI(GN, DB_CARD_PTR, CARD_RECORD);
+     END;
+
+     IF CARD_COUNT = 0 THEN
+       WS_RETURN_MSG = 'No cards found for this account';
+     ELSE
+       OUT_INFOMSG = 'Select a card for details (S)';
+   END LIST_CARDS_BY_ACCT;
+
+   /******************************************************************/
+   /* LIST_CARD_BY_NUM                                               */
+   /******************************************************************/
+   LIST_CARD_BY_NUM: PROC;
+     CARD_SSA = 'CARDSEG (CARDNUM =' || IN_CARDNUM || ')';
+
+     CALL PLITDLI(GU, DB_CARD_PTR, CARD_RECORD, CARD_SSA);
+
+     IF CARD_DBSTAT = '  ' THEN DO;
+       OUT_SEL(1) = ' ';
+       OUT_CRDNUM(1) = CARD_NUM;
+       OUT_CRDACT(1) = CARD_ACCT_ID;
+       OUT_CRDSTS(1) = CARD_ACTIVE_STATUS;
+       OUT_CRDEXP(1) = CARD_EXPIRAION_DATE;
+       OUT_CRDNAM(1) = SUBSTR(CARD_EMBOSSED_NAME, 1, 25);
+       OUT_INFOMSG = 'Select card for details (S)';
+     END;
+     ELSE
+       WS_RETURN_MSG = 'Card not found';
+   END LIST_CARD_BY_NUM;
+
+   SEND_MAP: PROC;
+     CALL POPULATE_HEADER_INFO;
+     OUT_ERRMSG = WS_RETURN_MSG;
+     OUTPUT_MSG.LL = SIZE(OUTPUT_MSG);
+     OUTPUT_MSG.ZZ = 0;
+     IO_MOD = 'COCRDLI';
+     CALL PLITDLI(ISRT, IO_PCB_PTR, OUTPUT_MSG);
+   END SEND_MAP;
+
+   POPULATE_HEADER_INFO: PROC;
+     DCL CURRENT_TS CHAR(17);
+     CURRENT_TS = DATETIME();
+     OUT_TRNNAME = WS_TRANID;
+     OUT_TITLE01 = CCDA_TITLE01;
+     OUT_TITLE02 = CCDA_TITLE02;
+     OUT_PGMNAME = WS_PGMNAME;
+     OUT_CURDATE = SUBSTR(CURRENT_TS, 5, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 7, 2) || '/' ||
+                   SUBSTR(CURRENT_TS, 3, 2);
+     OUT_CURTIME = SUBSTR(CURRENT_TS, 9, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 11, 2) || ':' ||
+                   SUBSTR(CURRENT_TS, 13, 2);
+   END POPULATE_HEADER_INFO;
+
+ END COCRDLIC;
