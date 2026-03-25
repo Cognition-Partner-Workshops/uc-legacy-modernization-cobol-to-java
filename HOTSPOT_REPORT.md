@@ -55,7 +55,7 @@ Each module is scored on three dimensions (1-5 scale each):
 | Metric              | Value    | Detail                                                    |
 |---------------------|----------|-----------------------------------------------------------|
 | **Lines of Code**   | 732      | Medium size but high business logic density               |
-| **Copybooks Used**  | 6        | CVACT01Y, CVACT03Y, CVTRA01Y, CVTRA05Y, CVTRA06Y        |
+| **Copybooks Used**  | 5        | CVACT01Y, CVACT03Y, CVTRA01Y, CVTRA05Y, CVTRA06Y        |
 | **VSAM Files**      | 6 R/W    | DALYTRAN (R), TRANSACT (W), ACCTDAT (R/W), CCXREF (R), TCATBALF (R/W), DALYREJS (W) |
 | **Complexity Score** | 4/5     | Multi-file transaction posting with validation, rejection handling, running balance updates |
 | **Risk Score**       | 5/5     | Writes to 4 VSAM files atomically — most critical batch job for data integrity. Cross-reference validation. Reject file generation |
@@ -81,7 +81,7 @@ Each module is scored on three dimensions (1-5 scale each):
 | **Complexity Score** | 4/5     | Multi-file join logic, SORT integration, HTML output generation, CALL to CBSTM03B subroutine |
 | **Risk Score**       | 4/5     | Complex report formatting, HTML generation in COBOL, customer PII in output, GDG management |
 | **Impact Score**     | 5/5     | Customer-facing statements — regulatory requirement, directly visible to cardholders |
-| **Composite Score**  | **87**  |                                                           |
+| **Composite Score**  | **86**  |                                                           |
 
 **Migration Concerns:**
 - Two-program structure (CBSTM03A calls CBSTM03B) — consolidate or maintain as service + helper
@@ -141,7 +141,7 @@ Each module is scored on three dimensions (1-5 scale each):
 | **Complexity Score** | 4/5     | Interest rate calculation with disclosure group lookup, category balance updates |
 | **Risk Score**       | 4/5     | Financial calculation accuracy is critical. Writes to same files as CBTRN02C |
 | **Impact Score**     | 5/5     | Revenue-generating — interest charges are core to credit card business model |
-| **Composite Score**  | **87** (tied with #3, ranked lower due to lower LOC) |
+| **Composite Score**  | **86** (tied with #3, ranked lower due to lower LOC) |
 
 **Migration Concerns:**
 - Financial calculations MUST use BigDecimal in Java — no floating-point rounding errors
@@ -161,7 +161,7 @@ Each module is scored on three dimensions (1-5 scale each):
 | **Complexity Score** | 3/5     | Multi-file join via VSAM reads and alternate indexes      |
 | **Risk Score**       | 3/5     | Read-only reduces risk, but uses two alternate indexes (CXACAIX, CARDAIX) that need careful DB index mapping |
 | **Impact Score**     | 4/5     | Most frequently accessed screen — first menu option for users |
-| **Composite Score**  | **67**  |                                                           |
+| **Composite Score**  | **66**  |                                                           |
 
 **Migration Concerns:**
 - Five VSAM file reads joined in program logic — becomes SQL JOIN in modernized version
@@ -181,7 +181,7 @@ Each module is scored on three dimensions (1-5 scale each):
 | **Complexity Score** | 3/5     | SORT integration, report header/detail/total formatting, page breaks, GDG output |
 | **Risk Score**       | 3/5     | Read-only access to files. CVTRA07Y report layout (74 lines) is fragile formatting |
 | **Impact Score**     | 4/5     | Daily transaction reports used for reconciliation and audit |
-| **Composite Score**  | **67** (tied with #7, ranked lower due to batch-only execution) |
+| **Composite Score**  | **66** (tied with #7, ranked lower due to batch-only execution) |
 
 **Migration Concerns:**
 - SORT utility integration in JCL must become programmatic sort or database ORDER BY
@@ -221,7 +221,7 @@ Each module is scored on three dimensions (1-5 scale each):
 | **Complexity Score** | 3/5     | VSAM BROWSE for user list, selection routing to COUSR02C/COUSR03C |
 | **Risk Score**       | 4/5     | Security-critical — manages authentication data. Plain-text passwords in legacy. Admin-only but high consequence |
 | **Impact Score**     | 3/5     | Admin function, lower frequency than card/account operations but critical for access control |
-| **Composite Score**  | **67**  |                                                           |
+| **Composite Score**  | **66**  |                                                           |
 
 **Migration Concerns:**
 - Plain-text password storage (SEC-USR-PWD) — MUST implement bcrypt/scrypt hashing
@@ -237,13 +237,13 @@ Each module is scored on three dimensions (1-5 scale each):
 | Rank | Program    | Type   | LOC   | Copybooks | Files R/W | Complexity | Risk | Impact | Score |
 |------|------------|--------|-------|-----------|-----------|:----------:|:----:|:------:|:-----:|
 | 1    | COACTUPC   | Online | 4,237 | 17        | 5 R/W     | 5          | 5    | 5      | **100** |
-| 2    | CBTRN02C   | Batch  | 732   | 6         | 6 R/W     | 4          | 5    | 5      | **93**  |
-| 3    | CBSTM03A   | Batch  | 924   | 5         | 4 R       | 4          | 4    | 5      | **87**  |
+| 2    | CBTRN02C   | Batch  | 732   | 5         | 6 R/W     | 4          | 5    | 5      | **93**  |
+| 3    | CBSTM03A   | Batch  | 924   | 5         | 4 R       | 4          | 4    | 5      | **86**  |
 | 4    | COCRDUPC   | Online | 1,560 | 13        | 3 R/W     | 4          | 4    | 4      | **80**  |
 | 5    | COCRDLIC   | Online | 1,459 | 11        | 2 R       | 4          | 3    | 4      | **73**  |
-| 6    | CBACT04C   | Batch  | 652   | 5         | 5 R/W     | 4          | 4    | 5      | **87**  |
-| 7    | COACTVWC   | Online | 942   | 13        | 5 R       | 3          | 3    | 4      | **67**  |
-| 8    | CBTRN03C   | Batch  | 649   | 5         | 4 R       | 3          | 3    | 4      | **67**  |
+| 6    | CBACT04C   | Batch  | 652   | 5         | 5 R/W     | 4          | 4    | 5      | **86**  |
+| 7    | COACTVWC   | Online | 942   | 13        | 5 R       | 3          | 3    | 4      | **66**  |
+| 8    | CBTRN03C   | Batch  | 649   | 5         | 4 R       | 3          | 3    | 4      | **66**  |
 | 9    | COTRN02C   | Online | 784   | 9         | 4 R/W     | 3          | 4    | 4      | **73**  |
 | 10   | COUSR00C   | Online | 695   | 8         | 1 R/W     | 3          | 4    | 3      | **67**  |
 

@@ -12,12 +12,12 @@ The CardDemo application manages **7 core business entities** stored as VSAM KSD
 | Entity                    | Copybook   | Record Length | Field Count | VSAM File             |
 |---------------------------|------------|---------------|-------------|-----------------------|
 | Account                   | CVACT01Y   | 300 bytes     | 12          | ACCTDAT               |
-| Card                      | CVACT02Y   | 150 bytes     | 7           | CARDDAT               |
-| Card Cross-Reference      | CVACT03Y   | 50 bytes      | 4           | CCXREF / CXACAIX      |
-| Customer                  | CVCUS01Y   | 500 bytes     | 19          | CUSTDAT               |
-| Transaction (Master)      | CVTRA05Y   | 350 bytes     | 14          | TRANSACT              |
-| Daily Transaction         | CVTRA06Y   | 350 bytes     | 14          | DALYTRAN              |
-| User Security             | CSUSR01Y   | 80 bytes      | 6           | USRSEC                |
+| Card                      | CVACT02Y   | 150 bytes     | 6           | CARDDAT               |
+| Card Cross-Reference      | CVACT03Y   | 50 bytes      | 3           | CCXREF / CXACAIX      |
+| Customer                  | CVCUS01Y   | 500 bytes     | 18          | CUSTDAT               |
+| Transaction (Master)      | CVTRA05Y   | 350 bytes     | 13          | TRANSACT              |
+| Daily Transaction         | CVTRA06Y   | 350 bytes     | 13          | DALYTRAN              |
+| User Security             | CSUSR01Y   | 80 bytes      | 5           | USRSEC                |
 
 ---
 

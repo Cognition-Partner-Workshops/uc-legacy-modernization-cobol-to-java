@@ -158,7 +158,7 @@ Legend: **D** = Data record layout, **C** = Communication/infrastructure, **B** 
 
 | Copybook   | Additional Users                                        | Purpose                            |
 |------------|--------------------------------------------------------|------------------------------------|
-| CSMEN02Y   | COMEN01C (COMEN02Y)                                    | Main menu option definitions       |
+| COMEN02Y   | COMEN01C                                               | Main menu option definitions       |
 | COADM02Y   | COADM01C                                               | Admin menu option definitions      |
 | CSMSG02Y   | COACTVWC, COCRDSLC, COCRDUPC, COACTUPC                | Abend handling                     |
 | CVCRD01Y   | COACTVWC, COCRDLIC, COCRDSLC, COCRDUPC, COACTUPC      | Card work area / AID handling      |
