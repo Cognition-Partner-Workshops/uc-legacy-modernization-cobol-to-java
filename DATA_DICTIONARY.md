@@ -21,8 +21,9 @@
 | 8 | Reissue Date | ACCT-REISSUE-DATE | PIC X(10) | Date | 10 | Date of last card reissue |
 | 9 | Current Cycle Credit | ACCT-CURR-CYC-CREDIT | PIC S9(10)V99 | Decimal | 12 | Credits in current billing cycle |
 | 10 | Current Cycle Debit | ACCT-CURR-CYC-DEBIT | PIC S9(10)V99 | Decimal | 12 | Debits in current billing cycle |
-| 11 | Account Group ID | ACCT-GROUP-ID | PIC X(10) | Alpha | 10 | Disclosure/interest group classification |
-| 12 | Filler | FILLER | PIC X(178) | -- | 178 | Reserved space |
+| 11 | Address ZIP | ACCT-ADDR-ZIP | PIC X(10) | Alpha | 10 | Account holder postal/ZIP code |
+| 12 | Account Group ID | ACCT-GROUP-ID | PIC X(10) | Alpha | 10 | Disclosure/interest group classification |
+| 13 | Filler | FILLER | PIC X(178) | -- | 178 | Reserved space |
 
 **Business Rules:**
 - Primary entity for credit card account management
@@ -74,7 +75,7 @@
 | 12 | Phone Number 2 | CUST-PHONE-NUM-2 | PIC X(15) | Alpha | 15 | Secondary phone |
 | 13 | SSN | CUST-SSN | PIC 9(09) | Numeric | 9 | Social Security Number |
 | 14 | Government ID | CUST-GOVT-ISSUED-ID | PIC X(20) | Alpha | 20 | Government-issued ID |
-| 15 | Date of Birth | CUST-DOB-YYYYMMDD | PIC X(10) | Date | 10 | Date of birth |
+| 15 | Date of Birth | CUST-DOB-YYYY-MM-DD | PIC X(10) | Date | 10 | Date of birth |
 | 16 | EFT Account ID | CUST-EFT-ACCOUNT-ID | PIC X(10) | Alpha | 10 | Electronic fund transfer account |
 | 17 | Primary Holder Ind | CUST-PRI-CARD-HOLDER-IND | PIC X(01) | Alpha | 1 | Primary card holder indicator (Y/N) |
 | 18 | FICO Score | CUST-FICO-CREDIT-SCORE | PIC 9(03) | Numeric | 3 | Credit score (300-850) |

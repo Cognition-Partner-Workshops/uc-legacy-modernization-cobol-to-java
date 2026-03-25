@@ -95,7 +95,7 @@ Each module is scored on four dimensions (1-5 scale each, 5 = highest):
 
 | Dimension | Score | Evidence |
 |-----------|------:|---------|
-| Code Complexity | **4** | 924 + 230 = 1,154 lines combined. CBSTM03A calls CBSTM03B 12 times for file open/close/read. ALTER statement modifies paragraph flow dynamically. Generates both text and HTML output. |
+| Code Complexity | **4** | 924 + 230 = 1,154 lines combined. CBSTM03A calls CBSTM03B 13 times for file open/close/read. ALTER statement modifies paragraph flow dynamically. Generates both text and HTML output. |
 | Data Coupling | **4** | Reads 4 files (sorted transactions, xref, customer, account). Writes 2 output files (text statement, HTML statement). Uses COSTM01 and CUSTREC specialized copybooks. |
 | Business Criticality | **4** | Produces customer-facing statements. Any error = incorrect bills sent to customers. Regulatory compliance concern. |
 | Modernization Risk | **4** | Uses COBOL ALTER statement (dynamically changes PERFORM targets) — very difficult to convert. Two-program CALL architecture needs refactoring. HTML generation embedded in COBOL. |

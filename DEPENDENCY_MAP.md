@@ -106,7 +106,7 @@ CBACT04C ──(reads)──▶ Category Balance, Xref, Account, Disclosure Grou
    │      ──(writes)──▶ System Transactions (interest entries)
    │      ──(updates)─▶ Account Master (balance adjustments)
    │
-CBSTM03A ──(CALL)───▶ CBSTM03B (file I/O subroutine, called 12 times)
+CBSTM03A ──(CALL)───▶ CBSTM03B (file I/O subroutine, called 13 times)
    │      ──(reads)──▶ Sorted Transactions, Xref, Customer, Account
    │      ──(writes)──▶ Statement Files (text + HTML)
    │
@@ -130,7 +130,7 @@ COBSWAIT ──(CALL)───▶ MVSWAIT (assembler wait routine)
 
 | Caller | Callee | Type | Purpose |
 |--------|--------|------|---------|
-| CBSTM03A | CBSTM03B | CALL (12x) | Open/close/read TRNX, XREF, CUST, ACCT files |
+| CBSTM03A | CBSTM03B | CALL (13x) | Open/close/read TRNX, XREF, CUST, ACCT files |
 | CBACT01C | COBDATFT | CALL (ASM) | Date formatting for account reports |
 | COBSWAIT | MVSWAIT | CALL (ASM) | System wait/sleep in centiseconds |
 | All batch | CEE3ABD | CALL (LE) | Language Environment abnormal termination |
