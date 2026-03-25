@@ -224,7 +224,7 @@ Each module is scored on three axes (1-5 scale each):
 | Complexity | **3** | Cross-reference lookup, date validation (2 calls), card/account validation, transaction ID generation |
 | Risk | **4** | Writes directly to TRANSACT master and reads account for validation. Bad transaction = financial impact |
 | Impact | **4** | Online transaction entry: real-time business operations depend on this |
-| **Weighted Score** | **3.55** | |
+| **Weighted Score** | **3.60** | |
 
 **Modernization Priority:** HIGH
 **Recommendation:** Implement as a TransactionService with validation pipeline (card exists → account active → amount valid → date valid). Use event sourcing for transaction creation audit trail.
