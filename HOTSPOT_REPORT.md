@@ -190,7 +190,7 @@ Each module is scored on three dimensions (1-10 scale):
 | 3 | **COCRDUPC** | Online | 1,560 | 9 | 8 | 7 | **8.15** | PCI card data, complex validation |
 | 4 | **CBACT04C** | Batch | 652 | 7 | 9 | 8 | **7.95** | Interest calculation accuracy |
 | 5 | **COCRDLIC** | Online | 1,460 | 8 | 7 | 7 | **7.40** | Pagination complexity, card display |
-| 6 | **CBSTM03A** | Batch | 924 | 8 | 7 | 7 | **7.40** | Dual-format output, report accuracy |
+| 5 | **CBSTM03A** | Batch | 924 | 8 | 7 | 7 | **7.40** | Dual-format output, report accuracy |
 | 7 | **COTRN02C** | Online | 783 | 7 | 8 | 7 | **7.35** | Transaction creation, validation |
 | 8 | **CBTRN03C** | Batch | 649 | 7 | 7 | 6 | **6.75** | Multi-file join, report accuracy |
 | 9 | **COBIL00C** | Online | 572 | 6 | 8 | 6 | **6.70** | Payment atomicity, balance updates |
