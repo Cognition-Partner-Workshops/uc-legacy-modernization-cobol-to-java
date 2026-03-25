@@ -38,9 +38,7 @@
          05 WS-TRANID                  PIC X(04) VALUE 'CR00'.
          05 WS-MESSAGE                 PIC X(80) VALUE SPACES.
          05 WS-TRANSACT-FILE             PIC X(08) VALUE 'TRANSACT'.
-         05 WS-ERR-FLG                 PIC X(01) VALUE 'N'.
-           88 ERR-FLG-ON                         VALUE 'Y'.
-           88 ERR-FLG-OFF                        VALUE 'N'.
+         COPY CSVAR01Y.
          05 WS-TRANSACT-EOF            PIC X(01) VALUE 'N'.
            88 TRANSACT-EOF                       VALUE 'Y'.
            88 TRANSACT-NOT-EOF                   VALUE 'N'.
@@ -126,14 +124,7 @@
         02 JOB-DATA-2 REDEFINES JOB-DATA-1.
          05 JOB-LINES OCCURS 1000 TIMES PIC X(80).
 
-       01 CSUTLDTC-PARM.
-          05 CSUTLDTC-DATE                   PIC X(10).
-          05 CSUTLDTC-DATE-FORMAT            PIC X(10).
-          05 CSUTLDTC-RESULT.
-             10 CSUTLDTC-RESULT-SEV-CD       PIC X(04).
-             10 FILLER                       PIC X(11).
-             10 CSUTLDTC-RESULT-MSG-NUM      PIC X(04).
-             10 CSUTLDTC-RESULT-MSG          PIC X(61).
+       COPY CSUTL01Y.
 
        COPY COCOM01Y.
 
@@ -537,18 +528,7 @@
       *----------------------------------------------------------------*
       *                      RETURN-TO-PREV-SCREEN
       *----------------------------------------------------------------*
-       RETURN-TO-PREV-SCREEN.
-
-           IF CDEMO-TO-PROGRAM = LOW-VALUES OR SPACES
-               MOVE 'COSGN00C' TO CDEMO-TO-PROGRAM
-           END-IF
-           MOVE WS-TRANID    TO CDEMO-FROM-TRANID
-           MOVE WS-PGMNAME   TO CDEMO-FROM-PROGRAM
-           MOVE ZEROS        TO CDEMO-PGM-CONTEXT
-           EXEC CICS
-               XCTL PROGRAM(CDEMO-TO-PROGRAM)
-               COMMAREA(CARDDEMO-COMMAREA)
-           END-EXEC.
+       COPY CSRTN01Y.
 
       *----------------------------------------------------------------*
       *                      SEND-TRNRPT-SCREEN
@@ -608,24 +588,8 @@
       *----------------------------------------------------------------*
        POPULATE-HEADER-INFO.
 
-           MOVE FUNCTION CURRENT-DATE  TO WS-CURDATE-DATA
-
-           MOVE CCDA-TITLE01           TO TITLE01O OF CORPT0AO
-           MOVE CCDA-TITLE02           TO TITLE02O OF CORPT0AO
-           MOVE WS-TRANID              TO TRNNAMEO OF CORPT0AO
-           MOVE WS-PGMNAME             TO PGMNAMEO OF CORPT0AO
-
-           MOVE WS-CURDATE-MONTH       TO WS-CURDATE-MM
-           MOVE WS-CURDATE-DAY         TO WS-CURDATE-DD
-           MOVE WS-CURDATE-YEAR(3:2)   TO WS-CURDATE-YY
-
-           MOVE WS-CURDATE-MM-DD-YY    TO CURDATEO OF CORPT0AO
-
-           MOVE WS-CURTIME-HOURS       TO WS-CURTIME-HH
-           MOVE WS-CURTIME-MINUTE      TO WS-CURTIME-MM
-           MOVE WS-CURTIME-SECOND      TO WS-CURTIME-SS
-
-           MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF CORPT0AO.
+           COPY CSHDR01Y
+               REPLACING ==MAPOUT== BY ==CORPT0AO==.
 
       *----------------------------------------------------------------*
       *                      INITIALIZE-ALL-FIELDS

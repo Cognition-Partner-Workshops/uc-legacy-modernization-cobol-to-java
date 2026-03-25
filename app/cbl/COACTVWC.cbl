@@ -83,26 +83,7 @@
               88 FOUND-ACCT-IN-MASTER              VALUE '1'.
            10 WS-CUST-MASTER-READ-FLAG             PIC X(1).
               88 FOUND-CUST-IN-MASTER              VALUE '1'.                   
-         05  WS-FILE-ERROR-MESSAGE.                                             
-           10  FILLER                              PIC X(12)                    
-                                                   VALUE 'File Error: '.        
-           10  ERROR-OPNAME                        PIC X(8)                     
-                                                   VALUE SPACES.                
-           10  FILLER                              PIC X(4)                     
-                                                   VALUE ' on '.                
-           10  ERROR-FILE                          PIC X(9)                     
-                                                   VALUE SPACES.                
-           10  FILLER                              PIC X(15)                    
-                                                   VALUE                        
-                                                   ' returned RESP '.           
-           10  ERROR-RESP                          PIC X(10)                    
-                                                   VALUE SPACES.                
-           10  FILLER                              PIC X(7)                     
-                                                   VALUE ',RESP2 '.             
-           10  ERROR-RESP2                         PIC X(10)                    
-                                                   VALUE SPACES.                
-          10  FILLER                               PIC X(5)                     
-                                                   VALUE SPACES.                
+         COPY CSERR01Y.                
       ******************************************************************        
       *      Output Message Construction                                        
       ******************************************************************        

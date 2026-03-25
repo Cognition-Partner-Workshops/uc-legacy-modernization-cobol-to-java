@@ -35,11 +35,8 @@
        01 WS-VARIABLES.
          05 WS-PGMNAME                 PIC X(08) VALUE 'COUSR00C'.
          05 WS-TRANID                  PIC X(04) VALUE 'CU00'.
-         05 WS-MESSAGE                 PIC X(80) VALUE SPACES.
+         COPY CSVAR01Y.
          05 WS-USRSEC-FILE             PIC X(08) VALUE 'USRSEC  '.
-         05 WS-ERR-FLG                 PIC X(01) VALUE 'N'.
-           88 ERR-FLG-ON                         VALUE 'Y'.
-           88 ERR-FLG-OFF                        VALUE 'N'.
          05 WS-USER-SEC-EOF            PIC X(01) VALUE 'N'.
            88 USER-SEC-EOF                       VALUE 'Y'.
            88 USER-SEC-NOT-EOF                   VALUE 'N'.
@@ -503,18 +500,7 @@
       *----------------------------------------------------------------*
       *                      RETURN-TO-PREV-SCREEN
       *----------------------------------------------------------------*
-       RETURN-TO-PREV-SCREEN.
-
-           IF CDEMO-TO-PROGRAM = LOW-VALUES OR SPACES
-               MOVE 'COSGN00C' TO CDEMO-TO-PROGRAM
-           END-IF
-           MOVE WS-TRANID    TO CDEMO-FROM-TRANID
-           MOVE WS-PGMNAME   TO CDEMO-FROM-PROGRAM
-           MOVE ZEROS        TO CDEMO-PGM-CONTEXT
-           EXEC CICS
-               XCTL PROGRAM(CDEMO-TO-PROGRAM)
-               COMMAREA(CARDDEMO-COMMAREA)
-           END-EXEC.
+       COPY CSRTN01Y.
 
       *----------------------------------------------------------------*
       *                      SEND-USRLST-SCREEN
@@ -561,24 +547,8 @@
       *----------------------------------------------------------------*
        POPULATE-HEADER-INFO.
 
-           MOVE FUNCTION CURRENT-DATE  TO WS-CURDATE-DATA
-
-           MOVE CCDA-TITLE01           TO TITLE01O OF COUSR0AO
-           MOVE CCDA-TITLE02           TO TITLE02O OF COUSR0AO
-           MOVE WS-TRANID              TO TRNNAMEO OF COUSR0AO
-           MOVE WS-PGMNAME             TO PGMNAMEO OF COUSR0AO
-
-           MOVE WS-CURDATE-MONTH       TO WS-CURDATE-MM
-           MOVE WS-CURDATE-DAY         TO WS-CURDATE-DD
-           MOVE WS-CURDATE-YEAR(3:2)   TO WS-CURDATE-YY
-
-           MOVE WS-CURDATE-MM-DD-YY    TO CURDATEO OF COUSR0AO
-
-           MOVE WS-CURTIME-HOURS       TO WS-CURTIME-HH
-           MOVE WS-CURTIME-MINUTE      TO WS-CURTIME-MM
-           MOVE WS-CURTIME-SECOND      TO WS-CURTIME-SS
-
-           MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF COUSR0AO.
+           COPY CSHDR01Y
+               REPLACING ==MAPOUT== BY ==COUSR0AO==.
 
       *----------------------------------------------------------------*
       *                      STARTBR-USER-SEC-FILE

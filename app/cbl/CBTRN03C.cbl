@@ -136,24 +136,7 @@
            05 WS-GRAND-TOTAL     PIC S9(09)V99 VALUE 0.                         
            05 WS-CURR-CARD-NUM   PIC X(16) VALUE SPACES.                        
                                                                                 
-       01 IO-STATUS.                                                            
-          05 IO-STAT1           PIC X.                                          
-          05 IO-STAT2           PIC X.                                          
-       01 TWO-BYTES-BINARY      PIC 9(4) BINARY.                                
-       01 TWO-BYTES-ALPHA REDEFINES TWO-BYTES-BINARY.                           
-          05 TWO-BYTES-LEFT     PIC X.                                          
-          05 TWO-BYTES-RIGHT    PIC X.                                          
-       01 IO-STATUS-04.                                                         
-          05 IO-STATUS-0401     PIC 9      VALUE 0.                             
-          05 IO-STATUS-0403     PIC 999    VALUE 0.                             
-                                                                                
-       01 APPL-RESULT           PIC S9(9) COMP.                                 
-          88 APPL-AOK                      VALUE 0.                             
-          88 APPL-EOF                      VALUE 16.                            
-                                                                                
-       01 END-OF-FILE           PIC X(01)  VALUE 'N'.                           
-       01 ABCODE                PIC S9(9) BINARY.                               
-       01 TIMING                PIC S9(9) BINARY.                               
+       COPY CBVAR01Y.                               
                                                                                 
       *****************************************************************         
        PROCEDURE DIVISION.                                                      

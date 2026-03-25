@@ -35,13 +35,8 @@
        01 WS-VARIABLES.
          05 WS-PGMNAME                 PIC X(08) VALUE 'COSGN00C'.
          05 WS-TRANID                  PIC X(04) VALUE 'CC00'.
-         05 WS-MESSAGE                 PIC X(80) VALUE SPACES.
+         COPY CSVAR01Y.
          05 WS-USRSEC-FILE             PIC X(08) VALUE 'USRSEC  '.
-         05 WS-ERR-FLG                 PIC X(01) VALUE 'N'.
-           88 ERR-FLG-ON                         VALUE 'Y'.
-           88 ERR-FLG-OFF                        VALUE 'N'.
-         05 WS-RESP-CD                 PIC S9(09) COMP VALUE ZEROS.
-         05 WS-REAS-CD                 PIC S9(09) COMP VALUE ZEROS.
          05 WS-USER-ID                 PIC X(08).
          05 WS-USER-PWD                PIC X(08).
 
@@ -176,24 +171,8 @@
       *----------------------------------------------------------------*
        POPULATE-HEADER-INFO.
 
-           MOVE FUNCTION CURRENT-DATE  TO WS-CURDATE-DATA
-
-           MOVE CCDA-TITLE01           TO TITLE01O OF COSGN0AO
-           MOVE CCDA-TITLE02           TO TITLE02O OF COSGN0AO
-           MOVE WS-TRANID              TO TRNNAMEO OF COSGN0AO
-           MOVE WS-PGMNAME             TO PGMNAMEO OF COSGN0AO
-
-           MOVE WS-CURDATE-MONTH       TO WS-CURDATE-MM
-           MOVE WS-CURDATE-DAY         TO WS-CURDATE-DD
-           MOVE WS-CURDATE-YEAR(3:2)   TO WS-CURDATE-YY
-
-           MOVE WS-CURDATE-MM-DD-YY    TO CURDATEO OF COSGN0AO
-
-           MOVE WS-CURTIME-HOURS       TO WS-CURTIME-HH
-           MOVE WS-CURTIME-MINUTE      TO WS-CURTIME-MM
-           MOVE WS-CURTIME-SECOND      TO WS-CURTIME-SS
-
-           MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF COSGN0AO
+           COPY CSHDR01Y
+               REPLACING ==MAPOUT== BY ==COSGN0AO==.
 
            EXEC CICS ASSIGN
                APPLID(APPLIDO OF COSGN0AO)

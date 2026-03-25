@@ -35,13 +35,8 @@
        01 WS-VARIABLES.                                                         
          05 WS-PGMNAME                 PIC X(08) VALUE 'COADM01C'.              
          05 WS-TRANID                  PIC X(04) VALUE 'CA00'.                  
-         05 WS-MESSAGE                 PIC X(80) VALUE SPACES.                  
-         05 WS-USRSEC-FILE             PIC X(08) VALUE 'USRSEC  '.              
-         05 WS-ERR-FLG                 PIC X(01) VALUE 'N'.                     
-           88 ERR-FLG-ON                         VALUE 'Y'.                     
-           88 ERR-FLG-OFF                        VALUE 'N'.                     
-         05 WS-RESP-CD                 PIC S9(09) COMP VALUE ZEROS.             
-         05 WS-REAS-CD                 PIC S9(09) COMP VALUE ZEROS.             
+         COPY CSVAR01Y.
+         05 WS-USRSEC-FILE             PIC X(08) VALUE 'USRSEC  '.             
          05 WS-OPTION-X                PIC X(02) JUST RIGHT.                    
          05 WS-OPTION                  PIC 9(02) VALUE 0.                       
          05 WS-IDX                     PIC S9(04) COMP VALUE ZEROS.             
@@ -204,24 +199,8 @@
       *----------------------------------------------------------------*        
        POPULATE-HEADER-INFO.                                                    
                                                                                 
-           MOVE FUNCTION CURRENT-DATE  TO WS-CURDATE-DATA                       
-                                                                                
-           MOVE CCDA-TITLE01           TO TITLE01O OF COADM1AO                  
-           MOVE CCDA-TITLE02           TO TITLE02O OF COADM1AO                  
-           MOVE WS-TRANID              TO TRNNAMEO OF COADM1AO                  
-           MOVE WS-PGMNAME             TO PGMNAMEO OF COADM1AO                  
-                                                                                
-           MOVE WS-CURDATE-MONTH       TO WS-CURDATE-MM                         
-           MOVE WS-CURDATE-DAY         TO WS-CURDATE-DD                         
-           MOVE WS-CURDATE-YEAR(3:2)   TO WS-CURDATE-YY                         
-                                                                                
-           MOVE WS-CURDATE-MM-DD-YY    TO CURDATEO OF COADM1AO                  
-                                                                                
-           MOVE WS-CURTIME-HOURS       TO WS-CURTIME-HH                         
-           MOVE WS-CURTIME-MINUTE      TO WS-CURTIME-MM                         
-           MOVE WS-CURTIME-SECOND      TO WS-CURTIME-SS                         
-                                                                                
-           MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF COADM1AO.                 
+           COPY CSHDR01Y
+               REPLACING ==MAPOUT== BY ==COADM1AO==.                 
                                                                                 
       *----------------------------------------------------------------*        
       *                      BUILD-MENU-OPTIONS                                 
@@ -285,4 +264,4 @@
                                                                                 
       *                                                                         
       * Ver: CardDemo_v1.0-15-g27d6c6f-68 Date: 2022-07-19 23:12:32 CDT         
-      *                                                                         
+      *                                                                                                                                                  

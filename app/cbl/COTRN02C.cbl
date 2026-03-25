@@ -41,11 +41,7 @@
          05 WS-CCXREF-FILE             PIC X(08) VALUE 'CCXREF  '.
          05 WS-CXACAIX-FILE            PIC X(08) VALUE 'CXACAIX '.
 
-         05 WS-ERR-FLG                 PIC X(01) VALUE 'N'.
-           88 ERR-FLG-ON                         VALUE 'Y'.
-           88 ERR-FLG-OFF                        VALUE 'N'.
-         05 WS-RESP-CD                 PIC S9(09) COMP VALUE ZEROS.
-         05 WS-REAS-CD                 PIC S9(09) COMP VALUE ZEROS.
+         COPY CSVAR01Y.
          05 WS-USR-MODIFIED            PIC X(01) VALUE 'N'.
            88 USR-MODIFIED-YES                   VALUE 'Y'.
            88 USR-MODIFIED-NO                    VALUE 'N'.
@@ -59,14 +55,7 @@
          05 WS-TRAN-AMT-E              PIC +99999999.99 VALUE ZEROS.
          05 WS-DATE-FORMAT             PIC X(10) VALUE 'YYYY-MM-DD'.
 
-       01 CSUTLDTC-PARM.
-          05 CSUTLDTC-DATE                   PIC X(10).
-          05 CSUTLDTC-DATE-FORMAT            PIC X(10).
-          05 CSUTLDTC-RESULT.
-             10 CSUTLDTC-RESULT-SEV-CD       PIC X(04).
-             10 FILLER                       PIC X(11).
-             10 CSUTLDTC-RESULT-MSG-NUM      PIC X(04).
-             10 CSUTLDTC-RESULT-MSG          PIC X(61).
+       COPY CSUTL01Y.
 
        COPY COCOM01Y.
           05 CDEMO-CT02-INFO.
@@ -497,18 +486,7 @@
       *----------------------------------------------------------------*
       *                      RETURN-TO-PREV-SCREEN
       *----------------------------------------------------------------*
-       RETURN-TO-PREV-SCREEN.
-
-           IF CDEMO-TO-PROGRAM = LOW-VALUES OR SPACES
-               MOVE 'COSGN00C' TO CDEMO-TO-PROGRAM
-           END-IF
-           MOVE WS-TRANID    TO CDEMO-FROM-TRANID
-           MOVE WS-PGMNAME   TO CDEMO-FROM-PROGRAM
-           MOVE ZEROS        TO CDEMO-PGM-CONTEXT
-           EXEC CICS
-               XCTL PROGRAM(CDEMO-TO-PROGRAM)
-               COMMAREA(CARDDEMO-COMMAREA)
-           END-EXEC.
+       COPY CSRTN01Y.
 
       *----------------------------------------------------------------*
       *                      SEND-TRNADD-SCREEN
@@ -551,24 +529,8 @@
       *----------------------------------------------------------------*
        POPULATE-HEADER-INFO.
 
-           MOVE FUNCTION CURRENT-DATE  TO WS-CURDATE-DATA
-
-           MOVE CCDA-TITLE01           TO TITLE01O OF COTRN2AO
-           MOVE CCDA-TITLE02           TO TITLE02O OF COTRN2AO
-           MOVE WS-TRANID              TO TRNNAMEO OF COTRN2AO
-           MOVE WS-PGMNAME             TO PGMNAMEO OF COTRN2AO
-
-           MOVE WS-CURDATE-MONTH       TO WS-CURDATE-MM
-           MOVE WS-CURDATE-DAY         TO WS-CURDATE-DD
-           MOVE WS-CURDATE-YEAR(3:2)   TO WS-CURDATE-YY
-
-           MOVE WS-CURDATE-MM-DD-YY    TO CURDATEO OF COTRN2AO
-
-           MOVE WS-CURTIME-HOURS       TO WS-CURTIME-HH
-           MOVE WS-CURTIME-MINUTE      TO WS-CURTIME-MM
-           MOVE WS-CURTIME-SECOND      TO WS-CURTIME-SS
-
-           MOVE WS-CURTIME-HH-MM-SS    TO CURTIMEO OF COTRN2AO.
+           COPY CSHDR01Y
+               REPLACING ==MAPOUT== BY ==COTRN2AO==.
 
       *----------------------------------------------------------------*
       *                      READ-CXACAIX-FILE

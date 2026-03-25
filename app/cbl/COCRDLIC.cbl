@@ -150,25 +150,7 @@
          05  WS-RECORDS-TO-PROCESS-FLAG            PIC X(1).                    
            88  READ-LOOP-EXIT                      VALUE '0'.                   
            88  MORE-RECORDS-TO-READ                VALUE '1'.                   
-         05  WS-FILE-ERROR-MESSAGE.                                             
-           10  FILLER                              PIC X(12)                    
-                                                   VALUE 'File Error:'.         
-           10  ERROR-OPNAME                        PIC X(8)                     
-                                                   VALUE SPACES.                
-           10  FILLER                              PIC X(4)                     
-                                                   VALUE ' on '.                
-           10  ERROR-FILE                          PIC X(9)                     
-                                                   VALUE SPACES.                
-           10  FILLER                              PIC X(15)                    
-                                                   VALUE                        
-                                                   ' returned RESP '.           
-           10  ERROR-RESP                          PIC X(10)                    
-                                                   VALUE SPACES.                
-           10  FILLER                              PIC X(7)                     
-                                                   VALUE ',RESP2 '.             
-           10  ERROR-RESP2                         PIC X(10)                    
-                                                   VALUE SPACES.                
-          10  FILLER                               PIC X(5).                    
+         COPY CSERR01Y.                    
                                                                                 
       ******************************************************************
       * Literals and Constants                                                  
