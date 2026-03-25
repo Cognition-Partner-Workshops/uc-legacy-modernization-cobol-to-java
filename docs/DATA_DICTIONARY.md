@@ -130,21 +130,25 @@ This dictionary documents every business data entity extracted from the CardDemo
 
 ---
 
-## 5. Card Extended Entity (CVCRD01Y)
+## 5. Card Screen Working Area (CVCRD01Y)
 
-**Copybook:** `app/cpy/CVCRD01Y.cpy` | **Working-storage structure used by online card programs**
+**Copybook:** `app/cpy/CVCRD01Y.cpy` | **Working-storage control structure for online card management screens**
+
+**Group:** `CC-WORK-AREAS` → `CC-WORK-AREA`
 
 | # | COBOL Field | PIC Clause | Type | Size | Business Name | Description |
 |---|-------------|-----------|------|------|---------------|-------------|
-| 1 | `CDEMO-CCARD-ID` | `9(04)` | Numeric | 4 | Card Record ID | Internal sequence number |
-| 2 | `CDEMO-CCARD-NUM` | `X(16)` | Alpha | 16 | Card Number | 16-digit card number |
-| 3 | `CDEMO-CCARD-ACCT-ID` | `9(11)` | Numeric | 11 | Account ID | Parent account ID |
-| 4 | `CDEMO-CCARD-CVV-CD` | `9(03)` | Numeric | 3 | CVV Code | Card verification value |
-| 5 | `CDEMO-CCARD-EMBOSSED-NAME` | `X(50)` | Alpha | 50 | Embossed Name | Name on card |
-| 6 | `CDEMO-CCARD-EXPIRAION-DATE` | `X(10)` | Alpha | 10 | Expiration Date | Card expiry date |
-| 7 | `CDEMO-CCARD-ACTIVE-STATUS` | `X(01)` | Alpha | 1 | Active Status | Card active flag |
+| 1 | `CCARD-AID` | `X(5)` | Alpha | 5 | AID Key | Attention Identifier key (88-level conditions for ENTER, CLEAR, PA1, PA2, PFK01–PFK12) |
+| 2 | `CCARD-NEXT-PROG` | `X(8)` | Alpha | 8 | Next Program | Program name to transfer control to via XCTL |
+| 3 | `CCARD-NEXT-MAPSET` | `X(7)` | Alpha | 7 | Next Mapset | BMS mapset name for next screen |
+| 4 | `CCARD-NEXT-MAP` | `X(7)` | Alpha | 7 | Next Map | BMS map name for next screen |
+| 5 | `CCARD-ERROR-MSG` | `X(75)` | Alpha | 75 | Error Message | Error message display area |
+| 6 | `CCARD-RETURN-MSG` | `X(75)` | Alpha | 75 | Return Message | Return/info message area (88-level OFF = LOW-VALUES) |
+| 7 | `CC-ACCT-ID` | `X(11)` | Alpha | 11 | Account ID | Selected account ID (REDEFINES as `CC-ACCT-ID-N` PIC 9(11)) |
+| 8 | `CC-CARD-NUM` | `X(16)` | Alpha | 16 | Card Number | Selected card number (REDEFINES as `CC-CARD-NUM-N` PIC 9(16)) |
+| 9 | `CC-CUST-ID` | `X(09)` | Alpha | 9 | Customer ID | Selected customer ID (REDEFINES as `CC-CUST-ID-N` PIC 9(9)) |
 
-**Note:** This is an in-memory working structure used by COCRDLIC, COCRDSLC, and COCRDUPC for screen display. Not persisted directly.
+**Note:** This is a working-storage control structure — not a persisted data record. It manages screen navigation state, AID key handling, and currently-selected entity keys for COCRDLIC, COCRDSLC, and COCRDUPC. The REDEFINES allow both alphanumeric and numeric access to the ID fields.
 
 ---
 
@@ -426,18 +430,26 @@ This is a union-type record that wraps all five core entities into a single expo
 
 **Copybook:** `app/cpy/COCOM01Y.cpy` | **Used by:** All online CICS programs
 
-| # | COBOL Field | PIC Clause | Type | Size | Business Name | Description |
-|---|-------------|-----------|------|------|---------------|-------------|
-| 1 | `CDEMO-FROM-TRANID` | `X(04)` | Alpha | 4 | Source Transaction | CICS transaction ID of the calling program |
-| 2 | `CDEMO-FROM-PROGRAM` | `X(08)` | Alpha | 8 | Source Program | Program name of the caller |
-| 3 | `CDEMO-TO-TRANID` | `X(04)` | Alpha | 4 | Target Transaction | CICS transaction ID to navigate to |
-| 4 | `CDEMO-TO-PROGRAM` | `X(08)` | Alpha | 8 | Target Program | Program name to XCTL to |
-| 5 | `CDEMO-PGM-REENTER` | `9(01)` | Numeric | 1 | Re-enter Flag | 0=first entry, 1=re-enter from child |
-| 6 | `CDEMO-USR-ID` | `X(08)` | Alpha | 8 | User ID | Currently signed-in user |
-| 7 | `CDEMO-USR-TYP` | `X(01)` | Alpha | 1 | User Type | A=Admin, U=Regular |
-| 8 | `CDEMO-USR-FNAME` | `X(20)` | Alpha | 20 | First Name | Current user's first name |
-| 9 | `CDEMO-USR-LNAME` | `X(20)` | Alpha | 20 | Last Name | Current user's last name |
-| — | Additional `CDEMO-*` fields | Various | — | — | Context Data | Account IDs, card numbers, selection flags |
+**Group:** `CARDDEMO-COMMAREA`
+
+| # | Group | COBOL Field | PIC Clause | Type | Size | Business Name | Description |
+|---|-------|-------------|-----------|------|------|---------------|-------------|
+| 1 | CDEMO-GENERAL-INFO | `CDEMO-FROM-TRANID` | `X(04)` | Alpha | 4 | Source Transaction | CICS transaction ID of the calling program |
+| 2 | | `CDEMO-FROM-PROGRAM` | `X(08)` | Alpha | 8 | Source Program | Program name of the caller |
+| 3 | | `CDEMO-TO-TRANID` | `X(04)` | Alpha | 4 | Target Transaction | CICS transaction ID to navigate to |
+| 4 | | `CDEMO-TO-PROGRAM` | `X(08)` | Alpha | 8 | Target Program | Program name to XCTL to |
+| 5 | | `CDEMO-USER-ID` | `X(08)` | Alpha | 8 | User ID | Currently signed-in user |
+| 6 | | `CDEMO-USER-TYPE` | `X(01)` | Alpha | 1 | User Type | 88-level: CDEMO-USRTYP-ADMIN='A', CDEMO-USRTYP-USER='U' |
+| 7 | | `CDEMO-PGM-CONTEXT` | `9(01)` | Numeric | 1 | Program Context | 88-level: CDEMO-PGM-ENTER=0, CDEMO-PGM-REENTER=1 |
+| 8 | CDEMO-CUSTOMER-INFO | `CDEMO-CUST-ID` | `9(09)` | Numeric | 9 | Customer ID | Selected customer identifier |
+| 9 | | `CDEMO-CUST-FNAME` | `X(25)` | Alpha | 25 | Customer First Name | Selected customer's first name |
+| 10 | | `CDEMO-CUST-MNAME` | `X(25)` | Alpha | 25 | Customer Middle Name | Selected customer's middle name |
+| 11 | | `CDEMO-CUST-LNAME` | `X(25)` | Alpha | 25 | Customer Last Name | Selected customer's last name |
+| 12 | CDEMO-ACCOUNT-INFO | `CDEMO-ACCT-ID` | `9(11)` | Numeric | 11 | Account ID | Selected account identifier |
+| 13 | | `CDEMO-ACCT-STATUS` | `X(01)` | Alpha | 1 | Account Status | Selected account's active status |
+| 14 | CDEMO-CARD-INFO | `CDEMO-CARD-NUM` | `9(16)` | Numeric | 16 | Card Number | Selected card number |
+| 15 | CDEMO-MORE-INFO | `CDEMO-LAST-MAP` | `X(7)` | Alpha | 7 | Last Map | Previous BMS map name |
+| 16 | | `CDEMO-LAST-MAPSET` | `X(7)` | Alpha | 7 | Last Mapset | Previous BMS mapset name |
 
 **Purpose:** This is the COMMAREA — the shared state passed between all CICS programs via XCTL and RETURN. It carries user session context, navigation state, and selected entity keys.
 

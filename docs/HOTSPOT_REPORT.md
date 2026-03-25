@@ -13,13 +13,13 @@
 - [4. Detailed Hotspot Analysis](#4-detailed-hotspot-analysis)
   - [#1 COACTUPC — Account Update](#1-coactupc--account-update)
   - [#2 CBTRN02C — Transaction Posting](#2-cbtrn02c--transaction-posting)
-  - [#3 COCRDLIC — Card List](#3-cocrdlic--card-list)
-  - [#4 CBSTM03A — Statement Generation](#4-cbstm03a--statement-generation)
-  - [#5 COCRDUPC — Card Update](#5-cocrdupc--card-update)
-  - [#6 CBACT04C — Interest Calculation](#6-cbact04c--interest-calculation)
-  - [#7 CBTRN03C — Transaction Report](#7-cbtrn03c--transaction-report)
-  - [#8 COTRN02C — Transaction Add](#8-cotrn02c--transaction-add)
-  - [#9 COBIL00C — Bill Payment](#9-cobil00c--bill-payment)
+  - [#3 CBSTM03A — Statement Generation](#3-cbstm03a--statement-generation)
+  - [#4 COBIL00C — Bill Payment](#4-cobil00c--bill-payment)
+  - [#5 COTRN02C — Transaction Add](#5-cotrn02c--transaction-add)
+  - [#6 COCRDLIC — Card List](#6-cocrdlic--card-list)
+  - [#7 CBACT04C — Interest Calculation](#7-cbact04c--interest-calculation)
+  - [#8 COCRDUPC — Card Update](#8-cocrdupc--card-update)
+  - [#9 CBTRN03C — Transaction Report](#9-cbtrn03c--transaction-report)
   - [#10 COTRN00C — Transaction List](#10-cotrn00c--transaction-list)
 - [5. Risk Heat Map](#5-risk-heat-map)
 - [6. Recommended Migration Sequence](#6-recommended-migration-sequence)
@@ -61,13 +61,13 @@ Each module is scored on four dimensions (1–10 scale each, max total = 40):
 |------|---------|-----|:----------:|:--------:|:---------------:|:--------------:|:-------------:|
 | **1** | **COACTUPC** | 4,236 | 10 | 9 | 9 | 8 | **9.05** |
 | **2** | **CBTRN02C** | 731 | 8 | 9 | 10 | 6 | **8.45** |
-| **3** | **COCRDLIC** | 1,459 | 9 | 7 | 7 | 8 | **7.70** |
-| **4** | **CBSTM03A** | 924 | 8 | 8 | 8 | 9 | **8.20** |
-| **5** | **COCRDUPC** | 1,560 | 9 | 7 | 7 | 7 | **7.50** |
-| **6** | **CBACT04C** | 652 | 7 | 9 | 9 | 5 | **7.70** |
-| **7** | **CBTRN03C** | 649 | 7 | 8 | 7 | 5 | **6.85** |
-| **8** | **COTRN02C** | 783 | 8 | 8 | 8 | 7 | **7.80** |
-| **9** | **COBIL00C** | 572 | 7 | 8 | 9 | 7 | **7.90** |
+| **3** | **CBSTM03A** | 924 | 8 | 8 | 8 | 9 | **8.20** |
+| **4** | **COBIL00C** | 572 | 7 | 8 | 9 | 7 | **7.85** |
+| **5** | **COTRN02C** | 783 | 8 | 8 | 8 | 7 | **7.80** |
+| **6** | **COCRDLIC** | 1,459 | 9 | 7 | 7 | 8 | **7.70** |
+| **7** | **CBACT04C** | 652 | 7 | 9 | 9 | 5 | **7.70** |
+| **8** | **COCRDUPC** | 1,560 | 9 | 7 | 7 | 7 | **7.50** |
+| **9** | **CBTRN03C** | 649 | 7 | 8 | 7 | 5 | **6.85** |
 | **10** | **COTRN00C** | 699 | 7 | 6 | 6 | 7 | **6.45** |
 
 ---
@@ -137,39 +137,7 @@ Each module is scored on four dimensions (1–10 scale each, max total = 40):
 
 ---
 
-### #3 COCRDLIC — Card List
-
-**File:** `app/cbl/COCRDLIC.cbl` | **Lines:** 1,459 | **Type:** CICS Online | **Composite: 7.70**
-
-| Metric | Value | Assessment |
-|--------|-------|------------|
-| Lines of Code | 1,459 | High |
-| IF Statements | 59 | High |
-| EVALUATE Blocks | 18 | High |
-| PERFORM Calls | 34 | Moderate |
-| Paragraphs | 42 | High |
-| CICS Browse Ops | STARTBR, READNEXT, READPREV, ENDBR | Complex cursor management |
-| XCTL Targets | COMEN01C, COCRDSLC, COCRDUPC | 3 navigation targets |
-| Copybooks | CSSTRPFY (string formatting) | Extra utility dependency |
-
-**Why It's #3:**
-- Implements multi-page browsable list with forward/backward scrolling
-- Complex VSAM browse logic (STARTBR/READNEXT/READPREV/ENDBR) for pagination
-- Three XCTL targets for navigation (menu, view, update)
-- PCI-sensitive — displays card numbers on screen
-- 42 paragraphs indicate highly procedural control flow
-
-**Migration Challenges:**
-- VSAM browse with cursor → SQL pagination (OFFSET/LIMIT or keyset pagination)
-- BMS multi-row display → paginated REST API + frontend table/grid
-- READNEXT/READPREV logic → bidirectional cursor or page number tracking
-- Card number masking needed in modern UI (PCI DSS compliance)
-
-**Recommendation:** Implement as paginated REST endpoint with Spring Data JPA. Use keyset pagination for performance. Add card number masking (show last 4 digits only). Frontend: paginated data table with view/edit actions.
-
----
-
-### #4 CBSTM03A — Statement Generation
+### #3 CBSTM03A — Statement Generation
 
 **File:** `app/cbl/CBSTM03A.CBL` | **Lines:** 924 | **Type:** Batch | **Composite: 8.20**
 
@@ -203,38 +171,102 @@ Each module is scored on four dimensions (1–10 scale each, max total = 40):
 
 ---
 
-### #5 COCRDUPC — Card Update
+### #4 COBIL00C — Bill Payment
 
-**File:** `app/cbl/COCRDUPC.cbl` | **Lines:** 1,560 | **Type:** CICS Online | **Composite: 7.50**
+**File:** `app/cbl/COBIL00C.cbl` | **Lines:** 572 | **Type:** CICS Online | **Composite: 7.85**
 
 | Metric | Value | Assessment |
 |--------|-------|------------|
-| Lines of Code | 1,560 | High |
-| IF Statements | 72 | High |
-| EVALUATE Blocks | 16 | High |
-| Paragraphs | 48 | High |
-| VSAM Files | 2 (CARDDATA, ACCTDATA) | |
-| CICS Operations | READ ×2, XCTL | |
-| Copybooks | 13+ (includes CSMSG02Y, CSSTRPFY) | |
+| Lines of Code | 572 | Medium |
+| EVALUATE Blocks | 18 | High |
+| IF Statements | 10 | Low |
+| PERFORM Calls | 38 | Moderate |
+| Paragraphs | 18 | Moderate |
+| VSAM Files | 3 (TRANSACT, ACCTDATA, CARDXREF) | |
+| CICS Operations | READ, READPREV, REWRITE, WRITE, STARTBR, ENDBR | **Full CRUD** |
 
-**Why It's #5:**
-- Second-largest online program after COACTUPC
-- 72 IF statements for card field validation
-- PCI-sensitive — handles card numbers, CVV codes, expiration dates
-- Complex screen interaction with confirmation flows
-- HANDLE ABEND for error recovery
+**Why It's #4:**
+- **Payment processing** — highest business criticality per line of code
+- Full CRUD on VSAM: reads account, rewrites balance, writes transaction
+- Directly modifies account balances (REWRITE on ACCTDATA)
+- Creates payment transaction records
+- 18 EVALUATE blocks for payment validation and processing states
 
 **Migration Challenges:**
-- Card data handling needs PCI DSS compliance (encryption at rest, masking)
-- Field validation → Java Bean Validation with custom validators
-- HANDLE ABEND → try/catch with proper rollback
-- Multi-step confirmation → REST API with optimistic locking
+- Payment processing requires ACID transactions — must use database transactions
+- REWRITE (in-place update) → optimistic locking with version column
+- Balance update must be atomic — race condition risk in concurrent environment
+- Regulatory compliance for payment processing (audit trail, reversibility)
 
-**Recommendation:** Implement strict PCI DSS controls in Java. Use Spring Security for access control. Encrypt card data at rest. Field validation via Bean Validation annotations.
+**Recommendation:** Implement as transactional REST endpoint with `@Transactional`. Use pessimistic or optimistic locking for balance updates. Add comprehensive audit logging. Consider event sourcing for payment traceability.
 
 ---
 
-### #6 CBACT04C — Interest Calculation
+### #5 COTRN02C — Transaction Add
+
+**File:** `app/cbl/COTRN02C.cbl` | **Lines:** 783 | **Type:** CICS Online | **Composite: 7.80**
+
+| Metric | Value | Assessment |
+|--------|-------|------------|
+| Lines of Code | 783 | Medium-High |
+| EVALUATE Blocks | 26 | **Very High** — most EVALUATEs after COACTUPC |
+| IF Statements | 14 | Moderate |
+| PERFORM Calls | 61 | High |
+| Paragraphs | 20 | Moderate |
+| VSAM Files | 3 (TRANSACT, ACCTDATA, CARDXREF) | |
+| CICS Operations | READ ×2, STARTBR, READPREV, ENDBR, WRITE | Complex |
+| CALL Targets | CSUTLDTC | Date validation |
+
+**Why It's #5:**
+- Entry point for new financial transactions — directly impacts revenue
+- 26 EVALUATE blocks for complex screen state management
+- Validates transaction against account and card cross-reference
+- Generates transaction IDs using READPREV to find last ID
+- Date validation via CSUTLDTC/CEEDAYS
+
+**Migration Challenges:**
+- Transaction ID generation (READPREV for max ID) → database sequence or UUID
+- 26 EVALUATE blocks → switch statements or state machine
+- Multi-file validation → service layer with repository pattern
+- CEEDAYS date validation → `java.time` API
+
+**Recommendation:** Implement as REST POST endpoint. Use database sequences for ID generation. Replace EVALUATE-based state management with proper controller flow. Date validation via `java.time.LocalDate`.
+
+---
+
+### #6 COCRDLIC — Card List
+
+**File:** `app/cbl/COCRDLIC.cbl` | **Lines:** 1,459 | **Type:** CICS Online | **Composite: 7.70**
+
+| Metric | Value | Assessment |
+|--------|-------|------------|
+| Lines of Code | 1,459 | High |
+| IF Statements | 59 | High |
+| EVALUATE Blocks | 18 | High |
+| PERFORM Calls | 34 | Moderate |
+| Paragraphs | 42 | High |
+| CICS Browse Ops | STARTBR, READNEXT, READPREV, ENDBR | Complex cursor management |
+| XCTL Targets | COMEN01C, COCRDSLC, COCRDUPC | 3 navigation targets |
+| Copybooks | CSSTRPFY (string formatting) | Extra utility dependency |
+
+**Why It's #6:**
+- Implements multi-page browsable list with forward/backward scrolling
+- Complex VSAM browse logic (STARTBR/READNEXT/READPREV/ENDBR) for pagination
+- Three XCTL targets for navigation (menu, view, update)
+- PCI-sensitive — displays card numbers on screen
+- 42 paragraphs indicate highly procedural control flow
+
+**Migration Challenges:**
+- VSAM browse with cursor → SQL pagination (OFFSET/LIMIT or keyset pagination)
+- BMS multi-row display → paginated REST API + frontend table/grid
+- READNEXT/READPREV logic → bidirectional cursor or page number tracking
+- Card number masking needed in modern UI (PCI DSS compliance)
+
+**Recommendation:** Implement as paginated REST endpoint with Spring Data JPA. Use keyset pagination for performance. Add card number masking (show last 4 digits only). Frontend: paginated data table with view/edit actions.
+
+---
+
+### #7 CBACT04C — Interest Calculation
 
 **File:** `app/cbl/CBACT04C.cbl` | **Lines:** 652 | **Type:** Batch | **Composite: 7.70**
 
@@ -248,7 +280,7 @@ Each module is scored on four dimensions (1–10 scale each, max total = 40):
 | I-O Files | 1 (ACCTFILE) | **Critical** — updates balances |
 | Output Files | 1 (TRANSACT) | Creates interest transaction records |
 
-**Why It's #6:**
+**Why It's #7:**
 - **Financial calculation engine** — computes interest on account balances
 - Reads disclosure group rates and applies them per transaction category
 - Updates account balances in-place (I-O mode)
@@ -266,7 +298,38 @@ Each module is scored on four dimensions (1–10 scale each, max total = 40):
 
 ---
 
-### #7 CBTRN03C — Transaction Report
+### #8 COCRDUPC — Card Update
+
+**File:** `app/cbl/COCRDUPC.cbl` | **Lines:** 1,560 | **Type:** CICS Online | **Composite: 7.50**
+
+| Metric | Value | Assessment |
+|--------|-------|------------|
+| Lines of Code | 1,560 | High |
+| IF Statements | 72 | High |
+| EVALUATE Blocks | 16 | High |
+| Paragraphs | 48 | High |
+| VSAM Files | 2 (CARDDATA, ACCTDATA) | |
+| CICS Operations | READ ×2, XCTL | |
+| Copybooks | 13+ (includes CSMSG02Y, CSSTRPFY) | |
+
+**Why It's #8:**
+- Second-largest online program after COACTUPC
+- 72 IF statements for card field validation
+- PCI-sensitive — handles card numbers, CVV codes, expiration dates
+- Complex screen interaction with confirmation flows
+- HANDLE ABEND for error recovery
+
+**Migration Challenges:**
+- Card data handling needs PCI DSS compliance (encryption at rest, masking)
+- Field validation → Java Bean Validation with custom validators
+- HANDLE ABEND → try/catch with proper rollback
+- Multi-step confirmation → REST API with optimistic locking
+
+**Recommendation:** Implement strict PCI DSS controls in Java. Use Spring Security for access control. Encrypt card data at rest. Field validation via Bean Validation annotations.
+
+---
+
+### #9 CBTRN03C — Transaction Report
 
 **File:** `app/cbl/CBTRN03C.cbl` | **Lines:** 649 | **Type:** Batch | **Composite: 6.85**
 
@@ -280,7 +343,7 @@ Each module is scored on four dimensions (1–10 scale each, max total = 40):
 | Input Files | 5 (TRANFILE, CARDXREF, TRANTYPE, TRANCATG, DATEPARM) | **High** — most inputs |
 | Output Files | 1 (TRANREPT) | Report output |
 
-**Why It's #7:**
+**Why It's #9:**
 - Highest PERFORM count (72) — indicates highly modular but procedural structure
 - Reads from 5 different input files — complex data assembly
 - Generates formatted report with page totals, account totals, grand totals
@@ -294,69 +357,6 @@ Each module is scored on four dimensions (1–10 scale each, max total = 40):
 - 72 PERFORM calls → many small methods; good for refactoring
 
 **Recommendation:** Implement as Spring Batch job with JasperReports or Apache POI for output. Replace 5-file reads with a single SQL query joining the equivalent tables. The high PERFORM count actually aids migration — each paragraph maps to a Java method.
-
----
-
-### #8 COTRN02C — Transaction Add
-
-**File:** `app/cbl/COTRN02C.cbl` | **Lines:** 783 | **Type:** CICS Online | **Composite: 7.80**
-
-| Metric | Value | Assessment |
-|--------|-------|------------|
-| Lines of Code | 783 | Medium-High |
-| EVALUATE Blocks | 26 | **Very High** — most EVALUATEs after COACTUPC |
-| IF Statements | 14 | Moderate |
-| PERFORM Calls | 61 | High |
-| Paragraphs | 20 | Moderate |
-| VSAM Files | 3 (TRANSACT, ACCTDATA, CARDXREF) | |
-| CICS Operations | READ ×2, STARTBR, READPREV, ENDBR, WRITE | Complex |
-| CALL Targets | CSUTLDTC | Date validation |
-
-**Why It's #8:**
-- Entry point for new financial transactions — directly impacts revenue
-- 26 EVALUATE blocks for complex screen state management
-- Validates transaction against account and card cross-reference
-- Generates transaction IDs using READPREV to find last ID
-- Date validation via CSUTLDTC/CEEDAYS
-
-**Migration Challenges:**
-- Transaction ID generation (READPREV for max ID) → database sequence or UUID
-- 26 EVALUATE blocks → switch statements or state machine
-- Multi-file validation → service layer with repository pattern
-- CEEDAYS date validation → `java.time` API
-
-**Recommendation:** Implement as REST POST endpoint. Use database sequences for ID generation. Replace EVALUATE-based state management with proper controller flow. Date validation via `java.time.LocalDate`.
-
----
-
-### #9 COBIL00C — Bill Payment
-
-**File:** `app/cbl/COBIL00C.cbl` | **Lines:** 572 | **Type:** CICS Online | **Composite: 7.90**
-
-| Metric | Value | Assessment |
-|--------|-------|------------|
-| Lines of Code | 572 | Medium |
-| EVALUATE Blocks | 18 | High |
-| IF Statements | 10 | Low |
-| PERFORM Calls | 38 | Moderate |
-| Paragraphs | 18 | Moderate |
-| VSAM Files | 3 (TRANSACT, ACCTDATA, CARDXREF) | |
-| CICS Operations | READ, READPREV, REWRITE, WRITE, STARTBR, ENDBR | **Full CRUD** |
-
-**Why It's #9:**
-- **Payment processing** — highest business criticality per line of code
-- Full CRUD on VSAM: reads account, rewrites balance, writes transaction
-- Directly modifies account balances (REWRITE on ACCTDATA)
-- Creates payment transaction records
-- 18 EVALUATE blocks for payment validation and processing states
-
-**Migration Challenges:**
-- Payment processing requires ACID transactions — must use database transactions
-- REWRITE (in-place update) → optimistic locking with version column
-- Balance update must be atomic — race condition risk in concurrent environment
-- Regulatory compliance for payment processing (audit trail, reversibility)
-
-**Recommendation:** Implement as transactional REST endpoint with `@Transactional`. Use pessimistic or optimistic locking for balance updates. Add comprehensive audit logging. Consider event sourcing for payment traceability.
 
 ---
 
@@ -394,15 +394,15 @@ Each module is scored on four dimensions (1–10 scale each, max total = 40):
 ```
                     LOW Impact ◄──────────────────────► HIGH Impact
                     │                                            │
-HIGH Complexity ────┤  COCRDLIC(3)          COACTUPC(1)         │
-                    │  COCRDUPC(5)                               │
+HIGH Complexity ────┤  COCRDLIC(6)          COACTUPC(1)         │
+                    │  COCRDUPC(8)                               │
                     │                                            │
-                    │  COTRN00C(10)        COTRN02C(8)          │
-                    │                      CBSTM03A(4)          │
+                    │  COTRN00C(10)        COTRN02C(5)          │
+                    │                      CBSTM03A(3)          │
                     │                                            │
-LOW Complexity  ────┤  CBTRN03C(7)         CBTRN02C(2)          │
-                    │                      CBACT04C(6)          │
-                    │                      COBIL00C(9)          │
+LOW Complexity  ────┤  CBTRN03C(9)         CBTRN02C(2)          │
+                    │                      CBACT04C(7)          │
+                    │                      COBIL00C(4)          │
                     │                                            │
                     └────────────────────────────────────────────┘
 
