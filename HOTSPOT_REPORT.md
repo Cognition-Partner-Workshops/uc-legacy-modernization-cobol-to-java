@@ -28,8 +28,8 @@ Each dimension is scored 1–10. **Composite = (Complexity × 0.30) + (Risk × 0
 |   3  | CBACT04C   |   652 |     7      |  8   |   9    |   **8.05**    | Batch — Interest Calculation |
 |   4  | COCRDUPC   | 1,560 |     8      |  8   |   7    |   **7.65**    | Online — Card Update     |
 |   5  | COCRDLIC   | 1,459 |     8      |  7   |   7    |   **7.30**    | Online — Card List       |
-|   6  | CBSTM03A   |   924 |     7      |  7   |   7    |   **7.00**    | Batch — Statement Gen    |
-|   7  | COBIL00C   |   572 |     6      |  7   |   8    |   **7.05**    | Online — Bill Payment    |
+|   6  | COBIL00C   |   572 |     6      |  7   |   8    |   **7.05**    | Online — Bill Payment    |
+|   7  | CBSTM03A   |   924 |     7      |  7   |   7    |   **7.00**    | Batch — Statement Gen    |
 |   8  | COTRN02C   |   783 |     7      |  7   |   7    |   **7.00**    | Online — Transaction Add |
 |   9  | CBTRN01C   |   494 |     5      |  7   |   8    |   **6.75**    | Batch — Tran Validation  |
 |  10  | COTRN00C   |   699 |     6      |  6   |   7    |   **6.35**    | Online — Transaction List|
@@ -113,23 +113,9 @@ and row-selection logic. Navigates to detail (COCRDSLC) and update (COCRDUPC) sc
 | **Key Risk** | Pagination logic with STARTBR/READNEXT/READPREV is error-prone; alternate index browsing adds complexity |
 | **Modernization Notes** | Replace with paginated REST API + list UI component. Pagination becomes SQL OFFSET/LIMIT or cursor-based. |
 
-### #6 — CBSTM03A (Statement Generation) — Score: 7.00
+### #6 — COBIL00C (Bill Payment) — Score: 7.05
 
-**Why it's #6:** Generates customer statements in both text and HTML formats. Calls sub-program
-CBSTM03B 11 times for file I/O operations. Reads from 4 VSAM files.
-
-| Metric | Detail |
-|--------|--------|
-| **Lines of Code** | 924 (+ 230 in CBSTM03B = 1,154 combined) |
-| **CALL Statements** | 11 calls to CBSTM03B for I/O operations |
-| **VSAM Files** | 4 read (TRNXFILE, XREFFILE, ACCTFILE, CUSTFILE) + 2 write (STMTFILE, HTMLFILE) |
-| **Output Formats** | Dual output: fixed-width text + HTML |
-| **Key Risk** | Complex nested loops (card → transaction), HTML generation embedded in COBOL |
-| **Modernization Notes** | Replace with template engine (Thymeleaf/FreeMarker). CBSTM03B becomes a DAO layer. |
-
-### #7 — COBIL00C (Bill Payment) — Score: 7.05
-
-**Why it's #7:** Revenue-critical — handles bill payments that directly modify account balances
+**Why it's #6:** Revenue-critical — handles bill payments that directly modify account balances
 and create transaction records. Involves STARTBR/READPREV for last-transaction lookup.
 
 | Metric | Detail |
@@ -140,6 +126,20 @@ and create transaction records. Involves STARTBR/READPREV for last-transaction l
 | **CICS API Calls** | READ, REWRITE, WRITE, STARTBR, READPREV, ENDBR, ASKTIME, FORMATTIME |
 | **Key Risk** | Financial transaction — incorrect payment processing means wrong balances |
 | **Modernization Notes** | PaymentService with transactional boundaries. Use database sequences instead of READPREV for ID generation. |
+
+### #7 — CBSTM03A (Statement Generation) — Score: 7.00
+
+**Why it's #7:** Generates customer statements in both text and HTML formats. Calls sub-program
+CBSTM03B 11 times for file I/O operations. Reads from 4 VSAM files.
+
+| Metric | Detail |
+|--------|--------|
+| **Lines of Code** | 924 (+ 230 in CBSTM03B = 1,154 combined) |
+| **CALL Statements** | 11 calls to CBSTM03B for I/O operations |
+| **VSAM Files** | 4 read (TRNXFILE, XREFFILE, ACCTFILE, CUSTFILE) + 2 write (STMTFILE, HTMLFILE) |
+| **Output Formats** | Dual output: fixed-width text + HTML |
+| **Key Risk** | Complex nested loops (card → transaction), HTML generation embedded in COBOL |
+| **Modernization Notes** | Replace with template engine (Thymeleaf/FreeMarker). CBSTM03B becomes a DAO layer. |
 
 ### #8 — COTRN02C (Transaction Add) — Score: 7.00
 
