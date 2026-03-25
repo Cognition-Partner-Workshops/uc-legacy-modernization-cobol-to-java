@@ -115,6 +115,7 @@
 | Field Name | PIC Clause | Type | Length | Business Description |
 |------------|-----------|------|--------|---------------------|
 | `XREF-CARD-NUM` | `X(16)` | Alpha | 16 | **Primary Key** — Card number |
+| `XREF-CUST-ID` | `9(09)` | Numeric | 9 | **Foreign Key** → Customer ID |
 | `XREF-ACCT-ID` | `9(11)` | Numeric | 11 | **Foreign Key** → Account ID |
 | `FILLER` | `X(14)` | Alpha | 14 | Reserved |
 
@@ -143,7 +144,7 @@
 | `CUST-PHONE-NUM-2` | `X(15)` | Alpha | 15 | Secondary phone number |
 | `CUST-SSN` | `9(09)` | Numeric | 9 | Social Security Number (PII) |
 | `CUST-GOVT-ISSUED-ID` | `X(20)` | Alpha | 20 | Government-issued ID number |
-| `CUST-DOB-YYYYMMDD` | `X(10)` | Alpha | 10 | Date of birth |
+| `CUST-DOB-YYYY-MM-DD` | `X(10)` | Alpha | 10 | Date of birth |
 | `CUST-EFT-ACCOUNT-ID` | `X(10)` | Alpha | 10 | EFT/bank account for payments |
 | `CUST-PRI-CARD-HOLDER-IND` | `X(01)` | Alpha | 1 | Primary cardholder indicator |
 | `CUST-FICO-CREDIT-SCORE` | `9(03)` | Numeric | 3 | FICO credit score |

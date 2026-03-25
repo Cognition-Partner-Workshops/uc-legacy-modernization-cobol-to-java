@@ -38,12 +38,12 @@ Each module is scored across three dimensions on a 1–10 scale:
 | **2** | **CBTRN02C.cbl** | 731 | 8 | 10 | 10 | **9.30** | Transaction Posting |
 | **3** | **CBACT04C.cbl** | 652 | 7 | 9 | 10 | **8.60** | Interest Calculation |
 | **4** | **CBSTM03A.CBL** | 924 | 8 | 7 | 8 | **7.65** | Statement Generation |
-| **5** | **COCRDLIC.cbl** | 1,459 | 8 | 6 | 6 | **6.70** | Card List Browse |
-| **6** | **COCRDUPC.cbl** | 1,560 | 8 | 7 | 6 | **7.05** | Card Update |
-| **7** | **COSGN00C.cbl** | 260 | 3 | 7 | 10 | **6.50** | Sign-On / Auth |
-| **8** | **CBTRN03C.cbl** | 649 | 7 | 5 | 7 | **6.30** | Transaction Report |
-| **9** | **COTRN02C.cbl** | 783 | 7 | 7 | 7 | **7.00** | Transaction Add |
-| **10** | **COBIL00C.cbl** | 572 | 6 | 7 | 8 | **6.95** | Bill Payment |
+| **5** | **COCRDUPC.cbl** | 1,560 | 8 | 7 | 6 | **7.05** | Card Update |
+| **6** | **COTRN02C.cbl** | 783 | 7 | 7 | 7 | **7.00** | Transaction Add |
+| **7** | **COBIL00C.cbl** | 572 | 6 | 7 | 8 | **6.95** | Bill Payment |
+| **8** | **COCRDLIC.cbl** | 1,459 | 8 | 6 | 6 | **6.70** | Card List Browse |
+| **9** | **COSGN00C.cbl** | 260 | 3 | 7 | 10 | **6.50** | Sign-On / Auth |
+| **10** | **CBTRN03C.cbl** | 649 | 7 | 5 | 7 | **6.30** | Transaction Report |
 
 ---
 
@@ -137,28 +137,7 @@ Each module is scored across three dimensions on a 1–10 scale:
 
 ---
 
-### #5 — COCRDLIC.cbl (Card List Browse)
-
-| Metric | Value | Assessment |
-|--------|-------|-----------|
-| **Lines of Code** | 1,459 | Third-largest program |
-| **IF statements** | 59 | Complex pagination logic |
-| **EVALUATE blocks** | 18 | Highest EVALUATE count — complex state machine |
-| **PERFORM calls** | 34 | Moderate |
-| **CICS browse operations** | 7 (STARTBR, READNEXT, READPREV, ENDBR) | Full browse pattern |
-| **XCTL targets** | 3 (COMEN01C, COCRDSLC, COCRDUPC) | Dispatches to view/update |
-
-**Why it's #5:** The card list program implements the most complex UI interaction pattern in the application: paginated browse with forward/backward navigation, selection routing to detail or update screens, and dynamic screen refresh. The 18 EVALUATE blocks form a state machine that manages the browse context. This pattern appears in several programs (COTRN00C, COUSR00C) and establishes a reusable pattern for modernization.
-
-**Modernization Risks:**
-- CICS browse (STARTBR/READNEXT/READPREV/ENDBR) must be replaced with paginated queries
-- State machine logic needs careful mapping to a web session or API pagination pattern
-- Selection routing to child screens maps to navigation/routing in modern UI framework
-- Test data must cover edge cases: empty list, single record, boundary pages
-
----
-
-### #6 — COCRDUPC.cbl (Card Update)
+### #5 — COCRDUPC.cbl (Card Update)
 
 | Metric | Value | Assessment |
 |--------|-------|-----------|
@@ -169,7 +148,7 @@ Each module is scored across three dimensions on a 1–10 scale:
 | **VSAM files accessed** | 2 (CARDDATA R/W, CUSTDATA R) | Mutates card records |
 | **CICS REWRITE** | 1 (CARDDATA) | Writes to card master |
 
-**Why it's #6:** Card update handles modification of credit card records, including sensitive fields like expiration dates and active status. The 72 IF statements primarily handle field validation and error messaging. It's the second-largest program by LOC and directly mutates the card master file.
+**Why it's #5:** Card update handles modification of credit card records, including sensitive fields like expiration dates and active status. The 72 IF statements primarily handle field validation and error messaging. It's the second-largest program by LOC and directly mutates the card master file.
 
 **Modernization Risks:**
 - Field validation logic should be extracted into a reusable validation service
@@ -178,46 +157,7 @@ Each module is scored across three dimensions on a 1–10 scale:
 
 ---
 
-### #7 — COSGN00C.cbl (Sign-On / Authentication)
-
-| Metric | Value | Assessment |
-|--------|-------|-----------|
-| **Lines of Code** | 260 | Small but critical |
-| **VSAM files accessed** | 1 (USRSEC R) | Reads security credentials |
-| **XCTL targets** | 2 (COMEN01C, COADM01C) | Role-based dispatch |
-| **Security concerns** | Plaintext password comparison, no lockout, no session timeout | Multiple security vulnerabilities |
-
-**Why it's #7:** Despite its small size, this is the security gateway for the entire application. It reads plaintext passwords from USRSEC and performs a simple string comparison — no hashing, salting, or encryption. There is no account lockout mechanism, no password complexity enforcement, and no session timeout. The role-based dispatch (Regular → COMEN01C, Admin → COADM01C) is the sole authorization check.
-
-**Modernization Risks:**
-- **Must** implement proper authentication (bcrypt/scrypt hashing, OAuth2/OIDC, MFA)
-- Password storage must be completely redesigned
-- Session management needs implementation (no CICS pseudo-conversational equivalent)
-- Authorization model should be upgraded from binary (R/A) to RBAC
-- This should be one of the first modules migrated to establish the security foundation
-
----
-
-### #8 — CBTRN03C.cbl (Transaction Report)
-
-| Metric | Value | Assessment |
-|--------|-------|-----------|
-| **Lines of Code** | 649 | Moderate |
-| **IF statements** | 38 | Report break logic |
-| **PERFORM calls** | 72 | Highest PERFORM count — complex iteration |
-| **Files accessed** | 6 (TRANSACT, XREFFILE, TRANTYPE, TRANCATG, DATEPARM, TRANREPT) | Heavy read + report write |
-| **Report features** | Page breaks, control breaks, subtotals, grand totals | Classic report writer pattern |
-
-**Why it's #8:** The daily transaction report program has the highest PERFORM count (72) of any program, reflecting its complex nested iteration: by account, by transaction type, by category, with running totals at each break level. It reads 5 input files and produces formatted output. The report break logic (page totals, account totals, grand totals) is a classic COBOL pattern that maps to Spring Batch or reporting frameworks.
-
-**Modernization Risks:**
-- Control break logic should map to a reporting framework (JasperReports, BIRT)
-- Date parameter file (DATEPARM) input should become API parameters
-- Report output format likely needs modernization (PDF instead of fixed-width text)
-
----
-
-### #9 — COTRN02C.cbl (Transaction Add — Online)
+### #6 — COTRN02C.cbl (Transaction Add — Online)
 
 | Metric | Value | Assessment |
 |--------|-------|-----------|
@@ -228,7 +168,7 @@ Each module is scored across three dimensions on a 1–10 scale:
 | **CALL statements** | 2 (CSUTLDTC for date validation) | External dependency |
 | **CICS operations** | 6 (READ, WRITE, STARTBR, READPREV, ENDBR) | Full create workflow |
 
-**Why it's #9:** This is the online transaction entry point — where new transactions are created interactively. It validates the account and card via cross-reference lookups, validates dates using the CSUTLDTC utility, generates a unique transaction ID (via READPREV to find last ID), and writes the new transaction. It's a complete CRUD create operation touching 3 VSAM files.
+**Why it's #6:** This is the online transaction entry point — where new transactions are created interactively. It validates the account and card via cross-reference lookups, validates dates using the CSUTLDTC utility, generates a unique transaction ID (via READPREV to find last ID), and writes the new transaction. It's a complete CRUD create operation touching 3 VSAM files.
 
 **Modernization Risks:**
 - Transaction ID generation (READPREV for last ID + increment) needs a proper sequence generator
@@ -237,7 +177,7 @@ Each module is scored across three dimensions on a 1–10 scale:
 
 ---
 
-### #10 — COBIL00C.cbl (Bill Payment)
+### #7 — COBIL00C.cbl (Bill Payment)
 
 | Metric | Value | Assessment |
 |--------|-------|-----------|
@@ -248,7 +188,7 @@ Each module is scored across three dimensions on a 1–10 scale:
 | **CICS operations** | 7 (READ, REWRITE, WRITE, STARTBR, READPREV, ENDBR) | Full payment workflow |
 | **Financial sensitivity** | Updates account balance, creates payment transaction | Direct balance impact |
 
-**Why it's #10:** Bill payment is a financial transaction that debits the account balance and creates a payment record. It accesses 3 VSAM files with write operations (account rewrite + transaction write). The payment workflow includes account lookup, balance verification, payment posting, and transaction record creation. Any error directly impacts customer balances.
+**Why it's #7:** Bill payment is a financial transaction that debits the account balance and creates a payment record. It accesses 3 VSAM files with write operations (account rewrite + transaction write). The payment workflow includes account lookup, balance verification, payment posting, and transaction record creation. Any error directly impacts customer balances.
 
 **Modernization Risks:**
 - Payment processing must be atomic (account update + transaction write)
@@ -258,21 +198,81 @@ Each module is scored across three dimensions on a 1–10 scale:
 
 ---
 
+### #8 — COCRDLIC.cbl (Card List Browse)
+
+| Metric | Value | Assessment |
+|--------|-------|-----------|
+| **Lines of Code** | 1,459 | Third-largest program |
+| **IF statements** | 59 | Complex pagination logic |
+| **EVALUATE blocks** | 18 | Highest EVALUATE count — complex state machine |
+| **PERFORM calls** | 34 | Moderate |
+| **CICS browse operations** | 7 (STARTBR, READNEXT, READPREV, ENDBR) | Full browse pattern |
+| **XCTL targets** | 3 (COMEN01C, COCRDSLC, COCRDUPC) | Dispatches to view/update |
+
+**Why it's #8:** The card list program implements the most complex UI interaction pattern in the application: paginated browse with forward/backward navigation, selection routing to detail or update screens, and dynamic screen refresh. The 18 EVALUATE blocks form a state machine that manages the browse context. This pattern appears in several programs (COTRN00C, COUSR00C) and establishes a reusable pattern for modernization.
+
+**Modernization Risks:**
+- CICS browse (STARTBR/READNEXT/READPREV/ENDBR) must be replaced with paginated queries
+- State machine logic needs careful mapping to a web session or API pagination pattern
+- Selection routing to child screens maps to navigation/routing in modern UI framework
+- Test data must cover edge cases: empty list, single record, boundary pages
+
+---
+
+### #9 — COSGN00C.cbl (Sign-On / Authentication)
+
+| Metric | Value | Assessment |
+|--------|-------|-----------|
+| **Lines of Code** | 260 | Small but critical |
+| **VSAM files accessed** | 1 (USRSEC R) | Reads security credentials |
+| **XCTL targets** | 2 (COMEN01C, COADM01C) | Role-based dispatch |
+| **Security concerns** | Plaintext password comparison, no lockout, no session timeout | Multiple security vulnerabilities |
+
+**Why it's #9:** Despite its small size, this is the security gateway for the entire application. It reads plaintext passwords from USRSEC and performs a simple string comparison — no hashing, salting, or encryption. There is no account lockout mechanism, no password complexity enforcement, and no session timeout. The role-based dispatch (Regular → COMEN01C, Admin → COADM01C) is the sole authorization check.
+
+**Modernization Risks:**
+- **Must** implement proper authentication (bcrypt/scrypt hashing, OAuth2/OIDC, MFA)
+- Password storage must be completely redesigned
+- Session management needs implementation (no CICS pseudo-conversational equivalent)
+- Authorization model should be upgraded from binary (R/A) to RBAC
+- This should be one of the first modules migrated to establish the security foundation
+
+---
+
+### #10 — CBTRN03C.cbl (Transaction Report)
+
+| Metric | Value | Assessment |
+|--------|-------|-----------|
+| **Lines of Code** | 649 | Moderate |
+| **IF statements** | 38 | Report break logic |
+| **PERFORM calls** | 72 | Highest PERFORM count — complex iteration |
+| **Files accessed** | 6 (TRANSACT, XREFFILE, TRANTYPE, TRANCATG, DATEPARM, TRANREPT) | Heavy read + report write |
+| **Report features** | Page breaks, control breaks, subtotals, grand totals | Classic report writer pattern |
+
+**Why it's #10:** The daily transaction report program has the highest PERFORM count (72) of any program, reflecting its complex nested iteration: by account, by transaction type, by category, with running totals at each break level. It reads 5 input files and produces formatted output. The report break logic (page totals, account totals, grand totals) is a classic COBOL pattern that maps to Spring Batch or reporting frameworks.
+
+**Modernization Risks:**
+- Control break logic should map to a reporting framework (JasperReports, BIRT)
+- Date parameter file (DATEPARM) input should become API parameters
+- Report output format likely needs modernization (PDF instead of fixed-width text)
+
+---
+
 ## Risk Heat Map
 
 ```
                     Low Business Impact    Medium Business Impact    High Business Impact
                   ┌─────────────────────┬────────────────────────┬───────────────────────┐
-  High Complexity │                     │  COCRDLIC (#5)         │  COACTUPC (#1)        │
-                  │                     │  COCRDUPC (#6)         │  CBSTM03A (#4)        │
+  High Complexity │                     │  COCRDLIC (#8)         │  COACTUPC (#1)        │
+                  │                     │  COCRDUPC (#5)         │  CBSTM03A (#4)        │
                   │                     │                        │                       │
                   ├─────────────────────┼────────────────────────┼───────────────────────┤
-  Med Complexity  │  CBACT01C           │  CBTRN03C (#8)         │  CBTRN02C (#2)        │
+  Med Complexity  │  CBACT01C           │  CBTRN03C (#10)        │  CBTRN02C (#2)        │
                   │  CBACT02C           │  COTRN00C              │  CBACT04C (#3)        │
-                  │  CBACT03C           │  COUSR00C              │  COTRN02C (#9)        │
-                  │  CBCUS01C           │                        │  COBIL00C (#10)       │
+                  │  CBACT03C           │  COUSR00C              │  COTRN02C (#6)        │
+                  │  CBCUS01C           │                        │  COBIL00C (#7)        │
                   ├─────────────────────┼────────────────────────┼───────────────────────┤
-  Low Complexity  │  COBSWAIT           │  COUSR01C              │  COSGN00C (#7)        │
+  Low Complexity  │  COBSWAIT           │  COUSR01C              │  COSGN00C (#9)        │
                   │  UNUSED1Y           │  COUSR02C              │                       │
                   │  CBSTM03B (sub)     │  COUSR03C              │                       │
                   │                     │  COTRN01C              │                       │
@@ -290,7 +290,7 @@ Based on the hotspot analysis, here is the recommended migration sequence:
 
 | Module | Priority | Rationale |
 |--------|----------|-----------|
-| **COSGN00C** (#7) | Security gateway | Must be migrated first to establish auth framework |
+| **COSGN00C** (#9) | Security gateway | Must be migrated first to establish auth framework |
 | **COMEN01C** / **COADM01C** | Navigation | Menu routing → Spring MVC controllers / API gateway |
 | **COCOM01Y** copybook | Shared context | Defines inter-program communication → Session/context management |
 
@@ -310,8 +310,8 @@ Based on the hotspot analysis, here is the recommended migration sequence:
 | Module | Priority | Rationale |
 |--------|----------|-----------|
 | **COUSR01C–03C** | User CRUD | Simple CRUD, low financial risk |
-| **COCRDUPC** (#6) | Card update | Single-file write, moderate complexity |
-| **COTRN02C** (#9) | Transaction add | Validates write path for transactions |
+| **COCRDUPC** (#5) | Card update | Single-file write, moderate complexity |
+| **COTRN02C** (#6) | Transaction add | Validates write path for transactions |
 
 ### Wave 3 — Financial Core (Weeks 11–15)
 **Goal:** Migrate the most critical financial programs with extensive testing
@@ -319,7 +319,7 @@ Based on the hotspot analysis, here is the recommended migration sequence:
 | Module | Priority | Rationale |
 |--------|----------|-----------|
 | **COACTUPC** (#1) | Account update | Highest complexity — decompose into Account + Customer services |
-| **COBIL00C** (#10) | Bill payment | Financial transaction, needs atomicity |
+| **COBIL00C** (#7) | Bill payment | Financial transaction, needs atomicity |
 | **CORPT00C** | Online reports | Report submission → async job |
 
 ### Wave 4 — Batch Processing (Weeks 16–20)
@@ -330,7 +330,7 @@ Based on the hotspot analysis, here is the recommended migration sequence:
 | **CBTRN02C** (#2) | Transaction posting | Core batch engine — needs Spring Batch job with step-by-step validation |
 | **CBACT04C** (#3) | Interest calculation | Financially critical — requires exact decimal regression testing |
 | **CBSTM03A/B** (#4) | Statement generation | Template engine replacement, paired migration |
-| **CBTRN03C** (#8) | Transaction report | Report framework migration |
+| **CBTRN03C** (#10) | Transaction report | Report framework migration |
 | **CBEXPORT / CBIMPORT** | Data migration | Utility functions — may become ETL jobs or APIs |
 
 ### Wave 5 — Optional Modules (Weeks 21+)
