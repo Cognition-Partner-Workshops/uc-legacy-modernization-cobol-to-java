@@ -21,7 +21,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ## Top 10 Hotspot Modules
 
-### Rank 1: COACTUPC — Account Update (Score: 9.35)
+### Rank 1: COACTUPC — Account Update (Score: 9.40)
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
@@ -38,7 +38,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 2: CBTRN02C — Transaction Posting (Score: 8.55)
+### Rank 2: CBTRN02C — Transaction Posting (Score: 8.70)
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
@@ -55,7 +55,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 3: COCRDUPC — Card Update (Score: 8.00)
+### Rank 3: COCRDUPC — Card Update (Score: 8.15)
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
@@ -71,7 +71,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 4: CBACT04C — Interest Calculation (Score: 7.90)
+### Rank 4: CBACT04C — Interest Calculation (Score: 7.95)
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
@@ -87,7 +87,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 5: COCRDLIC — Card List (Score: 7.45)
+### Rank 5: COCRDLIC — Card List (Score: 7.40)
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
@@ -102,7 +102,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 6: CBSTM03A — Statement Generation (Score: 7.35)
+### Rank 6: CBSTM03A — Statement Generation (Score: 7.40)
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
@@ -118,7 +118,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 7: COTRN02C — Transaction Add (Score: 7.20)
+### Rank 7: COTRN02C — Transaction Add (Score: 7.35)
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
@@ -134,22 +134,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 8: COTRN00C — Transaction List (Score: 6.80)
-
-| Dimension | Score | Justification |
-|-----------|-------|---------------|
-| **Complexity** | 7 | 699 lines. Paginated transaction browsing with VSAM STARTBR/READNEXT. Filter by account/card. Dynamic column display. |
-| **Risk** | 6 | Read-only, but displays financial transaction data. Pagination state must be consistent across pseudo-conversational interactions. |
-| **Business Impact** | 7 | Primary transaction inquiry screen. Most frequently accessed function for customer service. |
-
-**Modernization Recommendations:**
-- Indexed database queries with pagination
-- Search/filter capabilities
-- Estimated effort: **Low-Medium** (1 week)
-
----
-
-### Rank 9: CBTRN03C — Transaction Report (Score: 6.70)
+### Rank 8: CBTRN03C — Transaction Report (Score: 6.75)
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
@@ -165,7 +150,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 10: COBIL00C — Bill Payment (Score: 6.65)
+### Rank 9: COBIL00C — Bill Payment (Score: 6.70)
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
@@ -181,20 +166,35 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
+### Rank 10: COTRN00C — Transaction List (Score: 6.65)
+
+| Dimension | Score | Justification |
+|-----------|-------|---------------|
+| **Complexity** | 7 | 699 lines. Paginated transaction browsing with VSAM STARTBR/READNEXT. Filter by account/card. Dynamic column display. |
+| **Risk** | 6 | Read-only, but displays financial transaction data. Pagination state must be consistent across pseudo-conversational interactions. |
+| **Business Impact** | 7 | Primary transaction inquiry screen. Most frequently accessed function for customer service. |
+
+**Modernization Recommendations:**
+- Indexed database queries with pagination
+- Search/filter capabilities
+- Estimated effort: **Low-Medium** (1 week)
+
+---
+
 ## Summary Ranking Table
 
 | Rank | Program | Type | Lines | Complexity | Risk | Biz Impact | **Score** | Primary Concern |
 |------|---------|------|-------|:----------:|:----:|:----------:|:---------:|----------------|
-| 1 | **COACTUPC** | Online | 4,237 | 10 | 9 | 9 | **9.35** | Massive size, multi-file PII updates |
-| 2 | **CBTRN02C** | Batch | 731 | 8 | 10 | 8 | **8.55** | Core financial posting, atomicity |
-| 3 | **COCRDUPC** | Online | 1,560 | 9 | 8 | 7 | **8.00** | PCI card data, complex validation |
-| 4 | **CBACT04C** | Batch | 652 | 7 | 9 | 8 | **7.90** | Interest calculation accuracy |
-| 5 | **COCRDLIC** | Online | 1,460 | 8 | 7 | 7 | **7.45** | Pagination complexity, card display |
-| 6 | **CBSTM03A** | Batch | 924 | 8 | 7 | 7 | **7.35** | Dual-format output, report accuracy |
-| 7 | **COTRN02C** | Online | 783 | 7 | 8 | 7 | **7.20** | Transaction creation, validation |
-| 8 | **COTRN00C** | Online | 699 | 7 | 6 | 7 | **6.80** | Pagination, high-traffic screen |
-| 9 | **CBTRN03C** | Batch | 649 | 7 | 7 | 6 | **6.70** | Multi-file join, report accuracy |
-| 10 | **COBIL00C** | Online | 572 | 6 | 8 | 6 | **6.65** | Payment atomicity, balance updates |
+| 1 | **COACTUPC** | Online | 4,237 | 10 | 9 | 9 | **9.40** | Massive size, multi-file PII updates |
+| 2 | **CBTRN02C** | Batch | 731 | 8 | 10 | 8 | **8.70** | Core financial posting, atomicity |
+| 3 | **COCRDUPC** | Online | 1,560 | 9 | 8 | 7 | **8.15** | PCI card data, complex validation |
+| 4 | **CBACT04C** | Batch | 652 | 7 | 9 | 8 | **7.95** | Interest calculation accuracy |
+| 5 | **COCRDLIC** | Online | 1,460 | 8 | 7 | 7 | **7.40** | Pagination complexity, card display |
+| 6 | **CBSTM03A** | Batch | 924 | 8 | 7 | 7 | **7.40** | Dual-format output, report accuracy |
+| 7 | **COTRN02C** | Online | 783 | 7 | 8 | 7 | **7.35** | Transaction creation, validation |
+| 8 | **CBTRN03C** | Batch | 649 | 7 | 7 | 6 | **6.75** | Multi-file join, report accuracy |
+| 9 | **COBIL00C** | Online | 572 | 6 | 8 | 6 | **6.70** | Payment atomicity, balance updates |
+| 10 | **COTRN00C** | Online | 699 | 7 | 6 | 7 | **6.65** | Pagination, high-traffic screen |
 
 ---
 
