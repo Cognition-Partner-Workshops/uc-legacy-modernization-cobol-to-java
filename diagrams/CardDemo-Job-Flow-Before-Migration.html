@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardDemo - Batch Job Flow Diagram (Before Migration)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%);
+            color: white;
+            padding: 2rem 3rem;
+            text-align: center;
+        }
+        .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .header p { font-size: 1.1rem; opacity: 0.9; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section-header h2 { font-size: 1.3rem; color: #1a365d; }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-daily { background: #ebf8ff; color: #2b6cb0; }
+        .badge-weekly { background: #f0fff4; color: #276749; }
+        .badge-monthly { background: #fefcbf; color: #975a16; }
+        .badge-ondemand { background: #fed7e2; color: #97266d; }
+        .badge-ca7 { background: #e9d8fd; color: #553c9a; }
+        .section-body { padding: 1.5rem; }
+        .section-desc { color: #718096; margin-bottom: 1rem; font-size: 0.95rem; }
+        .mermaid { display: flex; justify-content: center; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th {
+            background: #edf2f7;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+        tr:hover td { background: #f7fafc; }
+        code {
+            background: #edf2f7;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #e53e3e;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .overview-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid;
+        }
+        .overview-card.daily { border-left-color: #2b6cb0; }
+        .overview-card.weekly { border-left-color: #276749; }
+        .overview-card.monthly { border-left-color: #975a16; }
+        .overview-card.ondemand { border-left-color: #97266d; }
+        .overview-card h3 { font-size: 1rem; margin-bottom: 0.3rem; }
+        .overview-card p { font-size: 0.85rem; color: #718096; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>CardDemo - Batch Job Flow Diagram</h1>
+    <p>Pre-Migration COBOL/JCL/CICS Mainframe Application &mdash; Job Scheduling &amp; Dependencies</p>
+</div>
+
+<div class="container">
+
+    <!-- Overview -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Scheduling Overview</h2>
+        </div>
+        <div class="section-body">
+            <div class="overview-grid">
+                <div class="overview-card daily">
+                    <h3>Daily</h3>
+                    <p>CLOSEFIL &rarr; TRANBKP &rarr; WAITSTEP &rarr; OPENFIL</p>
+                    <p>Transaction backup cycle</p>
+                </div>
+                <div class="overview-card weekly">
+                    <h3>Weekly (Saturday)</h3>
+                    <p>MNTTRDB2 &rarr; (DISCGRP flow | TRANEXTR)</p>
+                    <p>DB2 refresh &amp; disclosure groups</p>
+                </div>
+                <div class="overview-card monthly">
+                    <h3>Monthly</h3>
+                    <p>CLOSEFIL &rarr; INTCALC &rarr; COMBTRAN &rarr; WAITSTEP &rarr; OPENFIL</p>
+                    <p>Interest calculation &amp; transaction consolidation</p>
+                </div>
+                <div class="overview-card ondemand">
+                    <h3>On-Demand / Full Batch</h3>
+                    <p>Close &rarr; Data Refresh &rarr; Post &rarr; Interest &rarr; Backup &rarr; Combine &rarr; Index &rarr; Report &rarr; Open</p>
+                    <p>Complete end-to-end processing</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Cycle -->
+    <div class="section">
+        <div class="section-header">
+            <h2>1. Daily Batch Cycle</h2>
+            <span class="badge badge-daily">Daily</span>
+        </div>
+        <div class="section-body">
+            <p class="section-desc">Runs every day. Backs up the transaction master VSAM file, clears and redefines it for the next day's online processing.</p>
+            <div class="mermaid">
+flowchart LR
+    CLOSEFIL["<b>CLOSEFIL</b><br/>Close CICS Files<br/><i>PGM=SDSF</i>"]:::cicsJob --> TRANBKP["<b>TRANBKP</b><br/>Backup Transactions<br/><i>PROC=REPROC + IDCAMS</i><br/>Repro TRANSACT VSAM to GDG<br/>Delete &amp; Redefine TRANSACT"]:::batchJob --> WAITSTEP["<b>WAITSTEP</b><br/>Wait 36 sec<br/><i>PGM=COBSWAIT</i>"]:::utilJob --> OPENFIL["<b>OPENFIL</b><br/>Open CICS Files<br/><i>PGM=SDSF</i>"]:::cicsJob
+
+    classDef cicsJob fill:#ebf8ff,stroke:#2b6cb0,stroke-width:2px,color:#1a365d
+    classDef batchJob fill:#fff5f5,stroke:#e53e3e,stroke-width:2px,color:#742a2a
+    classDef utilJob fill:#f0fff4,stroke:#38a169,stroke-width:2px,color:#276749
+            </div>
+        </div>
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background:#ebf8ff;border:2px solid #2b6cb0"></div> CICS File Control</div>
+            <div class="legend-item"><div class="legend-color" style="background:#fff5f5;border:2px solid #e53e3e"></div> Batch Processing (COBOL/IDCAMS)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#f0fff4;border:2px solid #38a169"></div> Utility</div>
+        </div>
+    </div>
+
+    <!-- Weekly Cycle -->
+    <div class="section">
+        <div class="section-header">
+            <h2>2. Weekly Batch Cycle</h2>
+            <span class="badge badge-weekly">Saturday</span>
+        </div>
+        <div class="section-body">
+            <p class="section-desc">Runs every Saturday. Maintains DB2 transaction types, then triggers two parallel flows: disclosure groups refresh and transaction types extraction.</p>
+            <div class="mermaid">
+flowchart TD
+    MNTTRDB2["<b>MNTTRDB2</b><br/>Maintain Transaction Types (DB2)"]:::db2Job --> CLOSEFIL["<b>CLOSEFIL</b><br/>Close CICS Files"]:::cicsJob
+    MNTTRDB2 --> TRANEXTR["<b>TRANEXTR</b><br/>Extract Transaction Types<br/>from DB2"]:::db2Job
+    CLOSEFIL --> DISCGRP["<b>DISCGRP</b><br/>Refresh Disclosure Groups<br/><i>PGM=IDCAMS</i><br/>Delete/Define/Load VSAM"]:::batchJob
+    DISCGRP --> WAITSTEP["<b>WAITSTEP</b><br/>Wait"]:::utilJob
+    WAITSTEP --> OPENFIL["<b>OPENFIL</b><br/>Open CICS Files"]:::cicsJob
+
+    classDef cicsJob fill:#ebf8ff,stroke:#2b6cb0,stroke-width:2px,color:#1a365d
+    classDef batchJob fill:#fff5f5,stroke:#e53e3e,stroke-width:2px,color:#742a2a
+    classDef utilJob fill:#f0fff4,stroke:#38a169,stroke-width:2px,color:#276749
+    classDef db2Job fill:#e9d8fd,stroke:#805ad5,stroke-width:2px,color:#44337a
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Cycle -->
+    <div class="section">
+        <div class="section-header">
+            <h2>3. Monthly Batch Cycle</h2>
+            <span class="badge badge-monthly">Monthly</span>
+        </div>
+        <div class="section-body">
+            <p class="section-desc">Runs monthly. Calculates interest and fees on transaction category balances, then combines system-generated transactions with backed-up daily transactions.</p>
+            <div class="mermaid">
+flowchart LR
+    CLOSEFIL["<b>CLOSEFIL</b><br/>Close CICS Files<br/><i>PGM=SDSF</i>"]:::cicsJob --> INTCALC["<b>INTCALC</b><br/>Interest Calculation<br/><i>PGM=CBACT04C</i><br/>Reads: TCATBALF, XREFFILE,<br/>ACCTFILE, DISCGRP<br/>Writes: SYSTRAN GDG"]:::batchJob --> COMBTRAN["<b>COMBTRAN</b><br/>Combine Transactions<br/><i>PGM=SORT + IDCAMS</i><br/>Merge backup + system trans<br/>Sort &amp; reload to VSAM"]:::batchJob --> WAITSTEP["<b>WAITSTEP</b><br/>Wait<br/><i>PGM=COBSWAIT</i>"]:::utilJob --> OPENFIL["<b>OPENFIL</b><br/>Open CICS Files<br/><i>PGM=SDSF</i>"]:::cicsJob
+
+    classDef cicsJob fill:#ebf8ff,stroke:#2b6cb0,stroke-width:2px,color:#1a365d
+    classDef batchJob fill:#fff5f5,stroke:#e53e3e,stroke-width:2px,color:#742a2a
+    classDef utilJob fill:#f0fff4,stroke:#38a169,stroke-width:2px,color:#276749
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Batch Cycle -->
+    <div class="section">
+        <div class="section-header">
+            <h2>4. On-Demand Full Batch Cycle</h2>
+            <span class="badge badge-ondemand">On-Demand</span>
+        </div>
+        <div class="section-body">
+            <p class="section-desc">The complete batch run covers all 6 phases: close CICS files, refresh all data, core transaction processing, interest calculation &amp; consolidation, reporting, and reopen CICS files.</p>
+            <div class="mermaid">
+flowchart TD
+    subgraph P1["Phase 1: Close CICS Files"]
+        CLOSEFIL["<b>CLOSEFIL</b><br/>Close CICS Files<br/><i>PGM=SDSF</i><br/>Closes: TRANSACT, CCXREF,<br/>ACCTDAT, CXACAIX, USRSEC"]:::cicsJob
+    end
+
+    subgraph P2["Phase 2: Data Refresh"]
+        direction TB
+        ACCTFILE["<b>ACCTFILE</b><br/>Account Master<br/><i>IDCAMS</i>"]:::dataJob
+        CARDFILE["<b>CARDFILE</b><br/>Card Data + AIX<br/><i>IDCAMS + SDSF</i>"]:::dataJob
+        XREFFILE["<b>XREFFILE</b><br/>Card Cross-Ref + AIX<br/><i>IDCAMS</i>"]:::dataJob
+        CUSTFILE["<b>CUSTFILE</b><br/>Customer Data<br/><i>IDCAMS + SDSF</i>"]:::dataJob
+        TRANFILE["<b>TRANFILE</b><br/>Transaction Master + AIX<br/><i>IDCAMS + SDSF</i>"]:::dataJob
+        DISCGRP["<b>DISCGRP</b><br/>Disclosure Groups<br/><i>IDCAMS</i>"]:::dataJob
+        TCATBALF["<b>TCATBALF</b><br/>Tran Category Balance<br/><i>IDCAMS</i>"]:::dataJob
+        TRANTYPE["<b>TRANTYPE</b><br/>Transaction Types<br/><i>IDCAMS</i>"]:::dataJob
+        DUSRSECJ["<b>DUSRSECJ</b><br/>User Security<br/><i>IEBGENER + IDCAMS</i>"]:::dataJob
+    end
+
+    subgraph P3["Phase 3: Core Processing"]
+        POSTTRAN["<b>POSTTRAN</b><br/>Post Transactions<br/><i>PGM=CBTRN02C</i><br/>Process daily transactions<br/>Update TCATBALF &amp; TRANSACT<br/>Create DALYREJS GDG"]:::batchJob
+    end
+
+    subgraph P4["Phase 4: Interest &amp; Consolidation"]
+        INTCALC["<b>INTCALC</b><br/>Interest Calculation<br/><i>PGM=CBACT04C</i><br/>Compute interest/fees<br/>Create SYSTRAN GDG"]:::batchJob
+        TRANBKP["<b>TRANBKP</b><br/>Transaction Backup<br/><i>REPROC + IDCAMS</i><br/>Backup &amp; redefine TRANSACT"]:::batchJob
+        COMBTRAN["<b>COMBTRAN</b><br/>Combine Transactions<br/><i>SORT + IDCAMS</i><br/>Merge backup + system trans"]:::batchJob
+        TRANIDX["<b>TRANIDX</b><br/>Define Alternate Index<br/><i>IDCAMS</i><br/>AIX + PATH + BLDINDEX"]:::batchJob
+    end
+
+    subgraph P5["Phase 5: Reporting"]
+        CREASTMT["<b>CREASTMT</b><br/>Create Statements<br/><i>SORT + IDCAMS + CBSTM03A</i><br/>Text + HTML statements"]:::reportJob
+        TXT2PDF1["<b>TXT2PDF1</b><br/>Convert to PDF<br/><i>PGM=IKJEFT1B</i>"]:::reportJob
+        PRTCATBL["<b>PRTCATBL</b><br/>Print Category Balance<br/><i>REPROC + SORT</i>"]:::reportJob
+    end
+
+    subgraph P6["Phase 6: Open CICS Files"]
+        OPENFIL["<b>OPENFIL</b><br/>Open CICS Files<br/><i>PGM=SDSF</i><br/>Opens: TRANSACT, CCXREF,<br/>ACCTDAT, CXACAIX, USRSEC"]:::cicsJob
+    end
+
+    CLOSEFIL --> ACCTFILE
+    CLOSEFIL --> CARDFILE
+    CLOSEFIL --> XREFFILE
+    CLOSEFIL --> CUSTFILE
+    CLOSEFIL --> TRANFILE
+    CLOSEFIL --> DISCGRP
+    CLOSEFIL --> TCATBALF
+    CLOSEFIL --> TRANTYPE
+    CLOSEFIL --> DUSRSECJ
+
+    ACCTFILE --> POSTTRAN
+    CARDFILE --> POSTTRAN
+    XREFFILE --> POSTTRAN
+    CUSTFILE --> POSTTRAN
+    TRANFILE --> POSTTRAN
+    DISCGRP --> POSTTRAN
+    TCATBALF --> POSTTRAN
+    TRANTYPE --> POSTTRAN
+    DUSRSECJ --> POSTTRAN
+
+    POSTTRAN --> INTCALC --> TRANBKP --> COMBTRAN --> TRANIDX
+    TRANIDX --> CREASTMT --> TXT2PDF1 --> PRTCATBL
+    PRTCATBL --> OPENFIL
+
+    classDef cicsJob fill:#ebf8ff,stroke:#2b6cb0,stroke-width:2px,color:#1a365d
+    classDef batchJob fill:#fff5f5,stroke:#e53e3e,stroke-width:2px,color:#742a2a
+    classDef utilJob fill:#f0fff4,stroke:#38a169,stroke-width:2px,color:#276749
+    classDef dataJob fill:#fffbeb,stroke:#d69e2e,stroke-width:2px,color:#975a16
+    classDef reportJob fill:#faf5ff,stroke:#805ad5,stroke-width:2px,color:#553c9a
+            </div>
+        </div>
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background:#ebf8ff;border:2px solid #2b6cb0"></div> CICS File Control</div>
+            <div class="legend-item"><div class="legend-color" style="background:#fffbeb;border:2px solid #d69e2e"></div> Data Refresh (IDCAMS)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#fff5f5;border:2px solid #e53e3e"></div> COBOL Batch Processing</div>
+            <div class="legend-item"><div class="legend-color" style="background:#faf5ff;border:2px solid #805ad5"></div> Reporting</div>
+        </div>
+    </div>
+
+    <!-- CA7 Chains -->
+    <div class="section">
+        <div class="section-header">
+            <h2>5. CA7 Scheduler Chains</h2>
+            <span class="badge badge-ca7">CA7</span>
+        </div>
+        <div class="section-body">
+            <p class="section-desc">Additional triggered job chains defined in the CA7 job scheduler, showing the posting chain, data validation chain, and statement generation chain.</p>
+            <div class="mermaid">
+flowchart TD
+    subgraph CHAIN1["Posting Chain"]
+        C1A["<b>CLOSEFIL</b>"]:::cicsJob --> C1B["<b>CBPAUP0J</b><br/>Purge Auth Pending"]:::batchJob --> C1C["<b>POSTTRAN</b><br/>Post Transactions<br/><i>PGM=CBTRN02C</i>"]:::batchJob --> C1D["<b>WAITSTEP</b>"]:::utilJob --> C1E["<b>OPENFIL</b>"]:::cicsJob
+    end
+
+    subgraph CHAIN2["Data Validation Chain"]
+        C2A["<b>CLOSEFIL</b>"]:::cicsJob --> C2B["<b>READACCT</b><br/><i>PGM=CBACT01C</i>"]:::batchJob --> C2C["<b>READCARD</b><br/><i>PGM=CBACT02C</i>"]:::batchJob --> C2D["<b>READCUST</b><br/><i>PGM=CBCUS01C</i>"]:::batchJob --> C2E["<b>READXREF</b><br/><i>PGM=CBACT03C</i>"]:::batchJob --> C2F["<b>WAITSTEP</b>"]:::utilJob --> C2G["<b>OPENFIL</b>"]:::cicsJob
+    end
+
+    subgraph CHAIN3["Statement Generation Chain"]
+        C3A["<b>CLOSEFIL</b>"]:::cicsJob --> C3B["<b>CREASTMT</b><br/><i>PGM=CBSTM03A</i>"]:::reportJob --> C3C["<b>TXT2PDF1</b><br/>Text to PDF"]:::reportJob --> C3D["<b>WAITSTEP</b>"]:::utilJob --> C3E["<b>OPENFIL</b>"]:::cicsJob
+    end
+
+    subgraph CHAIN4["Category Balance Chain"]
+        C4A["<b>CLOSEFIL</b>"]:::cicsJob --> C4B["<b>TRANCATG</b><br/>Refresh Tran Categories"]:::dataJob --> C4C["<b>WAITSTEP</b>"]:::utilJob
+        C4D["<b>CLOSEFIL</b>"]:::cicsJob --> C4E["<b>TCATBALF</b><br/>Refresh Category Balance"]:::dataJob --> C4F["<b>WAITSTEP</b>"]:::utilJob
+        C4G["<b>CLOSEFIL</b>"]:::cicsJob --> C4H["<b>PRTCATBL</b><br/>Print Category Balance"]:::reportJob --> C4I["<b>WAITSTEP</b>"]:::utilJob --> C4J["<b>OPENFIL</b>"]:::cicsJob
+    end
+
+    classDef cicsJob fill:#ebf8ff,stroke:#2b6cb0,stroke-width:2px,color:#1a365d
+    classDef batchJob fill:#fff5f5,stroke:#e53e3e,stroke-width:2px,color:#742a2a
+    classDef utilJob fill:#f0fff4,stroke:#38a169,stroke-width:2px,color:#276749
+    classDef dataJob fill:#fffbeb,stroke:#d69e2e,stroke-width:2px,color:#975a16
+    classDef reportJob fill:#faf5ff,stroke:#805ad5,stroke-width:2px,color:#553c9a
+            </div>
+        </div>
+    </div>
+
+    <!-- VSAM Data Files -->
+    <div class="section">
+        <div class="section-header">
+            <h2>VSAM Data Files</h2>
+        </div>
+        <div class="section-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>VSAM File</th>
+                        <th>Record Size</th>
+                        <th>Key</th>
+                        <th>Description</th>
+                        <th>Used By Jobs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>ACCTDATA.VSAM.KSDS</code></td><td>300 bytes</td><td>11 bytes @ 0</td><td>Account Master</td><td>ACCTFILE, POSTTRAN, INTCALC, CREASTMT, CBEXPORT</td></tr>
+                    <tr><td><code>CARDDATA.VSAM.KSDS</code></td><td>150 bytes</td><td>16 bytes @ 0</td><td>Card Data + AIX on Acct ID</td><td>CARDFILE, CBEXPORT</td></tr>
+                    <tr><td><code>CARDXREF.VSAM.KSDS</code></td><td>50 bytes</td><td>16 bytes @ 0</td><td>Card Cross-Reference + AIX</td><td>XREFFILE, POSTTRAN, INTCALC, CREASTMT, CBEXPORT</td></tr>
+                    <tr><td><code>CUSTDATA.VSAM.KSDS</code></td><td>500 bytes</td><td>9 bytes @ 0</td><td>Customer Data</td><td>CUSTFILE, CREASTMT, CBEXPORT</td></tr>
+                    <tr><td><code>TRANSACT.VSAM.KSDS</code></td><td>350 bytes</td><td>16 bytes @ 0</td><td>Transaction Master + AIX</td><td>TRANFILE, POSTTRAN, TRANBKP, COMBTRAN, TRANIDX, CREASTMT, CBEXPORT</td></tr>
+                    <tr><td><code>TCATBALF.VSAM.KSDS</code></td><td>50 bytes</td><td>17 bytes @ 0</td><td>Transaction Category Balance</td><td>TCATBALF, POSTTRAN, INTCALC, PRTCATBL</td></tr>
+                    <tr><td><code>TRANTYPE.VSAM.KSDS</code></td><td>60 bytes</td><td>2 bytes @ 0</td><td>Transaction Type Codes</td><td>TRANTYPE, TRANREPT</td></tr>
+                    <tr><td><code>TRANCATG.VSAM.KSDS</code></td><td>60 bytes</td><td>6 bytes @ 0</td><td>Transaction Categories</td><td>TRANCATG, TRANREPT</td></tr>
+                    <tr><td><code>DISCGRP.VSAM.KSDS</code></td><td>50 bytes</td><td>16 bytes @ 0</td><td>Disclosure Groups</td><td>DISCGRP, INTCALC</td></tr>
+                    <tr><td><code>USRSEC.VSAM.KSDS</code></td><td>80 bytes</td><td>8 bytes @ 0</td><td>User Security</td><td>DUSRSECJ</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- COBOL Batch Programs -->
+    <div class="section">
+        <div class="section-header">
+            <h2>COBOL Batch Programs</h2>
+        </div>
+        <div class="section-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Program</th>
+                        <th>JCL Job</th>
+                        <th>Description</th>
+                        <th>Input Files</th>
+                        <th>Output Files</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>CBTRN02C</code></td><td>POSTTRAN</td><td>Process daily transactions, update category balances</td><td>TRANFILE, DALYTRAN, XREFFILE, ACCTFILE, TCATBALF</td><td>DALYREJS (GDG)</td></tr>
+                    <tr><td><code>CBACT04C</code></td><td>INTCALC</td><td>Calculate interest and fees on transaction balances</td><td>TCATBALF, XREFFILE, ACCTFILE, DISCGRP</td><td>SYSTRAN (GDG)</td></tr>
+                    <tr><td><code>CBSTM03A</code></td><td>CREASTMT</td><td>Generate account statements (text + HTML)</td><td>TRNXFILE, XREFFILE, ACCTFILE, CUSTFILE</td><td>STATEMNT.PS, STATEMNT.HTML</td></tr>
+                    <tr><td><code>CBSTM03B</code></td><td>(subroutine)</td><td>HTML formatting subroutine called by CBSTM03A</td><td>-</td><td>-</td></tr>
+                    <tr><td><code>CBTRN03C</code></td><td>TRANREPT</td><td>Produce formatted transaction report</td><td>TRANFILE, CARDXREF, TRANTYPE, TRANCATG</td><td>TRANREPT (GDG)</td></tr>
+                    <tr><td><code>CBACT01C</code></td><td>READACCT</td><td>Read/validate account master file</td><td>ACCTFILE</td><td>PSCOMP, ARRYPS, VBPS</td></tr>
+                    <tr><td><code>CBACT02C</code></td><td>READCARD</td><td>Read/validate card data file</td><td>CARDDATA</td><td>(output files)</td></tr>
+                    <tr><td><code>CBACT03C</code></td><td>READXREF</td><td>Read/validate cross-reference file</td><td>XREFFILE</td><td>(output files)</td></tr>
+                    <tr><td><code>CBCUS01C</code></td><td>READCUST</td><td>Read/validate customer data file</td><td>CUSTFILE</td><td>(output files)</td></tr>
+                    <tr><td><code>COBSWAIT</code></td><td>WAITSTEP</td><td>Wait utility (centisecond delay)</td><td>SYSIN (delay)</td><td>-</td></tr>
+                    <tr><td><code>CBEXPORT</code></td><td>CBEXPORT</td><td>Export all VSAM data to combined export file</td><td>All VSAM files</td><td>EXPORT.DATA</td></tr>
+                    <tr><td><code>CBIMPORT</code></td><td>CBIMPORT</td><td>Import from export file into normalized flat files</td><td>EXPORT.DATA</td><td>*.IMPORT files</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- GDG Files -->
+    <div class="section">
+        <div class="section-header">
+            <h2>GDG (Generation Data Group) Files</h2>
+        </div>
+        <div class="section-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>GDG Base</th>
+                        <th>Max Generations</th>
+                        <th>Created By</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>DALYREJS</code></td><td>5</td><td>POSTTRAN</td><td>Daily rejected transactions</td></tr>
+                    <tr><td><code>TRANSACT.BKUP</code></td><td>-</td><td>TRANBKP, TRANREPT</td><td>Transaction master backups</td></tr>
+                    <tr><td><code>SYSTRAN</code></td><td>-</td><td>INTCALC</td><td>System-generated transactions (interest/fees)</td></tr>
+                    <tr><td><code>TRANSACT.COMBINED</code></td><td>-</td><td>COMBTRAN</td><td>Merged transaction file</td></tr>
+                    <tr><td><code>TRANSACT.DALY</code></td><td>-</td><td>TRANREPT</td><td>Filtered daily transactions for reporting</td></tr>
+                    <tr><td><code>TRANREPT</code></td><td>10</td><td>TRANREPT</td><td>Formatted transaction reports</td></tr>
+                    <tr><td><code>TCATBALF.BKUP</code></td><td>-</td><td>PRTCATBL</td><td>Category balance backup</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+            fontSize: '14px',
+            primaryColor: '#ebf8ff',
+            primaryBorderColor: '#2b6cb0',
+            lineColor: '#4a5568',
+            secondaryColor: '#f0fff4',
+            tertiaryColor: '#fff5f5'
+        },
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+            curve: 'basis',
+            rankSpacing: 50,
+            nodeSpacing: 30
+        }
+    });
+</script>
+
+</body>
+</html>
