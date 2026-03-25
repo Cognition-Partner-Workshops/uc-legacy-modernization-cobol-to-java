@@ -1,0 +1,468 @@
+{
+  "metadata": {
+    "source_file": "carddata.txt",
+    "copybook": "CVACT02Y",
+    "record_length": 150,
+    "record_count": 50,
+    "layout_fields": [
+      "CARD_NUM",
+      "CARD_ACCT_ID",
+      "CARD_CVV_CD",
+      "CARD_EMBOSSED_NAME",
+      "CARD_EXPIRAION_DATE",
+      "CARD_ACTIVE_STATUS"
+    ]
+  },
+  "records": [
+    {
+      "CARD_NUM": "0500024453765740",
+      "CARD_ACCT_ID": 50,
+      "CARD_CVV_CD": 747,
+      "CARD_EMBOSSED_NAME": "Aniya Von",
+      "CARD_EXPIRAION_DATE": "2023-03-09",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 1
+    },
+    {
+      "CARD_NUM": "0683586198171516",
+      "CARD_ACCT_ID": 27,
+      "CARD_CVV_CD": 567,
+      "CARD_EMBOSSED_NAME": "Ward Jones",
+      "CARD_EXPIRAION_DATE": "2025-07-13",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 2
+    },
+    {
+      "CARD_NUM": "0923877193247330",
+      "CARD_ACCT_ID": 2,
+      "CARD_CVV_CD": 28,
+      "CARD_EMBOSSED_NAME": "Enrico Rosenbaum",
+      "CARD_EXPIRAION_DATE": "2024-08-11",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 3
+    },
+    {
+      "CARD_NUM": "0927987108636232",
+      "CARD_ACCT_ID": 20,
+      "CARD_CVV_CD": 3,
+      "CARD_EMBOSSED_NAME": "Carter Veum",
+      "CARD_EXPIRAION_DATE": "2024-03-13",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 4
+    },
+    {
+      "CARD_NUM": "0982496213629795",
+      "CARD_ACCT_ID": 12,
+      "CARD_CVV_CD": 75,
+      "CARD_EMBOSSED_NAME": "Maci Robel",
+      "CARD_EXPIRAION_DATE": "2023-07-07",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 5
+    },
+    {
+      "CARD_NUM": "1014086565224350",
+      "CARD_ACCT_ID": 44,
+      "CARD_CVV_CD": 640,
+      "CARD_EMBOSSED_NAME": "Irving Emard",
+      "CARD_EXPIRAION_DATE": "2024-01-17",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 6
+    },
+    {
+      "CARD_NUM": "1142167692878931",
+      "CARD_ACCT_ID": 37,
+      "CARD_CVV_CD": 625,
+      "CARD_EMBOSSED_NAME": "Shany Walker",
+      "CARD_EXPIRAION_DATE": "2023-10-24",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 7
+    },
+    {
+      "CARD_NUM": "1561409106491600",
+      "CARD_ACCT_ID": 35,
+      "CARD_CVV_CD": 31,
+      "CARD_EMBOSSED_NAME": "Angelica Dach",
+      "CARD_EXPIRAION_DATE": "2025-09-23",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 8
+    },
+    {
+      "CARD_NUM": "2745303720002090",
+      "CARD_ACCT_ID": 39,
+      "CARD_CVV_CD": 33,
+      "CARD_EMBOSSED_NAME": "Aliyah Berge",
+      "CARD_EXPIRAION_DATE": "2025-09-08",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 9
+    },
+    {
+      "CARD_NUM": "2760836797107565",
+      "CARD_ACCT_ID": 24,
+      "CARD_CVV_CD": 859,
+      "CARD_EMBOSSED_NAME": "Stefanie Dickinson",
+      "CARD_EXPIRAION_DATE": "2025-02-11",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 10
+    },
+    {
+      "CARD_NUM": "2871968252812490",
+      "CARD_ACCT_ID": 6,
+      "CARD_CVV_CD": 775,
+      "CARD_EMBOSSED_NAME": "Ignacio Douglas",
+      "CARD_EXPIRAION_DATE": "2025-10-08",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 11
+    },
+    {
+      "CARD_NUM": "2940139362300449",
+      "CARD_ACCT_ID": 22,
+      "CARD_CVV_CD": 876,
+      "CARD_EMBOSSED_NAME": "Allene Brown",
+      "CARD_EXPIRAION_DATE": "2025-12-28",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 12
+    },
+    {
+      "CARD_NUM": "2988091353094312",
+      "CARD_ACCT_ID": 4,
+      "CARD_CVV_CD": 795,
+      "CARD_EMBOSSED_NAME": "Delbert Parisian",
+      "CARD_EXPIRAION_DATE": "2023-12-16",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 13
+    },
+    {
+      "CARD_NUM": "3260763612337560",
+      "CARD_ACCT_ID": 10,
+      "CARD_CVV_CD": 342,
+      "CARD_EMBOSSED_NAME": "Maybell Mann",
+      "CARD_EXPIRAION_DATE": "2023-01-27",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 14
+    },
+    {
+      "CARD_NUM": "3766281984155154",
+      "CARD_ACCT_ID": 41,
+      "CARD_CVV_CD": 622,
+      "CARD_EMBOSSED_NAME": "Lucinda Dach",
+      "CARD_EXPIRAION_DATE": "2023-04-24",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 15
+    },
+    {
+      "CARD_NUM": "3940246016141489",
+      "CARD_ACCT_ID": 19,
+      "CARD_CVV_CD": 375,
+      "CARD_EMBOSSED_NAME": "Hadley Hamill",
+      "CARD_EXPIRAION_DATE": "2025-07-23",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 16
+    },
+    {
+      "CARD_NUM": "3999169246375885",
+      "CARD_ACCT_ID": 3,
+      "CARD_CVV_CD": 317,
+      "CARD_EMBOSSED_NAME": "Larry Homenick",
+      "CARD_EXPIRAION_DATE": "2024-01-10",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 17
+    },
+    {
+      "CARD_NUM": "4011500891777367",
+      "CARD_ACCT_ID": 13,
+      "CARD_CVV_CD": 390,
+      "CARD_EMBOSSED_NAME": "Mariane Fadel",
+      "CARD_EXPIRAION_DATE": "2024-08-04",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 18
+    },
+    {
+      "CARD_NUM": "4385271476627819",
+      "CARD_ACCT_ID": 34,
+      "CARD_CVV_CD": 709,
+      "CARD_EMBOSSED_NAME": "Faustino Schmidt",
+      "CARD_EXPIRAION_DATE": "2025-10-06",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 19
+    },
+    {
+      "CARD_NUM": "4534784102713951",
+      "CARD_ACCT_ID": 36,
+      "CARD_CVV_CD": 644,
+      "CARD_EMBOSSED_NAME": "Toney Gerhold",
+      "CARD_EXPIRAION_DATE": "2024-12-23",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 20
+    },
+    {
+      "CARD_NUM": "4859452612877065",
+      "CARD_ACCT_ID": 7,
+      "CARD_CVV_CD": 321,
+      "CARD_EMBOSSED_NAME": "Cooper Mayert",
+      "CARD_EXPIRAION_DATE": "2024-12-13",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 21
+    },
+    {
+      "CARD_NUM": "5407099850479866",
+      "CARD_ACCT_ID": 21,
+      "CARD_CVV_CD": 524,
+      "CARD_EMBOSSED_NAME": "Jerrold Maggio",
+      "CARD_EXPIRAION_DATE": "2023-01-06",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 22
+    },
+    {
+      "CARD_NUM": "5656830544981216",
+      "CARD_ACCT_ID": 46,
+      "CARD_CVV_CD": 196,
+      "CARD_EMBOSSED_NAME": "Cindy Cremin",
+      "CARD_EXPIRAION_DATE": "2025-06-20",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 23
+    },
+    {
+      "CARD_NUM": "5671184478505844",
+      "CARD_ACCT_ID": 18,
+      "CARD_CVV_CD": 137,
+      "CARD_EMBOSSED_NAME": "Emile White",
+      "CARD_EXPIRAION_DATE": "2023-09-10",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 24
+    },
+    {
+      "CARD_NUM": "5787351228879339",
+      "CARD_ACCT_ID": 47,
+      "CARD_CVV_CD": 67,
+      "CARD_EMBOSSED_NAME": "Rigoberto Hoeger",
+      "CARD_EXPIRAION_DATE": "2025-08-23",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 25
+    },
+    {
+      "CARD_NUM": "5975117516616077",
+      "CARD_ACCT_ID": 42,
+      "CARD_CVV_CD": 426,
+      "CARD_EMBOSSED_NAME": "Heather Nienow",
+      "CARD_EXPIRAION_DATE": "2025-09-19",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 26
+    },
+    {
+      "CARD_NUM": "6009619150674526",
+      "CARD_ACCT_ID": 5,
+      "CARD_CVV_CD": 21,
+      "CARD_EMBOSSED_NAME": "Treva Schowalter",
+      "CARD_EXPIRAION_DATE": "2025-03-09",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 27
+    },
+    {
+      "CARD_NUM": "6349250331648509",
+      "CARD_ACCT_ID": 15,
+      "CARD_CVV_CD": 735,
+      "CARD_EMBOSSED_NAME": "Aubree Hermann",
+      "CARD_EXPIRAION_DATE": "2025-06-09",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 28
+    },
+    {
+      "CARD_NUM": "6503535181795992",
+      "CARD_ACCT_ID": 48,
+      "CARD_CVV_CD": 413,
+      "CARD_EMBOSSED_NAME": "Lyric Pacocha",
+      "CARD_EXPIRAION_DATE": "2025-02-06",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 29
+    },
+    {
+      "CARD_NUM": "6509230362553816",
+      "CARD_ACCT_ID": 30,
+      "CARD_CVV_CD": 236,
+      "CARD_EMBOSSED_NAME": "Layla Ullrich",
+      "CARD_EXPIRAION_DATE": "2024-06-27",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 30
+    },
+    {
+      "CARD_NUM": "6723000463207764",
+      "CARD_ACCT_ID": 28,
+      "CARD_CVV_CD": 486,
+      "CARD_EMBOSSED_NAME": "Hester Hane",
+      "CARD_EXPIRAION_DATE": "2024-05-09",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 31
+    },
+    {
+      "CARD_NUM": "6727055190616014",
+      "CARD_ACCT_ID": 16,
+      "CARD_CVV_CD": 641,
+      "CARD_EMBOSSED_NAME": "Carroll Bergstrom",
+      "CARD_EXPIRAION_DATE": "2024-01-25",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 32
+    },
+    {
+      "CARD_NUM": "6832676047698087",
+      "CARD_ACCT_ID": 33,
+      "CARD_CVV_CD": 983,
+      "CARD_EMBOSSED_NAME": "Bernice Herman",
+      "CARD_EXPIRAION_DATE": "2025-10-07",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 33
+    },
+    {
+      "CARD_NUM": "7026637615032277",
+      "CARD_ACCT_ID": 31,
+      "CARD_CVV_CD": 920,
+      "CARD_EMBOSSED_NAME": "Lucious O'Connell",
+      "CARD_EXPIRAION_DATE": "2025-06-08",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 34
+    },
+    {
+      "CARD_NUM": "7058267261837752",
+      "CARD_ACCT_ID": 43,
+      "CARD_CVV_CD": 401,
+      "CARD_EMBOSSED_NAME": "Britney Waters",
+      "CARD_EXPIRAION_DATE": "2025-08-29",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 35
+    },
+    {
+      "CARD_NUM": "7094142751055551",
+      "CARD_ACCT_ID": 32,
+      "CARD_CVV_CD": 659,
+      "CARD_EMBOSSED_NAME": "Stephany Fisher",
+      "CARD_EXPIRAION_DATE": "2025-05-19",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 36
+    },
+    {
+      "CARD_NUM": "7251508149188883",
+      "CARD_ACCT_ID": 29,
+      "CARD_CVV_CD": 717,
+      "CARD_EMBOSSED_NAME": "Rickie Daugherty",
+      "CARD_EXPIRAION_DATE": "2024-06-04",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 37
+    },
+    {
+      "CARD_NUM": "7379335634661142",
+      "CARD_ACCT_ID": 45,
+      "CARD_CVV_CD": 134,
+      "CARD_EMBOSSED_NAME": "Dixie Beier",
+      "CARD_EXPIRAION_DATE": "2025-07-09",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 38
+    },
+    {
+      "CARD_NUM": "7427684863423209",
+      "CARD_ACCT_ID": 11,
+      "CARD_CVV_CD": 892,
+      "CARD_EMBOSSED_NAME": "Hayden Pfannerstill",
+      "CARD_EXPIRAION_DATE": "2025-03-12",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 39
+    },
+    {
+      "CARD_NUM": "7443870988897530",
+      "CARD_ACCT_ID": 38,
+      "CARD_CVV_CD": 708,
+      "CARD_EMBOSSED_NAME": "Angela Ankunding",
+      "CARD_EXPIRAION_DATE": "2023-07-23",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 40
+    },
+    {
+      "CARD_NUM": "8040580410348680",
+      "CARD_ACCT_ID": 26,
+      "CARD_CVV_CD": 971,
+      "CARD_EMBOSSED_NAME": "Marjory Stracke",
+      "CARD_EXPIRAION_DATE": "2024-12-19",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 41
+    },
+    {
+      "CARD_NUM": "8112545834239735",
+      "CARD_ACCT_ID": 23,
+      "CARD_CVV_CD": 440,
+      "CARD_EMBOSSED_NAME": "Johnson Ruecker",
+      "CARD_EXPIRAION_DATE": "2025-03-18",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 42
+    },
+    {
+      "CARD_NUM": "8262593602473076",
+      "CARD_ACCT_ID": 49,
+      "CARD_CVV_CD": 457,
+      "CARD_EMBOSSED_NAME": "Immanuel Bednar",
+      "CARD_EXPIRAION_DATE": "2023-09-17",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 43
+    },
+    {
+      "CARD_NUM": "8517866958206008",
+      "CARD_ACCT_ID": 14,
+      "CARD_CVV_CD": 955,
+      "CARD_EMBOSSED_NAME": "Chelsea Marks",
+      "CARD_EXPIRAION_DATE": "2025-12-11",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 44
+    },
+    {
+      "CARD_NUM": "8931369351894783",
+      "CARD_ACCT_ID": 8,
+      "CARD_CVV_CD": 230,
+      "CARD_EMBOSSED_NAME": "Kelsie Dicki",
+      "CARD_EXPIRAION_DATE": "2024-05-20",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 45
+    },
+    {
+      "CARD_NUM": "9056297931664011",
+      "CARD_ACCT_ID": 25,
+      "CARD_CVV_CD": 931,
+      "CARD_EMBOSSED_NAME": "Elliott Howell",
+      "CARD_EXPIRAION_DATE": "2025-07-10",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 46
+    },
+    {
+      "CARD_NUM": "9349107475869214",
+      "CARD_ACCT_ID": 17,
+      "CARD_CVV_CD": 218,
+      "CARD_EMBOSSED_NAME": "Sigrid Mann",
+      "CARD_EXPIRAION_DATE": "2025-03-01",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 47
+    },
+    {
+      "CARD_NUM": "9501733721429893",
+      "CARD_ACCT_ID": 9,
+      "CARD_CVV_CD": 725,
+      "CARD_EMBOSSED_NAME": "Melvin Ondricka",
+      "CARD_EXPIRAION_DATE": "2024-12-27",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 48
+    },
+    {
+      "CARD_NUM": "9680294154603697",
+      "CARD_ACCT_ID": 1,
+      "CARD_CVV_CD": 45,
+      "CARD_EMBOSSED_NAME": "Immanuel Kessler",
+      "CARD_EXPIRAION_DATE": "2025-05-20",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 49
+    },
+    {
+      "CARD_NUM": "9805583408996588",
+      "CARD_ACCT_ID": 40,
+      "CARD_CVV_CD": 908,
+      "CARD_EMBOSSED_NAME": "Davon Emmerich",
+      "CARD_EXPIRAION_DATE": "2023-10-27",
+      "CARD_ACTIVE_STATUS": "Y",
+      "_line_number": 50
+    }
+  ]
+}
