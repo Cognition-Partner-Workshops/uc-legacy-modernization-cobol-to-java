@@ -8,6 +8,7 @@ import com.carddemo.batch.model.VbrcRecord2;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.StringJoiner;
 
 /**
  * Writes migrated account records to output files in delimited text format.
@@ -24,26 +25,51 @@ public final class RecordWriter {
 
     private RecordWriter() {}
 
+    // ── Shared helpers ─────────────────────────────────────────────────
+
+    /**
+     * Build a pipe-delimited line from an arbitrary list of field values.
+     * {@link BigDecimal} fields are written via {@code toPlainString()};
+     * all others use {@code String.valueOf()}.
+     */
+    static String delimit(Object... fields) {
+        StringJoiner joiner = new StringJoiner(DELIMITER);
+        for (Object field : fields) {
+            if (field instanceof BigDecimal bd) {
+                joiner.add(bd.toPlainString());
+            } else {
+                joiner.add(String.valueOf(field));
+            }
+        }
+        return joiner.toString();
+    }
+
+    private static void writeLine(BufferedWriter writer, String line) throws IOException {
+        writer.write(line);
+        writer.newLine();
+    }
+
+    // ── Public write methods ───────────────────────────────────────────
+
     /**
      * Write an OutputAccountRecord to the output file.
      * Field order matches the COBOL OUT-ACCT-REC layout.
      */
     public static void writeOutputRecord(BufferedWriter writer,
                                          OutputAccountRecord rec) throws IOException {
-        writer.write(String.join(DELIMITER,
-                String.valueOf(rec.acctId()),
+        writeLine(writer, delimit(
+                rec.acctId(),
                 rec.activeStatus(),
-                rec.currBal().toPlainString(),
-                rec.creditLimit().toPlainString(),
-                rec.cashCreditLimit().toPlainString(),
+                rec.currBal(),
+                rec.creditLimit(),
+                rec.cashCreditLimit(),
                 rec.openDate(),
                 rec.expirationDate(),
                 rec.reissueDate(),
-                rec.currCycCredit().toPlainString(),
-                rec.currCycDebit().toPlainString(),
+                rec.currCycCredit(),
+                rec.currCycDebit(),
                 rec.groupId()
         ));
-        writer.newLine();
     }
 
     /**
@@ -58,8 +84,7 @@ public final class RecordWriter {
             sb.append(DELIMITER).append(entry.currBal().toPlainString());
             sb.append(DELIMITER).append(entry.currCycDebit().toPlainString());
         }
-        writer.write(sb.toString());
-        writer.newLine();
+        writeLine(writer, sb.toString());
     }
 
     /**
@@ -67,11 +92,7 @@ public final class RecordWriter {
      */
     public static void writeVbrc1(BufferedWriter writer,
                                   VbrcRecord1 rec) throws IOException {
-        writer.write(String.join(DELIMITER,
-                String.valueOf(rec.acctId()),
-                rec.activeStatus()
-        ));
-        writer.newLine();
+        writeLine(writer, delimit(rec.acctId(), rec.activeStatus()));
     }
 
     /**
@@ -79,12 +100,11 @@ public final class RecordWriter {
      */
     public static void writeVbrc2(BufferedWriter writer,
                                   VbrcRecord2 rec) throws IOException {
-        writer.write(String.join(DELIMITER,
-                String.valueOf(rec.acctId()),
-                rec.currBal().toPlainString(),
-                rec.creditLimit().toPlainString(),
+        writeLine(writer, delimit(
+                rec.acctId(),
+                rec.currBal(),
+                rec.creditLimit(),
                 rec.reissueYyyy()
         ));
-        writer.newLine();
     }
 }

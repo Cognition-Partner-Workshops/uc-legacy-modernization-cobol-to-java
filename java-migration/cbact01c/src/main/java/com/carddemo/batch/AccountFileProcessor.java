@@ -59,6 +59,7 @@ public class AccountFileProcessor {
     public List<AccountRecord> execute() throws IOException {
         System.out.println("START OF EXECUTION OF PROGRAM CBACT01C");
 
+        recordsProcessed = 0;
         List<AccountRecord> records = new ArrayList<>();
 
         try (BufferedReader reader = Files.newBufferedReader(inputFile);

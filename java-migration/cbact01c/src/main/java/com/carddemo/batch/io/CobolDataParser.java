@@ -3,7 +3,6 @@ package com.carddemo.batch.io;
 import com.carddemo.batch.model.AccountRecord;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 
 /**
  * Parses fixed-width COBOL account records from ASCII data files.
