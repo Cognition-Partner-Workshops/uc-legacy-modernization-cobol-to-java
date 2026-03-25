@@ -1,0 +1,151 @@
+name: overlapping-leave-requests
+description: >
+  Tests handling of overlapping and conflicting leave requests. Ensures the
+  system correctly rejects fully overlapping dates, handles partial overlaps,
+  manages concurrent requests from different leave types, and properly
+  enforces leave balance constraints. Maps legacy COBOL date-range validation
+  to modern Java service-layer checks.
+module: leave
+legacy_program: COTRN02C
+modern_endpoint: /api/leave
+
+steps:
+  - name: Set up employee with known leave balances
+    action: set_leave_balance
+    input:
+      emp_id: 34
+      balances:
+        - leave_type: "PTO"
+          leave_type_id: 1
+          total_entitled: 20
+          used: 5
+          remaining: 15
+        - leave_type: "SICK"
+          leave_type_id: 2
+          total_entitled: 10
+          used: 2
+          remaining: 8
+    expect:
+      emp_id: 34
+      balance_count: 2
+
+  - name: Submit first PTO request (baseline)
+    action: submit_leave
+    input:
+      emp_id: 34
+      leave_type_id: 1
+      start_date: "2024-08-12"
+      end_date: "2024-08-16"
+      half_day_flag: "N"
+      reason: "Summer vacation"
+    expect:
+      status: "PENDING"
+      total_days: 5
+    save_as: leave_request_1
+
+  - name: Approve the first request
+    action: approve_leave
+    input:
+      request_id: "{{leave_request_1.request_id}}"
+      approver_emp_id: 31
+    expect:
+      status: "APPROVED"
+
+  - name: Submit fully overlapping PTO request (same dates)
+    action: submit_leave
+    input:
+      emp_id: 34
+      leave_type_id: 1
+      start_date: "2024-08-12"
+      end_date: "2024-08-16"
+      half_day_flag: "N"
+      reason: "Duplicate request"
+    expect:
+      status: "REJECTED"
+      error_code: "OVERLAP_FULL"
+      overlapping_request_id: "{{leave_request_1.request_id}}"
+
+  - name: Submit partially overlapping PTO request (overlap last 2 days)
+    action: submit_leave
+    input:
+      emp_id: 34
+      leave_type_id: 1
+      start_date: "2024-08-15"
+      end_date: "2024-08-20"
+      half_day_flag: "N"
+      reason: "Extended vacation"
+    expect:
+      status: "REJECTED"
+      error_code: "OVERLAP_PARTIAL"
+      overlap_days: 2
+
+  - name: Submit sick leave overlapping PTO (different leave type, same dates)
+    action: submit_leave
+    input:
+      emp_id: 34
+      leave_type_id: 2
+      start_date: "2024-08-14"
+      end_date: "2024-08-15"
+      half_day_flag: "N"
+      reason: "Sick during planned PTO"
+    expect:
+      status: "REJECTED"
+      error_code: "OVERLAP_CROSS_TYPE"
+
+  - name: Submit adjacent (non-overlapping) PTO request
+    action: submit_leave
+    input:
+      emp_id: 34
+      leave_type_id: 1
+      start_date: "2024-08-19"
+      end_date: "2024-08-23"
+      half_day_flag: "N"
+      reason: "Follow-up vacation"
+    expect:
+      status: "PENDING"
+      total_days: 5
+    save_as: leave_request_adjacent
+
+  - name: Submit request exceeding remaining balance
+    action: submit_leave
+    input:
+      emp_id: 34
+      leave_type_id: 1
+      start_date: "2024-09-02"
+      end_date: "2024-09-13"
+      half_day_flag: "N"
+      reason: "Long holiday"
+    expect:
+      status: "REJECTED"
+      error_code: "INSUFFICIENT_BALANCE"
+      requested_days: 10
+      remaining_balance: 5
+
+  - name: Cancel first request and resubmit overlapping dates
+    action: cancel_leave
+    input:
+      request_id: "{{leave_request_1.request_id}}"
+      reason: "Plans changed"
+    expect:
+      status: "CANCELLED"
+
+  - name: Verify balance restored after cancellation
+    action: get_leave_balance
+    input:
+      emp_id: 34
+      leave_type_id: 1
+    expect:
+      remaining: 15
+
+  - name: Resubmit on previously overlapping dates (now available)
+    action: submit_leave
+    input:
+      emp_id: 34
+      leave_type_id: 1
+      start_date: "2024-08-12"
+      end_date: "2024-08-14"
+      half_day_flag: "N"
+      reason: "Short vacation instead"
+    expect:
+      status: "PENDING"
+      total_days: 3

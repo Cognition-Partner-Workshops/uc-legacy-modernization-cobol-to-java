@@ -1,0 +1,120 @@
+name: terminated-employee-payroll-exclusion
+description: >
+  Validates that terminated employees are correctly excluded from payroll
+  processing. Covers termination mid-period, termination before period,
+  and rehire scenarios to ensure the legacy COBOL batch and modern Java
+  system handle employment status transitions identically.
+module: payroll
+legacy_program: CBTRN02C
+modern_endpoint: /api/payroll
+
+steps:
+  - name: Create active employee for payroll test
+    action: create_employee
+    input:
+      first_name: "ROBERT"
+      last_name: "TERMINATED"
+      emp_id: 90001
+      department: "ACCOUNTING"
+      hire_date: "2023-01-15"
+      salary: 72000.00
+      employment_status: "ACTIVE"
+      pay_frequency: "BIWEEKLY"
+    expect:
+      employment_status: "ACTIVE"
+    save_as: test_employee
+
+  - name: Run payroll including active employee
+    action: run_payroll
+    input:
+      period_start: "2024-11-01"
+      period_end: "2024-11-15"
+      run_type: "REGULAR"
+    expect:
+      status: "CALCULATED"
+      includes_emp_id: 90001
+      employee_count: "> 0"
+    tolerance:
+      total_gross: 0.01
+      total_net: 0.01
+    save_as: payroll_before_term
+
+  - name: Terminate employee mid-period
+    action: terminate_employee
+    input:
+      emp_id: 90001
+      termination_date: "2024-11-20"
+      reason: "VOLUNTARY_RESIGNATION"
+    expect:
+      employment_status: "TERMINATED"
+      termination_date: "2024-11-20"
+      active_flag: "N"
+
+  - name: Run payroll for period after termination
+    action: run_payroll
+    input:
+      period_start: "2024-12-01"
+      period_end: "2024-12-15"
+      run_type: "REGULAR"
+    expect:
+      status: "CALCULATED"
+      excludes_emp_id: 90001
+    save_as: payroll_after_term
+
+  - name: Verify terminated employee has no pay stub for post-term period
+    action: get_employee_pay
+    input:
+      run_id: "{{payroll_after_term.run_id}}"
+      emp_id: 90001
+    expect:
+      found: false
+      error_code: "EMP_NOT_IN_PAYROLL"
+
+  - name: Run payroll for termination period with proration
+    action: run_payroll
+    input:
+      period_start: "2024-11-16"
+      period_end: "2024-11-30"
+      run_type: "REGULAR"
+    expect:
+      status: "CALCULATED"
+      includes_emp_id: 90001
+    save_as: payroll_term_period
+
+  - name: Verify prorated pay for termination period
+    action: get_employee_pay
+    input:
+      run_id: "{{payroll_term_period.run_id}}"
+      emp_id: 90001
+    expect:
+      base_pay: "> 0"
+      proration_applied: true
+      days_worked: 5
+      net_pay: "> 0"
+    tolerance:
+      base_pay: 0.01
+      net_pay: 0.01
+
+  - name: Rehire the terminated employee
+    action: rehire_employee
+    input:
+      emp_id: 90001
+      rehire_date: "2025-02-01"
+      new_salary: 75000.00
+      department: "ACCOUNTING"
+    expect:
+      employment_status: "ACTIVE"
+      active_flag: "Y"
+
+  - name: Verify rehired employee included in next payroll
+    action: run_payroll
+    input:
+      period_start: "2025-02-01"
+      period_end: "2025-02-15"
+      run_type: "REGULAR"
+    expect:
+      status: "CALCULATED"
+      includes_emp_id: 90001
+    tolerance:
+      total_gross: 0.01
+      total_net: 0.01

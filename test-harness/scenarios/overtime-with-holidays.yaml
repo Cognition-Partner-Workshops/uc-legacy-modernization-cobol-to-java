@@ -1,0 +1,213 @@
+name: overtime-with-holidays
+description: >
+  Tests overtime calculation when pay periods include public holidays.
+  Validates holiday premium rates, overtime stacking with holiday pay,
+  weekly overtime threshold adjustments, and correct gross-to-net
+  calculations. Maps legacy COBOL batch payroll processing (CBTRN02C,
+  CBACT04C) to modern Java payroll service.
+module: payroll
+legacy_program: CBTRN02C
+modern_endpoint: /api/payroll
+
+steps:
+  - name: Define holiday calendar for test period
+    action: set_holiday_calendar
+    input:
+      year: 2024
+      holidays:
+        - date: "2024-11-28"
+          name: "Thanksgiving"
+          type: "FEDERAL"
+          premium_rate: 1.5
+        - date: "2024-11-29"
+          name: "Day After Thanksgiving"
+          type: "COMPANY"
+          premium_rate: 1.5
+        - date: "2024-12-25"
+          name: "Christmas Day"
+          type: "FEDERAL"
+          premium_rate: 2.0
+        - date: "2024-12-31"
+          name: "New Year's Eve"
+          type: "COMPANY"
+          premium_rate: 1.5
+    expect:
+      holidays_set: 4
+
+  - name: Create hourly employee for overtime testing
+    action: create_employee
+    input:
+      emp_id: 90002
+      first_name: "MARIA"
+      last_name: "OVERTIME"
+      department: "OPERATIONS"
+      hire_date: "2022-06-01"
+      pay_type: "HOURLY"
+      hourly_rate: 25.00
+      overtime_eligible: true
+      overtime_rate: 1.5
+      employment_status: "ACTIVE"
+    expect:
+      employment_status: "ACTIVE"
+      pay_type: "HOURLY"
+    save_as: hourly_employee
+
+  - name: Submit timecard with overtime during holiday week
+    action: submit_timecard
+    input:
+      emp_id: 90002
+      period_start: "2024-11-25"
+      period_end: "2024-11-30"
+      entries:
+        - date: "2024-11-25"
+          hours: 10
+          type: "REGULAR"
+        - date: "2024-11-26"
+          hours: 10
+          type: "REGULAR"
+        - date: "2024-11-27"
+          hours: 10
+          type: "REGULAR"
+        - date: "2024-11-28"
+          hours: 8
+          type: "HOLIDAY"
+        - date: "2024-11-29"
+          hours: 8
+          type: "HOLIDAY"
+        - date: "2024-11-30"
+          hours: 6
+          type: "REGULAR"
+    expect:
+      total_hours: 52
+      status: "SUBMITTED"
+    save_as: timecard_thanksgiving
+
+  - name: Calculate pay for holiday-overtime week
+    action: calculate_weekly_pay
+    input:
+      emp_id: 90002
+      timecard_id: "{{timecard_thanksgiving.timecard_id}}"
+    expect:
+      regular_hours: 40
+      overtime_hours: 4
+      holiday_hours: 8
+      regular_pay: 1000.00
+      overtime_pay: 150.00
+      holiday_premium_pay: 60.00
+      gross_pay: 1210.00
+    tolerance:
+      regular_pay: 0.01
+      overtime_pay: 0.01
+      holiday_premium_pay: 0.01
+      gross_pay: 0.01
+
+  - name: Submit timecard working ON a double-time holiday
+    action: submit_timecard
+    input:
+      emp_id: 90002
+      period_start: "2024-12-23"
+      period_end: "2024-12-28"
+      entries:
+        - date: "2024-12-23"
+          hours: 8
+          type: "REGULAR"
+        - date: "2024-12-24"
+          hours: 8
+          type: "REGULAR"
+        - date: "2024-12-25"
+          hours: 8
+          type: "HOLIDAY_WORKED"
+        - date: "2024-12-26"
+          hours: 8
+          type: "REGULAR"
+        - date: "2024-12-27"
+          hours: 8
+          type: "REGULAR"
+        - date: "2024-12-28"
+          hours: 0
+          type: "OFF"
+    expect:
+      total_hours: 40
+      status: "SUBMITTED"
+    save_as: timecard_christmas
+
+  - name: Calculate pay with holiday worked at double time
+    action: calculate_weekly_pay
+    input:
+      emp_id: 90002
+      timecard_id: "{{timecard_christmas.timecard_id}}"
+    expect:
+      regular_hours: 32
+      overtime_hours: 0
+      holiday_worked_hours: 8
+      regular_pay: 800.00
+      holiday_worked_pay: 400.00
+      gross_pay: 1200.00
+    tolerance:
+      regular_pay: 0.01
+      holiday_worked_pay: 0.01
+      gross_pay: 0.01
+
+  - name: Submit timecard with overtime stacked on holiday work
+    action: submit_timecard
+    input:
+      emp_id: 90002
+      period_start: "2024-12-30"
+      period_end: "2025-01-04"
+      entries:
+        - date: "2024-12-30"
+          hours: 10
+          type: "REGULAR"
+        - date: "2024-12-31"
+          hours: 10
+          type: "HOLIDAY_WORKED"
+        - date: "2025-01-01"
+          hours: 0
+          type: "HOLIDAY"
+        - date: "2025-01-02"
+          hours: 10
+          type: "REGULAR"
+        - date: "2025-01-03"
+          hours: 10
+          type: "REGULAR"
+        - date: "2025-01-04"
+          hours: 8
+          type: "REGULAR"
+    expect:
+      total_hours: 48
+      status: "SUBMITTED"
+    save_as: timecard_nye
+
+  - name: Calculate pay with overtime stacking on holiday
+    action: calculate_weekly_pay
+    input:
+      emp_id: 90002
+      timecard_id: "{{timecard_nye.timecard_id}}"
+    expect:
+      regular_hours: 40
+      overtime_hours: 8
+      holiday_worked_hours: 10
+      regular_pay: 1000.00
+      overtime_pay: 300.00
+      holiday_premium_pay: 125.00
+      gross_pay: 1425.00
+    tolerance:
+      regular_pay: 0.01
+      overtime_pay: 0.01
+      holiday_premium_pay: 0.01
+      gross_pay: 0.01
+
+  - name: Run full payroll for the period and verify totals
+    action: run_payroll
+    input:
+      period_start: "2024-11-25"
+      period_end: "2024-11-30"
+      run_type: "REGULAR"
+    expect:
+      status: "CALCULATED"
+      includes_emp_id: 90002
+      total_gross: "> 0"
+      total_net: "> 0"
+    tolerance:
+      total_gross: 0.01
+      total_net: 0.01
