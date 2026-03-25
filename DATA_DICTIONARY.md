@@ -277,9 +277,9 @@ This data dictionary extracts business entities from COBOL copybook record layou
 | 8 | CDEMO-LAST-MAP          | X(07)            | Alpha   | 7      | Last BMS map displayed                   |
 | 9 | CDEMO-LAST-MAPSET       | X(07)            | Alpha   | 7      | Last BMS mapset used                     |
 | 10| CDEMO-ACCT-ID           | 9(11)            | Numeric | 11     | Selected account ID                      |
-| 11| CDEMO-CARD-NUM          | X(16)            | Alpha   | 16     | Selected card number                     |
+| 11| CDEMO-CARD-NUM          | 9(16)            | Numeric | 16     | Selected card number                     |
 | 12| CCARD-AID-*             | X(01)            | Alpha   | 1      | Mapped attention identifier (PF keys)    |
-| 13| CCARD-ERROR-MSG         | X(80)            | Alpha   | 80     | Error message buffer                     |
+| 13| CCARD-ERROR-MSG         | X(75)            | Alpha   | 75     | Error message buffer                     |
 
 **Business Rules**:
 - Shared communication area passed via `EXEC CICS XCTL COMMAREA`

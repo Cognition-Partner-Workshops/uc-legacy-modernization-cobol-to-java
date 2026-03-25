@@ -113,7 +113,7 @@ CardDemo is a mainframe credit card management application built with COBOL, CIC
 
 | # | Copybook   | Record Name           | Record Len | Business Entity            |
 |---|------------|-----------------------|------------|----------------------------|
-| 1 | CVACT01Y   | ACCT-RECORD           | 300 bytes  | Account Master             |
+| 1 | CVACT01Y   | ACCOUNT-RECORD        | 300 bytes  | Account Master             |
 | 2 | CVACT02Y   | CARD-RECORD           | 150 bytes  | Card Master                |
 | 3 | CVACT03Y   | CARD-XREF-RECORD      | 50 bytes   | Card-Account Cross Reference|
 | 4 | CVCUS01Y   | CUSTOMER-RECORD       | 500 bytes  | Customer Master            |
