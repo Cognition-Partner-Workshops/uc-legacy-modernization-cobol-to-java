@@ -315,7 +315,7 @@ Each module is scored on three dimensions (1–10 scale):
                            │
          ┌─────────────────┼─────────────────┐
          │                 │                  │
-         │  CBACT04C (6)   │  CBTRN02C (2)   │
+         │  CBACT04C (4)   │  CBTRN02C (2)   │
          │  Interest Calc  │  Tran Posting    │
          │                 │                  │
          │  COTRN02C (7)   │  COACTUPC (1)    │
@@ -323,13 +323,13 @@ Each module is scored on three dimensions (1–10 scale):
          │                 │                  │
 LOW ─────┼─────────────────┼──────────────────┼───── HIGH
 COMPLEXITY│                │                  │    COMPLEXITY
-         │  COTRN00C (9)   │  COCRDLIC (4)    │
+         │  COTRN00C (9)   │  COCRDLIC (5)    │
          │  Tran List      │  Card List       │
          │                 │                  │
          │  COACTVWC (10)  │  COCRDUPC (3)    │
          │  Account View   │  Card Update     │
          │                 │                  │
-         │  CBTRN03C (8)   │  CBSTM03A (5)    │
+         │  CBTRN03C (8)   │  CBSTM03A (6)    │
          │  Tran Report    │  Statement Gen   │
          │                 │                  │
          └─────────────────┼─────────────────┘
