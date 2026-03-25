@@ -81,22 +81,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank #5: COCRDLIC - Card List
-
-| Metric              | Value / Assessment                                               |
-|---------------------|------------------------------------------------------------------|
-| **File**            | `app/cbl/COCRDLIC.cbl`                                          |
-| **Lines of Code**   | 1,459                                                            |
-| **Type**            | Online CICS                                                      |
-| **Complexity**      | **8/10** - CICS STARTBR/READNEXT/ENDBR browse logic, pagination (PF7/PF8), multi-record display (10 cards per page), cross-reference lookup per card, selection routing to view/update programs |
-| **Risk**            | **6/10** - Read-only browse, but incorrect pagination or selection routing could send users to wrong card records. Handles card numbers (PCI scope). |
-| **Business Impact** | **7/10** - Primary card discovery screen. Entry point for all card operations. High usage frequency. |
-| **Composite Score** | **7.1**                                                          |
-| **Modernization Notes** | Convert browse logic to paginated REST API with cursor-based pagination. Card numbers should be masked in list view (show last 4 digits only). |
-
----
-
-### Rank #6: CBSTM03A - Statement Generation (Driver)
+### Rank #5: CBSTM03A - Statement Generation (Driver)
 
 | Metric              | Value / Assessment                                               |
 |---------------------|------------------------------------------------------------------|
@@ -111,22 +96,22 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank #7: COACTVWC - Account View
+### Rank #6: COBIL00C - Bill Payment
 
 | Metric              | Value / Assessment                                               |
 |---------------------|------------------------------------------------------------------|
-| **File**            | `app/cbl/COACTVWC.cbl`                                          |
-| **Lines of Code**   | 941                                                              |
+| **File**            | `app/cbl/COBIL00C.cbl`                                          |
+| **Lines of Code**   | 572                                                              |
 | **Type**            | Online CICS                                                      |
-| **Complexity**      | **7/10** - 12 copybooks (most of any view-only program), reads 4 VSAM files (ACCT, CARD, CUST, XREF), complex screen layout with multiple data sources, navigation state management |
-| **Risk**            | **5/10** - Read-only, but displays PII (customer SSN, address) and financial data (balances, limits). Incorrect data display could lead to wrong decisions. |
-| **Business Impact** | **8/10** - Most frequently used screen after menu. Foundation for account inquiries. Used by both regular users and admin. |
-| **Composite Score** | **6.7**                                                          |
-| **Modernization Notes** | Good candidate for early migration as read-only. Convert to REST GET endpoint + React/Angular component. Apply field-level masking for PII. |
+| **Complexity**      | **6/10** - Payment amount validation, account lookup, balance update, transaction record creation, confirmation workflow |
+| **Risk**            | **9/10** - REWRITE to ACCTFILE (balance update) + WRITE to TRANSACT. Double-write: if either fails, data is inconsistent. Financial impact of incorrect payment posting. No explicit SYNCPOINT for atomicity. |
+| **Business Impact** | **8/10** - Customer-facing payment processing. Directly affects account balances and customer satisfaction. Revenue-impacting. |
+| **Composite Score** | **7.5**                                                          |
+| **Modernization Notes** | Critical to implement proper transaction management (database ACID transactions). Add idempotency keys to prevent double payments. Integrate with payment gateway. |
 
 ---
 
-### Rank #8: COTRN02C - Transaction Add (Online)
+### Rank #7: COTRN02C - Transaction Add (Online)
 
 | Metric              | Value / Assessment                                               |
 |---------------------|------------------------------------------------------------------|
@@ -141,18 +126,33 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank #9: COBIL00C - Bill Payment
+### Rank #8: COCRDLIC - Card List
 
 | Metric              | Value / Assessment                                               |
 |---------------------|------------------------------------------------------------------|
-| **File**            | `app/cbl/COBIL00C.cbl`                                          |
-| **Lines of Code**   | 572                                                              |
+| **File**            | `app/cbl/COCRDLIC.cbl`                                          |
+| **Lines of Code**   | 1,459                                                            |
 | **Type**            | Online CICS                                                      |
-| **Complexity**      | **6/10** - Payment amount validation, account lookup, balance update, transaction record creation, confirmation workflow |
-| **Risk**            | **9/10** - REWRITE to ACCTFILE (balance update) + WRITE to TRANSACT. Double-write: if either fails, data is inconsistent. Financial impact of incorrect payment posting. No explicit SYNCPOINT for atomicity. |
-| **Business Impact** | **8/10** - Customer-facing payment processing. Directly affects account balances and customer satisfaction. Revenue-impacting. |
-| **Composite Score** | **7.5**                                                          |
-| **Modernization Notes** | Critical to implement proper transaction management (database ACID transactions). Add idempotency keys to prevent double payments. Integrate with payment gateway. |
+| **Complexity**      | **8/10** - CICS STARTBR/READNEXT/ENDBR browse logic, pagination (PF7/PF8), multi-record display (10 cards per page), cross-reference lookup per card, selection routing to view/update programs |
+| **Risk**            | **6/10** - Read-only browse, but incorrect pagination or selection routing could send users to wrong card records. Handles card numbers (PCI scope). |
+| **Business Impact** | **7/10** - Primary card discovery screen. Entry point for all card operations. High usage frequency. |
+| **Composite Score** | **7.1**                                                          |
+| **Modernization Notes** | Convert browse logic to paginated REST API with cursor-based pagination. Card numbers should be masked in list view (show last 4 digits only). |
+
+---
+
+### Rank #9: COACTVWC - Account View
+
+| Metric              | Value / Assessment                                               |
+|---------------------|------------------------------------------------------------------|
+| **File**            | `app/cbl/COACTVWC.cbl`                                          |
+| **Lines of Code**   | 941                                                              |
+| **Type**            | Online CICS                                                      |
+| **Complexity**      | **7/10** - 12 copybooks (most of any view-only program), reads 4 VSAM files (ACCT, CARD, CUST, XREF), complex screen layout with multiple data sources, navigation state management |
+| **Risk**            | **5/10** - Read-only, but displays PII (customer SSN, address) and financial data (balances, limits). Incorrect data display could lead to wrong decisions. |
+| **Business Impact** | **8/10** - Most frequently used screen after menu. Foundation for account inquiries. Used by both regular users and admin. |
+| **Composite Score** | **6.7**                                                          |
+| **Modernization Notes** | Good candidate for early migration as read-only. Convert to REST GET endpoint + React/Angular component. Apply field-level masking for PII. |
 
 ---
 
