@@ -34,6 +34,7 @@ This data dictionary extracts business entities from COBOL copybook record layou
 | `ACCT-REISSUE-DATE` | `PIC X(10)` | Alpha | 10 chars | Last reissue date |
 | `ACCT-CURR-CYC-CREDIT` | `PIC S9(10)V99` | Decimal | 12.2 | Current cycle credit total |
 | `ACCT-CURR-CYC-DEBIT` | `PIC S9(10)V99` | Decimal | 12.2 | Current cycle debit total |
+| `ACCT-ADDR-ZIP` | `PIC X(10)` | Alpha | 10 chars | Account address ZIP code |
 | `ACCT-GROUP-ID` | `PIC X(10)` | Alpha | 10 chars | Account group/portfolio ID |
 | `FILLER` | `PIC X(178)` | Alpha | 178 chars | Reserved for future use |
 
@@ -85,7 +86,7 @@ This data dictionary extracts business entities from COBOL copybook record layou
 | `CUST-PHONE-NUM-2` | `PIC X(15)` | Alpha | 15 chars | Secondary phone |
 | `CUST-SSN` | `PIC 9(09)` | Numeric | 9 digits | Social Security Number (PII) |
 | `CUST-GOVT-ISSUED-ID` | `PIC X(20)` | Alpha | 20 chars | Government-issued ID |
-| `CUST-DOB-YYYYMMDD` | `PIC X(10)` | Alpha | 10 chars | Date of birth |
+| `CUST-DOB-YYYY-MM-DD` | `PIC X(10)` | Alpha | 10 chars | Date of birth |
 | `CUST-EFT-ACCOUNT-ID` | `PIC X(10)` | Alpha | 10 chars | EFT (electronic funds transfer) account |
 | `CUST-PRI-CARD-HOLDER-IND` | `PIC X(01)` | Alpha | 1 char | Primary cardholder indicator |
 | `CUST-FICO-CREDIT-SCORE` | `PIC 9(03)` | Numeric | 3 digits | FICO credit score |
@@ -324,9 +325,13 @@ This data dictionary extracts business entities from COBOL copybook record layou
 | `CDEMO-USER-ID` | `PIC X(08)` | Alpha | 8 chars | Current user ID |
 | `CDEMO-USER-TYPE` | `PIC X(01)` | Alpha | 1 char | User type (A/U) |
 | `CDEMO-PGM-CONTEXT` | `PIC 9(01)` | Numeric | 1 digit | Program context flag |
-| `CDEMO-ACCT-ID` | `PIC 9(11)` | Numeric | 11 digits | Selected account ID |
-| `CDEMO-CARD-NUM` | `PIC X(16)` | Alpha | 16 chars | Selected card number |
 | `CDEMO-CUST-ID` | `PIC 9(09)` | Numeric | 9 digits | Selected customer ID |
+| `CDEMO-CUST-FNAME` | `PIC X(25)` | Alpha | 25 chars | Selected customer first name |
+| `CDEMO-CUST-MNAME` | `PIC X(25)` | Alpha | 25 chars | Selected customer middle name |
+| `CDEMO-CUST-LNAME` | `PIC X(25)` | Alpha | 25 chars | Selected customer last name |
+| `CDEMO-ACCT-ID` | `PIC 9(11)` | Numeric | 11 digits | Selected account ID |
+| `CDEMO-ACCT-STATUS` | `PIC X(01)` | Alpha | 1 char | Selected account status |
+| `CDEMO-CARD-NUM` | `PIC 9(16)` | Numeric | 16 digits | Selected card number |
 | `CDEMO-LAST-MAP` | `PIC X(07)` | Alpha | 7 chars | Last displayed map |
 | `CDEMO-LAST-MAPSET` | `PIC X(07)` | Alpha | 7 chars | Last displayed mapset |
 

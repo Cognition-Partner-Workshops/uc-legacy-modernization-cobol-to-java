@@ -161,7 +161,7 @@ Each module is scored on three axes (1-5 scale each):
 | Complexity | **2** | Simple READ + compare logic, small program |
 | Risk | **5** | Plaintext passwords, no lockout, no encryption. Single point of entry for all users |
 | Impact | **5** | Authentication gateway: compromise here = full system access. Every user session starts here |
-| **Weighted Score** | **3.85** | |
+| **Weighted Score** | **3.80** | |
 
 **Modernization Priority:** CRITICAL (Security)
 **Recommendation:** Replace with Spring Security + bcrypt/argon2 password hashing. Add account lockout, MFA, session management, and audit logging. Despite low complexity, the security risk makes this a day-one migration priority.
@@ -240,11 +240,11 @@ Each module is scored on three axes (1-5 scale each):
 | 3 | **CBACT04C** | 652 | 4 | 5 | 5 | **4.60** | CRITICAL |
 | 4 | **CBSTM03A/B** | 1,154 | 5 | 4 | 4 | **4.40** | HIGH |
 | 5 | **COCRDUPC** | 1,560 | 4 | 4 | 4 | **4.00** | HIGH |
-| 6 | **COSGN00C** | 260 | 2 | 5 | 5 | **3.85** | CRITICAL* |
+| 6 | **COSGN00C** | 260 | 2 | 5 | 5 | **3.80** | CRITICAL* |
 | 7 | **COCRDLIC** | 1,459 | 4 | 3 | 4 | **3.65** | HIGH |
 | 8 | **CBTRN03C** | 649 | 4 | 3 | 4 | **3.65** | MEDIUM |
 | 9 | **COBIL00C** | 572 | 3 | 4 | 4 | **3.60** | HIGH |
-| 10 | **COTRN02C** | 783 | 3 | 4 | 4 | **3.55** | HIGH |
+| 10 | **COTRN02C** | 783 | 3 | 4 | 4 | **3.60** | HIGH |
 
 *COSGN00C ranked 6th by weighted score but flagged CRITICAL due to security risk (plaintext passwords).*
 
