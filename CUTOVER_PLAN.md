@@ -56,7 +56,7 @@ This document defines a phased migration sequence for the CardDemo mainframe app
 
 **Duration:** 4-6 weeks
 **Risk Level:** Low
-**Bounded Contexts:** BC-1 (Identity), BC-9 (Reference Data), BC-12 (Utilities)
+**Bounded Contexts:** BC-1 (Identity), BC-9 (Reference Data); **Functional Area:** FA-12 (Utilities)
 **Strategy:** Rewrite (Identity) + Replatform (Reference Data, Utilities)
 
 ### 3.1 Scope
@@ -113,7 +113,7 @@ This document defines a phased migration sequence for the CardDemo mainframe app
 
 **Duration:** 6-8 weeks
 **Risk Level:** Low-Medium
-**Bounded Contexts:** BC-7 (Reporting), BC-15 (VSAM-MQ Integration)
+**Bounded Contexts:** BC-7 (Reporting); **Functional Area:** FA-15 (VSAM-MQ Integration)
 **Strategy:** Rewrite (Reporting, VSAM-MQ)
 
 ### 4.1 Scope
@@ -287,7 +287,7 @@ The 4,237-line COACTUPC program contains 40+ validation rules that must be prese
 
 **Duration:** 12-16 weeks
 **Risk Level:** High
-**Bounded Contexts:** BC-4 (Transaction Processing), BC-6 (Financial Calculations), BC-10 (Statement Generation)
+**Bounded Contexts:** BC-4 (Transaction Processing), BC-6 (Financial Calculations), BC-7 (Reporting & Statements -- statement generation subset)
 **Strategy:** Strangler Fig (Transaction online), Replatform (Batch posting, Interest calc), Rewrite (Statements)
 
 ### 6.1 Scope
