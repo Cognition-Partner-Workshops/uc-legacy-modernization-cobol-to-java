@@ -102,27 +102,7 @@ Each module is scored on four dimensions (1–5 scale), then weighted to produce
 
 ---
 
-### Rank 5: COCRDLIC — Card List (Browse)
-
-| Dimension | Score | Rationale |
-|-----------|-------|-----------|
-| Complexity | **4** | 1,459 lines. Complex STARTBR/READNEXT/READPREV browse logic with pagination. Forward and backward scrolling. Selection for view or update. CSSTRPFY string formatting. |
-| Integration Risk | **4** | Browses CARDDATA VSAM. XCTL to COCRDSLC (view) and COCRDUPC (update). Complex navigation state management via COMMAREA. |
-| Business Impact | **3** | Card inquiry — important for customer service but read-only (no data modification risk). |
-| Data Sensitivity | **4** | Displays card numbers in list format — PCI scope. Must mask card numbers in modernized display. |
-| **Composite** | **3.75** | |
-
-**Modernization Concerns:**
-- VSAM browse with STARTBR/READNEXT/READPREV maps to paginated SQL queries
-- Forward/backward scrolling is non-trivial — VSAM allows bidirectional browse natively
-- Card number masking required in modernized UI (show only last 4 digits)
-- Selection mechanism (line selection → XCTL) maps to list-detail navigation pattern
-
-**Recommended Approach:** Implement as paginated REST endpoint with Spring Data JPA. Use `Pageable` for forward/backward navigation. Mask card numbers in DTO layer.
-
----
-
-### Rank 6: CBSTM03A — Statement Generation (Batch)
+### Rank 5: CBSTM03A — Statement Generation (Batch)
 
 | Dimension | Score | Rationale |
 |-----------|-------|-----------|
@@ -139,6 +119,26 @@ Each module is scored on four dimensions (1–5 scale), then weighted to produce
 - 2D array usage for statement line accumulation needs careful mapping
 
 **Recommended Approach:** Refactor ALTER/GO TO into structured control flow first. Implement as Spring Batch job with dedicated statement template engine. Separate the file I/O (CBSTM03B) into a repository layer.
+
+---
+
+### Rank 6: COCRDLIC — Card List (Browse)
+
+| Dimension | Score | Rationale |
+|-----------|-------|-----------|
+| Complexity | **4** | 1,459 lines. Complex STARTBR/READNEXT/READPREV browse logic with pagination. Forward and backward scrolling. Selection for view or update. CSSTRPFY string formatting. |
+| Integration Risk | **4** | Browses CARDDATA VSAM. XCTL to COCRDSLC (view) and COCRDUPC (update). Complex navigation state management via COMMAREA. |
+| Business Impact | **3** | Card inquiry — important for customer service but read-only (no data modification risk). |
+| Data Sensitivity | **4** | Displays card numbers in list format — PCI scope. Must mask card numbers in modernized display. |
+| **Composite** | **3.75** | |
+
+**Modernization Concerns:**
+- VSAM browse with STARTBR/READNEXT/READPREV maps to paginated SQL queries
+- Forward/backward scrolling is non-trivial — VSAM allows bidirectional browse natively
+- Card number masking required in modernized UI (show only last 4 digits)
+- Selection mechanism (line selection → XCTL) maps to list-detail navigation pattern
+
+**Recommended Approach:** Implement as paginated REST endpoint with Spring Data JPA. Use `Pageable` for forward/backward navigation. Mask card numbers in DTO layer.
 
 ---
 
@@ -229,8 +229,8 @@ Each module is scored on four dimensions (1–5 scale), then weighted to produce
 | 2 | **CBTRN02C** | **4.60** | 4 | 5 | 5 | 4 | 731 | Transaction Posting |
 | 3 | **CBACT04C** | **4.55** | 4 | 4 | 5 | 5 | 652 | Interest Calculation |
 | 4 | **COCRDUPC** | **4.45** | 5 | 4 | 4 | 5 | 1,560 | Card Update |
-| 5 | **COCRDLIC** | **3.75** | 4 | 4 | 3 | 4 | 1,459 | Card List |
-| 6 | **CBSTM03A** | **4.30** | 5 | 4 | 4 | 4 | 924 | Statement Generation |
+| 5 | **CBSTM03A** | **4.30** | 5 | 4 | 4 | 4 | 924 | Statement Generation |
+| 6 | **COCRDLIC** | **3.75** | 4 | 4 | 3 | 4 | 1,459 | Card List |
 | 7 | **COTRN02C** | **4.00** | 4 | 4 | 4 | 4 | 783 | Add Transaction |
 | 8 | **COTRN00C** | **3.30** | 3 | 3 | 4 | 3 | 699 | Transaction List |
 | 9 | **CBTRN03C** | **3.55** | 4 | 3 | 4 | 3 | 649 | Transaction Report |
