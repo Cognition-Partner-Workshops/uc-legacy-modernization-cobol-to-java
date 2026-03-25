@@ -39,8 +39,9 @@ Stores the master record for each credit card account.
 | 8 | `ACCT-REISSUE-DATE`       | `X(10)`            | Date (text)       |     10 | Date of last card reissue             |
 | 9 | `ACCT-CURR-CYC-CREDIT`    | `S9(10)V99`        | Currency          |     12 | Credits in current billing cycle      |
 |10 | `ACCT-CURR-CYC-DEBIT`     | `S9(10)V99`        | Currency          |     12 | Debits in current billing cycle       |
-|11 | `ACCT-GROUP-ID`            | `X(10)`            | Code              |     10 | Disclosure/rate group assignment      |
-|12 | `FILLER`                  | `X(178)`           | Reserved          |    178 | Padding to 300-byte record            |
+|11 | `ACCT-ADDR-ZIP`           | `X(10)`            | Postal Code       |     10 | Account address ZIP / postal code     |
+|12 | `ACCT-GROUP-ID`            | `X(10)`            | Code              |     10 | Disclosure/rate group assignment      |
+|13 | `FILLER`                  | `X(178)`           | Reserved          |    178 | Padding to 300-byte record            |
 
 ---
 
@@ -98,7 +99,7 @@ Stores personal information for each cardholder.
 |12 | `CUST-PHONE-NUM-2`        | `X(15)`            | Phone             |     15 | Secondary phone number                |
 |13 | `CUST-SSN`                | `9(09)`            | SSN               |      9 | Social Security Number (PII)          |
 |14 | `CUST-GOVT-ISSUED-ID`     | `X(20)`            | ID Document       |     20 | Government-issued ID number           |
-|15 | `CUST-DOB-YYYYMMDD`       | `X(10)`            | Date (text)       |     10 | Date of birth                         |
+|15 | `CUST-DOB-YYYY-MM-DD`     | `X(10)`            | Date (text)       |     10 | Date of birth                         |
 |16 | `CUST-EFT-ACCOUNT-ID`     | `X(10)`            | Account Number    |     10 | EFT/bank account for payments         |
 |17 | `CUST-PRI-CARD-HOLDER-IND`| `X(01)`            | Flag              |      1 | Primary cardholder indicator          |
 |18 | `CUST-FICO-CREDIT-SCORE`  | `9(03)`            | Score             |      3 | FICO credit score                     |

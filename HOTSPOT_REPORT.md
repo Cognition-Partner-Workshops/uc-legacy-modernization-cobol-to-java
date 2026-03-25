@@ -28,9 +28,9 @@ Each module is scored on three dimensions (1–10 scale):
 |    1 | COACTUPC   | 4,236 | Online | Account Update         |    10      |  10  |       9         |  **9.7**      |
 |    2 | CBTRN02C   |   731 | Batch  | Transaction Posting    |     8      |  10  |      10         |  **9.2**      |
 |    3 | COCRDUPC   | 1,560 | Online | Card Update            |     9      |   9  |       8         |  **8.7**      |
-|    4 | COCRDLIC   | 1,459 | Online | Card List              |     8      |   7  |       8         |  **7.7**      |
-|    5 | CBSTM03A   |   924 | Batch  | Statement Generation   |     8      |   8  |       7         |  **7.7**      |
-|    6 | CBACT04C   |   652 | Batch  | Interest Calculation   |     7      |   9  |       9         |  **8.2**      |
+|    4 | CBACT04C   |   652 | Batch  | Interest Calculation   |     7      |   9  |       9         |  **8.2**      |
+|    5 | COCRDLIC   | 1,459 | Online | Card List              |     8      |   7  |       8         |  **7.7**      |
+|    6 | CBSTM03A   |   924 | Batch  | Statement Generation   |     8      |   8  |       7         |  **7.7**      |
 |    7 | COTRN02C   |   783 | Online | Transaction Add        |     7      |   8  |       8         |  **7.6**      |
 |    8 | CBTRN03C   |   649 | Batch  | Transaction Report     |     7      |   6  |       7         |  **6.7**      |
 |    9 | COTRN00C   |   699 | Online | Transaction List       |     6      |   6  |       8         |  **6.6**      |
@@ -123,9 +123,37 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### 4. COCRDLIC — Card List (Composite: 7.7)
+### 4. CBACT04C — Interest Calculation (Composite: 8.2)
 
-**Why #4:** Complex browsing logic with forward/backward pagination over VSAM BROWSE operations and drill-down navigation to view/update screens.
+**Why #4:** Financial calculation engine with direct account balance mutations. High business impact despite moderate code size.
+
+| Metric                  | Value                                          |
+|-------------------------|------------------------------------------------|
+| Lines of Code           | 652                                            |
+| IF Statements           | 43                                             |
+| PERFORM Statements      | 56                                             |
+| Sections                | 4                                              |
+| Files Read              | ACCTDAT, DISCGRP                               |
+| Files Written           | ACCTDAT (balance update with interest)         |
+| JCL Invocation          | INTCALC.jcl (PARM='2022071800')                |
+
+**Key Risks:**
+- **Highest financial risk:** Directly modifies account balances with interest charges
+- Parameterized date via JCL PARM — incorrect date causes wrong calculations
+- No audit trail for interest postings
+- Rounding logic must exactly match legacy behavior during migration
+
+**Migration Recommendations:**
+- Use `BigDecimal` with explicit `RoundingMode` matching COBOL `COMP-3` arithmetic
+- Implement comprehensive audit logging for every interest calculation
+- Add reconciliation checks comparing old vs. new calculation results
+- Run in parallel with legacy during cutover (shadow mode)
+
+---
+
+### 5. COCRDLIC — Card List (Composite: 7.7)
+
+**Why #5:** Complex browsing logic with forward/backward pagination over VSAM BROWSE operations and drill-down navigation to view/update screens.
 
 | Metric                  | Value                                          |
 |-------------------------|------------------------------------------------|
@@ -149,9 +177,9 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### 5. CBSTM03A — Statement Generation (Composite: 7.7)
+### 6. CBSTM03A — Statement Generation (Composite: 7.7)
 
-**Why #5:** The most architecturally complex batch program. Generates dual-format output (plain text + HTML), calls a subroutine (CBSTM03B) for all file I/O, and uses mainframe-specific control block addressing.
+**Why #6:** The most architecturally complex batch program. Generates dual-format output (plain text + HTML), calls a subroutine (CBSTM03B) for all file I/O, and uses mainframe-specific control block addressing.
 
 | Metric                  | Value                                          |
 |-------------------------|------------------------------------------------|
@@ -174,34 +202,6 @@ Each module is scored on three dimensions (1–10 scale):
 - Replace CBSTM03B file I/O with Spring Resource/BufferedWriter
 - Use Thymeleaf or similar for HTML statement templates
 - Add proper exception handling with Spring Batch's skip/retry policies
-
----
-
-### 6. CBACT04C — Interest Calculation (Composite: 8.2)
-
-**Why #6:** Financial calculation engine with direct account balance mutations. High business impact despite moderate code size.
-
-| Metric                  | Value                                          |
-|-------------------------|------------------------------------------------|
-| Lines of Code           | 652                                            |
-| IF Statements           | 43                                             |
-| PERFORM Statements      | 56                                             |
-| Sections                | 4                                              |
-| Files Read              | ACCTDAT, DISCGRP                               |
-| Files Written           | ACCTDAT (balance update with interest)         |
-| JCL Invocation          | INTCALC.jcl (PARM='2022071800')                |
-
-**Key Risks:**
-- **Highest financial risk:** Directly modifies account balances with interest charges
-- Parameterized date via JCL PARM — incorrect date causes wrong calculations
-- No audit trail for interest postings
-- Rounding logic must exactly match legacy behavior during migration
-
-**Migration Recommendations:**
-- Use `BigDecimal` with explicit `RoundingMode` matching COBOL `COMP-3` arithmetic
-- Implement comprehensive audit logging for every interest calculation
-- Add reconciliation checks comparing old vs. new calculation results
-- Run in parallel with legacy during cutover (shadow mode)
 
 ---
 
