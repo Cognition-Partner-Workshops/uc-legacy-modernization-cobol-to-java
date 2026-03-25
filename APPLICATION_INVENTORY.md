@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-CardDemo is a mainframe credit card management application comprising **44 COBOL programs**, **42 copybooks**, **21 BMS screen maps**, and **43 JCL jobs** across the core system and three optional extension modules. The application handles account management, card management, transaction processing, bill payments, reporting, and administrative user management.
+CardDemo is a mainframe credit card management application comprising **44 COBOL programs**, **43 copybooks**, **21 BMS screen maps**, and **46 JCL jobs** across the core system and three optional extension modules. The application handles account management, card management, transaction processing, bill payments, reporting, and administrative user management.
 
 | Category                  | Core | Auth (IMS/DB2/MQ) | Tran Type (DB2) | VSAM-MQ | **Total** |
 |---------------------------|------|--------------------|-----------------|---------|-----------|

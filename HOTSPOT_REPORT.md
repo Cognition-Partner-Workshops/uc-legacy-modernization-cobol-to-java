@@ -215,7 +215,31 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### Rank #9 — COACTVWC (Account View — Online)
+### Rank #9 — COSGN00C + CSUSR01Y (Sign-On + User Security)
+
+| Metric | Value | Score |
+|--------|-------|-------|
+| Lines of Code | 260 (COSGN00C) + 80-byte record (CSUSR01Y) | |
+| EVALUATE Blocks | 6 | |
+| VSAM Operations | 1 (READ USRSEC) | |
+| **Code Complexity** | | **4/10** |
+| **Business Risk** | | **10/10** |
+| **Modernization Impact** | | **8/10** |
+| **Composite Score** | | **7.10** |
+
+**Why #9:** Although small in code size, this is a **critical security hotspot**. Passwords are stored in plaintext (PIC X(08) in CSUSR01Y). The authentication model has no password hashing, no session timeout, no failed login lockout, no MFA. This must be one of the first things modernized to meet any security standard.
+
+**Modernization Recommendations:**
+- Replace with Spring Security + OAuth2/OIDC
+- Hash passwords with bcrypt/argon2 (never plaintext)
+- Implement session management with JWT tokens
+- Add MFA support, account lockout, and audit logging
+- Consider integration with enterprise identity provider (AD/LDAP/Okta)
+- **Estimated Effort:** 3–4 weeks (greenfield replacement, not conversion)
+
+---
+
+### Rank #10 — COACTVWC (Account View — Online)
 
 | Metric | Value | Score |
 |--------|-------|-------|
@@ -228,7 +252,7 @@ Each module is scored on three dimensions (1–10 scale):
 | **Modernization Impact** | | **8/10** |
 | **Composite Score** | | **6.95** |
 
-**Why #9:** Account view is the highest-traffic screen — every user session hits it. It aggregates data from 3 VSAM files to present a consolidated account view. While read-only, its performance characteristics and data aggregation pattern will define the modern API layer's account endpoint.
+**Why #10:** Account view is the highest-traffic screen — every user session hits it. It aggregates data from 3 VSAM files to present a consolidated account view. While read-only, its performance characteristics and data aggregation pattern will define the modern API layer's account endpoint.
 
 **Modernization Recommendations:**
 - Implement as GET /accounts/{id} REST endpoint
@@ -236,30 +260,6 @@ Each module is scored on three dimensions (1–10 scale):
 - Add caching layer (Redis) for frequently accessed accounts
 - Design as the foundational account API that other services consume
 - **Estimated Effort:** 2–3 weeks
-
----
-
-### Rank #10 — COSGN00C + CSUSR01Y (Sign-On + User Security)
-
-| Metric | Value | Score |
-|--------|-------|-------|
-| Lines of Code | 260 (COSGN00C) + 80-byte record (CSUSR01Y) | |
-| EVALUATE Blocks | 6 | |
-| VSAM Operations | 1 (READ USRSEC) | |
-| **Code Complexity** | | **4/10** |
-| **Business Risk** | | **10/10** |
-| **Modernization Impact** | | **8/10** |
-| **Composite Score** | | **7.10** |
-
-**Why #10:** Although small in code size, this is a **critical security hotspot**. Passwords are stored in plaintext (PIC X(08) in CSUSR01Y). The authentication model has no password hashing, no session timeout, no failed login lockout, no MFA. This must be one of the first things modernized to meet any security standard.
-
-**Modernization Recommendations:**
-- Replace with Spring Security + OAuth2/OIDC
-- Hash passwords with bcrypt/argon2 (never plaintext)
-- Implement session management with JWT tokens
-- Add MFA support, account lockout, and audit logging
-- Consider integration with enterprise identity provider (AD/LDAP/Okta)
-- **Estimated Effort:** 3–4 weeks (greenfield replacement, not conversion)
 
 ---
 
@@ -275,8 +275,8 @@ Each module is scored on three dimensions (1–10 scale):
 | 6 | **CBSTM03A/B** | **7.60** | 8 | 7 | 8 | 1,154 | Statement gen, subroutine pattern |
 | 7 | **COTRN02C** | **7.60** | 7 | 9 | 7 | 783 | Transaction entry, most EVALUATEs |
 | 8 | **CBTRN03C** | **7.00** | 7 | 7 | 7 | 649 | Compliance reporting, 5 files |
-| 9 | **COACTVWC** | **6.95** | 6 | 7 | 8 | 941 | High-traffic, defines API pattern |
-| 10 | **COSGN00C** | **7.10** | 4 | 10 | 8 | 260 | Plaintext passwords, no MFA |
+| 9 | **COSGN00C** | **7.10** | 4 | 10 | 8 | 260 | Plaintext passwords, no MFA |
+| 10 | **COACTVWC** | **6.95** | 6 | 7 | 8 | 941 | High-traffic, defines API pattern |
 
 ---
 
