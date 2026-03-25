@@ -12,8 +12,8 @@ Each module is scored across three dimensions on a 1-10 scale:
 | Dimension           | Weight | Indicators                                                                 |
 |---------------------|-------:|----------------------------------------------------------------------------|
 | **Complexity**      |   40%  | Lines of code, IF/EVALUATE branches, PERFORM paragraphs, COPY inclusions  |
-| **Risk**            |   35%  | File I/O operations, data mutation (WRITE/REWRITE/DELETE), cross-program coupling, PII handling |
-| **Business Impact** |   25%  | Revenue criticality, user-facing operations, batch cycle dependency, data volume |
+| **Risk**            |   40%  | File I/O operations, data mutation (WRITE/REWRITE/DELETE), cross-program coupling, PII handling |
+| **Business Impact** |   20%  | Revenue criticality, user-facing operations, batch cycle dependency, data volume |
 
 **Composite Score** = (Complexity x 0.40) + (Risk x 0.40) + (Business Impact x 0.20), normalized to 1-10.
 
