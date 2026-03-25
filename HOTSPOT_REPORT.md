@@ -35,14 +35,14 @@ Each module is scored across four dimensions on a 1–5 scale:
 |-----:|--------|----:|:----------:|:------------:|:---------------:|:--------------:|:-------------:|
 | 1 | **COACTUPC.cbl** | 4,236 | 5 | 5 | 5 | 5 | **5.00** |
 | 2 | **CBTRN02C.cbl** | 731 | 4 | 5 | 5 | 4 | **4.50** |
-| 3 | **CBSTM03A.CBL** | 924 | 4 | 4 | 5 | 4 | **4.25** |
-| 4 | **CBACT04C.cbl** | 652 | 4 | 4 | 5 | 3 | **4.10** |
-| 5 | **COCRDUPC.cbl** | 1,560 | 5 | 4 | 4 | 4 | **4.25** |
-| 6 | **COCRDLIC.cbl** | 1,459 | 5 | 4 | 3 | 4 | **4.00** |
+| 3 | **COCRDUPC.cbl** | 1,560 | 5 | 4 | 4 | 4 | **4.30** |
+| 4 | **CBSTM03A.CBL** | 924 | 4 | 4 | 5 | 4 | **4.25** |
+| 5 | **CBACT04C.cbl** | 652 | 4 | 4 | 5 | 3 | **4.05** |
+| 6 | **COCRDLIC.cbl** | 1,459 | 5 | 4 | 3 | 4 | **4.05** |
 | 7 | **COTRN02C.cbl** | 783 | 4 | 3 | 4 | 4 | **3.75** |
-| 8 | **COBIL00C.cbl** | 572 | 3 | 3 | 5 | 3 | **3.55** |
-| 9 | **CBTRN03C.cbl** | 649 | 4 | 4 | 3 | 3 | **3.55** |
-| 10 | **COSGN00C.cbl** | 260 | 2 | 3 | 5 | 3 | **3.30** |
+| 8 | **CBTRN03C.cbl** | 649 | 4 | 4 | 3 | 3 | **3.55** |
+| 9 | **COBIL00C.cbl** | 572 | 3 | 3 | 5 | 3 | **3.50** |
+| 10 | **COSGN00C.cbl** | 260 | 2 | 3 | 5 | 3 | **3.20** |
 
 ---
 
@@ -94,7 +94,28 @@ Each module is scored across four dimensions on a 1–5 scale:
 
 ---
 
-### Rank 3: CBSTM03A.CBL — Statement Generation (Batch)
+### Rank 3: COCRDUPC.cbl — Card Update (Online)
+
+| Metric | Value | Notes |
+|--------|------:|-------|
+| Lines of Code | 1,560 | Second-largest online program |
+| IF Statements | 72 | High validation complexity |
+| EVALUATE Statements | 16 | Multi-way branching |
+| EXEC CICS Commands | 12 | SEND, RECEIVE, READ, REWRITE |
+| COPY Statements | 15 | Moderate dependency set |
+
+**Why #3:** Card update involves sensitive data (card numbers, CVV, expiration dates) with extensive validation. The program manages card status changes, name updates, and expiration date modifications with cross-reference lookups. Its high code complexity (5) combined with broad dependencies and PCI-DSS implications push it above the batch modules.
+
+**Modernization Challenges:**
+- PCI-DSS compliance considerations for card data handling
+- Complex validation logic for card number format, dates, status transitions
+- BMS screen interaction with conditional field protection/highlighting
+
+**Recommended Approach:** CardUpdateService with validation decorators. Ensure PCI-DSS compliant data handling (tokenization, encryption at rest).
+
+---
+
+### Rank 4: CBSTM03A.CBL — Statement Generation (Batch)
 
 | Metric | Value | Notes |
 |--------|------:|-------|
@@ -105,7 +126,7 @@ Each module is scored across four dimensions on a 1–5 scale:
 | VSAM Files Read | 4 | TRANSACT, CARDXREF, ACCTDATA, CUSTDATA |
 | Output Formats | 2 | HTML file + flat print file (PS) |
 
-**Why #3:** Statement generation is a customer-facing output — errors are immediately visible to cardholders. The program reads across 4 VSAM files, aggregates transactions by card/account, and generates both HTML and print-format statements. The CALL-based subroutine pattern (CBSTM03A calls CBSTM03B for each I/O operation) adds conversion complexity.
+**Why #4:** Statement generation is a customer-facing output — errors are immediately visible to cardholders. The program reads across 4 VSAM files, aggregates transactions by card/account, and generates both HTML and print-format statements. The CALL-based subroutine pattern (CBSTM03A calls CBSTM03B for each I/O operation) adds conversion complexity.
 
 **Modernization Challenges:**
 - Multi-file join logic must be replicated as SQL JOINs or JPA queries
@@ -117,7 +138,7 @@ Each module is scored across four dimensions on a 1–5 scale:
 
 ---
 
-### Rank 4: CBACT04C.cbl — Interest Calculation (Batch)
+### Rank 5: CBACT04C.cbl — Interest Calculation (Batch)
 
 | Metric | Value | Notes |
 |--------|------:|-------|
@@ -126,7 +147,7 @@ Each module is scored across four dimensions on a 1–5 scale:
 | VSAM Files Accessed | 5 | TCATBAL, CARDXREF, DISCGRP, ACCTDATA, TRANSACT |
 | Copybooks | 5 | CVTRA01Y, CVACT03Y, CVTRA02Y, CVACT01Y, CVTRA05Y |
 
-**Why #4:** Interest calculation directly affects customer billing. It reads category balances, looks up applicable discount/interest rates by account group, computes interest charges, and creates interest transactions. Financial precision is paramount — any rounding difference means compliance issues.
+**Why #5:** Interest calculation directly affects customer billing. It reads category balances, looks up applicable discount/interest rates by account group, computes interest charges, and creates interest transactions. Financial precision is paramount — any rounding difference means compliance issues.
 
 **Modernization Challenges:**
 - Decimal precision: COBOL `PIC S9(10)V99` has implicit decimal — must use `BigDecimal` in Java
@@ -135,27 +156,6 @@ Each module is scored across four dimensions on a 1–5 scale:
 - Business rules for fee computation embedded in procedural code
 
 **Recommended Approach:** Dedicated InterestCalculationService with BigDecimal arithmetic. Spring Batch job with database transactions. Extract rate lookup into a RateService.
-
----
-
-### Rank 5: COCRDUPC.cbl — Card Update (Online)
-
-| Metric | Value | Notes |
-|--------|------:|-------|
-| Lines of Code | 1,560 | Second-largest online program |
-| IF Statements | 72 | High validation complexity |
-| EVALUATE Statements | 16 | Multi-way branching |
-| EXEC CICS Commands | 12 | SEND, RECEIVE, READ, REWRITE |
-| COPY Statements | 15 | Moderate dependency set |
-
-**Why #5:** Card update involves sensitive data (card numbers, CVV, expiration dates) with extensive validation. The program manages card status changes, name updates, and expiration date modifications with cross-reference lookups.
-
-**Modernization Challenges:**
-- PCI-DSS compliance considerations for card data handling
-- Complex validation logic for card number format, dates, status transitions
-- BMS screen interaction with conditional field protection/highlighting
-
-**Recommended Approach:** CardUpdateService with validation decorators. Ensure PCI-DSS compliant data handling (tokenization, encryption at rest).
 
 ---
 
@@ -199,27 +199,7 @@ Each module is scored across four dimensions on a 1–5 scale:
 
 ---
 
-### Rank 8: COBIL00C.cbl — Bill Payment (Online)
-
-| Metric | Value | Notes |
-|--------|------:|-------|
-| Lines of Code | 572 | Moderate size |
-| EVALUATE Statements | 18 | Complex payment flow |
-| EXEC CICS Commands | 13 | Multiple file operations |
-| VSAM Files | 3 | TRANSACT, ACCTDATA, CARDXREF |
-
-**Why #8:** Bill payment is a financial transaction that modifies account balances. Despite moderate code size, the business impact is maximum — payment errors directly affect customers. Requires proper transaction isolation.
-
-**Modernization Challenges:**
-- Financial transaction atomicity (update account balance + create transaction record)
-- Payment amount validation against account balance
-- Idempotency for payment processing (prevent double payments)
-
-**Recommended Approach:** BillPaymentService with idempotency key. `@Transactional` with proper isolation level. Event-driven architecture for payment confirmation.
-
----
-
-### Rank 9: CBTRN03C.cbl — Transaction Report (Batch)
+### Rank 8: CBTRN03C.cbl — Transaction Report (Batch)
 
 | Metric | Value | Notes |
 |--------|------:|-------|
@@ -229,7 +209,7 @@ Each module is scored across four dimensions on a 1–5 scale:
 | PERFORM Statements | 72 | Highest PERFORM count — many small routines |
 | VSAM Files Read | 6 | TRANSACT, CARDXREF, TRANTYPE, TRANCATG, DATEPARM, REPTFILE |
 
-**Why #9:** Complex report with control breaks (page totals, account totals, grand totals), multiple reference file lookups, and date-range filtering. The 72 PERFORM statements indicate highly modular but intricate logic.
+**Why #8:** Complex report with control breaks (page totals, account totals, grand totals), multiple reference file lookups, and date-range filtering. The 72 PERFORM statements indicate highly modular but intricate logic.
 
 **Modernization Challenges:**
 - Control-break reporting pattern has no direct Java equivalent
@@ -238,6 +218,26 @@ Each module is scored across four dimensions on a 1–5 scale:
 - Date range parameter handling
 
 **Recommended Approach:** Spring Batch with custom ItemProcessor. JasperReports or programmatic PDF generation. Replace character-position formatting with template-based layout.
+
+---
+
+### Rank 9: COBIL00C.cbl — Bill Payment (Online)
+
+| Metric | Value | Notes |
+|--------|------:|-------|
+| Lines of Code | 572 | Moderate size |
+| EVALUATE Statements | 18 | Complex payment flow |
+| EXEC CICS Commands | 13 | Multiple file operations |
+| VSAM Files | 3 | TRANSACT, ACCTDATA, CARDXREF |
+
+**Why #9:** Bill payment is a financial transaction that modifies account balances. Despite moderate code size, the business impact is maximum — payment errors directly affect customers. Requires proper transaction isolation.
+
+**Modernization Challenges:**
+- Financial transaction atomicity (update account balance + create transaction record)
+- Payment amount validation against account balance
+- Idempotency for payment processing (prevent double payments)
+
+**Recommended Approach:** BillPaymentService with idempotency key. `@Transactional` with proper isolation level. Event-driven architecture for payment confirmation.
 
 ---
 
