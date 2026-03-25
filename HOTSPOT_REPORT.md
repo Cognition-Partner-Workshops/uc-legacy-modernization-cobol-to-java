@@ -65,7 +65,30 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 3: COCRDUPC -- Credit Card Update
+### Rank 3: CBACT04C -- Interest Calculation
+
+| Metric | Value | Score |
+|--------|-------|-------|
+| Lines of Code | **652** | -- |
+| VSAM Files | 4 (ACCTFILE R/W, DISCGRP R, TRANFILE W, TCATBALF R) | -- |
+| Complexity | **7/10** | -- |
+| Risk | **8/10** | -- |
+| Business Impact | **9/10** | -- |
+| **Hotspot Score** | | **7.9** |
+
+**Why #3:** Core financial calculation with:
+- Interest rate computation based on disclosure groups
+- Account balance updates (financial mutation)
+- Creates interest charge transactions
+- Regulatory implications (Truth in Lending Act compliance)
+- Any calculation error affects all customer statements
+- Despite moderate LOC, highest risk/impact ratio in the codebase
+
+**Modernization Recommendation:** Implement as isolated Spring Batch step with `BigDecimal` arithmetic (not floating point). Add reconciliation reporting. Requires parallel-run validation against legacy calculations. Priority: **CRITICAL**.
+
+---
+
+### Rank 4: COCRDUPC -- Credit Card Update
 
 | Metric | Value | Score |
 |--------|-------|-------|
@@ -76,35 +99,13 @@ Each module is scored on three dimensions (1-10 scale):
 | Business Impact | **8/10** | -- |
 | **Hotspot Score** | | **7.7** |
 
-**Why #3:** Second-largest online program with:
+**Why #4:** Second-largest online program with:
 - Complex card field validation (card number, CVV, embossed name, expiration date)
 - BMS screen attribute manipulation similar to COACTUPC
 - Date validation for card expiration
 - XCTL navigation with dynamic return
 
 **Modernization Recommendation:** Extract to `CardUpdateService` with Bean Validation annotations. Reuse date validation from Account module. Priority: **HIGH**.
-
----
-
-### Rank 4: COCRDLIC -- Credit Card List
-
-| Metric | Value | Score |
-|--------|-------|-------|
-| Lines of Code | **1,460** | -- |
-| VSAM Files | 2 (CARDDAT R, CARDAIX R) | -- |
-| Complexity | **7/10** | -- |
-| Risk | **6/10** | -- |
-| Business Impact | **7/10** | -- |
-| **Hotspot Score** | | **6.7** |
-
-**Why #4:** Complex pagination logic with:
-- VSAM STARTBR/READNEXT/READPREV browse operations
-- Alternate index (CARDAIX) access for account-based card lookups
-- Forward/backward page navigation state management
-- XCTL to both COCRDSLC (view) and COCRDUPC (update)
-- Most frequently used card management screen
-
-**Modernization Recommendation:** Convert to paginated REST endpoint with Spring Data JPA `Pageable`. Replace VSAM browse with SQL `LIMIT`/`OFFSET` or keyset pagination. Priority: **HIGH**.
 
 ---
 
@@ -130,49 +131,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 6: COACTVWC -- Account View
-
-| Metric | Value | Score |
-|--------|-------|-------|
-| Lines of Code | **942** | -- |
-| VSAM Files | 3 (ACCTDAT R, CUSTDAT R, CARDXREF R) | -- |
-| Complexity | **6/10** | -- |
-| Risk | **5/10** | -- |
-| Business Impact | **8/10** | -- |
-| **Hotspot Score** | | **6.3** |
-
-**Why #6:** Primary account inquiry screen with:
-- Multi-file data aggregation (account + customer + cross-reference)
-- Complex screen layout with formatted display fields
-- High usage frequency (most common user action)
-- Read-only but critical for customer service workflows
-
-**Modernization Recommendation:** Convert to REST GET endpoint with DTO assembly. Good candidate for early conversion due to read-only nature. Priority: **MEDIUM-HIGH**.
-
----
-
-### Rank 7: COCRDSLC -- Credit Card Detail View
-
-| Metric | Value | Score |
-|--------|-------|-------|
-| Lines of Code | **888** | -- |
-| VSAM Files | 2 (CARDDAT R, CARDAIX R) | -- |
-| Complexity | **6/10** | -- |
-| Risk | **5/10** | -- |
-| Business Impact | **7/10** | -- |
-| **Hotspot Score** | | **6.0** |
-
-**Why #7:**
-- Alternate index access pattern (CARDAIX)
-- BMS screen handling with field formatting
-- Navigation state management via COMMAREA
-- Read-only but feeds into COCRDUPC for updates
-
-**Modernization Recommendation:** Convert alongside COCRDLIC as part of card management REST API. Priority: **MEDIUM**.
-
----
-
-### Rank 8: COTRN02C -- Transaction Add
+### Rank 6: COTRN02C -- Transaction Add
 
 | Metric | Value | Score |
 |--------|-------|-------|
@@ -184,7 +143,7 @@ Each module is scored on three dimensions (1-10 scale):
 | Business Impact | **6/10** | -- |
 | **Hotspot Score** | | **6.7** |
 
-**Why #8:** Online transaction entry with:
+**Why #6:** Online transaction entry with:
 - Card cross-reference validation before transaction creation
 - Date validation via CSUTLDTC CALL
 - VSAM WRITE to TRANSACT file (data creation)
@@ -194,25 +153,67 @@ Each module is scored on three dimensions (1-10 scale):
 
 ---
 
-### Rank 9: CBACT04C -- Interest Calculation
+### Rank 7: COCRDLIC -- Credit Card List
 
 | Metric | Value | Score |
 |--------|-------|-------|
-| Lines of Code | **652** | -- |
-| VSAM Files | 4 (ACCTFILE R/W, DISCGRP R, TRANFILE W, TCATBALF R) | -- |
+| Lines of Code | **1,460** | -- |
+| VSAM Files | 2 (CARDDAT R, CARDAIX R) | -- |
 | Complexity | **7/10** | -- |
-| Risk | **8/10** | -- |
-| Business Impact | **9/10** | -- |
-| **Hotspot Score** | | **7.9** |
+| Risk | **6/10** | -- |
+| Business Impact | **7/10** | -- |
+| **Hotspot Score** | | **6.7** |
 
-**Why #9 (scored higher, listed here for batch grouping):** Core financial calculation with:
-- Interest rate computation based on disclosure groups
-- Account balance updates (financial mutation)
-- Creates interest charge transactions
-- Regulatory implications (Truth in Lending Act compliance)
-- Any calculation error affects all customer statements
+**Why #7:** Complex pagination logic with:
+- VSAM STARTBR/READNEXT/READPREV browse operations
+- Alternate index (CARDAIX) access for account-based card lookups
+- Forward/backward page navigation state management
+- XCTL to both COCRDSLC (view) and COCRDUPC (update)
+- Most frequently used card management screen
 
-**Modernization Recommendation:** Implement as isolated Spring Batch step with `BigDecimal` arithmetic (not floating point). Add reconciliation reporting. Requires parallel-run validation against legacy calculations. Priority: **CRITICAL** -- but smaller scope than CBTRN02C.
+**Modernization Recommendation:** Convert to paginated REST endpoint with Spring Data JPA `Pageable`. Replace VSAM browse with SQL `LIMIT`/`OFFSET` or keyset pagination. Priority: **HIGH**.
+
+---
+
+### Rank 8: COACTVWC -- Account View
+
+| Metric | Value | Score |
+|--------|-------|-------|
+| Lines of Code | **942** | -- |
+| VSAM Files | 3 (ACCTDAT R, CUSTDAT R, CARDXREF R) | -- |
+| Complexity | **6/10** | -- |
+| Risk | **5/10** | -- |
+| Business Impact | **8/10** | -- |
+| **Hotspot Score** | | **6.3** |
+
+**Why #8:** Primary account inquiry screen with:
+- Multi-file data aggregation (account + customer + cross-reference)
+- Complex screen layout with formatted display fields
+- High usage frequency (most common user action)
+- Read-only but critical for customer service workflows
+
+**Modernization Recommendation:** Convert to REST GET endpoint with DTO assembly. Good candidate for early conversion due to read-only nature. Priority: **MEDIUM-HIGH**.
+
+---
+
+### Rank 9: COCRDSLC -- Credit Card Detail View
+
+| Metric | Value | Score |
+|--------|-------|-------|
+| Lines of Code | **888** | -- |
+| VSAM Files | 2 (CARDDAT R, CARDAIX R) | -- |
+| Complexity | **6/10** | -- |
+| Risk | **5/10** | -- |
+| Business Impact | **7/10** | -- |
+| **Hotspot Score** | | **6.0** |
+
+**Why #9:**
+- Alternate index access pattern (CARDAIX)
+- BMS screen handling with field formatting
+- Navigation state management via COMMAREA
+- Read-only but feeds into COCRDUPC for updates
+
+**Modernization Recommendation:** Convert alongside COCRDLIC as part of card management REST API. Priority: **MEDIUM**.
 
 ---
 
