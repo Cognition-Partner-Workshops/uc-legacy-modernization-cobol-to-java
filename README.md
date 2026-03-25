@@ -37,6 +37,71 @@ CardDemo is a mainframe application designed to test and showcase AWS and partne
 
 The application intentionally incorporates various coding styles and patterns to exercise analysis, transformation, and migration tooling across different mainframe programming paradigms.
 
+## Architecture Overview
+
+```mermaid
+graph TD
+    subgraph "User Interface - BMS Maps"
+        SIGNON["COSGN00 - Signon"]
+        MENU["COMEN01 - Main Menu"]
+        ADMIN["COADM01 - Admin Menu"]
+    end
+
+    subgraph "Online Transactions - CICS"
+        direction LR
+        ACCTVIEW["COACTVWC - Account View"]
+        ACCTUPD["COACTUPC - Account Update"]
+        CARDLIST["COCRDLIC - Card List"]
+        TRANLIST["COTRN00C - Transaction List"]
+        TRANADD["COTRN02C - Transaction Add"]
+        BILLPAY["COBIL00C - Bill Payment"]
+        USRMGMT["COUSR00C-03C - User Mgmt"]
+    end
+
+    subgraph "Batch Processing - JCL/COBOL"
+        POSTTRAN["CBTRN02C - Post Transactions"]
+        INTCALC["CBACT04C - Interest Calculation"]
+        COMBTRAN["SORT - Combine Transactions"]
+        CREASTMT["CBSTM03A - Generate Statements"]
+    end
+
+    subgraph "Data Storage - VSAM KSDS"
+        ACCTFILE[("ACCTFILE - Accounts")]
+        CARDFILE[("CARDFILE - Cards")]
+        CUSTFILE[("CUSTFILE - Customers")]
+        TRANSACT[("TRANSACT - Transactions")]
+        USRSEC[("USRSEC - User Security")]
+        XREFFILE[("XREFFILE - Cross Reference")]
+    end
+
+    subgraph "Optional Extensions"
+        DB2["DB2 - Transaction Types"]
+        IMSDB["IMS DB - Hierarchical Data"]
+        MQ["MQ - Message Queuing"]
+    end
+
+    SIGNON --> MENU
+    MENU --> ACCTVIEW
+    MENU --> CARDLIST
+    MENU --> TRANLIST
+    MENU --> BILLPAY
+    MENU --> ADMIN
+    ADMIN --> USRMGMT
+
+    ACCTVIEW --> ACCTFILE
+    ACCTUPD --> ACCTFILE
+    CARDLIST --> CARDFILE
+    TRANLIST --> TRANSACT
+    TRANADD --> TRANSACT
+    BILLPAY --> TRANSACT
+    USRMGMT --> USRSEC
+
+    POSTTRAN --> TRANSACT
+    INTCALC --> ACCTFILE
+    COMBTRAN --> TRANSACT
+    CREASTMT --> TRANSACT
+```
+
 ## Technologies
 
 ### Core Technologies
