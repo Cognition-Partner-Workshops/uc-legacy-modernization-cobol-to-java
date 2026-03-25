@@ -272,19 +272,23 @@ This data dictionary extracts business entities from COBOL copybook record layou
 | 3 | CDEMO-TO-TRANID         | X(04)            | Alpha   | 4      | Target transaction ID                    |
 | 4 | CDEMO-TO-PROGRAM        | X(08)            | Alpha   | 8      | Target program name                      |
 | 5 | CDEMO-USER-ID           | X(08)            | Alpha   | 8      | Logged-in user ID                        |
-| 6 | CDEMO-USER-TYPE         | X(01)            | Alpha   | 1      | User type (A/U)                          |
+| 6 | CDEMO-USER-TYPE         | X(01)            | Alpha   | 1      | User type (A=Admin, U=User)              |
 | 7 | CDEMO-PGM-CONTEXT       | 9(01)            | Numeric | 1      | Program context (0=Enter, 1=Reenter)     |
-| 8 | CDEMO-LAST-MAP          | X(07)            | Alpha   | 7      | Last BMS map displayed                   |
-| 9 | CDEMO-LAST-MAPSET       | X(07)            | Alpha   | 7      | Last BMS mapset used                     |
-| 10| CDEMO-ACCT-ID           | 9(11)            | Numeric | 11     | Selected account ID                      |
-| 11| CDEMO-CARD-NUM          | 9(16)            | Numeric | 16     | Selected card number                     |
-| 12| CCARD-AID-*             | X(01)            | Alpha   | 1      | Mapped attention identifier (PF keys)    |
-| 13| CCARD-ERROR-MSG         | X(75)            | Alpha   | 75     | Error message buffer                     |
+| 8 | CDEMO-CUST-ID           | 9(09)            | Numeric | 9      | Selected customer ID                     |
+| 9 | CDEMO-CUST-FNAME        | X(25)            | Alpha   | 25     | Customer first name                      |
+| 10| CDEMO-CUST-MNAME        | X(25)            | Alpha   | 25     | Customer middle name                     |
+| 11| CDEMO-CUST-LNAME        | X(25)            | Alpha   | 25     | Customer last name                       |
+| 12| CDEMO-ACCT-ID           | 9(11)            | Numeric | 11     | Selected account ID                      |
+| 13| CDEMO-ACCT-STATUS       | X(01)            | Alpha   | 1      | Selected account status                  |
+| 14| CDEMO-CARD-NUM          | 9(16)            | Numeric | 16     | Selected card number                     |
+| 15| CDEMO-LAST-MAP          | X(07)            | Alpha   | 7      | Last BMS map displayed                   |
+| 16| CDEMO-LAST-MAPSET       | X(07)            | Alpha   | 7      | Last BMS mapset used                     |
 
 **Business Rules**:
 - Shared communication area passed via `EXEC CICS XCTL COMMAREA`
 - Carries navigation state, user identity, and selected entity keys
 - `CDEMO-PGM-CONTEXT` controls first-time vs. re-enter logic in every screen
+- Fields `CCARD-AID-*` and `CCARD-ERROR-MSG` are sometimes used alongside this area but belong to `CVCRD01Y.cpy` (Credit Card Work Area), not this copybook
 
 ---
 
