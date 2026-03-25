@@ -24,22 +24,22 @@ Each module is scored 1–5 on four dimensions:
 
 | Rank | Module     | Lines | Composite | Complexity | Data Coupling | Business Impact | Migration Risk | Domain |
 |:----:|-----------|------:|:---------:|:----------:|:-------------:|:---------------:|:--------------:|--------|
-| 1    | **COACTUPC** | 4,237 | **4.70** | 5 | 5 | 5 | 4 | Account Update |
-| 2    | **CBTRN02C** | 731   | **4.40** | 4 | 5 | 5 | 4 | Transaction Posting |
+| 1    | **COACTUPC** | 4,237 | **4.80** | 5 | 5 | 5 | 4 | Account Update |
+| 2    | **CBTRN02C** | 731   | **4.50** | 4 | 5 | 5 | 4 | Transaction Posting |
 | 3    | **CBACT04C** | 652   | **4.30** | 4 | 5 | 5 | 3 | Interest Calculation |
-| 4    | **COCRDLIC** | 1,460 | **4.00** | 5 | 3 | 4 | 4 | Card List |
-| 5    | **COCRDUPC** | 1,560 | **3.90** | 5 | 3 | 4 | 4 | Card Update |
-| 6    | **COBIL00C** | 572   | **3.90** | 3 | 5 | 5 | 3 | Bill Payment |
+| 4    | **COCRDLIC** | 1,460 | **4.10** | 5 | 3 | 4 | 4 | Card List |
+| 5    | **COCRDUPC** | 1,560 | **4.10** | 5 | 3 | 4 | 4 | Card Update |
+| 6    | **COBIL00C** | 572   | **4.00** | 3 | 5 | 5 | 3 | Bill Payment |
 | 7    | **CBSTM03A** | 924   | **3.80** | 4 | 4 | 4 | 3 | Statement Generation |
-| 8    | **COACTVWC** | 942   | **3.70** | 4 | 4 | 3 | 4 | Account View |
-| 9    | **COTRN02C** | 783   | **3.60** | 4 | 4 | 4 | 3 | Transaction Add |
-| 10   | **CBTRN03C** | 649   | **3.40** | 3 | 4 | 4 | 3 | Transaction Report |
+| 8    | **COTRN02C** | 783   | **3.80** | 4 | 4 | 4 | 3 | Transaction Add |
+| 9    | **COACTVWC** | 942   | **3.70** | 4 | 4 | 3 | 4 | Account View |
+| 10   | **CBTRN03C** | 649   | **3.50** | 3 | 4 | 4 | 3 | Transaction Report |
 
 ---
 
 ## Detailed Analysis
 
-### #1 — COACTUPC (Account Update) — Score: 4.70
+### #1 — COACTUPC (Account Update) — Score: 4.80
 
 **Why it's #1**: The largest program in the codebase at 4,237 lines. Contains the most complex business logic with full CRUD operations on account data, extensive field-level validation (SSN, phone, dates, credit limits), and multi-file updates.
 
@@ -61,7 +61,7 @@ Each module is scored 1–5 on four dimensions:
 
 ---
 
-### #2 — CBTRN02C (Transaction Posting — Batch) — Score: 4.40
+### #2 — CBTRN02C (Transaction Posting — Batch) — Score: 4.50
 
 **Why it's #2**: Core financial processing program that posts daily transactions to the master file. Touches 6 files simultaneously and performs balance updates — any bug here means incorrect account balances.
 
@@ -103,7 +103,7 @@ Each module is scored 1–5 on four dimensions:
 
 ---
 
-### #4 — COCRDLIC (Credit Card List) — Score: 4.00
+### #4 — COCRDLIC (Credit Card List) — Score: 4.10
 
 **Why it's #4**: Complex browse/paging logic with CICS STARTBR/READNEXT/ENDBR patterns, row selection handling (S for view, U for update), and conditional filtering based on user type.
 
@@ -124,7 +124,7 @@ Each module is scored 1–5 on four dimensions:
 
 ---
 
-### #5 — COCRDUPC (Credit Card Update) — Score: 3.90
+### #5 — COCRDUPC (Credit Card Update) — Score: 4.10
 
 **Why it's #5**: Similar complexity to COCRDSLC but adds write operations. Contains card-level validation, cross-reference lookups, and REWRITE operations.
 
@@ -140,7 +140,7 @@ Each module is scored 1–5 on four dimensions:
 
 ---
 
-### #6 — COBIL00C (Bill Payment) — Score: 3.90
+### #6 — COBIL00C (Bill Payment) — Score: 4.00
 
 **Why it's #6**: Moves money — pays account balance in full. Involves reading cross-references, computing payment amount, writing a transaction record, and updating the account balance. Financial operations are the highest-risk category.
 
@@ -180,24 +180,9 @@ Each module is scored 1–5 on four dimensions:
 
 ---
 
-### #8 — COACTVWC (Account View) — Score: 3.70
+### #8 — COTRN02C (Transaction Add — Online) — Score: 3.80
 
-**Why it's #8**: Read-only but touches 4 VSAM files (account, card, customer, cross-reference) and has complex screen population logic. The first screen most users see after login.
-
-| Metric                | Detail                                                   |
-|-----------------------|----------------------------------------------------------|
-| **Lines of Code**     | 942                                                      |
-| **CICS Operations**   | READ ×3 (ACCTDAT, CARDDAT/CARDAIX, CUSTDAT)              |
-| **Files Accessed**    | ACCTDAT, CARDDAT, CARDAIX, CXACAIX, CUSTDAT              |
-| **Key Risk Factors**  | Multi-file join logic, screen formatting, currency display |
-
-**Recommended Approach**: REST `GET /api/accounts/{id}` with JPA `@ManyToOne`/`@OneToMany` relationships. Single query with JOIN fetching.
-
----
-
-### #9 — COTRN02C (Transaction Add — Online) — Score: 3.60
-
-**Why it's #9**: Adds new transactions via the online CICS interface. Validates card/account existence via cross-reference, validates amounts, and writes to TRANSACT.
+**Why it's #8**: Adds new transactions via the online CICS interface. Validates card/account existence via cross-reference, validates amounts, and writes to TRANSACT.
 
 | Metric                | Detail                                                   |
 |-----------------------|----------------------------------------------------------|
@@ -211,7 +196,22 @@ Each module is scored 1–5 on four dimensions:
 
 ---
 
-### #10 — CBTRN03C (Transaction Report — Batch) — Score: 3.40
+### #9 — COACTVWC (Account View) — Score: 3.70
+
+**Why it's #9**: Read-only but touches 4 VSAM files (account, card, customer, cross-reference) and has complex screen population logic. The first screen most users see after login.
+
+| Metric                | Detail                                                   |
+|-----------------------|----------------------------------------------------------|
+| **Lines of Code**     | 942                                                      |
+| **CICS Operations**   | READ ×3 (ACCTDAT, CARDDAT/CARDAIX, CUSTDAT)              |
+| **Files Accessed**    | ACCTDAT, CARDDAT, CARDAIX, CXACAIX, CUSTDAT              |
+| **Key Risk Factors**  | Multi-file join logic, screen formatting, currency display |
+
+**Recommended Approach**: REST `GET /api/accounts/{id}` with JPA `@ManyToOne`/`@OneToMany` relationships. Single query with JOIN fetching.
+
+---
+
+### #10 — CBTRN03C (Transaction Report — Batch) — Score: 3.50
 
 **Why it's #10**: Batch report generation reading from 5 files with control-break logic (by account, by type, by category). Produces formatted report with page/account/grand totals.
 
