@@ -1,0 +1,24 @@
+{
+  "name": "carddemo-e2e-tests",
+  "version": "1.0.0",
+  "description": "Playwright E2E tests for the modernized CardDemo application",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui",
+    "test:auth": "npx playwright test auth.spec.ts",
+    "test:menu": "npx playwright test main-menu.spec.ts admin-menu.spec.ts",
+    "test:accounts": "npx playwright test account-view.spec.ts account-update.spec.ts",
+    "test:cards": "npx playwright test card-list.spec.ts card-view.spec.ts card-update.spec.ts",
+    "test:transactions": "npx playwright test transaction-list.spec.ts transaction-view.spec.ts transaction-add.spec.ts",
+    "test:reports": "npx playwright test reports.spec.ts",
+    "test:billing": "npx playwright test bill-payment.spec.ts",
+    "test:users": "npx playwright test user-list.spec.ts user-add.spec.ts user-update.spec.ts user-delete.spec.ts",
+    "test:batch": "npx playwright test batch-verification.spec.ts",
+    "test:integration": "npx playwright test integration.spec.ts",
+    "report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}
