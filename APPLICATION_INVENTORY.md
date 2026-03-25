@@ -7,7 +7,7 @@
 
 ## 1. COBOL Programs (31)
 
-### 1.1 Online CICS Programs (20)
+### 1.1 Online CICS Programs (18)
 
 | # | Program | Lines | CICS Tran | Function | Business Domain | Layer |
 |---|---------|------:|-----------|----------|-----------------|-------|

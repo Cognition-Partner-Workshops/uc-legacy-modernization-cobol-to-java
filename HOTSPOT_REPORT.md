@@ -57,7 +57,7 @@ Each module is scored on four dimensions (1-5 scale each, 5 = highest):
 | Data Coupling | **4** | Reads CARDDAT via both primary key and alternate index (CARDAIX). Multi-page state managed through extended COMMAREA (WS-THIS-PROGCOMMAREA with first/last keys, page indicators). |
 | Business Criticality | **4** | Primary card lookup screen — gateway to card detail and update. Used by both admin and regular users. |
 | Modernization Risk | **5** | Complex CICS browse logic (STARTBR/READNEXT/READPREV) with custom pagination state. Row selection pattern maps to list + detail REST API. Extended COMMAREA for page state needs session/cache replacement. |
-| **Composite** | **4.25** | |
+| **Composite** | **4.20** | |
 
 **Recommendation:** Replace with paginated REST API backed by SQL queries (LIMIT/OFFSET or cursor-based). Card list + selection pattern maps naturally to a data table UI component.
 
@@ -77,17 +77,17 @@ Each module is scored on four dimensions (1-5 scale each, 5 = highest):
 
 ---
 
-### Rank #5 — COACTVWC (Account View — Online)
+### Rank #5 — CBACT04C (Interest Calculation — Batch)
 
 | Dimension | Score | Evidence |
 |-----------|------:|---------|
-| Code Complexity | **3** | 942 lines. Three sequential VSAM reads (CXACAIX → ACCTDAT → CUSTDAT) to assemble full account view. Abend handling. |
-| Data Coupling | **5** | Reads 3 VSAM files via 2 different access paths. Includes 14 copybooks (CVACT01Y, CVACT02Y, CVACT03Y, CVCUS01Y, CVCRD01Y). Assembles data from 4 business entities for display. |
-| Business Criticality | **4** | Primary account inquiry screen. Read-only but heavily used. Gateway to understanding account state. |
-| Modernization Risk | **3** | Read-only pattern is simpler. Main risk is the multi-file join pattern and BMS map complexity. |
-| **Composite** | **3.80** | |
+| Code Complexity | **3** | 652 lines. Multi-file lookups: category balance → xref → account → disclosure group. Interest computation with rate lookups. Generates system transactions. |
+| Data Coupling | **5** | Reads 4 files (TCATBALF, XREF, ACCTDAT, DISCGRP). Writes 1 file (SYSTRAN — generated interest transactions). Updates ACCTDAT balances. |
+| Business Criticality | **5** | Financial calculation — interest charges directly affect customer bills. Regulatory and audit implications. Must be mathematically identical after migration. |
+| Modernization Risk | **3** | Standard batch pattern. Main risk is decimal precision (COBOL COMP-3 vs. Java BigDecimal). |
+| **Composite** | **4.00** | |
 
-**Recommendation:** Convert to Account detail REST API with JPA joins replacing multi-file reads. Natural candidate for early migration as a read-only endpoint.
+**Recommendation:** Use Java BigDecimal for all calculations. Implement parallel-run reconciliation comparing COBOL and Java outputs. Prioritize extensive numeric regression testing.
 
 ---
 
@@ -105,17 +105,17 @@ Each module is scored on four dimensions (1-5 scale each, 5 = highest):
 
 ---
 
-### Rank #7 — CBACT04C (Interest Calculation — Batch)
+### Rank #7 — COACTVWC (Account View — Online)
 
 | Dimension | Score | Evidence |
 |-----------|------:|---------|
-| Code Complexity | **3** | 652 lines. Multi-file lookups: category balance → xref → account → disclosure group. Interest computation with rate lookups. Generates system transactions. |
-| Data Coupling | **5** | Reads 4 files (TCATBALF, XREF, ACCTDAT, DISCGRP). Writes 1 file (SYSTRAN — generated interest transactions). Updates ACCTDAT balances. |
-| Business Criticality | **5** | Financial calculation — interest charges directly affect customer bills. Regulatory and audit implications. Must be mathematically identical after migration. |
-| Modernization Risk | **3** | Standard batch pattern. Main risk is decimal precision (COBOL COMP-3 vs. Java BigDecimal). |
-| **Composite** | **3.95** | |
+| Code Complexity | **3** | 942 lines. Three sequential VSAM reads (CXACAIX → ACCTDAT → CUSTDAT) to assemble full account view. Abend handling. |
+| Data Coupling | **5** | Reads 3 VSAM files via 2 different access paths. Includes 14 copybooks (CVACT01Y, CVACT02Y, CVACT03Y, CVCUS01Y, CVCRD01Y). Assembles data from 4 business entities for display. |
+| Business Criticality | **4** | Primary account inquiry screen. Read-only but heavily used. Gateway to understanding account state. |
+| Modernization Risk | **3** | Read-only pattern is simpler. Main risk is the multi-file join pattern and BMS map complexity. |
+| **Composite** | **3.75** | |
 
-**Recommendation:** Use Java BigDecimal for all calculations. Implement parallel-run reconciliation comparing COBOL and Java outputs. Prioritize extensive numeric regression testing.
+**Recommendation:** Convert to Account detail REST API with JPA joins replacing multi-file reads. Natural candidate for early migration as a read-only endpoint.
 
 ---
 
@@ -141,7 +141,7 @@ Each module is scored on four dimensions (1-5 scale each, 5 = highest):
 | Data Coupling | **3** | Reads TRANSACT file only. Extended COMMAREA for pagination state. |
 | Business Criticality | **3** | Transaction inquiry — important for customer service but read-only. |
 | Modernization Risk | **4** | Same CICS browse pagination pattern as COCRDLIC. Custom page state in COMMAREA. |
-| **Composite** | **3.25** | |
+| **Composite** | **3.20** | |
 
 **Recommendation:** Convert to paginated REST API. Reuse pagination pattern developed for Card List (COCRDLIC).
 
@@ -155,7 +155,7 @@ Each module is scored on four dimensions (1-5 scale each, 5 = highest):
 | Data Coupling | **2** | Reads 1 file (USRSEC). Sets COMMAREA fields for session. |
 | Business Criticality | **5** | Authentication gateway — all access flows through this. Security-critical. Plaintext password storage is a major vulnerability. |
 | Modernization Risk | **3** | Simple CICS READ + XCTL. Main risk is replacing plaintext auth with proper security (Spring Security, BCrypt, JWT). |
-| **Composite** | **3.00** | |
+| **Composite** | **2.95** | |
 
 **Recommendation:** Replace with Spring Security + BCrypt password hashing + JWT tokens. Critical security improvement. Should be one of the first modules migrated to eliminate plaintext password risk.
 
@@ -167,14 +167,14 @@ Each module is scored on four dimensions (1-5 scale each, 5 = highest):
 |-----:|--------|------:|------|----------------:|---------------------|
 | 1 | **COACTUPC** | 4,237 | Online | **5.00** | Extreme complexity, 4-file updates, 39 screen macros |
 | 2 | **CBTRN02C** | 731 | Batch | **4.50** | 6-file posting engine, financial integrity |
-| 3 | **COCRDLIC** | 1,460 | Online | **4.25** | Complex CICS browse pagination |
+| 3 | **COCRDLIC** | 1,460 | Online | **4.20** | Complex CICS browse pagination |
 | 4 | **COCRDUPC** | 1,560 | Online | **4.00** | Card update with multi-file I/O |
-| 5 | **COACTVWC** | 942 | Online | **3.80** | 5-entity data assembly, high coupling |
+| 5 | **CBACT04C** | 652 | Batch | **4.00** | Interest calculation, decimal precision |
 | 6 | **CBSTM03A/B** | 1,154 | Batch | **4.00** | ALTER statement, dual-output generation |
-| 7 | **CBACT04C** | 652 | Batch | **3.95** | Interest calculation, decimal precision |
+| 7 | **COACTVWC** | 942 | Online | **3.75** | 5-entity data assembly, high coupling |
 | 8 | **COTRN02C** | 783 | Online | **3.50** | Transaction creation, ID generation |
-| 9 | **COTRN00C** | 699 | Online | **3.25** | CICS browse pagination |
-| 10 | **COSGN00C** | 261 | Online | **3.00** | Plaintext auth, security gateway |
+| 9 | **COTRN00C** | 699 | Online | **3.20** | CICS browse pagination |
+| 10 | **COSGN00C** | 261 | Online | **2.95** | Plaintext auth, security gateway |
 
 ---
 
