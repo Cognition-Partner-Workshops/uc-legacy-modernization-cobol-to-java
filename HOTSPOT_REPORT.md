@@ -26,13 +26,13 @@ Each module is scored across three dimensions on a 1-10 scale:
 | Rank | Module     | Lines | Score | Complexity | Risk | Biz Impact | Domain                  | Migration Priority |
 |-----:|-----------|------:|------:|-----------:|-----:|-----------:|-------------------------|--------------------|
 |    1 | COACTUPC  | 4,236 |  9.6  |       10   |   9  |        10  | Account Update (Online) | **P0 - Critical**  |
-|    2 | CBTRN02C  |   731 |  9.0  |        8   |  10  |        10  | Transaction Posting     | **P0 - Critical**  |
+|    2 | CBTRN02C  |   731 |  9.2  |        8   |  10  |        10  | Transaction Posting     | **P0 - Critical**  |
 |    3 | COCRDUPC  | 1,560 |  8.4  |        9   |   8  |         8  | Card Update (Online)    | **P0 - Critical**  |
 |    4 | COCRDLIC  | 1,459 |  8.0  |        9   |   7  |         8  | Card List (Online)      | **P1 - High**      |
-|    5 | CBACT04C  |   652 |  7.8  |        7   |   9  |         8  | Interest Calculation    | **P0 - Critical**  |
-|    6 | CBSTM03A  |   924 |  7.6  |        6   |   8  |         9  | Statement Generation    | **P1 - High**      |
-|    7 | COACTVWC  |   941 |  7.0  |        7   |   6  |         8  | Account View (Online)   | **P1 - High**      |
-|    8 | COCRDSLC  |   887 |  6.8  |        7   |   6  |         7  | Card Detail View        | **P2 - Medium**    |
+|    5 | CBACT04C  |   652 |  8.0  |        7   |   9  |         8  | Interest Calculation    | **P0 - Critical**  |
+|    6 | CBSTM03A  |   924 |  7.4  |        6   |   8  |         9  | Statement Generation    | **P1 - High**      |
+|    7 | COACTVWC  |   941 |  6.8  |        7   |   6  |         8  | Account View (Online)   | **P1 - High**      |
+|    8 | COCRDSLC  |   887 |  6.6  |        7   |   6  |         7  | Card Detail View        | **P2 - Medium**    |
 |    9 | CBTRN03C  |   649 |  6.6  |        7   |   6  |         7  | Transaction Report      | **P2 - Medium**    |
 |   10 | COTRN02C  |   783 |  6.4  |        6   |   7  |         6  | Transaction Add         | **P1 - High**      |
 
@@ -79,7 +79,7 @@ COACTUPC is by far the largest program in the codebase (4,236 lines - nearly 3x 
 
 ---
 
-### #2 - CBTRN02C (Transaction Posting) - Score: 9.0
+### #2 - CBTRN02C (Transaction Posting) - Score: 9.2
 
 **Location:** `app/cbl/CBTRN02C.cbl` | **Lines:** 731 | **Type:** Batch
 
@@ -185,7 +185,7 @@ Second-largest online program. Handles credit card detail updates including card
 
 ---
 
-### #5 - CBACT04C (Interest Calculation) - Score: 7.8
+### #5 - CBACT04C (Interest Calculation) - Score: 8.0
 
 **Location:** `app/cbl/CBACT04C.cbl` | **Lines:** 652 | **Type:** Batch
 
@@ -219,7 +219,7 @@ Second-largest online program. Handles credit card detail updates including card
 
 ---
 
-### #6 - CBSTM03A (Statement Generation) - Score: 7.6
+### #6 - CBSTM03A (Statement Generation) - Score: 7.4
 
 **Location:** `app/cbl/CBSTM03A.CBL` | **Lines:** 924 | **Type:** Batch
 
@@ -251,7 +251,7 @@ Second-largest online program. Handles credit card detail updates including card
 
 ---
 
-### #7 - COACTVWC (Account View) - Score: 7.0
+### #7 - COACTVWC (Account View) - Score: 6.8
 
 **Location:** `app/cbl/COACTVWC.cbl` | **Lines:** 941 | **Type:** Online CICS
 
@@ -281,7 +281,7 @@ Second-largest online program. Handles credit card detail updates including card
 
 ---
 
-### #8 - COCRDSLC (Card Detail View) - Score: 6.8
+### #8 - COCRDSLC (Card Detail View) - Score: 6.6
 
 **Location:** `app/cbl/COCRDSLC.cbl` | **Lines:** 887 | **Type:** Online CICS
 
@@ -363,13 +363,13 @@ Second-largest online program. Handles credit card detail updates including card
 | Program    | LOC   | IF  | EVAL | PERF | READ | WRITE | REWRITE | DEL | COPY | CALL | XCTL | Weighted Score |
 |-----------|------:|----:|-----:|-----:|-----:|------:|--------:|----:|-----:|-----:|-----:|---------------:|
 | COACTUPC  | 4,236 | 168 |   10 |   64 |    0 |     2 |       2 |   0 |   56 |    0 |    2 |           9.6  |
-| CBTRN02C  |   731 |  93 |    0 |   61 |    6 |     5 |       2 |   0 |    5 |    1 |    0 |           9.0  |
+| CBTRN02C  |   731 |  93 |    0 |   61 |    6 |     5 |       2 |   0 |    5 |    1 |    0 |           9.2  |
 | COCRDUPC  | 1,560 | 148 |   16 |   26 |    2 |     1 |       1 |   0 |   15 |    0 |    2 |           8.4  |
 | COCRDLIC  | 1,459 | 122 |   18 |   34 |    3 |     0 |       0 |   0 |   13 |    3 |    3 |           8.0  |
-| CBACT04C  |   652 |  86 |    0 |   56 |    7 |     2 |       1 |   0 |    5 |    1 |    0 |           7.8  |
-| CBSTM03A  |   924 |  15 |    5 |   29 |    4 |    97 |       1 |   0 |    4 |   14 |    0 |           7.6  |
-| COACTVWC  |   941 |  57 |   10 |   21 |    3 |     0 |       0 |   0 |   15 |    0 |    2 |           7.0  |
-| COCRDSLC  |   887 |  68 |    8 |   19 |    2 |     0 |       0 |   0 |   15 |    0 |    2 |           6.8  |
+| CBACT04C  |   652 |  86 |    0 |   56 |    7 |     2 |       1 |   0 |    5 |    1 |    0 |           8.0  |
+| CBSTM03A  |   924 |  15 |    5 |   29 |    4 |    97 |       1 |   0 |    4 |   14 |    0 |           7.4  |
+| COACTVWC  |   941 |  57 |   10 |   21 |    3 |     0 |       0 |   0 |   15 |    0 |    2 |           6.8  |
+| COCRDSLC  |   887 |  68 |    8 |   19 |    2 |     0 |       0 |   0 |   15 |    0 |    2 |           6.6  |
 | CBTRN03C  |   649 |  75 |    4 |   72 |    8 |     1 |       0 |   0 |    5 |    1 |    0 |           6.6  |
 | COTRN02C  |   783 |  14 |   13 |   61 |    0 |     0 |       0 |   0 |   10 |    2 |    1 |           6.4  |
 | COTRN00C  |   699 |  26 |    8 |   43 |    0 |     0 |       0 |   0 |    8 |    0 |    2 |           5.8  |
