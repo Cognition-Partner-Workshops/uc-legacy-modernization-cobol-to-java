@@ -15,9 +15,18 @@ CardDemo is a comprehensive mainframe application that simulates a credit card m
 - [Application Details](#application-details)
   - [User Functions](#user-functions)
   - [Admin Functions](#admin-functions)
+  - [Application Navigation Flow](#application-navigation-flow)
+  - [Batch Processing Pipeline](#batch-processing-pipeline)
+  - [Data Entity Relationship Diagram](#data-entity-relationship-diagram)
   - [Application Inventory](#application-inventory)
   - [Application Screens](#application-screens)
 - [Technical Highlights](#technical-highlights)
+- [Modernization Hotspot Analysis](#modernization-hotspot-analysis)
+  - [Hotspot Summary Table](#hotspot-summary-table)
+  - [Complexity Heatmap](#complexity-heatmap)
+  - [Program-to-VSAM File Access Matrix](#program-to-vsam-file-access-matrix)
+  - [Key Migration Risks](#key-migration-risks)
+  - [Copybook Dependency Diagram](#copybook-dependency-diagram)
 - [Support](#support)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -262,6 +271,88 @@ Admin users can perform the following functions:
 - User management (list, add, update, delete)
 - Transaction type management (with DB2 optional module)
 
+### Application Navigation Flow
+
+The following diagram shows the complete CICS program navigation via XCTL (transfer control) relationships:
+
+```mermaid
+graph TD
+    COSGN00C["COSGN00C (CC00)\nSignon"]
+    COMEN01C["COMEN01C (CM00)\nMain Menu"]
+    COADM01C["COADM01C (CA00)\nAdmin Menu"]
+    COACTVWC["COACTVWC (CAVW)\nAccount View"]
+    COACTUPC["COACTUPC (CAUP)\nAccount Update"]
+    COCRDLIC["COCRDLIC (CCLI)\nCard List"]
+    COCRDSLC["COCRDSLC (CCDL)\nCard View"]
+    COCRDUPC["COCRDUPC (CCUP)\nCard Update"]
+    COTRN00C["COTRN00C (CT00)\nTransaction List"]
+    COTRN01C["COTRN01C (CT01)\nTransaction View"]
+    COTRN02C["COTRN02C (CT02)\nTransaction Add"]
+    COBIL00C["COBIL00C (CB00)\nBill Payment"]
+    CORPT00C["CORPT00C (CR00)\nTransaction Reports"]
+    COUSR00C["COUSR00C (CU00)\nList Users"]
+    COUSR01C["COUSR01C (CU01)\nAdd User"]
+    COUSR02C["COUSR02C (CU02)\nUpdate User"]
+    COUSR03C["COUSR03C (CU03)\nDelete User"]
+
+    COSGN00C -->|"Regular User"| COMEN01C
+    COSGN00C -->|"Admin User"| COADM01C
+
+    COMEN01C --> COACTVWC
+    COMEN01C --> COACTUPC
+    COMEN01C --> COCRDLIC
+    COMEN01C --> COCRDSLC
+    COMEN01C --> COCRDUPC
+    COMEN01C --> COTRN00C
+    COMEN01C --> COTRN01C
+    COMEN01C --> COTRN02C
+    COMEN01C --> COBIL00C
+    COMEN01C --> CORPT00C
+
+    COADM01C --> COUSR00C
+    COADM01C --> COUSR01C
+    COADM01C --> COUSR02C
+    COADM01C --> COUSR03C
+```
+
+### Batch Processing Pipeline
+
+The nightly batch processing sequence executes in the following order:
+
+```mermaid
+graph LR
+    CLOSEFIL["CLOSEFIL\nClose CICS Files"]
+    TRANBKP["TRANBKP\nBackup Transactions"]
+    POSTTRAN["POSTTRAN\nCBTRN02C\nPost Transactions"]
+    INTCALC["INTCALC\nCBACT04C\nInterest Calculation"]
+    COMBTRAN["COMBTRAN\nCombine Transactions"]
+    CREASTMT["CREASTMT\nCBSTM03A\nCreate Statements"]
+    TRANIDX["TRANIDX\nDefine Alt Index"]
+    OPENFIL["OPENFIL\nOpen CICS Files"]
+
+    CLOSEFIL --> TRANBKP
+    TRANBKP --> POSTTRAN
+    POSTTRAN --> INTCALC
+    INTCALC --> COMBTRAN
+    COMBTRAN --> CREASTMT
+    CREASTMT --> TRANIDX
+    TRANIDX --> OPENFIL
+```
+
+### Data Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    CUSTOMER["Customer (CVCUS01Y)"] ||--o{ ACCOUNT["Account (CVACT01Y)"] : "has"
+    ACCOUNT ||--o{ CARD["Card (CVACT02Y)"] : "has"
+    CARD ||--o{ TRANSACTION["Transaction (CVTRA05Y)"] : "has"
+    XREF["XREF (CVACT03Y)"] }o--|| CUSTOMER : "links"
+    XREF }o--|| ACCOUNT : "links"
+    XREF }o--|| CARD : "links"
+    CATEGORY_BALANCE["Category Balance (CVTRA01Y)"] }o--|| ACCOUNT : "linked to"
+    DISCLOSURE_GROUP["Disclosure Group (CVTRA02Y)"] }o--|| ACCOUNT : "linked to"
+```
+
 ### Application Inventory
 
 #### Online Components
@@ -349,6 +440,189 @@ Admin users can perform the following functions:
 |:----------|:----------------|:-------------------|
 | **Base Application** | Customer<br>Account<br>Card<br>Transaction<br>Bill Payment<br>Statement/Report | COBOL<br>CICS<br>JCL (Batch)<br>VSAM (KSDS with AIX) |
 | **Optional Features** | Authorization<br>Fraud<br>Transaction Type (Extension) | DB2<br>MQ<br>IMS DB<br>JCL Utilities<br>Complex data formats<br>Various dataset types<br>Advanced copybook structures |
+
+## Modernization Hotspot Analysis
+
+This section helps teams planning COBOL-to-Java migration identify the riskiest, most complex programs in the CardDemo application.
+
+### Hotspot Summary Table
+
+| Program | Type | Lines of Code | PERFORM Count | CICS I/O Operations | Copybook Dependencies (COPY) | Files Accessed | Migration Risk |
+|:--------|:-----|:--------------|:--------------|:--------------------|:-----------------------------|:---------------|:---------------|
+| COACTUPC.cbl | Online | ~4,236 | 128 | 12 | 113 | 3 (ACCTDAT, CUSTDAT, CXACAIX) | Critical |
+| CBTRN03C.cbl | Batch | Large | 144 | 0 | 10 | Multiple | High |
+| CBTRN02C.cbl | Batch | ~731 | 122 | 0 | 10 | 6 (DALYTRAN, TRANSACT, XREFFILE, DALYREJS, ACCTFILE, TCATBALF) | High |
+| COBIL00C.cbl | Online | Large | 76 | 12 | 20 | Multiple | High |
+| COCRDLIC.cbl | Online | Large | 68 | 18 | 26 | Multiple | High |
+| CBSTM03A.CBL | Batch | Large | — | 0 | — | Multiple | High |
+| CBACT04C.cbl | Batch | ~652 | 112 | 0 | 10 | 5 (TCATBALF, XREFFILE, ACCTFILE, DISCGRP, TRANSACT) | Medium-High |
+| COTRN02C.cbl | Online | ~783 | 122 | 10 | 20 | 3 | Medium-High |
+| COSGN00C.cbl | Online | ~260 | 19 | 6 | 19 | 1 (USRSEC) | Low |
+
+> **Note:** CBSTM03A intentionally uses legacy patterns (ALTER, GO TO, COMP-3, 2D arrays, subroutine calls) making it a stress test for automated migration tools.
+
+### Complexity Heatmap
+
+```mermaid
+graph TD
+    subgraph "Critical"
+        COACTUPC["COACTUPC\nAccount Update\n~4,236 lines"]
+    end
+
+    subgraph "High"
+        CBTRN03C["CBTRN03C\nTransaction Report"]
+        CBTRN02C["CBTRN02C\nTransaction Posting"]
+        COBIL00C["COBIL00C\nBill Payment"]
+        COCRDLIC["COCRDLIC\nCard List"]
+        CBSTM03A["CBSTM03A\nStatement Generation"]
+    end
+
+    subgraph "Medium"
+        CBACT04C["CBACT04C\nInterest Calculation"]
+        COTRN02C["COTRN02C\nTransaction Add"]
+        COTRN00C["COTRN00C\nTransaction List"]
+        COUSR00C["COUSR00C\nList Users"]
+        COACTVWC["COACTVWC\nAccount View"]
+    end
+
+    subgraph "Low"
+        COSGN00C["COSGN00C\nSignon"]
+        COMEN01C["COMEN01C\nMain Menu"]
+        COADM01C["COADM01C\nAdmin Menu"]
+        COUSR01C["COUSR01C\nAdd User"]
+        COUSR02C["COUSR02C\nUpdate User"]
+        COUSR03C["COUSR03C\nDelete User"]
+        COTRN01C["COTRN01C\nTransaction View"]
+    end
+```
+
+### Program-to-VSAM File Access Matrix
+
+```mermaid
+graph LR
+    ACCTDAT["ACCTDAT\nAccount Data"]
+    CARDDAT["CARDDAT\nCard Data"]
+    CUSTDAT["CUSTDAT\nCustomer Data"]
+    TRANSACT["TRANSACT\nTransactions"]
+    USRSEC["USRSEC\nUser Security"]
+    CCXREF["CCXREF / CXACAIX\nCross Reference"]
+
+    COACTUPC_P["COACTUPC"] --> ACCTDAT
+    COACTVWC_P["COACTVWC"] --> ACCTDAT
+    COBIL00C_P["COBIL00C"] --> ACCTDAT
+    CBTRN02C_P["CBTRN02C"] --> ACCTDAT
+    CBACT04C_P["CBACT04C"] --> ACCTDAT
+
+    COCRDLIC_P["COCRDLIC"] --> CARDDAT
+    COCRDSLC_P["COCRDSLC"] --> CARDDAT
+    COCRDUPC_P["COCRDUPC"] --> CARDDAT
+    COACTUPC_P --> CARDDAT
+
+    COACTUPC_P --> CUSTDAT
+    COACTVWC_P --> CUSTDAT
+
+    COTRN00C_P["COTRN00C"] --> TRANSACT
+    COTRN01C_P["COTRN01C"] --> TRANSACT
+    COTRN02C_P["COTRN02C"] --> TRANSACT
+    CBTRN02C_P --> TRANSACT
+    CBACT04C_P --> TRANSACT
+
+    COSGN00C_P["COSGN00C"] --> USRSEC
+    COUSR00C_P["COUSR00C"] --> USRSEC
+    COUSR01C_P["COUSR01C"] --> USRSEC
+    COUSR02C_P["COUSR02C"] --> USRSEC
+    COUSR03C_P["COUSR03C"] --> USRSEC
+
+    COACTUPC_P --> CCXREF
+    COTRN02C_P --> CCXREF
+    COBIL00C_P --> CCXREF
+    CBTRN02C_P --> CCXREF
+    CBACT04C_P --> CCXREF
+```
+
+### Key Migration Risks
+
+1. **COACTUPC is the #1 hotspot** — At 4,236 lines, it has heavy use of REDEFINES, complex field-level validation (SSN, phone numbers, dates), and performs dual-entity updates (both Account and Customer records in a single transaction). This program will require the most careful decomposition during migration.
+
+2. **CBSTM03A is a deliberate stress test** — It intentionally uses legacy patterns including ALTER, GO TO, COMP-3 packed decimal fields, 2D arrays, and subroutine calls. This makes it an ideal benchmark for evaluating automated migration tool capabilities.
+
+3. **Batch programs CBTRN02C and CBACT04C require careful transaction mapping** — Both have complex multi-file I/O with validation logic, rejection handling, and balance calculations. The transaction boundaries and error recovery patterns in these programs need careful mapping to Java transaction management (e.g., Spring `@Transactional` boundaries).
+
+4. **COMMAREA-based pseudo-conversational pattern** — All online programs use CICS COMMAREA for state management in a pseudo-conversational model. This pattern needs to be mapped to a session or state management approach in Java (e.g., HTTP session, stateful service beans, or a dedicated state store).
+
+5. **Shared copybooks represent data contracts** — Copybooks like COCOM01Y (used by all online programs), CVACT01Y, CVACT03Y, and CVTRA05Y define shared data structures that should become Java DTOs or domain model classes. Changes to these shared structures have a wide blast radius.
+
+### Copybook Dependency Diagram
+
+```mermaid
+graph TD
+    COCOM01Y["COCOM01Y\nCOMMAREA"]
+    CVACT01Y["CVACT01Y\nAccount"]
+    CVACT03Y["CVACT03Y\nXREF"]
+    CVTRA05Y["CVTRA05Y\nTransaction"]
+    CSUSR01Y["CSUSR01Y\nUser Security"]
+    CSDAT01Y["CSDAT01Y\nDate"]
+    CSMSG01Y["CSMSG01Y\nMessages"]
+
+    COCOM01Y --> COSGN00C_C["COSGN00C"]
+    COCOM01Y --> COMEN01C_C["COMEN01C"]
+    COCOM01Y --> COADM01C_C["COADM01C"]
+    COCOM01Y --> COACTUPC_C["COACTUPC"]
+    COCOM01Y --> COACTVWC_C["COACTVWC"]
+    COCOM01Y --> COCRDLIC_C["COCRDLIC"]
+    COCOM01Y --> COCRDSLC_C["COCRDSLC"]
+    COCOM01Y --> COCRDUPC_C["COCRDUPC"]
+    COCOM01Y --> COTRN00C_C["COTRN00C"]
+    COCOM01Y --> COTRN01C_C["COTRN01C"]
+    COCOM01Y --> COTRN02C_C["COTRN02C"]
+    COCOM01Y --> COBIL00C_C["COBIL00C"]
+    COCOM01Y --> CORPT00C_C["CORPT00C"]
+    COCOM01Y --> COUSR00C_C["COUSR00C"]
+    COCOM01Y --> COUSR01C_C["COUSR01C"]
+    COCOM01Y --> COUSR02C_C["COUSR02C"]
+    COCOM01Y --> COUSR03C_C["COUSR03C"]
+
+    CVACT01Y --> COACTUPC_C
+    CVACT01Y --> COACTVWC_C
+    CVACT01Y --> COBIL00C_C
+    CVACT01Y --> CBTRN02C_C["CBTRN02C"]
+    CVACT01Y --> CBACT04C_C["CBACT04C"]
+
+    CVACT03Y --> COACTUPC_C
+    CVACT03Y --> COTRN02C_C
+    CVACT03Y --> COBIL00C_C
+    CVACT03Y --> CBTRN02C_C
+    CVACT03Y --> CBACT04C_C
+
+    CVTRA05Y --> COTRN00C_C
+    CVTRA05Y --> COTRN01C_C
+    CVTRA05Y --> COTRN02C_C
+    CVTRA05Y --> CBTRN02C_C
+    CVTRA05Y --> CBACT04C_C
+
+    CSUSR01Y --> COSGN00C_C
+    CSUSR01Y --> COUSR00C_C
+    CSUSR01Y --> COUSR01C_C
+    CSUSR01Y --> COUSR02C_C
+    CSUSR01Y --> COUSR03C_C
+    CSUSR01Y --> COACTUPC_C
+
+    CSDAT01Y --> COACTUPC_C
+    CSDAT01Y --> COACTVWC_C
+    CSDAT01Y --> COCRDLIC_C
+    CSDAT01Y --> COTRN00C_C
+    CSDAT01Y --> COTRN02C_C
+    CSDAT01Y --> COBIL00C_C
+    CSDAT01Y --> CORPT00C_C
+
+    CSMSG01Y --> COACTUPC_C
+    CSMSG01Y --> COACTVWC_C
+    CSMSG01Y --> COCRDLIC_C
+    CSMSG01Y --> COTRN00C_C
+    CSMSG01Y --> COTRN02C_C
+    CSMSG01Y --> COBIL00C_C
+    CSMSG01Y --> CORPT00C_C
+```
 
 ## Support
 
