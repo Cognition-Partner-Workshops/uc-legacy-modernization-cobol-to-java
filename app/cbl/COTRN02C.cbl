@@ -35,7 +35,6 @@
        01 WS-VARIABLES.
          05 WS-PGMNAME                 PIC X(08) VALUE 'COTRN02C'.
          05 WS-TRANID                  PIC X(04) VALUE 'CT02'.
-         05 WS-MESSAGE                 PIC X(80) VALUE SPACES.
          05 WS-TRANSACT-FILE           PIC X(08) VALUE 'TRANSACT'.
          05 WS-ACCTDAT-FILE            PIC X(08) VALUE 'ACCTDAT '.
          05 WS-CCXREF-FILE             PIC X(08) VALUE 'CCXREF  '.

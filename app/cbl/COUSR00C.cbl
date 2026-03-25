@@ -44,8 +44,6 @@
            88 SEND-ERASE-YES                     VALUE 'Y'.
            88 SEND-ERASE-NO                      VALUE 'N'.
 
-         05 WS-RESP-CD                 PIC S9(09) COMP VALUE ZEROS.
-         05 WS-REAS-CD                 PIC S9(09) COMP VALUE ZEROS.
          05 WS-REC-COUNT               PIC S9(04) COMP VALUE ZEROS.
          05 WS-IDX                     PIC S9(04) COMP VALUE ZEROS.
          05 WS-PAGE-NUM                PIC S9(04) COMP VALUE ZEROS.

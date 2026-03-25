@@ -36,7 +36,6 @@
        01 WS-VARIABLES.
          05 WS-PGMNAME                 PIC X(08) VALUE 'CORPT00C'.
          05 WS-TRANID                  PIC X(04) VALUE 'CR00'.
-         05 WS-MESSAGE                 PIC X(80) VALUE SPACES.
          05 WS-TRANSACT-FILE             PIC X(08) VALUE 'TRANSACT'.
          COPY CSVAR01Y.
          05 WS-TRANSACT-EOF            PIC X(01) VALUE 'N'.
@@ -49,8 +48,6 @@
            88 END-LOOP-YES                       VALUE 'Y'.
            88 END-LOOP-NO                        VALUE 'N'.
 
-         05 WS-RESP-CD                 PIC S9(09) COMP VALUE ZEROS.
-         05 WS-REAS-CD                 PIC S9(09) COMP VALUE ZEROS.
          05 WS-REC-COUNT               PIC S9(04) COMP VALUE ZEROS.
          05 WS-IDX                     PIC S9(04) COMP VALUE ZEROS.
          05 WS-REPORT-NAME             PIC X(10) VALUE SPACES.
