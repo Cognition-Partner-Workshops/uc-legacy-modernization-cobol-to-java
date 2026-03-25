@@ -17,7 +17,7 @@ This module contains comprehensive JUnit 5 test cases that validate the business
 | `UserAdministrationTest` | COUSR00C-03C | CU00-CU03 | 12 tests |
 | `BatchProcessingTest` | CBTRN02C, CBACT04C, CBSTM03A/B | POSTTRAN, INTCALC, CREASTMT | 11 tests |
 
-**Total: 73 test cases**
+**Total: 74 test cases**
 
 ## Model Classes
 
