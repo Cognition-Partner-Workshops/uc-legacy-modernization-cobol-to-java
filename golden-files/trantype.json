@@ -1,0 +1,42 @@
+{
+  "source_file": "app/data/ASCII/trantype.txt",
+  "copybook_layout": "CVTRA03Y.cpy (TRAN-TYPE-RECORD, 60 bytes)",
+  "record_count": 7,
+  "records": [
+    {
+      "TRAN-TYPE": "01",
+      "TRAN-TYPE-DESC": "Purchase",
+      "_line_number": 1
+    },
+    {
+      "TRAN-TYPE": "02",
+      "TRAN-TYPE-DESC": "Payment",
+      "_line_number": 2
+    },
+    {
+      "TRAN-TYPE": "03",
+      "TRAN-TYPE-DESC": "Credit",
+      "_line_number": 3
+    },
+    {
+      "TRAN-TYPE": "04",
+      "TRAN-TYPE-DESC": "Authorization",
+      "_line_number": 4
+    },
+    {
+      "TRAN-TYPE": "05",
+      "TRAN-TYPE-DESC": "Refund",
+      "_line_number": 5
+    },
+    {
+      "TRAN-TYPE": "06",
+      "TRAN-TYPE-DESC": "Reversal",
+      "_line_number": 6
+    },
+    {
+      "TRAN-TYPE": "07",
+      "TRAN-TYPE-DESC": "Adjustment",
+      "_line_number": 7
+    }
+  ]
+}
