@@ -25,14 +25,14 @@ Each module is scored on three dimensions (1–10 scale):
 | Rank | Program | LOC | Composite | Complexity | Risk | Impact | Domain |
 |---|---|---|---|---|---|---|---|
 | **1** | COACTUPC | 4,236 | **9.35** | 10 | 9 | 9 | Account Update |
-| **2** | CBTRN02C | 731 | **8.65** | 7 | 9 | 10 | Transaction Posting |
-| **3** | COCRDLIC | 1,459 | **8.25** | 9 | 8 | 8 | Card List |
-| **4** | COCRDUPC | 1,560 | **8.25** | 9 | 8 | 8 | Card Update |
-| **5** | CBACT04C | 652 | **8.20** | 7 | 8 | 10 | Interest Calculation |
-| **6** | CBSTM03A | 924 | **7.85** | 8 | 9 | 7 | Statement Generation |
-| **7** | COCRDSLC | 887 | **7.45** | 8 | 8 | 7 | Card View |
-| **8** | COACTVWC | 941 | **7.45** | 8 | 7 | 8 | Account View |
-| **9** | COTRN02C | 783 | **7.40** | 7 | 8 | 7 | Transaction Add |
+| **2** | CBTRN02C | 731 | **8.60** | 7 | 9 | 10 | Transaction Posting |
+| **3** | COCRDLIC | 1,459 | **8.35** | 9 | 8 | 8 | Card List |
+| **4** | COCRDUPC | 1,560 | **8.35** | 9 | 8 | 8 | Card Update |
+| **5** | CBACT04C | 652 | **8.25** | 7 | 8 | 10 | Interest Calculation |
+| **6** | CBSTM03A | 924 | **8.05** | 8 | 9 | 7 | Statement Generation |
+| **7** | COCRDSLC | 887 | **7.70** | 8 | 8 | 7 | Card View |
+| **8** | COACTVWC | 941 | **7.65** | 8 | 7 | 8 | Account View |
+| **9** | COTRN02C | 783 | **7.35** | 7 | 8 | 7 | Transaction Add |
 | **10** | CBTRN03C | 649 | **7.05** | 8 | 7 | 6 | Transaction Report |
 
 ---
@@ -44,7 +44,7 @@ Each module is scored on three dimensions (1–10 scale):
 | Metric | Value | Assessment |
 |---|---|---|
 | Lines of Code | 4,236 | **Largest program in codebase** — 2.7× the next largest |
-| IF statements | 168 | Extremely high cyclomatic complexity |
+| IF statements | 164 | Extremely high cyclomatic complexity |
 | EVALUATE statements | 20 | Complex branching logic |
 | PERFORM statements | 64 | Deep procedure hierarchy |
 | COMPUTE statements | 5 | Financial calculations inline |
@@ -68,12 +68,12 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### Rank #2 — CBTRN02C (Transaction Posting) · Score: 8.65
+### Rank #2 — CBTRN02C (Transaction Posting) · Score: 8.60
 
 | Metric | Value | Assessment |
 |---|---|---|
 | Lines of Code | 731 | Moderate size but extreme business criticality |
-| IF statements | 93 | Very high — extensive validation logic |
+| IF statements | 93 | Extensive validation logic |
 | PERFORM statements | 62 | Complex flow control |
 | Files accessed | 6 | DALYTRAN (R), TRANSACT (W), XREFFILE (R), DALYREJS (W), ACCTFILE (R), TCATBALF (W) |
 | CALL targets | CSUTLDTC | Date utility dependency |
@@ -93,12 +93,12 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### Rank #3 — COCRDLIC (Card List) · Score: 8.25
+### Rank #3 — COCRDLIC (Card List) · Score: 8.35
 
 | Metric | Value | Assessment |
 |---|---|---|
 | Lines of Code | 1,459 | Third largest program |
-| IF statements | 122 | Very high — paging logic, selection handling |
+| IF statements | 120 | Very high — paging logic, selection handling |
 | EVALUATE statements | 18 | Complex state management |
 | PERFORM statements | 34 | Multi-level browsing logic |
 | CICS commands | ~25 | STARTBR, READNEXT, READPREV, ENDBR, XCTL |
@@ -118,12 +118,12 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### Rank #4 — COCRDUPC (Card Update) · Score: 8.25
+### Rank #4 — COCRDUPC (Card Update) · Score: 8.35
 
 | Metric | Value | Assessment |
 |---|---|---|
 | Lines of Code | 1,560 | Second largest program |
-| IF statements | 148 | Extremely high — field-by-field validation |
+| IF statements | 146 | Extremely high — field-by-field validation |
 | EVALUATE statements | 16 | State machine behavior |
 | PERFORM statements | 26 | |
 | Copybooks | 13 | High coupling |
@@ -143,7 +143,7 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### Rank #5 — CBACT04C (Interest Calculation) · Score: 8.20
+### Rank #5 — CBACT04C (Interest Calculation) · Score: 8.25
 
 | Metric | Value | Assessment |
 |---|---|---|
@@ -170,7 +170,7 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### Rank #6 — CBSTM03A (Statement Generation) · Score: 7.85
+### Rank #6 — CBSTM03A (Statement Generation) · Score: 8.05
 
 | Metric | Value | Assessment |
 |---|---|---|
@@ -198,7 +198,7 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### Rank #7 — COCRDSLC (Card View) · Score: 7.45
+### Rank #7 — COCRDSLC (Card View) · Score: 7.70
 
 | Metric | Value | Assessment |
 |---|---|---|
@@ -223,12 +223,12 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### Rank #8 — COACTVWC (Account View) · Score: 7.45
+### Rank #8 — COACTVWC (Account View) · Score: 7.65
 
 | Metric | Value | Assessment |
 |---|---|---|
 | Lines of Code | 941 | |
-| IF statements | 57 | |
+| IF statements | 56 | |
 | EVALUATE statements | 10 | |
 | PERFORM statements | 21 | |
 | CICS commands | ~22 | |
@@ -248,7 +248,7 @@ Each module is scored on three dimensions (1–10 scale):
 
 ---
 
-### Rank #9 — COTRN02C (Transaction Add) · Score: 7.40
+### Rank #9 — COTRN02C (Transaction Add) · Score: 7.35
 
 | Metric | Value | Assessment |
 |---|---|---|

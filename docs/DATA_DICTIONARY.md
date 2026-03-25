@@ -27,6 +27,18 @@
 | 15 | Statement Transaction | COSTM01 | 350 bytes | TRXFL.VSAM.KSDS | Card+Tran ID (32-char) | `StatementTransaction.java` |
 | 16 | Customer (statement) | CUSTREC | variable | N/A | N/A | embedded in Customer |
 | 17 | Report Layout | CVTRA07Y | 133 bytes | N/A (print) | N/A | Report template |
+| 18 | Admin Menu Options | COADM02Y | variable | N/A (menu) | N/A | Menu configuration |
+| 19 | Menu Definitions (alt) | COMEN02Y | variable | N/A (menu) | N/A | Menu configuration |
+| 20 | Title/Header | COTTL01Y | variable | N/A (screen) | N/A | Screen header layout |
+| 21 | Date Utility (WS) | CSUTLDWY | variable | N/A (working storage) | N/A | Date validation fields |
+| 22 | Date Utility (PD) | CSUTLDPY | variable | N/A (procedure) | N/A | Date validation paragraphs |
+| 23 | Date Shared | CSDAT01Y | variable | N/A (working storage) | N/A | Shared date fields |
+| 24 | Lookup Codes | CSLKPCDY | variable | N/A (reference) | N/A | Area/state code lookup |
+| 25 | Messages (primary) | CSMSG01Y | variable | N/A (messages) | N/A | User message definitions |
+| 26 | Messages (abend) | CSMSG02Y | variable | N/A (messages) | N/A | Abend work areas |
+| 27 | Set Attribute | CSSETATY | variable | N/A (screen) | N/A | BMS attribute control |
+| 28 | String Prefix | CSSTRPFY | variable | N/A (utility) | N/A | String prefix utility |
+| 29 | Unused Record | UNUSED1Y | 80 bytes | N/A | N/A | Reserved/placeholder |
 
 ---
 
