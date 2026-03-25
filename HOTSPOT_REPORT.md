@@ -252,6 +252,41 @@ Each module is scored across three weighted dimensions:
 
 ## Risk Heat Map
 
+### Mermaid: Risk Heat Map (Complexity vs Business Impact)
+
+```mermaid
+quadrantChart
+    title Hotspot Risk Heat Map
+    x-axis Low Business Impact --> High Business Impact
+    y-axis Low Complexity --> High Complexity
+    quadrant-1 Critical Hotspots
+    quadrant-2 Complex but Lower Impact
+    quadrant-3 Low Priority
+    quadrant-4 High Impact, Manageable
+    COACTUPC: [0.85, 0.95]
+    CBTRN02C: [0.90, 0.60]
+    CBACT04C: [0.85, 0.55]
+    CBSTM03A: [0.75, 0.70]
+    COCRDLIC: [0.40, 0.80]
+    COCRDUPC: [0.40, 0.75]
+    CBTRN03C: [0.65, 0.50]
+    COACTVWC: [0.55, 0.50]
+    COBIL00C: [0.80, 0.45]
+    COTRN02C: [0.70, 0.55]
+```
+
+### Mermaid: Composite Score Ranking
+
+```mermaid
+xychart-beta
+    title "Top 10 Hotspot Composite Scores"
+    x-axis ["COACTUPC", "CBTRN02C", "CBACT04C", "CBSTM03A", "COCRDLIC", "COCRDUPC", "COBIL00C", "CBTRN03C", "COTRN02C", "COACTVWC"]
+    y-axis "Composite Score" 0 --> 10
+    bar [9.4, 9.2, 8.2, 7.7, 7.1, 7.1, 6.9, 6.7, 6.7, 6.4]
+```
+
+### ASCII: Risk Heat Map
+
 ```
                     LOW Business Impact ◄──────────────────► HIGH Business Impact
                     │                                                           │
@@ -279,6 +314,53 @@ Legend: Programs in the upper-right quadrant require the most careful migration 
 ## Recommended Migration Order
 
 Based on the hotspot analysis, dependencies, and modernization best practices:
+
+### Mermaid: Migration Phase Sequence
+
+```mermaid
+gantt
+    title Recommended Migration Phases
+    dateFormat YYYY-MM-DD
+    axisFormat %b
+
+    section Phase 1 - Foundation
+    CSUTLDTC (Date Utility)           :p1a, 2026-01-01, 14d
+    COBSWAIT (Wait Utility)           :p1b, 2026-01-01, 7d
+    Copybook Entities (JPA)           :p1c, 2026-01-08, 21d
+    COCOM01Y (Session Context)        :p1d, 2026-01-15, 14d
+
+    section Phase 2 - Read-Only
+    COACTVWC (Account View)           :p2a, after p1d, 14d
+    COCRDSLC (Card Detail)            :p2b, after p1d, 10d
+    COTRN01C (Transaction View)       :p2c, after p1d, 10d
+    CBACT01C-03C (Batch Dumps)        :p2d, after p1d, 14d
+
+    section Phase 3 - List/Browse
+    COUSR00C (User List)              :p3a, after p2a, 10d
+    COTRN00C (Transaction List)       :p3b, after p2a, 14d
+    COCRDLIC (Card List)              :p3c, after p3b, 21d
+
+    section Phase 4 - CRUD
+    COUSR01C-03C (User CRUD)          :p4a, after p3c, 14d
+    COCRDUPC (Card Update)            :p4b, after p4a, 21d
+    COTRN02C (Transaction Add)        :p4c, after p4a, 21d
+    COACTUPC (Account Update)         :crit, p4d, after p4b, 30d
+
+    section Phase 5 - Financial
+    COBIL00C (Bill Payment)           :crit, p5a, after p4d, 21d
+    CBTRN02C (Transaction Posting)    :crit, p5b, after p5a, 30d
+    CBACT04C (Interest Calc)          :crit, p5c, after p5b, 21d
+
+    section Phase 6 - Reporting/ETL
+    CBTRN03C (Transaction Report)     :p6a, after p5c, 14d
+    CBSTM03A/B (Statements)           :p6b, after p6a, 21d
+    CBEXPORT/CBIMPORT (ETL)           :p6c, after p6a, 14d
+
+    section Phase 7 - Optional
+    TranType DB2 Module               :p7a, after p6b, 21d
+    VSAM-MQ Module                    :p7b, after p7a, 14d
+    Authorization IMS Module          :p7c, after p7b, 30d
+```
 
 ### Phase 1: Foundation (Low risk, high reuse)
 | Order | Module | Rationale |
@@ -336,6 +418,49 @@ Based on the hotspot analysis, dependencies, and modernization best practices:
 ---
 
 ## Modernization Patterns per Hotspot
+
+### Mermaid: Modernization Pattern Overview
+
+```mermaid
+graph LR
+    subgraph "COBOL Patterns"
+        A1["VSAM REWRITE"] 
+        A2["VSAM BROWSE"]
+        A3["Packed Decimal Math"]
+        A4["ALTER/GO TO"]
+        A5["Sequential File I/O"]
+        A6["BMS Screen Map"]
+        A7["CICS XCTL"]
+        A8["COMMAREA"]
+    end
+
+    subgraph "Java Target Patterns"
+        B1["JPA @Transactional"]
+        B2["SQL Pagination"]
+        B3["BigDecimal"]
+        B4["Standard Control Flow"]
+        B5["Spring Batch"]
+        B6["Web Forms / REST"]
+        B7["REST Controllers"]
+        B8["Session / JWT"]
+    end
+
+    A1 --> B1
+    A2 --> B2
+    A3 --> B3
+    A4 --> B4
+    A5 --> B5
+    A6 --> B6
+    A7 --> B7
+    A8 --> B8
+
+    style A1 fill:#ff6b6b,stroke:#333,color:#fff
+    style A3 fill:#ff6b6b,stroke:#333,color:#fff
+    style A4 fill:#ffa64d,stroke:#333,color:#000
+    style B1 fill:#4dff4d,stroke:#333,color:#000
+    style B3 fill:#4dff4d,stroke:#333,color:#000
+    style B5 fill:#4dff4d,stroke:#333,color:#000
+```
 
 | Hotspot | COBOL Pattern | Java Target Pattern | Key Risk |
 |---------|--------------|--------------------:|----------|

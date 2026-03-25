@@ -22,6 +22,57 @@
 
 CICS online programs transfer control via `EXEC CICS XCTL`. The COMMAREA (COCOM01Y) is passed between all programs.
 
+### Mermaid: Online CICS Call Graph
+
+```mermaid
+graph TD
+    COSGN00C["COSGN00C<br/>Sign-on (CC00)"] -->|Admin| COADM01C["COADM01C<br/>Admin Menu (CA00)"]
+    COSGN00C -->|Regular| COMEN01C["COMEN01C<br/>Main Menu (CM00)"]
+
+    COADM01C --> COUSR00C["COUSR00C<br/>User List (CU00)"]
+    COADM01C -.->|optional| COPAUS0C["COPAUS0C<br/>Auth Summary"]
+    COUSR00C --> COUSR01C["COUSR01C<br/>User Add (CU01)"]
+    COUSR00C --> COUSR02C["COUSR02C<br/>User Update (CU02)"]
+    COUSR00C --> COUSR03C["COUSR03C<br/>User Delete (CU03)"]
+    COUSR01C --> COUSR00C
+    COUSR02C --> COUSR00C
+    COUSR03C --> COUSR00C
+
+    COMEN01C --> COACTVWC["COACTVWC<br/>Account View (CAVW)"]
+    COMEN01C --> COACTUPC["COACTUPC<br/>Account Update (CAUP)"]
+    COMEN01C --> COCRDLIC["COCRDLIC<br/>Card List (CCLI)"]
+    COMEN01C --> COTRN00C["COTRN00C<br/>Transaction List (CT00)"]
+    COMEN01C --> COTRN02C["COTRN02C<br/>Transaction Add (CT02)"]
+    COMEN01C --> COBIL00C["COBIL00C<br/>Bill Payment (CB00)"]
+    COMEN01C --> CORPT00C["CORPT00C<br/>Reports (CR00)"]
+
+    COACTVWC --> COCRDLIC
+    COCRDLIC --> COCRDSLC["COCRDSLC<br/>Card Detail (CCDL)"]
+    COCRDLIC --> COCRDUPC["COCRDUPC<br/>Card Update (CCUP)"]
+    COTRN00C --> COTRN01C["COTRN01C<br/>Transaction View (CT01)"]
+
+    COACTVWC -->|PF3| COMEN01C
+    COACTUPC -->|PF3| COMEN01C
+    COCRDLIC -->|PF3| COMEN01C
+    COBIL00C -->|PF3| COMEN01C
+    CORPT00C -->|PF3| COMEN01C
+    COTRN00C -->|PF3| COMEN01C
+    COTRN02C -->|PF3| COMEN01C
+    COCRDSLC -->|PF3| COCRDLIC
+    COCRDUPC -->|PF3| COCRDLIC
+    COTRN01C -->|PF3| COTRN00C
+    COMEN01C -->|PF3| COSGN00C
+
+    style COSGN00C fill:#f9d71c,stroke:#333,color:#000
+    style COMEN01C fill:#4da6ff,stroke:#333,color:#000
+    style COADM01C fill:#4da6ff,stroke:#333,color:#000
+    style COACTUPC fill:#ff6b6b,stroke:#333,color:#fff
+    style COBIL00C fill:#ff6b6b,stroke:#333,color:#fff
+    style COPAUS0C fill:#c0c0c0,stroke:#999,color:#333
+```
+
+### ASCII: Online CICS Call Graph
+
 ```
 COSGN00C (Sign-on, CC00)
 ├──► COADM01C (Admin Menu, CA00)         [if user type = Admin]
@@ -80,6 +131,50 @@ These are `CALL` statements (not XCTL), meaning the calling program retains cont
 ---
 
 ## Batch Program Call Graph
+
+### Mermaid: Batch Program Call Graph
+
+```mermaid
+graph TD
+    subgraph "Core Batch Processing"
+        CBTRN02C["CBTRN02C<br/>Transaction Posting"] --> CEE3ABD1["CEE3ABD<br/>Abend Handler"]
+        CBACT04C["CBACT04C<br/>Interest Calculation"] --> CEE3ABD2["CEE3ABD"]
+        CBTRN01C["CBTRN01C<br/>Transaction Posting v1"] --> CEE3ABD3["CEE3ABD"]
+    end
+
+    subgraph "Statement Generation"
+        CBSTM03A["CBSTM03A<br/>Statement Gen (Main)"] --> CBSTM03B["CBSTM03B<br/>File I/O Subroutine"]
+        CBSTM03A --> CEE3ABD4["CEE3ABD"]
+    end
+
+    subgraph "Reports"
+        CBTRN03C["CBTRN03C<br/>Transaction Report"] --> CEE3ABD5["CEE3ABD"]
+    end
+
+    subgraph "Data Utilities"
+        CBACT01C["CBACT01C<br/>Account Extract"] --> COBDATFT["COBDATFT<br/>Date Formatting (ASM)"]
+        CBACT01C --> CEE3ABD6["CEE3ABD"]
+        CBACT02C["CBACT02C<br/>Card Dump"] --> CEE3ABD7["CEE3ABD"]
+        CBACT03C["CBACT03C<br/>Xref Dump"] --> CEE3ABD8["CEE3ABD"]
+        CBCUS01C["CBCUS01C<br/>Customer Dump"] --> CEE3ABD9["CEE3ABD"]
+    end
+
+    subgraph "ETL"
+        CBEXPORT["CBEXPORT<br/>Data Export"] --> CEE3ABD10["CEE3ABD"]
+        CBIMPORT["CBIMPORT<br/>Data Import"] --> CEE3ABD11["CEE3ABD"]
+    end
+
+    subgraph "Wait Utility"
+        COBSWAIT["COBSWAIT<br/>Wait Utility"] --> MVSWAIT["MVSWAIT<br/>Wait Impl (ASM)"]
+    end
+
+    style CBTRN02C fill:#ff6b6b,stroke:#333,color:#fff
+    style CBACT04C fill:#ff6b6b,stroke:#333,color:#fff
+    style CBSTM03A fill:#ffa64d,stroke:#333,color:#000
+    style CBSTM03B fill:#ffd699,stroke:#333,color:#000
+```
+
+### ASCII: Batch Program Call Graph
 
 ```
 CBTRN02C (Transaction Posting)
@@ -212,7 +307,41 @@ Shows which programs read (R), write (W), update (U), browse (B), or delete (D) 
 
 ## JCL Job Data Lineage
 
-### Data Flow: Transaction Processing Cycle
+### Mermaid: Transaction Processing Cycle
+
+```mermaid
+graph TD
+    DALYTRAN[("DALYTRAN<br/>Daily Transaction Input")] --> POSTTRAN
+
+    subgraph POSTTRAN["POSTTRAN (CBTRN02C)"]
+        direction LR
+        PT_R["Reads: DALYTRAN,<br/>XREFFILE, ACCTFILE"]
+        PT_W["Writes: TRANFILE,<br/>DALYREJS, TCATBALF"]
+    end
+
+    POSTTRAN --> TRANFILE[("TRANFILE<br/>Posted Transactions")]
+    POSTTRAN --> DALYREJS[("DALYREJS<br/>Rejected")]
+
+    TRANFILE --> INTCALC["INTCALC (CBACT04C)<br/>Interest Calculation"]
+    INTCALC --> TRANSACT[("TRANSACT<br/>+ Interest Txns")]
+
+    TRANSACT --> TRANBKP["TRANBKP<br/>Backup Transactions"]
+    TRANBKP --> BACKUPGDG[("Backup GDG")]
+    TRANBKP --> COMBTRAN["COMBTRAN<br/>Combine Transactions"]
+    COMBTRAN --> CREASTMT["CREASTMT (CBSTM03A)<br/>Generate Statements"]
+    CREASTMT --> STMTFILE[("STMTFILE<br/>Text Statements")]
+    CREASTMT --> HTMLFILE[("HTMLFILE<br/>HTML Statements")]
+    CREASTMT --> TRANIDX["TRANIDX<br/>Rebuild Alt Indexes"]
+
+    style POSTTRAN fill:#ff6b6b,stroke:#333,color:#fff
+    style INTCALC fill:#ff6b6b,stroke:#333,color:#fff
+    style CREASTMT fill:#ffa64d,stroke:#333,color:#000
+    style DALYTRAN fill:#e6f3ff,stroke:#333,color:#000
+    style TRANFILE fill:#e6f3ff,stroke:#333,color:#000
+    style DALYREJS fill:#ffe6e6,stroke:#333,color:#000
+```
+
+### ASCII: Transaction Processing Cycle
 
 ```
                     ┌─────────────┐
@@ -257,7 +386,30 @@ Shows which programs read (R), write (W), update (U), browse (B), or delete (D) 
     └─────────────────┘
 ```
 
-### Data Flow: Report Generation
+### Mermaid: Report Generation
+
+```mermaid
+graph TD
+    TRANFILE[("TRANFILE<br/>Transaction Master")] --> TRANREPT_JOB
+    CARDXREF[("CARDXREF")] --> TRANREPT_JOB
+    TRANTYPE[("TRANTYPE")] --> TRANREPT_JOB
+    TRANCATG[("TRANCATG")] --> TRANREPT_JOB
+    DATEPARM[("DATEPARM")] --> TRANREPT_JOB
+
+    subgraph TRANREPT_JOB["TRANREPT JCL"]
+        SORT["SORT<br/>Filter by date"] --> CBTRN03C["CBTRN03C<br/>Report Generator"]
+    end
+
+    TRANREPT_JOB --> TRANREPT_OUT[("TRANREPT<br/>Report Output")]
+
+    STMTFILE[("STMTFILE<br/>Statement Text")] --> TXT2PDF1["TXT2PDF1<br/>PDF Conversion"]
+    TXT2PDF1 --> PDF[("PDF Output")]
+
+    style TRANREPT_JOB fill:#ffa64d,stroke:#333,color:#000
+    style TXT2PDF1 fill:#c0c0c0,stroke:#333,color:#333
+```
+
+### ASCII: Report Generation
 
 ```
     ┌─────────────────┐
@@ -275,7 +427,29 @@ Shows which programs read (R), write (W), update (U), browse (B), or delete (D) 
     └─────────────────┘  Writes: PDF output
 ```
 
-### Data Flow: Data Refresh (File Loading)
+### Mermaid: Data Refresh (File Loading)
+
+```mermaid
+graph LR
+    ASCII["ASCII Flat Files<br/>(app/data/ASCII/)"] -->|IDCAMS REPRO| VSAM
+
+    subgraph VSAM["VSAM KSDS Files"]
+        ACCTDATA["ACCTDATA.VSAM.KSDS<br/>(ACCTFILE.jcl)"]
+        CARDDATA["CARDDATA.VSAM.KSDS<br/>(CARDFILE.jcl)"]
+        CUSTDATA["CUSTDATA.VSAM.KSDS<br/>(CUSTFILE.jcl)"]
+        CARDXREF["CARDXREF.VSAM.KSDS<br/>(XREFFILE.jcl)"]
+        TRANSACT["TRANSACT.VSAM.KSDS<br/>(TRANFILE.jcl)"]
+        USRSEC["USRSEC.VSAM.KSDS<br/>(DUSRSECJ.jcl)"]
+        TRANTYPE["TRANTYPE.VSAM.KSDS<br/>(TRANTYPE.jcl)"]
+        TRANCATG["TRANCATG.VSAM.KSDS<br/>(TRANCATG.jcl)"]
+        TCATBAL["TCATBAL.VSAM.KSDS<br/>(TCATBALF.jcl)"]
+        DISCGRP["DISCGRP.VSAM.KSDS<br/>(DISCGRP.jcl)"]
+    end
+
+    style ASCII fill:#e6f3ff,stroke:#333,color:#000
+```
+
+### ASCII: Data Refresh (File Loading)
 
 ```
     ┌──────────────────┐
@@ -300,7 +474,42 @@ Shows which programs read (R), write (W), update (U), browse (B), or delete (D) 
     └──────────────────────────────────────────────────┘
 ```
 
-### Data Flow: Export / Import
+### Mermaid: Export / Import
+
+```mermaid
+graph TD
+    subgraph INPUT["VSAM Source Files"]
+        CUSTFILE[("CUSTFILE")]
+        ACCTFILE[("ACCTFILE")]
+        XREFFILE[("XREFFILE")]
+        TRANSACT[("TRANSACT")]
+        CARDFILE[("CARDFILE")]
+    end
+
+    CUSTFILE --> CBEXPORT["CBEXPORT<br/>Data Export"]
+    ACCTFILE --> CBEXPORT
+    XREFFILE --> CBEXPORT
+    TRANSACT --> CBEXPORT
+    CARDFILE --> CBEXPORT
+
+    CBEXPORT --> EXPFILE[("EXPFILE<br/>Unified Flat File")]
+
+    EXPFILE --> CBIMPORT["CBIMPORT<br/>Data Import"]
+
+    CBIMPORT --> CUSTOUT[("CUSTOUT")]
+    CBIMPORT --> ACCTOUT[("ACCTOUT")]
+    CBIMPORT --> XREFOUT[("XREFOUT")]
+    CBIMPORT --> TRNXOUT[("TRNXOUT")]
+    CBIMPORT --> CARDOUT[("CARDOUT")]
+    CBIMPORT --> ERROUT[("ERROUT")]
+
+    style CBEXPORT fill:#4da6ff,stroke:#333,color:#000
+    style CBIMPORT fill:#4da6ff,stroke:#333,color:#000
+    style EXPFILE fill:#ffd699,stroke:#333,color:#000
+    style ERROUT fill:#ffe6e6,stroke:#333,color:#000
+```
+
+### ASCII: Export / Import
 
 ```
     ┌────────────────────────────────────────┐
@@ -334,6 +543,38 @@ Shows which programs read (R), write (W), update (U), browse (B), or delete (D) 
 ## Batch Cycle Execution Order
 
 The nightly batch cycle must execute in this sequence (defined in scheduler configs):
+
+### Mermaid: Batch Cycle Execution Order
+
+```mermaid
+graph TD
+    CLOSEFIL["1. CLOSEFIL<br/>Close CICS Files"] --> ACCTFILE["2. ACCTFILE<br/>Refresh Accounts"]
+    CLOSEFIL --> CARDFILE["3. CARDFILE<br/>Refresh Cards"]
+    CLOSEFIL --> CUSTFILE["4. CUSTFILE<br/>Refresh Customers"]
+    CLOSEFIL --> XREFFILE["5. XREFFILE<br/>Refresh Xref"]
+    CLOSEFIL --> TRANFILE["6. TRANFILE<br/>Refresh Transactions"]
+
+    ACCTFILE --> POSTTRAN["7. POSTTRAN<br/>Post Daily Transactions"]
+    CARDFILE --> POSTTRAN
+    CUSTFILE --> POSTTRAN
+    XREFFILE --> POSTTRAN
+    TRANFILE --> POSTTRAN
+
+    POSTTRAN --> INTCALC["8. INTCALC<br/>Calculate Interest"]
+    INTCALC --> TRANBKP["9. TRANBKP<br/>Backup Transactions"]
+    TRANBKP --> COMBTRAN["10. COMBTRAN<br/>Combine Transactions"]
+    COMBTRAN --> CREASTMT["11. CREASTMT<br/>Generate Statements"]
+    CREASTMT --> TRANIDX["12. TRANIDX<br/>Rebuild Alt Indexes"]
+    TRANIDX --> OPENFIL["13. OPENFIL<br/>Open CICS Files"]
+
+    style CLOSEFIL fill:#f9d71c,stroke:#333,color:#000
+    style POSTTRAN fill:#ff6b6b,stroke:#333,color:#fff
+    style INTCALC fill:#ff6b6b,stroke:#333,color:#fff
+    style CREASTMT fill:#ffa64d,stroke:#333,color:#000
+    style OPENFIL fill:#4dff4d,stroke:#333,color:#000
+```
+
+### ASCII: Batch Cycle Execution Order
 
 ```
 Step  JCL Job      Purpose                            Dependencies

@@ -28,6 +28,115 @@ CardDemo is a mainframe credit card management application designed for moderniz
 
 **Two user roles**: Regular User (card operations) and Admin (user/transaction type management).
 
+### Mermaid: Application Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "3270 Terminal UI"
+        BMS["17 BMS Screen Maps"]
+    end
+
+    subgraph "Online CICS Programs (17)"
+        SIGNON["COSGN00C<br/>Sign-on"]
+        MENU["COMEN01C / COADM01C<br/>Menus"]
+        ACCT["COACTVWC / COACTUPC<br/>Account Mgmt"]
+        CARD["COCRDLIC / COCRDSLC / COCRDUPC<br/>Card Mgmt"]
+        TRAN["COTRN00C / COTRN01C / COTRN02C<br/>Transactions"]
+        BILL["COBIL00C<br/>Bill Payment"]
+        RPT["CORPT00C<br/>Reports"]
+        USR["COUSR00C-03C<br/>User Admin"]
+    end
+
+    subgraph "Batch Programs (14)"
+        POST["CBTRN02C<br/>Transaction Posting"]
+        INT["CBACT04C<br/>Interest Calc"]
+        STMT["CBSTM03A/B<br/>Statements"]
+        RPTB["CBTRN03C<br/>Reports"]
+        ETL["CBEXPORT / CBIMPORT<br/>ETL"]
+        DUMP["CBACT01C-03C / CBCUS01C<br/>Data Dumps"]
+    end
+
+    subgraph "VSAM Files (10)"
+        USRSEC[("USRSEC")]
+        ACCTDAT[("ACCTDAT")]
+        CARDDAT[("CARDDAT")]
+        CUSTDAT[("CUSTDAT")]
+        TRANSACT[("TRANSACT")]
+        CARDXREF[("CARDXREF")]
+    end
+
+    subgraph "41 Copybooks"
+        CPY["30 Core + 11 Optional<br/>Data Structures & Utilities"]
+    end
+
+    subgraph "46 JCL Jobs"
+        JCL["38 Core + 8 Optional<br/>Batch Scheduling"]
+    end
+
+    BMS --> SIGNON
+    SIGNON --> MENU
+    MENU --> ACCT & CARD & TRAN & BILL & RPT & USR
+    ACCT --> ACCTDAT & CUSTDAT
+    CARD --> CARDDAT & CARDXREF
+    TRAN --> TRANSACT
+    BILL --> ACCTDAT & TRANSACT
+    USR --> USRSEC
+    JCL --> POST & INT & STMT & RPTB & ETL & DUMP
+    POST --> TRANSACT
+    INT --> ACCTDAT
+    CPY -.-> ACCT & CARD & TRAN & POST & INT
+
+    style BMS fill:#f9d71c,stroke:#333,color:#000
+    style BILL fill:#ff6b6b,stroke:#333,color:#fff
+    style POST fill:#ff6b6b,stroke:#333,color:#fff
+    style INT fill:#ff6b6b,stroke:#333,color:#fff
+```
+
+### Mermaid: Artifact Summary
+
+```mermaid
+pie title CardDemo Artifact Distribution
+    "Online CICS Programs (17)" : 17
+    "Batch Programs (14)" : 14
+    "Optional Module Programs (13)" : 13
+    "Copybooks (41)" : 41
+    "BMS Maps (21)" : 21
+    "JCL Jobs (46)" : 46
+```
+
+### Mermaid: Business Domain Coverage
+
+```mermaid
+graph LR
+    subgraph "Business Domains"
+        D1["Account<br/>Management"]
+        D2["Card<br/>Management"]
+        D3["Transaction<br/>Processing"]
+        D4["Bill<br/>Payment"]
+        D5["Reporting &<br/>Statements"]
+        D6["User/Security<br/>Admin"]
+        D7["Data<br/>Migration"]
+    end
+
+    subgraph "Program Count"
+        D1 --- P1["4 programs"]
+        D2 --- P2["6 programs"]
+        D3 --- P3["6 programs"]
+        D4 --- P4["1 program"]
+        D5 --- P5["4 programs"]
+        D6 --- P6["5 programs"]
+        D7 --- P7["2 programs"]
+    end
+
+    style D1 fill:#4da6ff,stroke:#333,color:#000
+    style D2 fill:#4da6ff,stroke:#333,color:#000
+    style D3 fill:#ff6b6b,stroke:#333,color:#fff
+    style D4 fill:#ff6b6b,stroke:#333,color:#fff
+    style D5 fill:#ffa64d,stroke:#333,color:#000
+    style D6 fill:#c0c0c0,stroke:#333,color:#333
+    style D7 fill:#c0c0c0,stroke:#333,color:#333
+```
+
 ---
 
 ## COBOL Programs -- Core Online (CICS)
@@ -333,6 +442,16 @@ Each BMS map has a corresponding generated copybook in `app/cpy-bms/` (17 core) 
 ---
 
 ## Summary Counts
+
+### Mermaid: COBOL Lines of Code by Module
+
+```mermaid
+xychart-beta
+    title "COBOL Lines of Code by Category"
+    x-axis ["Online CICS", "Core Batch", "Auth (IMS)", "TranType (DB2)", "VSAM-MQ"]
+    y-axis "Lines of Code" 0 --> 16000
+    bar [14745, 5911, 4344, 4037, 1144]
+```
 
 | Artifact Type | Core | Optional Modules | Total |
 |---------------|------|-------------------|-------|
