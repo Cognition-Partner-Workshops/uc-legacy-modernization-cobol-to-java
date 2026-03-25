@@ -70,7 +70,7 @@ public class TransactionFileMatchService {
             // 1500-VALIDATE-TRAN equivalent
             if (isValidTransaction(tran)) {
                 // Match by transaction type code
-                if (matchTypeCd.equalsIgnoreCase(tran.getTranTypeCd())) {
+                if (matchTypeCd.equals(tran.getTranTypeCd())) {
                     matchedTransactions.add(tran);
                     log.debug("POSTED: {}", tran);
                 } else {

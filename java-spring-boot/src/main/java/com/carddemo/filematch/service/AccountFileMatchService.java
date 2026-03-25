@@ -61,7 +61,7 @@ public class AccountFileMatchService {
 
         for (Account acct : allAccounts) {
             // Equivalent to: IF ACCT-ACTIVE-STATUS = WS-MATCH-CRITERIA
-            if (matchActiveStatus.equalsIgnoreCase(acct.getAcctActiveStatus())) {
+            if (matchActiveStatus.equals(acct.getAcctActiveStatus())) {
                 matchedAccounts.add(acct);
                 log.debug("MATCHED: {}", acct);
             } else {
