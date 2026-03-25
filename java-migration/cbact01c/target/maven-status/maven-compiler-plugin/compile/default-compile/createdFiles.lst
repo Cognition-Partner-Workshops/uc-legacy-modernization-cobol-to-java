@@ -1,9 +1,0 @@
-com/carddemo/batch/model/OutputAccountRecord.class
-com/carddemo/batch/AccountFileProcessor.class
-com/carddemo/batch/model/VbrcRecord1.class
-com/carddemo/batch/util/DateFormatter.class
-com/carddemo/batch/model/ArrayAccountRecord.class
-com/carddemo/batch/io/RecordWriter.class
-com/carddemo/batch/model/VbrcRecord2.class
-com/carddemo/batch/io/CobolDataParser.class
-com/carddemo/batch/model/ArrayAccountRecord$BalanceEntry.class

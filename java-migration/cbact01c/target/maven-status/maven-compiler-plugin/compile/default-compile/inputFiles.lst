@@ -1,9 +1,0 @@
-/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-migration/cbact01c/src/main/java/com/carddemo/batch/AccountFileProcessor.java
-/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-migration/cbact01c/src/main/java/com/carddemo/batch/model/VbrcRecord1.java
-/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-migration/cbact01c/src/main/java/com/carddemo/batch/model/AccountRecord.java
-/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-migration/cbact01c/src/main/java/com/carddemo/batch/io/RecordWriter.java
-/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-migration/cbact01c/src/main/java/com/carddemo/batch/model/OutputAccountRecord.java
-/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-migration/cbact01c/src/main/java/com/carddemo/batch/model/VbrcRecord2.java
-/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-migration/cbact01c/src/main/java/com/carddemo/batch/model/ArrayAccountRecord.java
-/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-migration/cbact01c/src/main/java/com/carddemo/batch/util/DateFormatter.java
-/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/java-migration/cbact01c/src/main/java/com/carddemo/batch/io/CobolDataParser.java
