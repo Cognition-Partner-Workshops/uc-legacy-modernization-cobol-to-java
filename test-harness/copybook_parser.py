@@ -82,7 +82,9 @@ def decode_signed_zoned(raw: str, decimal_places: int = 0) -> Decimal:
         full_digits = full_digits.zfill(decimal_places + 1)
         integer_part = full_digits[:-decimal_places]
         frac_part = full_digits[-decimal_places:]
-        value = Decimal(f"{sign * int(integer_part)}.{frac_part}")
+        value = Decimal(f"{integer_part}.{frac_part}")
+        if sign == -1:
+            value = -value
     else:
         value = Decimal(sign * int(full_digits))
 
