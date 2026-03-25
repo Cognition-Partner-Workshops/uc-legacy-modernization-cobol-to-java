@@ -432,21 +432,21 @@ This document catalogues the top risks associated with modernizing the CardDemo 
 | R-03 | COACTUPC Validation Rule Loss | 3 | 4 | **12** | Phase 3 |
 | R-04 | Batch Cycle Timing/Sequencing Failure | 3 | 4 | **12** | Phase 4 |
 | R-05 | CBSTM03A Conversion Failure | 4 | 3 | **12** | Phase 4 |
-| R-06 | Authentication Security Gap | 2 | 5 | **10** | Phase 1 |
 | R-10 | Knowledge Loss and Skill Gap | 3 | 4 | **12** | All |
+| R-06 | Authentication Security Gap | 2 | 5 | **10** | Phase 1 |
 | R-12 | Regulatory/Compliance Risk | 2 | 5 | **10** | All |
 | R-15 | Rollback Data Corruption | 2 | 5 | **10** | Phase 3-4 |
 | R-07 | VSAM Alternate Index Mismatch | 3 | 3 | **9** | Phase 3 |
-| R-08 | Transaction ID Generation Collision | 2 | 4 | **8** | Phase 3-4 |
 | R-09 | Performance Degradation | 3 | 3 | **9** | Phase 3-5 |
 | R-11 | CICS-Specific Behavior Loss | 3 | 3 | **9** | Phase 3-4 |
 | R-13 | Incomplete Batch Test Coverage | 3 | 3 | **9** | Phase 4 |
 | R-14 | IMS/DB2/MQ Migration Complexity | 3 | 3 | **9** | Phase 5 |
+| R-08 | Transaction ID Generation Collision | 2 | 4 | **8** | Phase 3-4 |
 
 ### Risk Heat Map
 
 ```
-Impact  5 |        R-06    |  R-01         |
+Impact  5 |  R-06,R-12,R-15|  R-01         |
         4 |        R-08    |  R-03,R-04    |  R-02
           |                |  R-10         |
         3 |                |  R-07,R-09    |  R-05
