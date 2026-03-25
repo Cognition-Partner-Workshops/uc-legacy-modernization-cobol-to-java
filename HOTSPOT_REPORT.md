@@ -40,10 +40,10 @@ Each module is scored across three weighted dimensions:
 | **4** | **CBSTM03A** | 924 | Batch | 8 | 7 | 8 | **7.7** | Statement generation; calls subroutine, 4-file reads, dual output |
 | **5** | **COCRDLIC** | 1,460 | Online CICS | 8 | 6 | 7 | **7.1** | Card list with VSAM browse pagination; complex screen handling |
 | **6** | **COCRDUPC** | 1,560 | Online CICS | 8 | 7 | 6 | **7.1** | Card update; REWRITE operations, field validation |
-| **7** | **CBTRN03C** | 649 | Batch | 7 | 5 | 8 | **6.7** | Transaction report; 6-file coordination, report formatting |
-| **8** | **COACTVWC** | 942 | Online CICS | 7 | 5 | 7 | **6.4** | Account view; 4-file reads, error handling for each |
-| **9** | **COBIL00C** | 572 | Online CICS | 6 | 8 | 7 | **6.9** | Bill payment; financial writes, balance updates |
-| **10** | **COTRN02C** | 783 | Online CICS | 7 | 7 | 6 | **6.7** | Transaction add; multi-file validation and writes |
+| **7** | **COBIL00C** | 572 | Online CICS | 6 | 8 | 7 | **6.9** | Bill payment; financial writes, balance updates |
+| **8** | **CBTRN03C** | 649 | Batch | 7 | 5 | 8 | **6.7** | Transaction report; 6-file coordination, report formatting |
+| **9** | **COTRN02C** | 783 | Online CICS | 7 | 7 | 6 | **6.7** | Transaction add; multi-file validation and writes |
+| **10** | **COACTVWC** | 942 | Online CICS | 7 | 5 | 7 | **6.4** | Account view; 4-file reads, error handling for each |
 
 ---
 
@@ -172,45 +172,7 @@ Each module is scored across three weighted dimensions:
 
 ---
 
-### #7 -- CBTRN03C (Transaction Report) -- Composite: 6.7
-
-| Metric | Value | Details |
-|--------|-------|---------|
-| **Lines of Code** | 649 | Transaction detail report generator |
-| **Files Read** | 5 | TRANFILE, CARDXREF, TRANTYPE, TRANCATG, DATEPARM |
-| **Files Written** | 1 | TRANREPT (report output) |
-| **Copybooks** | 5 | CVTRA05Y, CVACT03Y, CVTRA03Y, CVTRA04Y, CVTRA07Y |
-| **JCL Job** | TRANREPT | Preceded by SORT step for date filtering |
-
-**Why #7**: Reads from 5 different files to produce a formatted report with page totals, account totals, and grand totals. The JCL SORT step pre-filters by date range, so the COBOL program depends on correctly sorted input. Report formatting logic (column alignment, page breaks, subtotals) is brittle and spread across the program.
-
-**Migration Recommendations**:
-- Replace SORT pre-step + COBOL with a single SQL query joining relevant tables
-- Use a reporting library (JasperReports, Apache POI) for formatted output
-- Parameterize date range via API rather than JCL DATEPARM file
-
----
-
-### #8 -- COACTVWC (Account View) -- Composite: 6.4
-
-| Metric | Value | Details |
-|--------|-------|---------|
-| **Lines of Code** | 942 | Account detail display |
-| **VSAM Files** | 4 | ACCTDAT (R), CARDAIX (R), CXACAIX (R), CUSTDAT (R) |
-| **BMS Map** | COACTVW | Read-only account detail screen |
-| **Copybooks** | 13 | Full set of entity copybooks |
-| **Error Handling** | Extensive | Separate error messages for each file read failure |
-
-**Why #8**: Although read-only, this program performs 4 separate VSAM reads to assemble a single account view. Each read has its own error handling path. This is a common pattern that maps well to a single SQL JOIN in a relational database, but the COBOL implementation requires significant code for each file access.
-
-**Migration Recommendations**:
-- Replace 4 VSAM reads with a single SQL JOIN query
-- Implement as a REST `GET /accounts/{id}` endpoint returning a composite DTO
-- Error handling simplifies to standard exception handling
-
----
-
-### #9 -- COBIL00C (Bill Payment) -- Composite: 6.9
+### #7 -- COBIL00C (Bill Payment) -- Composite: 6.9
 
 | Metric | Value | Details |
 |--------|-------|---------|
@@ -220,7 +182,7 @@ Each module is scored across three weighted dimensions:
 | **Copybooks** | 10 | CVACT01Y, CVACT03Y, CVTRA05Y |
 | **Financial Operations** | Balance update + transaction creation | Must be atomic |
 
-**Why #9**: Financial transaction that creates a payment transaction record AND updates the account balance. These two operations must be atomic — if one succeeds and the other fails, the data becomes inconsistent. VSAM has no built-in transaction support, so the program relies on careful ordering and error checking. This is a critical data integrity concern.
+**Why #7**: Financial transaction that creates a payment transaction record AND updates the account balance. These two operations must be atomic — if one succeeds and the other fails, the data becomes inconsistent. VSAM has no built-in transaction support, so the program relies on careful ordering and error checking. This is a critical data integrity concern.
 
 **Migration Recommendations**:
 - Wrap in `@Transactional` with database-level atomicity
@@ -230,7 +192,26 @@ Each module is scored across three weighted dimensions:
 
 ---
 
-### #10 -- COTRN02C (Transaction Add) -- Composite: 6.7
+### #8 -- CBTRN03C (Transaction Report) -- Composite: 6.7
+
+| Metric | Value | Details |
+|--------|-------|---------|
+| **Lines of Code** | 649 | Transaction detail report generator |
+| **Files Read** | 5 | TRANFILE, CARDXREF, TRANTYPE, TRANCATG, DATEPARM |
+| **Files Written** | 1 | TRANREPT (report output) |
+| **Copybooks** | 5 | CVTRA05Y, CVACT03Y, CVTRA03Y, CVTRA04Y, CVTRA07Y |
+| **JCL Job** | TRANREPT | Preceded by SORT step for date filtering |
+
+**Why #8**: Reads from 5 different files to produce a formatted report with page totals, account totals, and grand totals. The JCL SORT step pre-filters by date range, so the COBOL program depends on correctly sorted input. Report formatting logic (column alignment, page breaks, subtotals) is brittle and spread across the program.
+
+**Migration Recommendations**:
+- Replace SORT pre-step + COBOL with a single SQL query joining relevant tables
+- Use a reporting library (JasperReports, Apache POI) for formatted output
+- Parameterize date range via API rather than JCL DATEPARM file
+
+---
+
+### #9 -- COTRN02C (Transaction Add) -- Composite: 6.7
 
 | Metric | Value | Details |
 |--------|-------|---------|
@@ -240,13 +221,32 @@ Each module is scored across three weighted dimensions:
 | **Copybooks** | 10 | CVTRA05Y, CVACT01Y, CVACT03Y |
 | **Subroutine Calls** | CSUTLDTC | Date validation (2 calls) |
 
-**Why #10**: User-facing transaction entry point. Validates card number against cross-reference, validates dates via CSUTLDTC subroutine call, generates a new transaction ID, and writes to the TRANSACT file. Involves multi-file reads for validation before the write, and date handling requires the external CSUTLDTC utility.
+**Why #9**: User-facing transaction entry point. Validates card number against cross-reference, validates dates via CSUTLDTC subroutine call, generates a new transaction ID, and writes to the TRANSACT file. Involves multi-file reads for validation before the write, and date handling requires the external CSUTLDTC utility.
 
 **Migration Recommendations**:
 - Implement as `POST /transactions` REST endpoint
 - Replace CSUTLDTC date validation with `java.time` API
 - Auto-generate transaction IDs with UUID or sequence
 - Add server-side validation annotations (`@Valid`, `@NotNull`, `@Pattern`)
+
+---
+
+### #10 -- COACTVWC (Account View) -- Composite: 6.4
+
+| Metric | Value | Details |
+|--------|-------|---------|
+| **Lines of Code** | 942 | Account detail display |
+| **VSAM Files** | 4 | ACCTDAT (R), CARDAIX (R), CXACAIX (R), CUSTDAT (R) |
+| **BMS Map** | COACTVW | Read-only account detail screen |
+| **Copybooks** | 13 | Full set of entity copybooks |
+| **Error Handling** | Extensive | Separate error messages for each file read failure |
+
+**Why #10**: Although read-only, this program performs 4 separate VSAM reads to assemble a single account view. Each read has its own error handling path. This is a common pattern that maps well to a single SQL JOIN in a relational database, but the COBOL implementation requires significant code for each file access.
+
+**Migration Recommendations**:
+- Replace 4 VSAM reads with a single SQL JOIN query
+- Implement as a REST `GET /accounts/{id}` endpoint returning a composite DTO
+- Error handling simplifies to standard exception handling
 
 ---
 
@@ -292,12 +292,12 @@ xychart-beta
                     │                                                           │
 HIGH Complexity     │  COCRDLIC (#5)        COACTUPC (#1)                      │
                     │  COCRDUPC (#6)        CBSTM03A (#4)                      │
-                    │                       COTRN02C (#10)                     │
+                    │                       COTRN02C (#9)                      │
                     │                                                           │
                     │                                                           │
-MEDIUM Complexity   │  COACTVWC (#8)        CBTRN02C (#2)                      │
-                    │  CBTRN03C (#7)        CBACT04C (#3)                      │
-                    │                       COBIL00C (#9)                      │
+MEDIUM Complexity   │  COACTVWC (#10)       CBTRN02C (#2)                      │
+                    │  CBTRN03C (#8)        CBACT04C (#3)                      │
+                    │                       COBIL00C (#7)                      │
                     │                                                           │
 LOW Complexity      │  CBACT01C             CSUTLDTC                           │
                     │  CBACT02C             COBSWAIT                           │
@@ -390,20 +390,20 @@ gantt
 |-------|--------|-----------|
 | 12 | COUSR01C-03C | User CRUD — simpler entity, validates create/update/delete patterns |
 | 13 | COCRDUPC (#6) | Card update — validates REWRITE → JPA update pattern |
-| 14 | COTRN02C (#10) | Transaction add — validates multi-file validation + write |
+| 14 | COTRN02C (#9) | Transaction add — validates multi-file validation + write |
 | 15 | COACTUPC (#1) | Account update — MOST COMPLEX, do last in CRUD phase |
 
 ### Phase 5: Financial Operations (Highest risk)
 | Order | Module | Rationale |
 |-------|--------|-----------|
-| 16 | COBIL00C (#9) | Bill payment — atomic financial transaction |
+| 16 | COBIL00C (#7) | Bill payment — atomic financial transaction |
 | 17 | CBTRN02C (#2) | Transaction posting — core batch, must be bulletproof |
 | 18 | CBACT04C (#3) | Interest calculation — financial precision critical |
 
 ### Phase 6: Reporting and ETL
 | Order | Module | Rationale |
 |-------|--------|-----------|
-| 19 | CBTRN03C (#7) | Transaction report — replace with SQL + report library |
+| 19 | CBTRN03C (#8) | Transaction report — replace with SQL + report library |
 | 20 | CBSTM03A/B (#4) | Statement generation — complex but isolated |
 | 21 | CBEXPORT/CBIMPORT | Data migration — may not be needed post-modernization |
 | 22 | CORPT00C | Report trigger — becomes simple API call |
@@ -470,7 +470,7 @@ graph LR
 | CBSTM03A (#4) | ALTER/GO TO + subroutine CALL | Template engine (Thymeleaf/JasperReports) | ALTER statement conversion |
 | COCRDLIC (#5) | VSAM BROWSE + pseudo-conversational | SQL pagination + REST API | Session state management |
 | COCRDUPC (#6) | REWRITE + field validation | JPA `save()` + Bean Validation | Field mapping completeness |
-| CBTRN03C (#7) | SORT pre-step + report formatting | SQL ORDER BY + report library | Date filtering accuracy |
-| COACTVWC (#8) | 4 sequential VSAM READs | Single SQL JOIN | N+1 query avoidance |
-| COBIL00C (#9) | Non-atomic dual writes | `@Transactional` | Atomicity guarantee |
-| COTRN02C (#10) | Multi-file validation + WRITE | Service validation + JPA persist | Validation completeness |
+| COBIL00C (#7) | Non-atomic dual writes | `@Transactional` | Atomicity guarantee |
+| CBTRN03C (#8) | SORT pre-step + report formatting | SQL ORDER BY + report library | Date filtering accuracy |
+| COTRN02C (#9) | Multi-file validation + WRITE | Service validation + JPA persist | Validation completeness |
+| COACTVWC (#10) | 4 sequential VSAM READs | Single SQL JOIN | N+1 query avoidance |

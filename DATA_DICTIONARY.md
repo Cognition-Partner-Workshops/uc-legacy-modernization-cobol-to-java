@@ -60,9 +60,9 @@ CardDemo uses **VSAM KSDS** (Key-Sequenced Data Sets) as its primary data store.
 | ACCT-REISSUE-DATE | X(10) | 68 | 10 | Reissue Date | LocalDate | Last card reissue date | YYYY-MM-DD |
 | ACCT-CURR-CYC-CREDIT | S9(10)V99 | 78 | 12 | Cycle Credits | BigDecimal | Credits in current cycle | Signed decimal |
 | ACCT-CURR-CYC-DEBIT | S9(10)V99 | 90 | 12 | Cycle Debits | BigDecimal | Debits in current cycle | Signed decimal |
-| ACCT-GROUP-ID | X(10) | 102 | 10 | Account Group | String | Disclosure/rate group | FK to DISCGRP |
-| ACCT-FICO-CREDIT-SCORE | 9(03) | 112 | 3 | FICO Score | int | Credit score (300-850) | 300-850 range |
-| FILLER | X(168) | 115 | 168 | Reserved | — | Padding to 300 bytes | — |
+| ACCT-ADDR-ZIP | X(10) | 102 | 10 | Account ZIP | String | Account address ZIP code | — |
+| ACCT-GROUP-ID | X(10) | 112 | 10 | Account Group | String | Disclosure/rate group | FK to DISCGRP |
+| FILLER | X(178) | 122 | 178 | Reserved | — | Padding to 300 bytes | — |
 
 ---
 
@@ -87,7 +87,7 @@ CardDemo uses **VSAM KSDS** (Key-Sequenced Data Sets) as its primary data store.
 
 ## Card-Account Cross-Reference (CVACT03Y)
 
-**Copybook**: `app/cpy/CVACT03Y.cpy` | **Record Length**: ~36 bytes
+**Copybook**: `app/cpy/CVACT03Y.cpy` | **Record Length**: 50 bytes
 **VSAM File**: `CARDXREF` (CARDXREF.VSAM.KSDS) | **Key**: Card Number (16 digits)
 **Alternate Index**: `CXACAIX` (by Account ID)
 **Used By**: 16 programs | **Business Domain**: Card-Account Linkage
@@ -97,6 +97,7 @@ CardDemo uses **VSAM KSDS** (Key-Sequenced Data Sets) as its primary data store.
 | XREF-CARD-NUM | X(16) | 0 | 16 | Card Number | String | Credit card number (PK) |
 | XREF-CUST-ID | 9(09) | 16 | 9 | Customer ID | long | Owning customer |
 | XREF-ACCT-ID | 9(11) | 25 | 11 | Account ID | long | Associated account |
+| FILLER | X(14) | 36 | 14 | Reserved | — | Padding to 50 bytes |
 
 **Business Purpose**: Links cards to accounts and customers. The primary key is the card number; alternate index allows lookup by account ID.
 
@@ -391,8 +392,8 @@ This is the backbone data structure passed between all CICS transactions via the
 | CARDDAT | CARDDATA.VSAM.KSDS | Card Number (16) | 150 | Credit Card | KSDS by Card Number |
 | CARDAIX | CARDDATA.VSAM.AIX | Account ID (11) | 150 | Credit Card | AIX by Account ID |
 | CUSTDAT | CUSTDATA.VSAM.KSDS | Customer ID (9) | 500 | Customer | KSDS by Customer ID |
-| CARDXREF | CARDXREF.VSAM.KSDS | Card Number (16) | ~36 | Cross-Reference | KSDS by Card Number |
-| CXACAIX | CARDXREF.VSAM.AIX | Account ID (11) | ~36 | Cross-Reference | AIX by Account ID |
+| CARDXREF | CARDXREF.VSAM.KSDS | Card Number (16) | 50 | Cross-Reference | KSDS by Card Number |
+| CXACAIX | CARDXREF.VSAM.AIX | Account ID (11) | 50 | Cross-Reference | AIX by Account ID |
 | TRANSACT | TRANSACT.VSAM.KSDS | Transaction ID (16) | 350 | Transaction | KSDS by Trans ID |
 | DALYTRAN | DALYTRAN.VSAM.KSDS | Daily Trans ID (16) | 350 | Daily Transaction | KSDS (batch input) |
 | TRANTYPE | TRANTYPE.VSAM.KSDS | Type Code (2) | 60 | Transaction Type | KSDS (reference) |

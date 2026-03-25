@@ -455,8 +455,8 @@ xychart-beta
 
 | Artifact Type | Core | Optional Modules | Total |
 |---------------|------|-------------------|-------|
-| COBOL Programs (Online) | 17 | 8 | 25 |
-| COBOL Programs (Batch) | 14 | 5 | 19 |
+| COBOL Programs (Online) | 17 | 6 | 23 |
+| COBOL Programs (Batch) | 14 | 7 | 21 |
 | **COBOL Programs Total** | **31** | **13** | **44** |
 | Copybooks (Data) | 17 | 11 | 28 |
 | Copybooks (Common/Utility) | 13 | — | 13 |
