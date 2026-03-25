@@ -131,10 +131,10 @@ Online programs access VSAM files via `EXEC CICS READ/WRITE/REWRITE/DELETE/START
 | **COSGN00C** | | | | | | R | | | | |
 | **COACTVWC** | R | R | R | | | | | | | |
 | **COACTUPC** | R/W | R | R | | | | | | | |
-| **COCRDLIC** | | R | | R | | | | | | |
-| **COCRDSLC** | R | R | | | | | | | | |
+| **COCRDLIC** | | R | | | | | | | | |
+| **COCRDSLC** | | R | | | | | | | | |
 | **COCRDUPC** | R | R | | | | | | | | |
-| **COTRN00C** | | | | R | R | | | | | |
+| **COTRN00C** | | | | | R | | | | | |
 | **COTRN01C** | | | | | R | | | | | |
 | **COTRN02C** | | | | R | R/W | | | R | R | |
 | **COBIL00C** | R/W | | | R | R/W | | | | | |
