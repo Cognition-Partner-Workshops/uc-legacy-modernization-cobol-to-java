@@ -8,7 +8,7 @@
 ## Table of Contents
 
 1. [Online CICS Programs (17)](#1-online-cics-programs)
-2. [Batch COBOL Programs (14)](#2-batch-cobol-programs)
+2. [Batch COBOL Programs (13)](#2-batch-cobol-programs)
 3. [Shared Utility Programs (1)](#3-shared-utility-programs)
 4. [Copybooks - Data Structures (30)](#4-copybooks---data-structures)
 5. [BMS Screen Maps (17)](#5-bms-screen-maps)
