@@ -11,13 +11,13 @@
 
 | # | Program ID | File | Lines | CICS Trans | Function | Business Domain | Classification |
 |---|-----------|------|-------|------------|----------|----------------|----------------|
-| 1 | COSGN00C | `app/cbl/COSGN00C.cbl` | 261 | CC00 | User sign-on / authentication | Security | Entry Point |
-| 2 | COMEN01C | `app/cbl/COMEN01C.cbl` | 309 | CM00 | Main menu for regular users | Navigation | Controller |
+| 1 | COSGN00C | `app/cbl/COSGN00C.cbl` | 260 | CC00 | User sign-on / authentication | Security | Entry Point |
+| 2 | COMEN01C | `app/cbl/COMEN01C.cbl` | 308 | CM00 | Main menu for regular users | Navigation | Controller |
 | 3 | COADM01C | `app/cbl/COADM01C.cbl` | 288 | CA00 | Admin menu for admin users | Navigation | Controller |
-| 4 | COACTVWC | `app/cbl/COACTVWC.cbl` | 942 | CAVW | Account view (read-only display) | Account Mgmt | Read |
-| 5 | COACTUPC | `app/cbl/COACTUPC.cbl` | 4,237 | CAUP | Account update (edit account + customer) | Account Mgmt | CRUD |
-| 6 | COCRDLIC | `app/cbl/COCRDLIC.cbl` | 1,460 | CCLI | List credit cards (paginated) | Card Mgmt | Read/List |
-| 7 | COCRDSLC | `app/cbl/COCRDSLC.cbl` | 888 | CCDL | View credit card details | Card Mgmt | Read |
+| 4 | COACTVWC | `app/cbl/COACTVWC.cbl` | 941 | CAVW | Account view (read-only display) | Account Mgmt | Read |
+| 5 | COACTUPC | `app/cbl/COACTUPC.cbl` | 4,236 | CAUP | Account update (edit account + customer) | Account Mgmt | CRUD |
+| 6 | COCRDLIC | `app/cbl/COCRDLIC.cbl` | 1,459 | CCLI | List credit cards (paginated) | Card Mgmt | Read/List |
+| 7 | COCRDSLC | `app/cbl/COCRDSLC.cbl` | 887 | CCDL | View credit card details | Card Mgmt | Read |
 | 8 | COCRDUPC | `app/cbl/COCRDUPC.cbl` | 1,560 | CCUP | Update credit card details | Card Mgmt | CRUD |
 | 9 | COTRN00C | `app/cbl/COTRN00C.cbl` | 699 | CT00 | List transactions (paginated) | Transaction Mgmt | Read/List |
 | 10 | COTRN01C | `app/cbl/COTRN01C.cbl` | 330 | CT01 | View transaction details | Transaction Mgmt | Read |
@@ -51,6 +51,8 @@
 ---
 
 ## 2. Optional Module Programs (13 programs)
+
+> **Note:** These programs reside in separate subdirectories (`app/app-authorization-ims-db2-mq/`, `app/app-transaction-type-db2/`, `app/app-vsam-mq/`) outside the main `app/cbl/` directory. They require IMS, DB2, or MQ middleware and are not part of the core CardDemo deployment.
 
 ### 2.1 Authorization Module (IMS/DB2/MQ) - 8 programs
 
@@ -261,7 +263,7 @@ CLOSEFIL → ACCTFILE/CARDFILE/CUSTFILE/XREFFILE/TRANFILE (data refresh)
 | **JCL Jobs** | 38 |
 | **JCL Procedures** | 2 |
 | **Assembler Programs** | 2 |
-| **Total Lines of COBOL** | ~30,175 |
+| **Total Lines of COBOL** | ~30,175 (core: 20,650 + optional: 9,525) |
 | **CICS Transactions** | 17 |
 | **VSAM Datasets** | ~12 |
 

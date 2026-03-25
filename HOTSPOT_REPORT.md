@@ -25,7 +25,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
-| **Complexity** | 10 | 4,237 lines — largest program in the codebase. Extensive field-by-field validation (SSN, phone, dates, credit limits, ZIP codes). Complex data-change tracking with before/after comparison. Reads/writes 4 VSAM files (ACCTDAT, CUSTDAT, CARDDAT, CXACAIX). Multiple REDEFINES and EVALUATE blocks. |
+| **Complexity** | 10 | 4,236 lines — largest program in the codebase. Extensive field-by-field validation (SSN, phone, dates, credit limits, ZIP codes). Complex data-change tracking with before/after comparison. Reads/writes 4 VSAM files (ACCTDAT, CUSTDAT, CARDDAT, CXACAIX). Multiple REDEFINES and EVALUATE blocks. |
 | **Risk** | 9 | Updates financial master data (credit limits, balances). Handles PII (SSN, DOB, addresses). Multi-file REWRITE without true transaction atomicity — partial update risk if abend occurs mid-update. No rollback mechanism for cross-file changes. |
 | **Business Impact** | 9 | Core user-facing function for account maintenance. Incorrect updates directly affect customer balances and credit limits. Regulatory exposure (PII handling). |
 
@@ -91,7 +91,7 @@ Each module is scored on three dimensions (1-10 scale):
 
 | Dimension | Score | Justification |
 |-----------|-------|---------------|
-| **Complexity** | 8 | 1,460 lines. Paginated list display with STARTBR/READNEXT/ENDBR VSAM browsing. Handles forward/backward pagination, record selection, and alternate index navigation. Dynamic BMS field attribute management. |
+| **Complexity** | 8 | 1,459 lines. Paginated list display with STARTBR/READNEXT/ENDBR VSAM browsing. Handles forward/backward pagination, record selection, and alternate index navigation. Dynamic BMS field attribute management. |
 | **Risk** | 7 | Displays PCI-sensitive card numbers on screen. Pagination state management across pseudo-conversational CICS interactions. |
 | **Business Impact** | 7 | Primary card lookup interface. Gateway to card detail/update functions. Performance directly affects user productivity. |
 
@@ -185,11 +185,11 @@ Each module is scored on three dimensions (1-10 scale):
 
 | Rank | Program | Type | Lines | Complexity | Risk | Biz Impact | **Score** | Primary Concern |
 |------|---------|------|-------|:----------:|:----:|:----------:|:---------:|----------------|
-| 1 | **COACTUPC** | Online | 4,237 | 10 | 9 | 9 | **9.40** | Massive size, multi-file PII updates |
+| 1 | **COACTUPC** | Online | 4,236 | 10 | 9 | 9 | **9.40** | Massive size, multi-file PII updates |
 | 2 | **CBTRN02C** | Batch | 731 | 8 | 10 | 8 | **8.70** | Core financial posting, atomicity |
 | 3 | **COCRDUPC** | Online | 1,560 | 9 | 8 | 7 | **8.15** | PCI card data, complex validation |
 | 4 | **CBACT04C** | Batch | 652 | 7 | 9 | 8 | **7.95** | Interest calculation accuracy |
-| 5 | **COCRDLIC** | Online | 1,460 | 8 | 7 | 7 | **7.40** | Pagination complexity, card display |
+| 5 | **COCRDLIC** | Online | 1,459 | 8 | 7 | 7 | **7.40** | Pagination complexity, card display |
 | 5 | **CBSTM03A** | Batch | 924 | 8 | 7 | 7 | **7.40** | Dual-format output, report accuracy |
 | 7 | **COTRN02C** | Online | 783 | 7 | 8 | 7 | **7.35** | Transaction creation, validation |
 | 8 | **CBTRN03C** | Batch | 649 | 7 | 7 | 6 | **6.75** | Multi-file join, report accuracy |
