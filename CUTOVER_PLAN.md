@@ -143,7 +143,7 @@ CREATE TABLE discount_groups (
     group_id            VARCHAR(10),
     transaction_type    CHAR(2),
     category_code       SMALLINT,
-    interest_rate       DECIMAL(6,4),
+    interest_rate       DECIMAL(8,4),
     PRIMARY KEY (group_id, transaction_type, category_code)
 );
 ```
