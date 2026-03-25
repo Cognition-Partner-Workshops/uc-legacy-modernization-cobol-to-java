@@ -114,25 +114,25 @@ class Cbact01cProcessorTest {
         ArrayRecord arr = result.arrayRecords().get(0);
 
         assertEquals(1L, arr.acctId());
-        ArrayRecord.BalanceEntry[] entries = arr.entries();
+        var entries = arr.entries();
 
         // Entry 1: ACCT-CURR-BAL, 1005.00
-        assertEquals(new BigDecimal("194.00"), entries[0].currBal());
-        assertEquals(new BigDecimal("1005.00"), entries[0].currCycDebit());
+        assertEquals(new BigDecimal("194.00"), entries.get(0).currBal());
+        assertEquals(new BigDecimal("1005.00"), entries.get(0).currCycDebit());
 
         // Entry 2: ACCT-CURR-BAL, 1525.00
-        assertEquals(new BigDecimal("194.00"), entries[1].currBal());
-        assertEquals(new BigDecimal("1525.00"), entries[1].currCycDebit());
+        assertEquals(new BigDecimal("194.00"), entries.get(1).currBal());
+        assertEquals(new BigDecimal("1525.00"), entries.get(1).currCycDebit());
 
         // Entry 3: -1025.00, -2500.00 (fixed values)
-        assertEquals(new BigDecimal("-1025.00"), entries[2].currBal());
-        assertEquals(new BigDecimal("-2500.00"), entries[2].currCycDebit());
+        assertEquals(new BigDecimal("-1025.00"), entries.get(2).currBal());
+        assertEquals(new BigDecimal("-2500.00"), entries.get(2).currCycDebit());
 
         // Entries 4-5: zero (INITIALIZE)
-        assertEquals(BigDecimal.ZERO, entries[3].currBal());
-        assertEquals(BigDecimal.ZERO, entries[3].currCycDebit());
-        assertEquals(BigDecimal.ZERO, entries[4].currBal());
-        assertEquals(BigDecimal.ZERO, entries[4].currCycDebit());
+        assertEquals(BigDecimal.ZERO, entries.get(3).currBal());
+        assertEquals(BigDecimal.ZERO, entries.get(3).currCycDebit());
+        assertEquals(BigDecimal.ZERO, entries.get(4).currBal());
+        assertEquals(BigDecimal.ZERO, entries.get(4).currCycDebit());
     }
 
     @Test
@@ -142,8 +142,8 @@ class Cbact01cProcessorTest {
 
         assertEquals(2L, arr.acctId());
         // Entries 1 and 2 use the account's current balance
-        assertEquals(new BigDecimal("158.00"), arr.entries()[0].currBal());
-        assertEquals(new BigDecimal("158.00"), arr.entries()[1].currBal());
+        assertEquals(new BigDecimal("158.00"), arr.entries().get(0).currBal());
+        assertEquals(new BigDecimal("158.00"), arr.entries().get(1).currBal());
     }
 
     // ---------------------------------------------------------------
@@ -223,7 +223,7 @@ class Cbact01cProcessorTest {
         List<String> arrLines = Files.readAllLines(arrayFile);
         ArrayRecord arrReparsed = ArrayRecord.fromDelimitedLine(arrLines.get(0));
         assertEquals(1L, arrReparsed.acctId());
-        assertEquals(5, arrReparsed.entries().length);
+        assertEquals(5, arrReparsed.entries().size());
     }
 
     // ---------------------------------------------------------------
@@ -260,8 +260,8 @@ class Cbact01cProcessorTest {
 
         // Verify array entries 4-5 are always zero
         for (ArrayRecord arr : result.arrayRecords()) {
-            assertEquals(BigDecimal.ZERO, arr.entries()[3].currBal());
-            assertEquals(BigDecimal.ZERO, arr.entries()[4].currBal());
+            assertEquals(BigDecimal.ZERO, arr.entries().get(3).currBal());
+            assertEquals(BigDecimal.ZERO, arr.entries().get(4).currBal());
         }
 
         // Verify output files
@@ -294,7 +294,7 @@ class Cbact01cProcessorTest {
         Cbact01cProcessor.ProcessingResult result = processor.execute();
 
         OutAccountRecord out = result.outRecords().get(0);
-        // Debit is 1000.00, not zero, so it should NOT be replaced with 2525.00
+        // S9(10)V99 "00000010000{" = digits 000000100000, V99 → 1000.00
         assertEquals(new BigDecimal("1000.00"), out.currCycDebit());
     }
 

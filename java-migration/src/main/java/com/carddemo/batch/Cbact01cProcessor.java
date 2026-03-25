@@ -171,18 +171,12 @@ public class Cbact01cProcessor {
     // 1400-POPUL-ARRAY-RECORD
     // ---------------------------------------------------------------
     ArrayRecord populateArrayRecord(AccountRecord acct) {
-        ArrayRecord record = ArrayRecord.initialized(acct.acctId());
-        ArrayRecord.BalanceEntry[] entries = record.entries();
-
-        // Entry 1: account balance + fixed debit 1005.00
-        entries[0] = new ArrayRecord.BalanceEntry(acct.currBal(), ARR_DEBIT_1);
-        // Entry 2: account balance + fixed debit 1525.00
-        entries[1] = new ArrayRecord.BalanceEntry(acct.currBal(), ARR_DEBIT_2);
-        // Entry 3: fixed balance -1025.00 + fixed debit -2500.00
-        entries[2] = new ArrayRecord.BalanceEntry(ARR_BAL_3, ARR_DEBIT_3);
-        // Entries 4-5 remain zero (INITIALIZE)
-
-        return record;
+        // Entries 1-3 are populated; entries 4-5 default to zero (COBOL INITIALIZE)
+        return ArrayRecord.of(acct.acctId(),
+                new ArrayRecord.BalanceEntry(acct.currBal(), ARR_DEBIT_1),   // Entry 1
+                new ArrayRecord.BalanceEntry(acct.currBal(), ARR_DEBIT_2),   // Entry 2
+                new ArrayRecord.BalanceEntry(ARR_BAL_3, ARR_DEBIT_3)         // Entry 3
+        );
     }
 
     // ---------------------------------------------------------------
