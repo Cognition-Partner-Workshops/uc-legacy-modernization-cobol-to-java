@@ -2,9 +2,9 @@
       * PROGRAM     : CBHELLO.CBL
       * Application : CardDemo
       * Type        : BATCH COBOL Program
-      * FUNCTION    : Simple program demonstrating basic COBOL
-      *               structure including variables, arithmetic,
-      *               conditionals, and formatted output.
+      * FUNCTION    : Demonstrates account deactivation by
+      *               displaying the account before and after
+      *               deactivation with status and balance changes.
       ******************************************************************
        IDENTIFICATION DIVISION.
        PROGRAM-ID.    CBHELLO.
@@ -42,6 +42,13 @@
            PERFORM 3000-DISPLAY-ACCOUNT-DETAILS.
 
            DISPLAY SPACES.
+           DISPLAY '--- DEACTIVATING ACCOUNT ---'.
+           DISPLAY SPACES.
+
+           PERFORM 4000-DEACTIVATE-ACCOUNT.
+           PERFORM 3000-DISPLAY-ACCOUNT-DETAILS.
+
+           DISPLAY SPACES.
            DISPLAY '================================================'.
            DISPLAY '  END OF REPORT'.
            DISPLAY '================================================'.
@@ -66,6 +73,17 @@
                WHEN OTHER
                    MOVE 'CREDIT' TO WS-ACCOUNT-STATUS
            END-EVALUATE.
+           EXIT.
+
+      *---------------------------------------------------------------*
+       4000-DEACTIVATE-ACCOUNT.
+           MOVE 'INACTIVE' TO WS-ACCOUNT-STATUS.
+           MOVE ZEROS TO WS-CURRENT-BALANCE.
+           MOVE ZEROS TO WS-CREDIT-LIMIT.
+           MOVE ZEROS TO WS-AVAILABLE-CREDIT.
+           MOVE ZEROS TO WS-DISPLAY-BALANCE.
+           MOVE ZEROS TO WS-DISPLAY-CREDIT.
+           MOVE ZEROS TO WS-DISPLAY-AVAILABLE.
            EXIT.
 
       *---------------------------------------------------------------*
