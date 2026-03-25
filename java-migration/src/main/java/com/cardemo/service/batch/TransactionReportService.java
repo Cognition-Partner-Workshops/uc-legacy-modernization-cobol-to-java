@@ -84,17 +84,20 @@ public class TransactionReportService {
             }
 
             // Account change - print account totals
-            if (!currentCardNum.equals(tran.getTranCardNum())) {
+            String tranCardNum = tran.getTranCardNum() != null ? tran.getTranCardNum() : "";
+            if (!currentCardNum.equals(tranCardNum)) {
                 if (!currentCardNum.isEmpty()) {
                     reportLines.add(String.format("  Account Total: %12.2f", accountTotal));
                     reportLines.add("");
                     grandTotal = grandTotal.add(accountTotal);
                     accountTotal = BigDecimal.ZERO;
                 }
-                currentCardNum = tran.getTranCardNum();
+                currentCardNum = tranCardNum;
 
                 // Look up xref for account ID
-                Optional<CardXrefRecord> xrefOpt = cardXrefRepository.findById(currentCardNum);
+                Optional<CardXrefRecord> xrefOpt = currentCardNum.isEmpty()
+                        ? Optional.empty()
+                        : cardXrefRepository.findById(currentCardNum);
                 if (xrefOpt.isPresent()) {
                     reportLines.add(String.format("Card: %s  Account: %d  Customer: %d",
                             currentCardNum, xrefOpt.get().getXrefAcctId(), xrefOpt.get().getXrefCustId()));
@@ -129,7 +132,6 @@ public class TransactionReportService {
             // Page break
             if (lineCounter % pageSize == 0) {
                 reportLines.add(String.format("  Page Total: %12.2f", pageTotal));
-                grandTotal = grandTotal.add(pageTotal);
                 pageTotal = BigDecimal.ZERO;
                 reportLines.add("");
                 reportLines.add(String.format("%s", "-".repeat(110)));
@@ -139,8 +141,8 @@ public class TransactionReportService {
         // Final totals
         if (!currentCardNum.isEmpty()) {
             reportLines.add(String.format("  Account Total: %12.2f", accountTotal));
+            grandTotal = grandTotal.add(accountTotal);
         }
-        grandTotal = grandTotal.add(pageTotal);
         reportLines.add("");
         reportLines.add(String.format("  GRAND TOTAL: %12.2f", grandTotal));
 
