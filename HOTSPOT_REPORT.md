@@ -23,15 +23,15 @@ Each module is scored on four dimensions (1–5 scale):
 
 | Rank | Module     | Lines  | Type   | Composite | Complexity | Coupling | Risk | Effort | Priority     |
 |------|------------|--------|--------|-----------|------------|----------|------|--------|--------------|
-| 1    | COACTUPC   | 4,237  | Online | **4.65**  | 5          | 5        | 5    | 4      | 🔴 Critical  |
-| 2    | CBTRN02C   | 731    | Batch  | **4.25**  | 4          | 5        | 5    | 3      | 🔴 Critical  |
+| 1    | COACTUPC   | 4,237  | Online | **4.80**  | 5          | 5        | 5    | 4      | 🔴 Critical  |
+| 2    | CBTRN02C   | 731    | Batch  | **4.30**  | 4          | 5        | 5    | 3      | 🔴 Critical  |
 | 3    | CBSTM03A   | 924    | Batch  | **4.05**  | 4          | 5        | 4    | 3      | 🔴 Critical  |
-| 4    | CBACT04C   | 652    | Batch  | **4.00**  | 4          | 4        | 5    | 3      | 🔴 Critical  |
-| 5    | COCRDLIC   | 1,460  | Online | **3.90**  | 4          | 3        | 4    | 5      | 🟠 High      |
-| 6    | COCRDUPC   | 1,560  | Online | **3.85**  | 4          | 3        | 4    | 4      | 🟠 High      |
-| 7    | COBIL00C   | 572    | Online | **3.80**  | 3          | 4        | 5    | 3      | 🟠 High      |
+| 4    | CBACT04C   | 652    | Batch  | **4.05**  | 4          | 4        | 5    | 3      | 🔴 Critical  |
+| 5    | COCRDLIC   | 1,460  | Online | **3.95**  | 4          | 3        | 4    | 5      | 🟠 High      |
+| 6    | COCRDUPC   | 1,560  | Online | **3.75**  | 4          | 3        | 4    | 4      | 🟠 High      |
+| 7    | COBIL00C   | 572    | Online | **3.75**  | 3          | 4        | 5    | 3      | 🟠 High      |
 | 8    | COACTVWC   | 942    | Online | **3.55**  | 4          | 4        | 3    | 3      | 🟠 High      |
-| 9    | COTRN02C   | 783    | Online | **3.45**  | 3          | 4        | 4    | 3      | 🟡 Medium    |
+| 9    | COTRN02C   | 783    | Online | **3.50**  | 3          | 4        | 4    | 3      | 🟡 Medium    |
 | 10   | CBTRN03C   | 649    | Batch  | **3.25**  | 3          | 4        | 3    | 3      | 🟡 Medium    |
 
 ---

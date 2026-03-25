@@ -26,8 +26,7 @@ This data dictionary extracts business entities from COBOL copybook record layou
 | 10| ACCT-CURR-CYC-DEBIT     | S9(10)V99        | Decimal     | 12,2   | Debits in current billing cycle          |
 | 11| ACCT-ADDR-ZIP           | X(10)            | Alpha       | 10     | Account holder ZIP code                  |
 | 12| ACCT-GROUP-ID           | X(10)            | Alpha       | 10     | Disclosure/rate group identifier         |
-| 13| ACCT-FICO-CREDIT-SCORE  | 9(03)            | Numeric     | 3      | FICO credit score (300-850)              |
-| 14| FILLER                  | X(168)           | Filler      | 168    | Reserved for future use                  |
+| 13| FILLER                  | X(178)           | Filler      | 178    | Reserved for future use                  |
 
 **Business Rules**:
 - Primary key: `ACCT-ID`
@@ -80,7 +79,7 @@ This data dictionary extracts business entities from COBOL copybook record layou
 | 12| CUST-PHONE-NUM-2        | X(15)            | Alpha       | 15     | Secondary phone number                   |
 | 13| CUST-SSN                | 9(09)            | Numeric     | 9      | Social Security Number (PII)             |
 | 14| CUST-GOVT-ISSUED-ID     | X(20)            | Alpha       | 20     | Government-issued ID number              |
-| 15| CUST-DOB-YYYYMMDD       | X(10)            | Date String | 10     | Date of birth (YYYY-MM-DD)               |
+| 15| CUST-DOB-YYYY-MM-DD     | X(10)            | Date String | 10     | Date of birth (YYYY-MM-DD)               |
 | 16| CUST-EFT-ACCOUNT-ID     | X(10)            | Alpha       | 10     | EFT/bank account ID                      |
 | 17| CUST-PRI-CARD-HOLDER-IND| X(01)            | Alpha       | 1      | Primary cardholder indicator (Y/N)       |
 | 18| CUST-FICO-CREDIT-SCORE  | 9(03)            | Numeric     | 3      | FICO credit score                        |
