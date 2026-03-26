@@ -1,4 +1,4 @@
-import { Before, After, BeforeAll, AfterAll, Status } from '@cucumber/cucumber';
+import { Before, After, BeforeAll, Status } from '@cucumber/cucumber';
 import { ICustomWorld } from './world';
 import * as fs from 'fs';
 
