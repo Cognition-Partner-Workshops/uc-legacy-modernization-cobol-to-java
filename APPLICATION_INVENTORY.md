@@ -11,8 +11,8 @@
 
 | Artifact Type | Core | Auth Module (IMS/DB2/MQ) | Tran-Type Module (DB2) | VSAM-MQ Module | **Total** |
 |---|---|---|---|---|---|
-| COBOL Programs | 33 | 8 | 3 | 2 | **46** |
-| Copybooks (data) | 32 | 9 | 2 | 0 | **43** |
+| COBOL Programs | 31 | 8 | 3 | 2 | **44** |
+| Copybooks (data) | 30 | 9 | 2 | 0 | **41** |
 | BMS Maps | 17 | 2 | 2 | 0 | **21** |
 | BMS-Generated Copybooks | 17 | — | — | — | **17** |
 | JCL Jobs | 38 | 5 | 3 | 0 | **46** |

@@ -52,28 +52,30 @@ logic maps to Jakarta Bean Validation annotations.
 
 ---
 
-### Rank 2: COCRDUPC — Credit Card Update
+### Rank 2: CBTRN02C — Transaction Posting (Batch)
 
 | Metric | Value | Detail |
 |--------|-------|--------|
-| **LOC** | **1,560** | 4th largest online program |
-| **PERFORMs** | 26 | Moderate procedural count |
-| **EVALUATEs** | 16 | Many status-based branches |
-| **IF conditions** | 72 | High validation complexity |
-| **Copybooks** | 12 | Card + customer + common |
-| **VSAM files** | CARDDAT (READ/REWRITE) | Card update operations |
-| **BMS Map** | COCRDUP | Update form with validation |
+| **LOC** | **731** | Core batch logic |
+| **PERFORMs** | 62 | Highest PERFORM count among batch programs |
+| **EVALUATEs** | 0 | Uses IF-based branching instead |
+| **IF conditions** | 48 | Complex validation rules |
+| **Copybooks** | 5 | Transaction + account entities |
+| **Files** | DALYTRAN (in), TRANFILE, XREFFILE, ACCTFILE, TCATBALF (R/W), DALYREJS (out) | Reads 4 files, writes 3 |
 
 | Complexity | Risk | Impact | **Composite** |
 |------------|------|--------|---------------|
-| 8 | 8 | 8 | **8.0** |
+| 7 | 8 | 10 | **8.3** |
 
-**Why #2:** Card data updates are PCI-sensitive. The 72 IF conditions implement card number
-validation, expiration date checks, and status transition rules. Incorrect migration could
-expose card data or allow invalid updates.
+**Why #2:** This is the **most business-critical batch program** — it posts all daily
+transactions. A bug here means incorrect account balances, lost transactions, or
+financial discrepancies. It reads from 4 input files and writes to 3 outputs,
+implementing cross-file validation (card→account lookup via XREF, balance checks).
+The reject file handling adds error-recovery complexity.
 
-**Migration Strategy:** Implement as CardUpdateService with PCI-DSS compliant field handling.
-Replace BMS validation with server-side validation + client-side form validation.
+**Migration Strategy:** Implement as a Spring Batch job with `ItemReader` (daily file),
+`ItemProcessor` (validation + XREF lookup), and `ItemWriter` (transaction + balance update).
+Use database transactions for atomicity instead of sequential file I/O.
 
 ---
 
@@ -103,30 +105,28 @@ The BMS list maps to a paginated REST endpoint + React/Angular table component.
 
 ---
 
-### Rank 4: CBTRN02C — Transaction Posting (Batch)
+### Rank 4: COCRDUPC — Credit Card Update
 
 | Metric | Value | Detail |
 |--------|-------|--------|
-| **LOC** | **731** | Core batch logic |
-| **PERFORMs** | 62 | Highest PERFORM count among batch programs |
-| **EVALUATEs** | 0 | Uses IF-based branching instead |
-| **IF conditions** | 48 | Complex validation rules |
-| **Copybooks** | 5 | Transaction + account entities |
-| **Files** | DALYTRAN (in), TRANFILE, XREFFILE, ACCTFILE, TCATBALF (R/W), DALYREJS (out) | Reads 4 files, writes 3 |
+| **LOC** | **1,560** | 4th largest online program |
+| **PERFORMs** | 26 | Moderate procedural count |
+| **EVALUATEs** | 16 | Many status-based branches |
+| **IF conditions** | 72 | High validation complexity |
+| **Copybooks** | 12 | Card + customer + common |
+| **VSAM files** | CARDDAT (READ/REWRITE) | Card update operations |
+| **BMS Map** | COCRDUP | Update form with validation |
 
 | Complexity | Risk | Impact | **Composite** |
 |------------|------|--------|---------------|
-| 7 | 8 | 10 | **8.3** |
+| 8 | 8 | 8 | **8.0** |
 
-**Why #4:** This is the **most business-critical batch program** — it posts all daily
-transactions. A bug here means incorrect account balances, lost transactions, or
-financial discrepancies. It reads from 4 input files and writes to 3 outputs,
-implementing cross-file validation (card→account lookup via XREF, balance checks).
-The reject file handling adds error-recovery complexity.
+**Why #4:** Card data updates are PCI-sensitive. The 72 IF conditions implement card number
+validation, expiration date checks, and status transition rules. Incorrect migration could
+expose card data or allow invalid updates.
 
-**Migration Strategy:** Implement as a Spring Batch job with `ItemReader` (daily file),
-`ItemProcessor` (validation + XREF lookup), and `ItemWriter` (transaction + balance update).
-Use database transactions for atomicity instead of sequential file I/O.
+**Migration Strategy:** Implement as CardUpdateService with PCI-DSS compliant field handling.
+Replace BMS validation with server-side validation + client-side form validation.
 
 ---
 
@@ -185,60 +185,7 @@ Eliminate the CBSTM03B sub-program by inlining its logic into the statement serv
 
 ---
 
-### Rank 7: COACTVWC — Account View
-
-| Metric | Value | Detail |
-|--------|-------|--------|
-| **LOC** | **941** | Moderate online program |
-| **PERFORMs** | 21 | Lower procedural count |
-| **EVALUATEs** | 10 | Display-mode branches |
-| **IF conditions** | 28 | Moderate |
-| **Copybooks** | 15 | Second-highest inclusion count |
-| **VSAM files** | ACCTDAT, CARDDAT, CUSTDAT (READ-only) | Multi-file read |
-| **BMS Map** | COACTVW (23 KB) | Dense display screen |
-
-| Complexity | Risk | Impact | **Composite** |
-|------------|------|--------|---------------|
-| 6 | 7 | 8 | **7.0** |
-
-**Why #7:** While read-only, this program assembles data from 3 VSAM files and
-displays it in a complex BMS screen. It includes 15 copybooks (second only to
-COACTUPC). The multi-file join pattern needs to be replaced with JPA entity
-relationships. High user frequency — this is the most-visited screen after the menu.
-
-**Migration Strategy:** Implement as a read-only REST endpoint returning a composite
-`AccountDetailDTO`. Use JPA `@ManyToOne` / `@OneToMany` relationships to replace the
-manual VSAM joins.
-
----
-
-### Rank 8: CBTRN03C — Transaction Report (Batch)
-
-| Metric | Value | Detail |
-|--------|-------|--------|
-| **LOC** | **649** | Moderate batch program |
-| **PERFORMs** | 73 | **Highest PERFORM count in entire codebase** |
-| **EVALUATEs** | 4 | Few top-level branches |
-| **IF conditions** | 38 | Moderate |
-| **Copybooks** | 5 | Transaction + type + category + report layout |
-| **Files** | TRANFILE, CARDXREF, TRANTYPE, TRANCATG, DATEPARM (in), TRANREPT (out) | 5-file input → print report |
-
-| Complexity | Risk | Impact | **Composite** |
-|------------|------|--------|---------------|
-| 7 | 6 | 7 | **6.6** |
-
-**Why #8:** The 73 PERFORM statements (highest in the codebase) indicate deeply
-modularized procedural logic that must be carefully untangled. The 5-file join with
-control-break reporting (page totals, account totals, grand totals) is a classic
-COBOL pattern that requires careful translation to a report-generation framework.
-
-**Migration Strategy:** Implement as a Spring Batch job with JasperReports or a custom
-report writer. Replace COBOL control-break logic with SQL GROUP BY aggregation.
-The DATEPARM file becomes application configuration / command-line arguments.
-
----
-
-### Rank 9: COTRN02C — Transaction Add (Online)
+### Rank 7: COTRN02C — Transaction Add (Online)
 
 | Metric | Value | Detail |
 |--------|-------|--------|
@@ -254,7 +201,7 @@ The DATEPARM file becomes application configuration / command-line arguments.
 |------------|------|--------|---------------|
 | 7 | 7 | 8 | **7.3** |
 
-**Why #9:** This program adds new transactions to the system — a write-path operation
+**Why #7:** This program adds new transactions to the system — a write-path operation
 with financial implications. The 26 EVALUATE statements implement a complex state
 machine for the transaction entry workflow. It validates the card against XREF,
 checks account status, and writes to TRANSACT VSAM. The CSUTLDTC sub-call for
@@ -266,7 +213,34 @@ Use `@Transactional` for atomicity.
 
 ---
 
-### Rank 10: COTRN00C — Transaction List (Online)
+### Rank 8: COACTVWC — Account View
+
+| Metric | Value | Detail |
+|--------|-------|--------|
+| **LOC** | **941** | Moderate online program |
+| **PERFORMs** | 21 | Lower procedural count |
+| **EVALUATEs** | 10 | Display-mode branches |
+| **IF conditions** | 28 | Moderate |
+| **Copybooks** | 15 | Second-highest inclusion count |
+| **VSAM files** | ACCTDAT, CARDDAT, CUSTDAT (READ-only) | Multi-file read |
+| **BMS Map** | COACTVW (23 KB) | Dense display screen |
+
+| Complexity | Risk | Impact | **Composite** |
+|------------|------|--------|---------------|
+| 6 | 7 | 8 | **7.0** |
+
+**Why #8:** While read-only, this program assembles data from 3 VSAM files and
+displays it in a complex BMS screen. It includes 15 copybooks (second only to
+COACTUPC). The multi-file join pattern needs to be replaced with JPA entity
+relationships. High user frequency — this is the most-visited screen after the menu.
+
+**Migration Strategy:** Implement as a read-only REST endpoint returning a composite
+`AccountDetailDTO`. Use JPA `@ManyToOne` / `@OneToMany` relationships to replace the
+manual VSAM joins.
+
+---
+
+### Rank 9: COTRN00C — Transaction List (Online)
 
 | Metric | Value | Detail |
 |--------|-------|--------|
@@ -282,7 +256,7 @@ Use `@Transactional` for atomicity.
 |------------|------|--------|---------------|
 | 6 | 7 | 7 | **6.7** |
 
-**Why #10:** Similar to COCRDLIC (#3), this implements the STARTBR/READNEXT pagination
+**Why #9:** Similar to COCRDLIC (#3), this implements the STARTBR/READNEXT pagination
 pattern for transactions. The large BMS map (29 KB) and pseudo-conversational state
 management make migration non-trivial. High user-facing frequency — core workflow screen.
 
@@ -291,28 +265,54 @@ Use Spring Data JPA `Pageable` with cursor-based pagination for performance.
 
 ---
 
+### Rank 10: CBTRN03C — Transaction Report (Batch)
+
+| Metric | Value | Detail |
+|--------|-------|--------|
+| **LOC** | **649** | Moderate batch program |
+| **PERFORMs** | 73 | **Highest PERFORM count in entire codebase** |
+| **EVALUATEs** | 4 | Few top-level branches |
+| **IF conditions** | 38 | Moderate |
+| **Copybooks** | 5 | Transaction + type + category + report layout |
+| **Files** | TRANFILE, CARDXREF, TRANTYPE, TRANCATG, DATEPARM (in), TRANREPT (out) | 5-file input → print report |
+
+| Complexity | Risk | Impact | **Composite** |
+|------------|------|--------|---------------|
+| 7 | 6 | 7 | **6.6** |
+
+**Why #10:** The 73 PERFORM statements (highest in the codebase) indicate deeply
+modularized procedural logic that must be carefully untangled. The 5-file join with
+control-break reporting (page totals, account totals, grand totals) is a classic
+COBOL pattern that requires careful translation to a report-generation framework.
+
+**Migration Strategy:** Implement as a Spring Batch job with JasperReports or a custom
+report writer. Replace COBOL control-break logic with SQL GROUP BY aggregation.
+The DATEPARM file becomes application configuration / command-line arguments.
+
+---
+
 ## Complexity Metrics — All Programs (Sorted by Composite Score)
 
 | Rank | Program | LOC | PERFORMs | EVALUATEs | IFs | Copybooks | Composite |
 |------|---------|-----|----------|-----------|-----|-----------|-----------|
 | 1 | **COACTUPC** | 4,236 | 64 | 20 | 164 | 18 | 9.7 |
-| 2 | **COCRDUPC** | 1,560 | 26 | 16 | 72 | 12 | 8.0 |
+| 2 | **CBTRN02C** | 731 | 62 | 0 | 48 | 5 | 8.3 |
 | 3 | **COCRDLIC** | 1,459 | 34 | 18 | 59 | 11 | 8.1 |
-| 4 | **CBTRN02C** | 731 | 62 | 0 | 48 | 5 | 8.3 |
+| 4 | **COCRDUPC** | 1,560 | 26 | 16 | 72 | 12 | 8.0 |
 | 5 | **CBACT04C** | 652 | 57 | 0 | 43 | 5 | 7.9 |
 | 6 | **CBSTM03A** | 924 | 33 | 9 | 15 | 4 | 7.3 |
-| 7 | **COACTVWC** | 941 | 21 | 10 | 28 | 15 | 7.0 |
-| 8 | **CBTRN03C** | 649 | 73 | 4 | 38 | 5 | 6.6 |
-| 9 | **COTRN02C** | 783 | 61 | 26 | 14 | 10 | 7.3 |
-| 10 | **COTRN00C** | 699 | 47 | 16 | 26 | 8 | 6.7 |
+| 7 | **COTRN02C** | 783 | 61 | 26 | 14 | 10 | 7.3 |
+| 8 | **COACTVWC** | 941 | 21 | 10 | 28 | 15 | 7.0 |
+| 9 | **COTRN00C** | 699 | 47 | 16 | 26 | 8 | 6.7 |
+| 10 | **CBTRN03C** | 649 | 73 | 4 | 38 | 5 | 6.6 |
 | — | COTRTLIC* | 2,098 | 69 | 32 | 0 | — | 6.5 |
 | — | COTRTUPC* | 1,702 | 40 | 26 | 0 | — | 6.3 |
 | — | COPAUA0C* | 1,026 | 38 | 10 | 26 | 14 | 6.2 |
 | — | COPAUS0C* | 1,032 | 48 | 22 | 25 | 14 | 6.0 |
+| — | COBIL00C | 572 | 38 | 18 | 10 | 10 | 5.8 |
 | — | COUSR00C | 695 | 45 | 16 | 25 | 8 | 5.5 |
 | — | COCRDSLC | 887 | 19 | 8 | 33 | 13 | 5.5 |
 | — | CORPT00C | 649 | 35 | 10 | 20 | 8 | 5.3 |
-| — | COBIL00C | 572 | 38 | 18 | 10 | 10 | 5.8 |
 | — | CBTRN01C | 494 | 43 | 0 | 33 | 6 | 4.5 |
 | — | CBEXPORT | 582 | 50 | 0 | 16 | 6 | 4.2 |
 
@@ -325,29 +325,29 @@ Use Spring Data JPA `Pageable` with cursor-based pagination for performance.
 Based on the hotspot analysis, we recommend the following migration sequence:
 
 ### Wave 1 — Foundation (De-risk Core Data Layer)
-**Programs:** CBTRN02C (#4), CBACT04C (#5)
+**Programs:** CBTRN02C (#2), CBACT04C (#5)
 **Rationale:** These batch programs own the most critical data-integrity logic
 (transaction posting and interest calculation). Migrating them first establishes
 the core Java data model and validates decimal-arithmetic compatibility.
 
 ### Wave 2 — Core Online CRUD
-**Programs:** COACTUPC (#1), COCRDUPC (#2), COTRN02C (#9)
+**Programs:** COACTUPC (#1), COCRDUPC (#4), COTRN02C (#7)
 **Rationale:** The three highest-complexity online programs. COACTUPC is the single
 riskiest module. Migrating these proves the CICS→Spring MVC/REST pattern and
 establishes the validation framework.
 
 ### Wave 3 — List/Browse Screens
-**Programs:** COCRDLIC (#3), COTRN00C (#10), COUSR00C
+**Programs:** COCRDLIC (#3), COTRN00C (#9), COUSR00C
 **Rationale:** These share the STARTBR/READNEXT pagination pattern. Once one is
 migrated, the pattern can be templated for the others.
 
 ### Wave 4 — Reporting & Statements
-**Programs:** CBSTM03A (#6), CBTRN03C (#8), CORPT00C
+**Programs:** CBSTM03A (#6), CBTRN03C (#10), CORPT00C
 **Rationale:** Report generation has lower real-time risk (not user-facing OLTP).
 Migrating these replaces COBOL print files with modern reporting (PDF/HTML).
 
 ### Wave 5 — View-Only & Navigation
-**Programs:** COACTVWC (#7), COCRDSLC, COTRN01C, COMEN01C, COSGN00C, COADM01C
+**Programs:** COACTVWC (#8), COCRDSLC, COTRN01C, COMEN01C, COSGN00C, COADM01C
 **Rationale:** Read-only and navigation programs are lowest risk. The sign-on
 screen migrates to Spring Security. Menus become a frontend router.
 
