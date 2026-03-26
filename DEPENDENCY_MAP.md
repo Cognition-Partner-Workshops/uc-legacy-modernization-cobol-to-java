@@ -201,7 +201,7 @@ Every online program can XCTL back to the menu or to another screen via `CDEMO-T
 | **CVTRA05Y** | COBIL00C, CORPT00C, COTRN00C, COTRN01C, COTRN02C, CBACT04C, CBEXPORT, CBIMPORT, CBTRN01C, CBTRN02C, CBTRN03C | Transaction record |
 | **CVTRA06Y** | CBTRN01C, CBTRN02C | Daily transaction record |
 | **CVCRD01Y** | COACTUPC, COACTVWC, COCRDLIC, COCRDSLC, COCRDUPC | Screen work areas |
-| **CSMEN02Y** → **COMEN02Y** | COMEN01C | Main menu option table |
+| **COMEN02Y** | COMEN01C | Main menu option table |
 | **COADM02Y** | COADM01C | Admin menu option table |
 | **CSMSG02Y** | COACTUPC, COACTVWC, COCRDSLC, COCRDUPC, COPAUS0C, COPAUS1C | Abend work areas |
 | **CSSTRPFY** | COACTUPC, COACTVWC, COCRDLIC, COCRDSLC, COCRDUPC | String processing procedures |
