@@ -1,0 +1,56 @@
+###################################################################
+# sftp_transfer.conf.template
+# Configuration Template for SFTP File Transfer (NDM Replacement)
+#
+# Copy this file to sftp_transfer.conf and update the values
+# for your environment. These values are read as environment
+# variables by sftp_transfer.sh.
+#
+# This replaces the NDM Process / Node definitions that were
+# configured in Connect:Direct.
+###################################################################
+
+# ------------------------------------------------------------------
+# SFTP Server Connection (replaces NDM PNODE/SNODE definitions)
+# ------------------------------------------------------------------
+# Hostname or IP of the SFTP server
+SFTP_HOST=sftp.yourcompany.com
+
+# SFTP port (default: 22)
+SFTP_PORT=22
+
+# SFTP username (replaces NDM SNODEID)
+SFTP_USER=batch_transfer
+
+# Path to SSH private key (replaces NDM password/security config)
+# Generate with: ssh-keygen -t rsa -b 4096 -f ~/.ssh/sftp_batch_key
+SFTP_KEY=/opt/carddemo/keys/sftp_batch_key
+
+# Alternative: password file (use key-based auth when possible)
+# SFTP_PASSWORD_FILE=/opt/carddemo/conf/.sftp_password
+
+# ------------------------------------------------------------------
+# Transfer Defaults (replaces NDM Process retry settings)
+# ------------------------------------------------------------------
+# Number of retry attempts on failure
+SFTP_RETRY_COUNT=3
+
+# Delay in seconds between retries
+SFTP_RETRY_DELAY=10
+
+# ------------------------------------------------------------------
+# Logging (replaces NDM statistics log)
+# ------------------------------------------------------------------
+SFTP_LOG_FILE=/var/log/carddemo/sftp_transfer.log
+
+# ------------------------------------------------------------------
+# Directory Mappings (replaces NDM Dataset Name mappings)
+# ------------------------------------------------------------------
+# Local directories for CardDemo data files
+LOCAL_EXPORT_DIR=/opt/carddemo/data/export
+LOCAL_IMPORT_DIR=/opt/carddemo/data/import
+LOCAL_ARCHIVE_DIR=/opt/carddemo/data/archive
+
+# Remote directories on the SFTP server
+REMOTE_INBOUND_DIR=/data/inbound/carddemo
+REMOTE_OUTBOUND_DIR=/data/outbound/carddemo
