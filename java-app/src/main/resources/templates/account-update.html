@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Account Update</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COACTUPC</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Account Update</h1>
+
+    <div th:if="${successMessage}" class="message-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/accounts/update/search}" method="post" th:unless="${account != null}">
+        <div class="form-group">
+            <label for="acctId">Account ID:</label>
+            <input type="number" id="acctId" name="acctId" placeholder="Enter Account ID" required/>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn">Search Account</button>
+        </div>
+    </form>
+
+    <div th:if="${account != null}">
+        <form th:action="@{/accounts/update}" method="post">
+            <input type="hidden" name="acctId" th:value="${account.acctId}"/>
+            <div class="form-group">
+                <label>Account ID:</label>
+                <span th:text="${#numbers.formatInteger(account.acctId, 11)}" style="color: #00ff41;"></span>
+            </div>
+            <div class="form-group">
+                <label for="activeStatus">Status:</label>
+                <select id="activeStatus" name="activeStatus">
+                    <option value="Y" th:selected="${account.activeStatus == 'Y'}">Active</option>
+                    <option value="N" th:selected="${account.activeStatus == 'N'}">Inactive</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="creditLimit">Credit Limit:</label>
+                <input type="number" id="creditLimit" name="creditLimit" step="0.01"
+                       th:value="${account.creditLimit}"/>
+            </div>
+            <div class="form-group">
+                <label for="cashCreditLimit">Cash Credit Limit:</label>
+                <input type="number" id="cashCreditLimit" name="cashCreditLimit" step="0.01"
+                       th:value="${account.cashCreditLimit}"/>
+            </div>
+            <div class="form-group">
+                <label for="expirationDate">Expiration Date:</label>
+                <input type="text" id="expirationDate" name="expirationDate"
+                       th:value="${account.expirationDate}" placeholder="YYYY-MM-DD"/>
+            </div>
+            <div class="form-group">
+                <label for="reissueDate">Reissue Date:</label>
+                <input type="text" id="reissueDate" name="reissueDate"
+                       th:value="${account.reissueDate}" placeholder="YYYY-MM-DD"/>
+            </div>
+            <div class="form-group">
+                <label for="groupId">Group ID:</label>
+                <input type="text" id="groupId" name="groupId" maxlength="10"
+                       th:value="${account.groupId}"/>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn">Update Account</button>
+                <a th:href="@{/accounts/update}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+</div>
+</body>
+</html>

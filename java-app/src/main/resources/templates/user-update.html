@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Update User</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COUSR02C</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">ADMIN</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Update User</h1>
+
+    <div th:if="${successMessage}" class="message-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <div th:if="${existingUser == null && errorMessage == null}">
+        <p>Select a user to update from the <a th:href="@{/admin/users}">user list</a>.</p>
+    </div>
+
+    <div th:if="${existingUser != null}">
+        <form th:action="@{'/admin/users/update/' + ${existingUser.userId}}" th:object="${userRequest}" method="post">
+            <div class="form-group">
+                <label>User ID:</label>
+                <span th:text="${existingUser.userId}" style="color: #00ff41;"></span>
+            </div>
+            <div class="form-group">
+                <label for="password">New Password:</label>
+                <input type="password" id="password" th:field="*{password}" maxlength="8"
+                       placeholder="Leave blank to keep current"/>
+            </div>
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" th:field="*{firstName}" maxlength="20"/>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" th:field="*{lastName}" maxlength="20"/>
+            </div>
+            <div class="form-group">
+                <label for="userType">User Type:</label>
+                <select id="userType" th:field="*{userType}">
+                    <option value="A">Admin</option>
+                    <option value="U">Regular User</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn">Update User</button>
+                <a th:href="@{/admin/users}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/admin/menu}">Back to Admin Menu</a>
+    </div>
+</div>
+</body>
+</html>

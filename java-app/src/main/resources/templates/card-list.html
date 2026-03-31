@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Credit Card List</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COCRDLIC</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Credit Card List</h1>
+
+    <table class="data-table">
+        <tr>
+            <th>Card Number</th>
+            <th>Account ID</th>
+            <th>Embossed Name</th>
+            <th>Expiration</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each="card : ${cards}">
+            <td th:text="${card.cardNum}"></td>
+            <td th:text="${card.acctId}"></td>
+            <td th:text="${card.embossedName}"></td>
+            <td th:text="${card.expirationDate}"></td>
+            <td th:text="${card.activeStatus == 'Y' ? 'Active' : 'Inactive'}"></td>
+            <td>
+                <a th:href="@{'/cards/view/' + ${card.cardNum}}">View</a> |
+                <a th:href="@{'/cards/update/' + ${card.cardNum}}">Update</a>
+            </td>
+        </tr>
+    </table>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+</div>
+</body>
+</html>

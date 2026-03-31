@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Error</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">Error</span>
+    </div>
+
+    <h1 class="page-title">Error</h1>
+
+    <div class="message-error">
+        <p th:text="${errorMessage != null ? errorMessage : 'An unexpected error occurred.'}"></p>
+        <p th:if="${reasonCode != null}" th:text="'Reason Code: ' + ${reasonCode}"></p>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a> |
+        <a th:href="@{/login}">Back to Login</a>
+    </div>
+</div>
+</body>
+</html>

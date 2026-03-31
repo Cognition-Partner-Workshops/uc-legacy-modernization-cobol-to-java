@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Bill Payment</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COBIL00C</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Bill Payment</h1>
+
+    <div th:if="${successMessage}" class="message-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/payments}" th:object="${paymentRequest}" method="post">
+        <div class="form-group">
+            <label for="acctId">Account ID:</label>
+            <input type="number" id="acctId" th:field="*{acctId}"
+                   placeholder="Enter Account ID" required/>
+            <span th:if="${#fields.hasErrors('acctId')}" class="message-error"
+                  th:errors="*{acctId}"></span>
+        </div>
+        <div class="form-group">
+            <label for="amount">Payment Amount:</label>
+            <input type="number" id="amount" th:field="*{amount}" step="0.01" min="0.01"
+                   placeholder="Enter Payment Amount" required/>
+            <span th:if="${#fields.hasErrors('amount')}" class="message-error"
+                  th:errors="*{amount}"></span>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn">Submit Payment</button>
+            <a th:href="@{/menu}" class="btn">Cancel</a>
+        </div>
+    </form>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+</div>
+</body>
+</html>

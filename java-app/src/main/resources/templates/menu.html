@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Main Menu</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COMEN01C</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Main Menu</h1>
+
+    <div class="menu-container">
+        <form th:action="@{/menu}" method="post">
+            <div class="menu-item">
+                <input type="radio" name="option" value="1" id="opt1"/>
+                <label for="opt1">1. Account View</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="2" id="opt2"/>
+                <label for="opt2">2. Account Update</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="3" id="opt3"/>
+                <label for="opt3">3. Credit Card List</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="4" id="opt4"/>
+                <label for="opt4">4. Credit Card View</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="5" id="opt5"/>
+                <label for="opt5">5. Credit Card Update</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="6" id="opt6"/>
+                <label for="opt6">6. Transaction List</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="7" id="opt7"/>
+                <label for="opt7">7. Transaction View</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="8" id="opt8"/>
+                <label for="opt8">8. Transaction Add</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="9" id="opt9"/>
+                <label for="opt9">9. Transaction Reports</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="10" id="opt10"/>
+                <label for="opt10">10. Bill Payment</label>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn">Select</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="nav-links" th:if="${isAdmin}">
+        <a th:href="@{/admin/menu}">Go to Admin Menu</a>
+    </div>
+
+    <div class="footer">
+        CardDemo - Credit Card Management System
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Admin Menu</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COADM01C</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">ADMIN</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Admin Menu</h1>
+
+    <div class="menu-container">
+        <form th:action="@{/admin/menu}" method="post">
+            <div class="menu-item">
+                <input type="radio" name="option" value="1" id="opt1"/>
+                <label for="opt1">1. User List (Security)</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="2" id="opt2"/>
+                <label for="opt2">2. User Add (Security)</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="3" id="opt3"/>
+                <label for="opt3">3. User Update (Security)</label>
+            </div>
+            <div class="menu-item">
+                <input type="radio" name="option" value="4" id="opt4"/>
+                <label for="opt4">4. User Delete (Security)</label>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn">Select</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+
+    <div class="footer">
+        CardDemo - Credit Card Management System
+    </div>
+</div>
+</body>
+</html>

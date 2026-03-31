@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Credit Card Update</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COCRDUPC</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Credit Card Update</h1>
+
+    <div th:if="${successMessage}" class="message-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <div th:if="${card == null}">
+        <p>Enter a card number to search, or select a card from the <a th:href="@{/cards/list}">card list</a>.</p>
+    </div>
+
+    <div th:if="${card != null}">
+        <form th:action="@{/cards/update}" method="post">
+            <input type="hidden" name="cardNum" th:value="${card.cardNum}"/>
+            <div class="form-group">
+                <label>Card Number:</label>
+                <span th:text="${card.cardNum}" style="color: #00ff41;"></span>
+            </div>
+            <div class="form-group">
+                <label>Account ID:</label>
+                <span th:text="${card.acctId}" style="color: #00ff41;"></span>
+            </div>
+            <div class="form-group">
+                <label for="embossedName">Embossed Name:</label>
+                <input type="text" id="embossedName" name="embossedName" maxlength="50"
+                       th:value="${card.embossedName}"/>
+            </div>
+            <div class="form-group">
+                <label for="expirationDate">Expiration Date:</label>
+                <input type="text" id="expirationDate" name="expirationDate"
+                       th:value="${card.expirationDate}" placeholder="YYYY-MM-DD"/>
+            </div>
+            <div class="form-group">
+                <label for="activeStatus">Status:</label>
+                <select id="activeStatus" name="activeStatus">
+                    <option value="Y" th:selected="${card.activeStatus == 'Y'}">Active</option>
+                    <option value="N" th:selected="${card.activeStatus == 'N'}">Inactive</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn">Update Card</button>
+                <a th:href="@{/cards/list}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+</div>
+</body>
+</html>

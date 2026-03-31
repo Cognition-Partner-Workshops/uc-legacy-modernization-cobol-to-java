@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Add User</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COUSR01C</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">ADMIN</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Add User</h1>
+
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/admin/users/add}" th:object="${userRequest}" method="post">
+        <div class="form-group">
+            <label for="userId">User ID:</label>
+            <input type="text" id="userId" th:field="*{userId}" maxlength="8"
+                   placeholder="Max 8 characters" required style="text-transform: uppercase;"/>
+            <span th:if="${#fields.hasErrors('userId')}" class="message-error" th:errors="*{userId}"></span>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" th:field="*{password}" maxlength="8"
+                   placeholder="Max 8 characters" required/>
+            <span th:if="${#fields.hasErrors('password')}" class="message-error" th:errors="*{password}"></span>
+        </div>
+        <div class="form-group">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" th:field="*{firstName}" maxlength="20" required/>
+            <span th:if="${#fields.hasErrors('firstName')}" class="message-error" th:errors="*{firstName}"></span>
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" th:field="*{lastName}" maxlength="20" required/>
+            <span th:if="${#fields.hasErrors('lastName')}" class="message-error" th:errors="*{lastName}"></span>
+        </div>
+        <div class="form-group">
+            <label for="userType">User Type:</label>
+            <select id="userType" th:field="*{userType}" required>
+                <option value="">-- Select --</option>
+                <option value="A">Admin</option>
+                <option value="U">Regular User</option>
+            </select>
+            <span th:if="${#fields.hasErrors('userType')}" class="message-error" th:errors="*{userType}"></span>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn">Add User</button>
+            <a th:href="@{/admin/users}" class="btn">Cancel</a>
+        </div>
+    </form>
+
+    <div class="nav-links">
+        <a th:href="@{/admin/menu}">Back to Admin Menu</a>
+    </div>
+</div>
+</body>
+</html>

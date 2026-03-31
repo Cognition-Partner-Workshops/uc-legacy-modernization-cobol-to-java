@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title != null ? title : 'CardDemo'}">CardDemo</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <div class="container" th:fragment="header">
+        <div class="header">
+            <span class="header-title">CardDemo Application</span>
+            <span class="header-info">
+                <span th:text="${programName}">PROGRAM</span> |
+                Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+                Time: <span th:text="${currentTime}">HH:MM:SS</span>
+                <span th:if="${userId != null}"> | User: <span th:text="${userId}">USER</span></span>
+                <span sec:authorize="isAuthenticated()"> |
+                    <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+                </span>
+            </span>
+        </div>
+    </div>
+</body>
+</html>

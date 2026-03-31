@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Transaction View</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COTRN01C</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Transaction View</h1>
+
+    <div th:if="${successMessage}" class="message-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <div th:if="${transaction != null}">
+        <div class="detail-grid">
+            <span class="label">Transaction ID:</span>
+            <span class="value" th:text="${transaction.tranId}"></span>
+            <span class="label">Type Code:</span>
+            <span class="value" th:text="${transaction.typeCd}"></span>
+            <span class="label">Category Code:</span>
+            <span class="value" th:text="${transaction.catCd}"></span>
+            <span class="label">Source:</span>
+            <span class="value" th:text="${transaction.source}"></span>
+            <span class="label">Description:</span>
+            <span class="value" th:text="${transaction.description}"></span>
+            <span class="label">Amount:</span>
+            <span class="value" th:text="'$' + ${#numbers.formatDecimal(transaction.amount, 1, 2)}"></span>
+            <span class="label">Merchant ID:</span>
+            <span class="value" th:text="${transaction.merchantId}"></span>
+            <span class="label">Merchant Name:</span>
+            <span class="value" th:text="${transaction.merchantName}"></span>
+            <span class="label">Merchant City:</span>
+            <span class="value" th:text="${transaction.merchantCity}"></span>
+            <span class="label">Merchant Zip:</span>
+            <span class="value" th:text="${transaction.merchantZip}"></span>
+            <span class="label">Card Number:</span>
+            <span class="value" th:text="${transaction.cardNum}"></span>
+            <span class="label">Original Timestamp:</span>
+            <span class="value" th:text="${transaction.origTimestamp}"></span>
+            <span class="label">Processed Timestamp:</span>
+            <span class="value" th:text="${transaction.procTimestamp}"></span>
+        </div>
+    </div>
+
+    <div th:if="${transaction == null && errorMessage == null}">
+        <p>Enter a transaction ID from the <a th:href="@{/transactions}">transaction list</a> to view details.</p>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/transactions}">Back to Transaction List</a> |
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+</div>
+</body>
+</html>

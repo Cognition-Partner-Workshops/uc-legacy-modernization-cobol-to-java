@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Transaction Reports</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">CORPT00C</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Transaction Reports</h1>
+
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/reports}" th:object="${reportRequest}" method="post">
+        <div class="form-group">
+            <label for="acctId">Account ID (optional):</label>
+            <input type="number" id="acctId" th:field="*{acctId}" placeholder="Filter by Account"/>
+        </div>
+        <div class="form-group">
+            <label for="cardNum">Card Number (optional):</label>
+            <input type="text" id="cardNum" th:field="*{cardNum}" maxlength="16"
+                   placeholder="Filter by Card"/>
+        </div>
+        <div class="form-group">
+            <label for="startDate">Start Date (optional):</label>
+            <input type="text" id="startDate" th:field="*{startDate}" placeholder="YYYY-MM-DD"/>
+        </div>
+        <div class="form-group">
+            <label for="endDate">End Date (optional):</label>
+            <input type="text" id="endDate" th:field="*{endDate}" placeholder="YYYY-MM-DD"/>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn">Generate Report</button>
+        </div>
+    </form>
+
+    <div th:if="${reportData != null}">
+        <h2 class="section-title">Report Results</h2>
+        <p>Total Transactions: <span th:text="${reportData.totalCount}"></span> |
+           Total Amount: $<span th:text="${#numbers.formatDecimal(reportData.totalAmount, 1, 2)}"></span></p>
+
+        <table class="data-table" th:if="${reportData.transactions != null && !reportData.transactions.isEmpty()}">
+            <tr>
+                <th>Transaction ID</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Card Number</th>
+            </tr>
+            <tr th:each="tran : ${reportData.transactions}">
+                <td th:text="${tran.tranId}"></td>
+                <td th:text="${tran.typeCd}"></td>
+                <td th:text="${tran.origTimestamp != null && tran.origTimestamp.length() >= 10 ? tran.origTimestamp.substring(0, 10) : ''}"></td>
+                <td th:text="${tran.description}"></td>
+                <td th:text="'$' + ${#numbers.formatDecimal(tran.amount, 1, 2)}"></td>
+                <td th:text="${tran.cardNum}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+</div>
+</body>
+</html>

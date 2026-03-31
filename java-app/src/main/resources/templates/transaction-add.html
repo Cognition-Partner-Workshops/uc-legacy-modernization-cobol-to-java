@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Transaction Add</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COTRN02C</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Add Transaction</h1>
+
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/transactions/add}" th:object="${transactionRequest}" method="post">
+        <div class="form-group">
+            <label for="cardNum">Card Number:</label>
+            <input type="text" id="cardNum" th:field="*{cardNum}" maxlength="16"
+                   placeholder="16-digit Card Number" required/>
+            <span th:if="${#fields.hasErrors('cardNum')}" class="message-error"
+                  th:errors="*{cardNum}"></span>
+        </div>
+        <div class="form-group">
+            <label for="typeCd">Transaction Type:</label>
+            <select id="typeCd" th:field="*{typeCd}" required>
+                <option value="">-- Select --</option>
+                <option value="01">01 - Purchase</option>
+                <option value="02">02 - Payment</option>
+                <option value="03">03 - Credit</option>
+                <option value="04">04 - Balance Transfer</option>
+                <option value="05">05 - Interest</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="catCd">Category Code:</label>
+            <input type="number" id="catCd" th:field="*{catCd}" min="1" max="9999"
+                   placeholder="Category Code" required/>
+        </div>
+        <div class="form-group">
+            <label for="source">Source:</label>
+            <input type="text" id="source" th:field="*{source}" maxlength="10" value="ONLINE"/>
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input type="text" id="description" th:field="*{description}" maxlength="100"
+                   placeholder="Transaction description"/>
+        </div>
+        <div class="form-group">
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" th:field="*{amount}" step="0.01" min="0.01"
+                   placeholder="Amount" required/>
+            <span th:if="${#fields.hasErrors('amount')}" class="message-error"
+                  th:errors="*{amount}"></span>
+        </div>
+        <div class="form-group">
+            <label for="merchantName">Merchant Name:</label>
+            <input type="text" id="merchantName" th:field="*{merchantName}" maxlength="50"/>
+        </div>
+        <div class="form-group">
+            <label for="merchantCity">Merchant City:</label>
+            <input type="text" id="merchantCity" th:field="*{merchantCity}" maxlength="50"/>
+        </div>
+        <div class="form-group">
+            <label for="merchantZip">Merchant Zip:</label>
+            <input type="text" id="merchantZip" th:field="*{merchantZip}" maxlength="10"/>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn">Add Transaction</button>
+            <a th:href="@{/transactions}" class="btn">Cancel</a>
+        </div>
+    </form>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+</div>
+</body>
+</html>

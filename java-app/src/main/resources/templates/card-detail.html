@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Credit Card View</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COCRDSLC</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Credit Card View</h1>
+
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/cards/view}" method="post" th:unless="${card != null}">
+        <div class="form-group">
+            <label for="cardNum">Card Number:</label>
+            <input type="text" id="cardNum" name="cardNum" maxlength="16"
+                   placeholder="Enter 16-digit Card Number" required/>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn">View Card</button>
+        </div>
+    </form>
+
+    <div th:if="${card != null}">
+        <div class="detail-grid">
+            <span class="label">Card Number:</span>
+            <span class="value" th:text="${card.cardNum}"></span>
+            <span class="label">Account ID:</span>
+            <span class="value" th:text="${card.acctId}"></span>
+            <span class="label">CVV Code:</span>
+            <span class="value" th:text="${card.cvvCd}"></span>
+            <span class="label">Embossed Name:</span>
+            <span class="value" th:text="${card.embossedName}"></span>
+            <span class="label">Expiration Date:</span>
+            <span class="value" th:text="${card.expirationDate}"></span>
+            <span class="label">Status:</span>
+            <span class="value" th:text="${card.activeStatus == 'Y' ? 'Active' : 'Inactive'}"></span>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{'/cards/update/' + ${card.cardNum}}">Update Card</a> |
+            <a th:href="@{/cards/list}">Back to Card List</a>
+        </div>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Account View</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COACTVWC</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Account View</h1>
+
+    <div th:if="${successMessage}" class="message-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/accounts/view}" method="post">
+        <div class="form-group">
+            <label for="acctId">Account ID:</label>
+            <input type="number" id="acctId" name="acctId"
+                   th:value="${searchRequest?.acctId}" placeholder="Enter 11-digit Account ID" required/>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn">View Account</button>
+        </div>
+    </form>
+
+    <div th:if="${account != null}">
+        <h2 class="section-title">Account Information</h2>
+        <div class="detail-grid">
+            <span class="label">Account ID:</span>
+            <span class="value" th:text="${#numbers.formatInteger(account.acctId, 11)}"></span>
+            <span class="label">Status:</span>
+            <span class="value" th:text="${account.activeStatus == 'Y' ? 'Active' : 'Inactive'}"></span>
+            <span class="label">Current Balance:</span>
+            <span class="value" th:text="'$' + ${#numbers.formatDecimal(account.currBal, 1, 2)}"></span>
+            <span class="label">Credit Limit:</span>
+            <span class="value" th:text="'$' + ${#numbers.formatDecimal(account.creditLimit, 1, 2)}"></span>
+            <span class="label">Cash Credit Limit:</span>
+            <span class="value" th:text="'$' + ${#numbers.formatDecimal(account.cashCreditLimit, 1, 2)}"></span>
+            <span class="label">Open Date:</span>
+            <span class="value" th:text="${account.openDate}"></span>
+            <span class="label">Expiration Date:</span>
+            <span class="value" th:text="${account.expirationDate}"></span>
+            <span class="label">Reissue Date:</span>
+            <span class="value" th:text="${account.reissueDate}"></span>
+            <span class="label">Cycle Credit:</span>
+            <span class="value" th:text="'$' + ${#numbers.formatDecimal(account.currCycCredit, 1, 2)}"></span>
+            <span class="label">Cycle Debit:</span>
+            <span class="value" th:text="'$' + ${#numbers.formatDecimal(account.currCycDebit, 1, 2)}"></span>
+            <span class="label">Group ID:</span>
+            <span class="value" th:text="${account.groupId}"></span>
+        </div>
+
+        <div th:if="${customer != null}">
+            <h2 class="section-title">Customer Information</h2>
+            <div class="detail-grid">
+                <span class="label">Customer ID:</span>
+                <span class="value" th:text="${#numbers.formatInteger(customer.custId, 9)}"></span>
+                <span class="label">Name:</span>
+                <span class="value" th:text="${customer.firstName + ' ' + customer.middleName + ' ' + customer.lastName}"></span>
+                <span class="label">Address:</span>
+                <span class="value" th:text="${customer.addressLine1}"></span>
+                <span class="label">City/State/Zip:</span>
+                <span class="value" th:text="${customer.addressLine3 + ', ' + customer.stateCode + ' ' + customer.zipCode}"></span>
+                <span class="label">Phone 1:</span>
+                <span class="value" th:text="${customer.phone1}"></span>
+                <span class="label">Phone 2:</span>
+                <span class="value" th:text="${customer.phone2}"></span>
+                <span class="label">SSN:</span>
+                <span class="value" th:text="${customer.ssn}"></span>
+                <span class="label">DOB:</span>
+                <span class="value" th:text="${customer.dob}"></span>
+                <span class="label">FICO Score:</span>
+                <span class="value" th:text="${customer.ficoScore}"></span>
+            </div>
+        </div>
+
+        <div th:if="${cardXrefs != null && !cardXrefs.isEmpty()}">
+            <h2 class="section-title">Associated Cards</h2>
+            <table class="data-table">
+                <tr><th>Card Number</th><th>Customer ID</th><th>Account ID</th></tr>
+                <tr th:each="xref : ${cardXrefs}">
+                    <td><a th:href="@{'/cards/view/' + ${xref.cardNum}}" th:text="${xref.cardNum}"></a></td>
+                    <td th:text="${xref.custId}"></td>
+                    <td th:text="${xref.acctId}"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+</div>
+</body>
+</html>

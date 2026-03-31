@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CardDemo - Transaction List</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="header-title">CardDemo Application</span>
+        <span class="header-info">
+            <span th:text="${programName}">COTRN00C</span> |
+            Date: <span th:text="${currentDate}">MM/DD/YY</span> |
+            Time: <span th:text="${currentTime}">HH:MM:SS</span> |
+            User: <span th:text="${userId}">USER</span> |
+            <a th:href="@{/logout}" class="logout-link">Sign Off</a>
+        </span>
+    </div>
+
+    <h1 class="page-title">Transaction List</h1>
+
+    <form th:action="@{/transactions}" method="get" style="margin-bottom: 15px;">
+        <div class="form-group">
+            <label for="cardNum">Filter by Card:</label>
+            <input type="text" id="cardNum" name="cardNum" maxlength="16"
+                   th:value="${cardNum}" placeholder="Card Number (optional)"/>
+            <button type="submit" class="btn">Filter</button>
+            <a th:href="@{/transactions}" class="btn">Clear</a>
+        </div>
+    </form>
+
+    <table class="data-table">
+        <tr>
+            <th>Transaction ID</th>
+            <th>Type</th>
+            <th>Cat</th>
+            <th>Source</th>
+            <th>Amount</th>
+            <th>Card Number</th>
+            <th>Date</th>
+        </tr>
+        <tr th:each="tran : ${transactions.content}">
+            <td><a th:href="@{'/transactions/view/' + ${tran.tranId}}" th:text="${tran.tranId}"></a></td>
+            <td th:text="${tran.typeCd}"></td>
+            <td th:text="${tran.catCd}"></td>
+            <td th:text="${tran.source}"></td>
+            <td th:text="'$' + ${#numbers.formatDecimal(tran.amount, 1, 2)}"></td>
+            <td th:text="${tran.cardNum}"></td>
+            <td th:text="${tran.origTimestamp != null && tran.origTimestamp.length() >= 10 ? tran.origTimestamp.substring(0, 10) : ''}"></td>
+        </tr>
+    </table>
+
+    <div class="pagination" th:if="${totalPages > 1}">
+        <a th:if="${currentPage > 0}" th:href="@{/transactions(page=${currentPage - 1}, cardNum=${cardNum})}">PF7 Prev</a>
+        <span th:text="'Page ' + ${currentPage + 1} + ' of ' + ${totalPages}"></span>
+        <a th:if="${currentPage < totalPages - 1}" th:href="@{/transactions(page=${currentPage + 1}, cardNum=${cardNum})}">PF8 Next</a>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/menu}">Back to Main Menu</a>
+    </div>
+</div>
+</body>
+</html>

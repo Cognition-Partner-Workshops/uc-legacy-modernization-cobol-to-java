@@ -1,0 +1,286 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #1a1a2e;
+    color: #00ff41;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 2px solid #00ff41;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.header-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #00ff41;
+}
+
+.header-info {
+    font-size: 0.85em;
+    color: #00cc33;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 1.5em;
+    margin: 20px 0;
+    color: #00ff41;
+    text-transform: uppercase;
+}
+
+.menu-container {
+    margin: 30px auto;
+    max-width: 600px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.menu-item label {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.menu-item input[type="radio"] {
+    accent-color: #00ff41;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: inline-block;
+    width: 200px;
+    color: #00cc33;
+}
+
+.form-group input,
+.form-group select {
+    background-color: #0d0d1a;
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    padding: 5px 10px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1em;
+    width: 300px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #00ff99;
+    box-shadow: 0 0 5px #00ff41;
+}
+
+.form-group input::placeholder {
+    color: #006622;
+}
+
+.btn {
+    background-color: #003300;
+    color: #00ff41;
+    border: 1px solid #00ff41;
+    padding: 8px 20px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1em;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.btn:hover {
+    background-color: #004400;
+    box-shadow: 0 0 10px #00ff41;
+}
+
+.btn-danger {
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+.btn-danger:hover {
+    background-color: #330000;
+    box-shadow: 0 0 10px #ff4444;
+}
+
+.btn-group {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #004400;
+    padding: 6px 10px;
+    text-align: left;
+    font-size: 0.9em;
+}
+
+.data-table th {
+    background-color: #003300;
+    color: #00ff99;
+}
+
+.data-table tr:hover {
+    background-color: #0a1a0a;
+}
+
+.data-table a {
+    color: #00ccff;
+    text-decoration: none;
+}
+
+.data-table a:hover {
+    text-decoration: underline;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 8px;
+    margin: 15px 0;
+    padding: 15px;
+    border: 1px solid #004400;
+}
+
+.detail-grid .label {
+    color: #00cc33;
+    font-weight: bold;
+}
+
+.detail-grid .value {
+    color: #00ff41;
+}
+
+.section-title {
+    font-size: 1.1em;
+    color: #00ff99;
+    margin: 20px 0 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #004400;
+}
+
+.message-success {
+    color: #00ff41;
+    background-color: #003300;
+    border: 1px solid #00ff41;
+    padding: 10px;
+    margin: 15px 0;
+    text-align: center;
+}
+
+.message-error {
+    color: #ff4444;
+    background-color: #330000;
+    border: 1px solid #ff4444;
+    padding: 10px;
+    margin: 15px 0;
+    text-align: center;
+}
+
+.pagination {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.pagination a,
+.pagination span {
+    padding: 5px 12px;
+    margin: 0 3px;
+    border: 1px solid #004400;
+    color: #00ff41;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background-color: #003300;
+}
+
+.pagination .active {
+    background-color: #003300;
+    font-weight: bold;
+}
+
+.nav-links {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.nav-links a {
+    color: #00ccff;
+    text-decoration: none;
+    margin: 0 15px;
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
+
+a {
+    color: #00ccff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.logout-link {
+    color: #ffcc00;
+}
+
+.report-output {
+    background-color: #0d0d1a;
+    border: 1px solid #004400;
+    padding: 15px;
+    margin: 15px 0;
+    white-space: pre-wrap;
+    font-size: 0.85em;
+    overflow-x: auto;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    text-align: center;
+}
+
+.login-container .page-title {
+    margin-bottom: 30px;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 10px;
+    border-top: 1px solid #004400;
+    color: #006622;
+    font-size: 0.8em;
+}
