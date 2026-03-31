@@ -30,7 +30,7 @@ import java.util.Optional;
 public class InterestCalculationTasklet implements Tasklet {
 
     private static final Logger log = LoggerFactory.getLogger(InterestCalculationTasklet.class);
-    private static final String DEFAULT_GROUP = "DEFAULT   ";
+    private static final String DEFAULT_GROUP = "DEFAULT";
 
     private final TransactionCategoryBalanceRepository tcatBalRepository;
     private final AccountRepository accountRepository;

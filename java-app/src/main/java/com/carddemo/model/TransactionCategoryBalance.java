@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "tran_cat_balance")
+@Table(name = "transaction_category_balance")
 @IdClass(TransactionCategoryBalanceId.class)
 @Data
 @NoArgsConstructor

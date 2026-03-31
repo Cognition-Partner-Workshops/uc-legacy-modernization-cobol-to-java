@@ -90,7 +90,7 @@ public class AccountService {
         Account account = getAccount(acctId);
         account.setCurrBal(account.getCurrBal().add(amount));
         if (isCredit) {
-            account.setCurrCycCredit(account.getCurrCycCredit().add(amount));
+            account.setCurrCycCredit(account.getCurrCycCredit().add(amount.abs()));
         } else {
             account.setCurrCycDebit(account.getCurrCycDebit().add(amount.abs()));
         }

@@ -24,8 +24,8 @@ public class CardData {
     @Column(name = "acct_id")
     private Long acctId;
 
-    @Column(name = "cvv_cd")
-    private Integer cvvCd;
+    @Column(name = "cvv_cd", length = 3)
+    private String cvvCd;
 
     @Column(name = "embossed_name", length = 50)
     private String embossedName;
