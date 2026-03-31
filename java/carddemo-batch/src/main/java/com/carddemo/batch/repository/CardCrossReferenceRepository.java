@@ -4,10 +4,10 @@ import com.carddemo.common.model.CardCrossReference;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface CardCrossReferenceRepository extends JpaRepository<CardCrossReference, String> {
 
-    Optional<CardCrossReference> findByAccountId(Long accountId);
+    List<CardCrossReference> findByAccountId(Long accountId);
 }

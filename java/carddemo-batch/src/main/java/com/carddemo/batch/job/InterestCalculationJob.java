@@ -128,13 +128,13 @@ public class InterestCalculationJob {
                 Account account = accountOpt.get();
 
                 // 1110-GET-XREF-DATA
-                Optional<CardCrossReference> xrefOpt =
+                List<CardCrossReference> xrefList =
                         cardCrossReferenceRepository.findByAccountId(accountId);
-                if (xrefOpt.isEmpty()) {
+                if (xrefList.isEmpty()) {
                     log.warn("Cross-reference not found for account: {}", accountId);
                     continue;
                 }
-                CardCrossReference xref = xrefOpt.get();
+                CardCrossReference xref = xrefList.get(0);
 
                 // 1200-GET-INTEREST-RATE
                 String groupId = account.getGroupId() != null

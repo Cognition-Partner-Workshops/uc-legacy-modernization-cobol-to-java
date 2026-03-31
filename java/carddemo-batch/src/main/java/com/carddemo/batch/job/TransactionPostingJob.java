@@ -210,7 +210,7 @@ public class TransactionPostingJob {
         } else {
             BigDecimal cycDebit = account.getCurrentCycleDebit() != null
                     ? account.getCurrentCycleDebit() : BigDecimal.ZERO;
-            account.setCurrentCycleDebit(cycDebit.add(tranAmt));
+            account.setCurrentCycleDebit(cycDebit.add(tranAmt.abs()));
         }
 
         // 2900-WRITE-TRANSACTION-FILE
