@@ -6,3 +6,7 @@ batch-app/markers/*
 /.idea/
 .DS_Store
 **/.DS_Store
+
+# React frontend
+java-app/frontend/node_modules/
+java-app/frontend/dist/
