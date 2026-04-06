@@ -85,6 +85,42 @@ const routes: Routes = [
     data: { roles: ['ROLE_ADMIN'] }
   },
   {
+    path: 'leads',
+    loadChildren: () => import('./features/leads/leads.module').then(m => m.LeadsModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'quotes',
+    loadChildren: () => import('./features/quotes/quotes.module').then(m => m.QuotesModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'calendar',
+    loadChildren: () => import('./features/calendar/calendar.module').then(m => m.CalendarModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'maps',
+    loadChildren: () => import('./features/maps/maps.module').then(m => m.MapsModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'templates',
+    loadChildren: () => import('./features/templates/templates.module').then(m => m.TemplatesModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'scheduler',
+    loadChildren: () => import('./features/scheduler/scheduler.module').then(m => m.SchedulerModule),
+    canActivate: [AuthGuard],
+    data: { roles: ['ROLE_ADMIN'] }
+  },
+  {
+    path: 'notifications',
+    loadChildren: () => import('./features/notifications/notifications.module').then(m => m.NotificationsModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'admin',
     loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule),
     canActivate: [AuthGuard],

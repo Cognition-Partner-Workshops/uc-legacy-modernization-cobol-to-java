@@ -70,6 +70,27 @@ spec:
           - service: connector-service
             port: "8098"
             dbName: suitecrm_connector
+          - service: lead-service
+            port: "8099"
+            dbName: suitecrm_leads
+          - service: quotes-billing-service
+            port: "8100"
+            dbName: suitecrm_quotes
+          - service: calendar-service
+            port: "8101"
+            dbName: suitecrm_calendar
+          - service: maps-service
+            port: "8102"
+            dbName: suitecrm_maps
+          - service: template-service
+            port: "8103"
+            dbName: suitecrm_templates
+          - service: scheduler-service
+            port: "8104"
+            dbName: suitecrm_scheduler
+          - service: notification-service
+            port: "8105"
+            dbName: suitecrm_notifications
           - service: frontend
             port: "80"
             dbName: ""

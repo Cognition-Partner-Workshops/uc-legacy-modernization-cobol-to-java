@@ -71,6 +71,21 @@ pipeline {
                         'backend/report-service': 'report-service',
                         'backend/document-service': 'document-service',
                         'backend/workflow-service': 'workflow-service',
+                        'backend/project-service': 'project-service',
+                        'backend/email-service': 'email-service',
+                        'backend/kb-service': 'kb-service',
+                        'backend/event-service': 'event-service',
+                        'backend/survey-service': 'survey-service',
+                        'backend/target-list-service': 'target-list-service',
+                        'backend/product-catalog-service': 'product-catalog-service',
+                        'backend/connector-service': 'connector-service',
+                        'backend/lead-service': 'lead-service',
+                        'backend/quotes-billing-service': 'quotes-billing-service',
+                        'backend/calendar-service': 'calendar-service',
+                        'backend/maps-service': 'maps-service',
+                        'backend/template-service': 'template-service',
+                        'backend/scheduler-service': 'scheduler-service',
+                        'backend/notification-service': 'notification-service',
                         'frontend/shell': 'frontend'
                     ]
                     serviceMap.each { path, service ->
@@ -137,6 +152,66 @@ pipeline {
                     when { expression { shouldBuild('workflow-service') } }
                     steps { buildMavenService('workflow-service') }
                 }
+                stage('Project Service') {
+                    when { expression { shouldBuild('project-service') } }
+                    steps { buildMavenService('project-service') }
+                }
+                stage('Email Service') {
+                    when { expression { shouldBuild('email-service') } }
+                    steps { buildMavenService('email-service') }
+                }
+                stage('KB Service') {
+                    when { expression { shouldBuild('kb-service') } }
+                    steps { buildMavenService('kb-service') }
+                }
+                stage('Event Service') {
+                    when { expression { shouldBuild('event-service') } }
+                    steps { buildMavenService('event-service') }
+                }
+                stage('Survey Service') {
+                    when { expression { shouldBuild('survey-service') } }
+                    steps { buildMavenService('survey-service') }
+                }
+                stage('Target List Service') {
+                    when { expression { shouldBuild('target-list-service') } }
+                    steps { buildMavenService('target-list-service') }
+                }
+                stage('Product Catalog Service') {
+                    when { expression { shouldBuild('product-catalog-service') } }
+                    steps { buildMavenService('product-catalog-service') }
+                }
+                stage('Connector Service') {
+                    when { expression { shouldBuild('connector-service') } }
+                    steps { buildMavenService('connector-service') }
+                }
+                stage('Lead Service') {
+                    when { expression { shouldBuild('lead-service') } }
+                    steps { buildMavenService('lead-service') }
+                }
+                stage('Quotes Billing Service') {
+                    when { expression { shouldBuild('quotes-billing-service') } }
+                    steps { buildMavenService('quotes-billing-service') }
+                }
+                stage('Calendar Service') {
+                    when { expression { shouldBuild('calendar-service') } }
+                    steps { buildMavenService('calendar-service') }
+                }
+                stage('Maps Service') {
+                    when { expression { shouldBuild('maps-service') } }
+                    steps { buildMavenService('maps-service') }
+                }
+                stage('Template Service') {
+                    when { expression { shouldBuild('template-service') } }
+                    steps { buildMavenService('template-service') }
+                }
+                stage('Scheduler Service') {
+                    when { expression { shouldBuild('scheduler-service') } }
+                    steps { buildMavenService('scheduler-service') }
+                }
+                stage('Notification Service') {
+                    when { expression { shouldBuild('notification-service') } }
+                    steps { buildMavenService('notification-service') }
+                }
             }
         }
 
@@ -160,7 +235,13 @@ pipeline {
                         'auth-service', 'api-gateway', 'discovery-server', 'config-server',
                         'contact-service', 'account-service', 'opportunity-service',
                         'case-service', 'campaign-service', 'activity-service',
-                        'report-service', 'document-service', 'workflow-service'
+                        'report-service', 'document-service', 'workflow-service',
+                        'project-service', 'email-service', 'kb-service',
+                        'event-service', 'survey-service', 'target-list-service',
+                        'product-catalog-service', 'connector-service',
+                        'lead-service', 'quotes-billing-service', 'calendar-service',
+                        'maps-service', 'template-service', 'scheduler-service',
+                        'notification-service'
                     ]
 
                     services.each { service ->
@@ -204,7 +285,12 @@ pipeline {
                         'auth-service', 'contact-service', 'account-service',
                         'opportunity-service', 'case-service', 'campaign-service',
                         'activity-service', 'report-service', 'document-service',
-                        'workflow-service', 'frontend'
+                        'workflow-service', 'project-service', 'email-service',
+                        'kb-service', 'event-service', 'survey-service',
+                        'target-list-service', 'product-catalog-service',
+                        'connector-service', 'lead-service', 'quotes-billing-service',
+                        'calendar-service', 'maps-service', 'template-service',
+                        'scheduler-service', 'notification-service', 'frontend'
                     ]
 
                     services.each { service ->
