@@ -14,7 +14,7 @@ services:
         suitecrm_auth,suitecrm_contacts,suitecrm_accounts,
         suitecrm_opportunities,suitecrm_cases,suitecrm_campaigns,
         suitecrm_activities,suitecrm_reports,suitecrm_documents,
-        suitecrm_workflows
+        suitecrm_workflows,suitecrm_project
     ports:
       - "5432:5432"
     volumes:
@@ -326,6 +326,28 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       DB_URL: jdbc:postgresql://postgres:5432/suitecrm_workflows
+      DB_USERNAME: suitecrm
+      DB_PASSWORD: suitecrm_secret
+      EUREKA_URI: http://discovery-server:8761/eureka
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/suitecrm
+    depends_on:
+      postgres:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - suitecrm-network
+
+  project-service:
+    build:
+      context: ./backend/project-service
+      dockerfile: Dockerfile
+    container_name: suitecrm-projects
+    ports:
+      - "8091:8091"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/suitecrm_project
       DB_USERNAME: suitecrm
       DB_PASSWORD: suitecrm_secret
       EUREKA_URI: http://discovery-server:8761/eureka

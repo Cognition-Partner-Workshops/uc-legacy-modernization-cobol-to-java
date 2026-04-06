@@ -46,6 +46,9 @@ spec:
           - service: workflow-service
             port: "8090"
             dbName: suitecrm_workflows
+          - service: project-service
+            port: "8091"
+            dbName: suitecrm_project
           - service: frontend
             port: "80"
             dbName: ""
