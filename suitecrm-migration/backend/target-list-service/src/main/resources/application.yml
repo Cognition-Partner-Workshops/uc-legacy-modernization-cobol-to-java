@@ -1,0 +1,37 @@
+server:
+  port: 8096
+spring:
+  application:
+    name: target-list-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/suitecrm_target_list}
+    username: ${DB_USERNAME:suitecrm}
+    password: ${DB_PASSWORD:suitecrm_secret}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: target_list_schema
+    show-sql: false
+  flyway:
+    enabled: true
+    schemas: target_list_schema
+    locations: classpath:db/migration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/suitecrm}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics

@@ -26,7 +26,7 @@ public class Reminder {
     @Builder.Default
     private Boolean popup = false;
 
-    @Column(name = "email_sent")
+    @Column(name = "email_flag")
     @Builder.Default
     private Boolean emailSent = false;
 

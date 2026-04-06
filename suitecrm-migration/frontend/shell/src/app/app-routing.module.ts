@@ -44,6 +44,47 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'projects',
+    loadChildren: () => import('./features/projects/projects.module').then(m => m.ProjectsModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'emails',
+    loadChildren: () => import('./features/emails/emails.module').then(m => m.EmailsModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'kb',
+    loadChildren: () => import('./features/kb/kb.module').then(m => m.KBModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'events',
+    loadChildren: () => import('./features/events/events.module').then(m => m.EventsModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'surveys',
+    loadChildren: () => import('./features/surveys/surveys.module').then(m => m.SurveysModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'products',
+    loadChildren: () => import('./features/products/products.module').then(m => m.ProductsModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'target-lists',
+    loadChildren: () => import('./features/target-lists/target-lists.module').then(m => m.TargetListsModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'connectors',
+    loadChildren: () => import('./features/connectors/connectors.module').then(m => m.ConnectorsModule),
+    canActivate: [AuthGuard],
+    data: { roles: ['ROLE_ADMIN'] }
+  },
+  {
     path: 'admin',
     loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule),
     canActivate: [AuthGuard],

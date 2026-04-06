@@ -14,7 +14,9 @@ services:
         suitecrm_auth,suitecrm_contacts,suitecrm_accounts,
         suitecrm_opportunities,suitecrm_cases,suitecrm_campaigns,
         suitecrm_activities,suitecrm_reports,suitecrm_documents,
-        suitecrm_workflows,suitecrm_project
+        suitecrm_workflows,suitecrm_project,suitecrm_email,
+        suitecrm_kb,suitecrm_event,suitecrm_survey,
+        suitecrm_product_catalog,suitecrm_target_list,suitecrm_connector
     ports:
       - "5432:5432"
     volumes:
@@ -348,6 +350,160 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       DB_URL: jdbc:postgresql://postgres:5432/suitecrm_project
+      DB_USERNAME: suitecrm
+      DB_PASSWORD: suitecrm_secret
+      EUREKA_URI: http://discovery-server:8761/eureka
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/suitecrm
+    depends_on:
+      postgres:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - suitecrm-network
+
+  email-service:
+    build:
+      context: ./backend/email-service
+      dockerfile: Dockerfile
+    container_name: suitecrm-emails
+    ports:
+      - "8092:8092"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/suitecrm_email
+      DB_USERNAME: suitecrm
+      DB_PASSWORD: suitecrm_secret
+      EUREKA_URI: http://discovery-server:8761/eureka
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/suitecrm
+    depends_on:
+      postgres:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - suitecrm-network
+
+  kb-service:
+    build:
+      context: ./backend/kb-service
+      dockerfile: Dockerfile
+    container_name: suitecrm-kb
+    ports:
+      - "8093:8093"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/suitecrm_kb
+      DB_USERNAME: suitecrm
+      DB_PASSWORD: suitecrm_secret
+      EUREKA_URI: http://discovery-server:8761/eureka
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/suitecrm
+    depends_on:
+      postgres:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - suitecrm-network
+
+  event-service:
+    build:
+      context: ./backend/event-service
+      dockerfile: Dockerfile
+    container_name: suitecrm-events
+    ports:
+      - "8094:8094"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/suitecrm_event
+      DB_USERNAME: suitecrm
+      DB_PASSWORD: suitecrm_secret
+      EUREKA_URI: http://discovery-server:8761/eureka
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/suitecrm
+    depends_on:
+      postgres:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - suitecrm-network
+
+  survey-service:
+    build:
+      context: ./backend/survey-service
+      dockerfile: Dockerfile
+    container_name: suitecrm-surveys
+    ports:
+      - "8095:8095"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/suitecrm_survey
+      DB_USERNAME: suitecrm
+      DB_PASSWORD: suitecrm_secret
+      EUREKA_URI: http://discovery-server:8761/eureka
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/suitecrm
+    depends_on:
+      postgres:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - suitecrm-network
+
+  target-list-service:
+    build:
+      context: ./backend/target-list-service
+      dockerfile: Dockerfile
+    container_name: suitecrm-target-lists
+    ports:
+      - "8096:8096"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/suitecrm_target_list
+      DB_USERNAME: suitecrm
+      DB_PASSWORD: suitecrm_secret
+      EUREKA_URI: http://discovery-server:8761/eureka
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/suitecrm
+    depends_on:
+      postgres:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - suitecrm-network
+
+  product-catalog-service:
+    build:
+      context: ./backend/product-catalog-service
+      dockerfile: Dockerfile
+    container_name: suitecrm-products
+    ports:
+      - "8097:8097"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/suitecrm_product_catalog
+      DB_USERNAME: suitecrm
+      DB_PASSWORD: suitecrm_secret
+      EUREKA_URI: http://discovery-server:8761/eureka
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/suitecrm
+    depends_on:
+      postgres:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - suitecrm-network
+
+  connector-service:
+    build:
+      context: ./backend/connector-service
+      dockerfile: Dockerfile
+    container_name: suitecrm-connectors
+    ports:
+      - "8098:8098"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/suitecrm_connector
       DB_USERNAME: suitecrm
       DB_PASSWORD: suitecrm_secret
       EUREKA_URI: http://discovery-server:8761/eureka

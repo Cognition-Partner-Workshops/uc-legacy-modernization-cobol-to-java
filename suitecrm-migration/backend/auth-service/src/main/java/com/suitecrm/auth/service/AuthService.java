@@ -33,8 +33,20 @@ public class AuthService {
         User user = userRepository.findByUsernameAndDeletedFalse(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
 
-        if (!"Active".equals(user.getStatus())) {
+        if ("Inactive".equals(user.getStatus())) {
             throw new RuntimeException("User account is inactive");
+        }
+
+        if ("Locked".equals(user.getStatus())) {
+            // Auto-unlock after 30 minutes
+            if (user.getDateModified() != null &&
+                    user.getDateModified().plusMinutes(30).isBefore(LocalDateTime.now())) {
+                user.setStatus("Active");
+                user.setFailedLoginAttempts(0);
+                userRepository.save(user);
+            } else {
+                throw new RuntimeException("User account is locked. Please try again later.");
+            }
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {

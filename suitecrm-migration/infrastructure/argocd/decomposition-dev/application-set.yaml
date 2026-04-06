@@ -49,6 +49,27 @@ spec:
           - service: project-service
             port: "8091"
             dbName: suitecrm_project
+          - service: email-service
+            port: "8092"
+            dbName: suitecrm_email
+          - service: kb-service
+            port: "8093"
+            dbName: suitecrm_kb
+          - service: event-service
+            port: "8094"
+            dbName: suitecrm_event
+          - service: survey-service
+            port: "8095"
+            dbName: suitecrm_survey
+          - service: target-list-service
+            port: "8096"
+            dbName: suitecrm_target_list
+          - service: product-catalog-service
+            port: "8097"
+            dbName: suitecrm_product_catalog
+          - service: connector-service
+            port: "8098"
+            dbName: suitecrm_connector
           - service: frontend
             port: "80"
             dbName: ""
