@@ -1,0 +1,22 @@
+replicaCount: 1
+image:
+  repository: suitecrm/config-server
+  tag: latest
+nameOverride: config-server
+service:
+  port: 8888
+  targetPort: 8888
+resources:
+  limits: { cpu: 300m, memory: 384Mi }
+  requests: { cpu: 150m, memory: 256Mi }
+autoscaling:
+  enabled: false
+spring:
+  profiles: kubernetes
+  datasource:
+    url: ""
+    username: ""
+    password: ""
+eureka:
+  enabled: true
+  uri: http://discovery-server:8761/eureka

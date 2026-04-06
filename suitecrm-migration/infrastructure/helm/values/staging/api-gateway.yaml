@@ -1,0 +1,35 @@
+replicaCount: 2
+image:
+  repository: suitecrm/api-gateway
+  tag: latest
+nameOverride: api-gateway
+service:
+  port: 8080
+  targetPort: 8080
+resources:
+  limits: { cpu: 1000m, memory: 1Gi }
+  requests: { cpu: 500m, memory: 512Mi }
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 65
+spring:
+  profiles: kubernetes
+  datasource:
+    url: ""
+    username: ""
+    password: ""
+eureka:
+  enabled: true
+  uri: http://discovery-server:8761/eureka
+keycloak:
+  issuerUri: http://keycloak:8080/realms/suitecrm
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: suitecrm-staging.example.com
+      paths:
+        - path: /api
+          pathType: Prefix

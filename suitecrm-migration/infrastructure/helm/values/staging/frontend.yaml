@@ -1,0 +1,21 @@
+replicaCount: 2
+image:
+  repository: suitecrm/frontend
+  tag: latest
+nameOverride: frontend
+service:
+  port: 80
+  targetPort: 80
+resources:
+  limits: { cpu: 500m, memory: 512Mi }
+  requests: { cpu: 250m, memory: 256Mi }
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+eureka:
+  enabled: true
+  uri: http://discovery-server:8761/eureka
+keycloak:
+  issuerUri: http://keycloak:8080/realms/suitecrm

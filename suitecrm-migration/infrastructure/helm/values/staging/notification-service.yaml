@@ -1,0 +1,27 @@
+replicaCount: 2
+image:
+  repository: suitecrm/notification-service
+  tag: latest
+nameOverride: notification-service
+service:
+  port: 8105
+  targetPort: 8105
+resources:
+  limits: { cpu: 500m, memory: 512Mi }
+  requests: { cpu: 200m, memory: 256Mi }
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 75
+spring:
+  profiles: kubernetes
+  datasource:
+    url: jdbc:postgresql://suitecrm-aurora:5432/suitecrm_notifications
+    username: suitecrm
+    password: changeme
+eureka:
+  enabled: true
+  uri: http://discovery-server:8761/eureka
+keycloak:
+  issuerUri: http://keycloak:8080/realms/suitecrm

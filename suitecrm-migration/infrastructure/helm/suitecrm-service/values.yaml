@@ -1,0 +1,108 @@
+# Default values for suitecrm-service
+# This is a generic chart used by all SuiteCRM microservices
+
+replicaCount: 2
+
+image:
+  repository: ""
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: suitecrm.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Spring Boot configuration
+spring:
+  profiles: kubernetes
+  datasource:
+    url: ""
+    username: ""
+    password: ""
+
+# Eureka configuration
+eureka:
+  enabled: true
+  uri: http://discovery-server:8761/eureka
+
+# Keycloak / OAuth2 configuration
+keycloak:
+  issuerUri: http://keycloak:8080/realms/suitecrm
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: http
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 5
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Network Policy
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: suitecrm
+      ports:
+        - protocol: TCP
+          port: 8080
+
+# ServiceMonitor for Prometheus
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  path: /actuator/prometheus
+  labels:
+    release: prometheus

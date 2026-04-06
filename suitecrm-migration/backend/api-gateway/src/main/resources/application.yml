@@ -1,0 +1,82 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+    config:
+      uri: http://config-server:8888
+      fail-fast: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/suitecrm}
+          jwk-set-uri: ${KEYCLOAK_JWK_URI:http://keycloak:8080/realms/suitecrm/protocol/openid-connect/certs}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://discovery-server:8761/eureka}
+  instance:
+    preferIpAddress: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 5
+    instances:
+      authCircuitBreaker:
+        baseConfig: default
+      contactCircuitBreaker:
+        baseConfig: default
+      accountCircuitBreaker:
+        baseConfig: default
+      opportunityCircuitBreaker:
+        baseConfig: default
+      caseCircuitBreaker:
+        baseConfig: default
+      campaignCircuitBreaker:
+        baseConfig: default
+      activityCircuitBreaker:
+        baseConfig: default
+      reportCircuitBreaker:
+        baseConfig: default
+      documentCircuitBreaker:
+        baseConfig: default
+      workflowCircuitBreaker:
+        baseConfig: default
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    com.suitecrm.gateway: DEBUG

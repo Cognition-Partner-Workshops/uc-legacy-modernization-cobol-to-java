@@ -1,0 +1,33 @@
+replicaCount: 1
+
+image:
+  repository: suitecrm/discovery-server
+  tag: latest
+
+nameOverride: discovery-server
+
+service:
+  port: 8761
+  targetPort: 8761
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 384Mi
+  requests:
+    cpu: 150m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+
+spring:
+  profiles: kubernetes
+  datasource:
+    url: ""
+    username: ""
+    password: ""
+
+eureka:
+  enabled: false
+  uri: ""

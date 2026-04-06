@@ -1,0 +1,27 @@
+replicaCount: 1
+image:
+  repository: suitecrm/maps-service
+  tag: latest
+nameOverride: maps-service
+service:
+  port: 8102
+  targetPort: 8102
+resources:
+  limits: { cpu: 500m, memory: 512Mi }
+  requests: { cpu: 200m, memory: 256Mi }
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 75
+spring:
+  profiles: kubernetes
+  datasource:
+    url: jdbc:postgresql://suitecrm-aurora:5432/suitecrm_maps
+    username: suitecrm
+    password: changeme
+eureka:
+  enabled: true
+  uri: http://discovery-server:8761/eureka
+keycloak:
+  issuerUri: http://keycloak:8080/realms/suitecrm

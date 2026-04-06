@@ -1,0 +1,25 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-server
+  security:
+    user:
+      name: ${EUREKA_USER:eureka}
+      password: ${EUREKA_PASSWORD:eureka_secret}
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${eureka.instance.hostname}:${server.port}/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

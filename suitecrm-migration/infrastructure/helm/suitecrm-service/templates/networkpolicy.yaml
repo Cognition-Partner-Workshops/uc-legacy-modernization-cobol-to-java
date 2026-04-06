@@ -1,0 +1,45 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "suitecrm-service.fullname" . }}
+  labels:
+    {{- include "suitecrm-service.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "suitecrm-service.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    {{- toYaml .Values.networkPolicy.ingress | nindent 4 }}
+  egress:
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow egress to PostgreSQL
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow egress to Eureka
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 8761
+    # Allow egress to Keycloak
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 8080
+    # Allow egress to other services in the namespace
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: suitecrm
+{{- end }}

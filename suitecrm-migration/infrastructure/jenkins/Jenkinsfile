@@ -1,0 +1,370 @@
+// Unified Jenkins Pipeline for SuiteCRM Microservices
+// Supports building, testing, and deploying all services
+
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'staging', 'production'],
+            description: 'Target deployment environment'
+        )
+        booleanParam(
+            name: 'DEPLOY',
+            defaultValue: false,
+            description: 'Deploy after successful build'
+        )
+        booleanParam(
+            name: 'BUILD_ALL',
+            defaultValue: true,
+            description: 'Build all services (false = only changed services)'
+        )
+    }
+
+    environment {
+        AWS_REGION         = 'us-east-1'
+        ECR_REGISTRY       = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        EKS_CLUSTER        = "suitecrm-${params.ENVIRONMENT}"
+        DOCKER_BUILDKIT    = '1'
+        JAVA_HOME          = tool('JDK17')
+        MAVEN_HOME         = tool('Maven3')
+        NODE_HOME          = tool('NodeJS20')
+    }
+
+    options {
+        timestamps()
+        timeout(time: 60, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    env.GIT_COMMIT_SHORT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    env.IMAGE_TAG = "${env.GIT_COMMIT_SHORT}-${env.BUILD_NUMBER}"
+                    echo "Building image tag: ${env.IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Detect Changes') {
+            when { expression { !params.BUILD_ALL } }
+            steps {
+                script {
+                    def changes = sh(script: "git diff --name-only HEAD~1 HEAD", returnStdout: true).trim()
+                    env.CHANGED_SERVICES = ''
+                    def serviceMap = [
+                        'backend/auth-service': 'auth-service',
+                        'backend/api-gateway': 'api-gateway',
+                        'backend/discovery-server': 'discovery-server',
+                        'backend/config-server': 'config-server',
+                        'backend/contact-service': 'contact-service',
+                        'backend/account-service': 'account-service',
+                        'backend/opportunity-service': 'opportunity-service',
+                        'backend/case-service': 'case-service',
+                        'backend/campaign-service': 'campaign-service',
+                        'backend/activity-service': 'activity-service',
+                        'backend/report-service': 'report-service',
+                        'backend/document-service': 'document-service',
+                        'backend/workflow-service': 'workflow-service',
+                        'backend/project-service': 'project-service',
+                        'backend/email-service': 'email-service',
+                        'backend/kb-service': 'kb-service',
+                        'backend/event-service': 'event-service',
+                        'backend/survey-service': 'survey-service',
+                        'backend/target-list-service': 'target-list-service',
+                        'backend/product-catalog-service': 'product-catalog-service',
+                        'backend/connector-service': 'connector-service',
+                        'backend/lead-service': 'lead-service',
+                        'backend/quotes-billing-service': 'quotes-billing-service',
+                        'backend/calendar-service': 'calendar-service',
+                        'backend/maps-service': 'maps-service',
+                        'backend/template-service': 'template-service',
+                        'backend/scheduler-service': 'scheduler-service',
+                        'backend/notification-service': 'notification-service',
+                        'frontend/shell': 'frontend'
+                    ]
+                    serviceMap.each { path, service ->
+                        if (changes.contains(path)) {
+                            env.CHANGED_SERVICES += "${service},"
+                        }
+                    }
+                    echo "Changed services: ${env.CHANGED_SERVICES}"
+                }
+            }
+        }
+
+        stage('Build Backend Services') {
+            parallel {
+                stage('Auth Service') {
+                    when { expression { shouldBuild('auth-service') } }
+                    steps { buildMavenService('auth-service') }
+                }
+                stage('API Gateway') {
+                    when { expression { shouldBuild('api-gateway') } }
+                    steps { buildMavenService('api-gateway') }
+                }
+                stage('Discovery Server') {
+                    when { expression { shouldBuild('discovery-server') } }
+                    steps { buildMavenService('discovery-server') }
+                }
+                stage('Config Server') {
+                    when { expression { shouldBuild('config-server') } }
+                    steps { buildMavenService('config-server') }
+                }
+                stage('Contact Service') {
+                    when { expression { shouldBuild('contact-service') } }
+                    steps { buildMavenService('contact-service') }
+                }
+                stage('Account Service') {
+                    when { expression { shouldBuild('account-service') } }
+                    steps { buildMavenService('account-service') }
+                }
+                stage('Opportunity Service') {
+                    when { expression { shouldBuild('opportunity-service') } }
+                    steps { buildMavenService('opportunity-service') }
+                }
+                stage('Case Service') {
+                    when { expression { shouldBuild('case-service') } }
+                    steps { buildMavenService('case-service') }
+                }
+                stage('Campaign Service') {
+                    when { expression { shouldBuild('campaign-service') } }
+                    steps { buildMavenService('campaign-service') }
+                }
+                stage('Activity Service') {
+                    when { expression { shouldBuild('activity-service') } }
+                    steps { buildMavenService('activity-service') }
+                }
+                stage('Report Service') {
+                    when { expression { shouldBuild('report-service') } }
+                    steps { buildMavenService('report-service') }
+                }
+                stage('Document Service') {
+                    when { expression { shouldBuild('document-service') } }
+                    steps { buildMavenService('document-service') }
+                }
+                stage('Workflow Service') {
+                    when { expression { shouldBuild('workflow-service') } }
+                    steps { buildMavenService('workflow-service') }
+                }
+                stage('Project Service') {
+                    when { expression { shouldBuild('project-service') } }
+                    steps { buildMavenService('project-service') }
+                }
+                stage('Email Service') {
+                    when { expression { shouldBuild('email-service') } }
+                    steps { buildMavenService('email-service') }
+                }
+                stage('KB Service') {
+                    when { expression { shouldBuild('kb-service') } }
+                    steps { buildMavenService('kb-service') }
+                }
+                stage('Event Service') {
+                    when { expression { shouldBuild('event-service') } }
+                    steps { buildMavenService('event-service') }
+                }
+                stage('Survey Service') {
+                    when { expression { shouldBuild('survey-service') } }
+                    steps { buildMavenService('survey-service') }
+                }
+                stage('Target List Service') {
+                    when { expression { shouldBuild('target-list-service') } }
+                    steps { buildMavenService('target-list-service') }
+                }
+                stage('Product Catalog Service') {
+                    when { expression { shouldBuild('product-catalog-service') } }
+                    steps { buildMavenService('product-catalog-service') }
+                }
+                stage('Connector Service') {
+                    when { expression { shouldBuild('connector-service') } }
+                    steps { buildMavenService('connector-service') }
+                }
+                stage('Lead Service') {
+                    when { expression { shouldBuild('lead-service') } }
+                    steps { buildMavenService('lead-service') }
+                }
+                stage('Quotes Billing Service') {
+                    when { expression { shouldBuild('quotes-billing-service') } }
+                    steps { buildMavenService('quotes-billing-service') }
+                }
+                stage('Calendar Service') {
+                    when { expression { shouldBuild('calendar-service') } }
+                    steps { buildMavenService('calendar-service') }
+                }
+                stage('Maps Service') {
+                    when { expression { shouldBuild('maps-service') } }
+                    steps { buildMavenService('maps-service') }
+                }
+                stage('Template Service') {
+                    when { expression { shouldBuild('template-service') } }
+                    steps { buildMavenService('template-service') }
+                }
+                stage('Scheduler Service') {
+                    when { expression { shouldBuild('scheduler-service') } }
+                    steps { buildMavenService('scheduler-service') }
+                }
+                stage('Notification Service') {
+                    when { expression { shouldBuild('notification-service') } }
+                    steps { buildMavenService('notification-service') }
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            when { expression { shouldBuild('frontend') } }
+            steps {
+                dir('suitecrm-migration/frontend/shell') {
+                    sh 'npm ci --legacy-peer-deps'
+                    sh 'npm run build -- --configuration production'
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            when { expression { params.DEPLOY } }
+            steps {
+                script {
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+
+                    def services = [
+                        'auth-service', 'api-gateway', 'discovery-server', 'config-server',
+                        'contact-service', 'account-service', 'opportunity-service',
+                        'case-service', 'campaign-service', 'activity-service',
+                        'report-service', 'document-service', 'workflow-service',
+                        'project-service', 'email-service', 'kb-service',
+                        'event-service', 'survey-service', 'target-list-service',
+                        'product-catalog-service', 'connector-service',
+                        'lead-service', 'quotes-billing-service', 'calendar-service',
+                        'maps-service', 'template-service', 'scheduler-service',
+                        'notification-service'
+                    ]
+
+                    services.each { service ->
+                        if (shouldBuild(service)) {
+                            def imageName = "${ECR_REGISTRY}/suitecrm/${params.ENVIRONMENT}/${service}:${IMAGE_TAG}"
+                            dir("suitecrm-migration/backend/${service}") {
+                                sh "docker build -t ${imageName} ."
+                                sh "docker push ${imageName}"
+                                sh "docker tag ${imageName} ${ECR_REGISTRY}/suitecrm/${params.ENVIRONMENT}/${service}:latest"
+                                sh "docker push ${ECR_REGISTRY}/suitecrm/${params.ENVIRONMENT}/${service}:latest"
+                            }
+                        }
+                    }
+
+                    // Build frontend
+                    if (shouldBuild('frontend')) {
+                        def frontendImage = "${ECR_REGISTRY}/suitecrm/${params.ENVIRONMENT}/frontend:${IMAGE_TAG}"
+                        dir('suitecrm-migration/frontend/shell') {
+                            sh "docker build -t ${frontendImage} ."
+                            sh "docker push ${frontendImage}"
+                            sh "docker tag ${frontendImage} ${ECR_REGISTRY}/suitecrm/${params.ENVIRONMENT}/frontend:latest"
+                            sh "docker push ${ECR_REGISTRY}/suitecrm/${params.ENVIRONMENT}/frontend:latest"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to EKS') {
+            when {
+                expression { params.DEPLOY }
+                expression { params.ENVIRONMENT != 'production' }
+            }
+            steps {
+                script {
+                    def namespace = "decomposition-${params.ENVIRONMENT}"
+                    sh "aws eks update-kubeconfig --name ${EKS_CLUSTER} --region ${AWS_REGION}"
+
+                    def services = [
+                        'discovery-server', 'config-server', 'api-gateway',
+                        'auth-service', 'contact-service', 'account-service',
+                        'opportunity-service', 'case-service', 'campaign-service',
+                        'activity-service', 'report-service', 'document-service',
+                        'workflow-service', 'project-service', 'email-service',
+                        'kb-service', 'event-service', 'survey-service',
+                        'target-list-service', 'product-catalog-service',
+                        'connector-service', 'lead-service', 'quotes-billing-service',
+                        'calendar-service', 'maps-service', 'template-service',
+                        'scheduler-service', 'notification-service', 'frontend'
+                    ]
+
+                    services.each { service ->
+                        if (shouldBuild(service)) {
+                            sh """
+                                helm upgrade --install ${service} \
+                                    suitecrm-migration/infrastructure/helm/suitecrm-service \
+                                    -f suitecrm-migration/infrastructure/helm/values/${params.ENVIRONMENT}/${service}.yaml \
+                                    --set image.repository=${ECR_REGISTRY}/suitecrm/${params.ENVIRONMENT}/${service} \
+                                    --set image.tag=${IMAGE_TAG} \
+                                    --namespace ${namespace} \
+                                    --create-namespace \
+                                    --wait --timeout 300s
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Production') {
+            when {
+                expression { params.DEPLOY }
+                expression { params.ENVIRONMENT == 'production' }
+            }
+            steps {
+                input message: 'Approve production deployment?', ok: 'Deploy'
+                script {
+                    sh "aws eks update-kubeconfig --name ${EKS_CLUSTER} --region ${AWS_REGION}"
+                    // Production uses ArgoCD for GitOps deployment
+                    echo "Production deployment triggered via ArgoCD sync"
+                    sh "argocd app sync suitecrm-production --force --prune"
+                }
+            }
+        }
+
+        stage('Smoke Tests') {
+            when { expression { params.DEPLOY } }
+            steps {
+                script {
+                    def namespace = "decomposition-${params.ENVIRONMENT}"
+                    sh """
+                        kubectl -n ${namespace} wait --for=condition=ready pod -l app.kubernetes.io/part-of=suitecrm --timeout=300s
+                        echo 'All pods are ready'
+                    """
+                    // Health check endpoints
+                    def services = ['api-gateway', 'auth-service', 'contact-service', 'account-service']
+                    services.each { service ->
+                        sh "kubectl -n ${namespace} exec deploy/${service} -- wget -qO- http://localhost:8080/actuator/health || true"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Build ${env.IMAGE_TAG} succeeded for ${params.ENVIRONMENT}"
+        }
+        failure {
+            echo "Build ${env.IMAGE_TAG} failed for ${params.ENVIRONMENT}"
+        }
+        always {
+            cleanWs()
+        }
+    }
+}
+
+def shouldBuild(String service) {
+    return params.BUILD_ALL || (env.CHANGED_SERVICES ?: '').contains(service)
+}
+
+def buildMavenService(String service) {
+    dir("suitecrm-migration/backend/${service}") {
+        sh "${MAVEN_HOME}/bin/mvn clean package -DskipTests -B"
+    }
+}

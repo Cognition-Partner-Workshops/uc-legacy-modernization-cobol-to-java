@@ -1,0 +1,40 @@
+server:
+  port: 8104
+spring:
+  application:
+    name: scheduler-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/suitecrm_scheduler}
+    username: ${DB_USERNAME:suitecrm}
+    password: ${DB_PASSWORD:suitecrm_secret}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: scheduler_schema
+    show-sql: false
+  flyway:
+    enabled: true
+    schemas: scheduler_schema
+    locations: classpath:db/migration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/suitecrm}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: when-authorized

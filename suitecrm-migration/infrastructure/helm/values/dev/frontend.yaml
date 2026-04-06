@@ -1,0 +1,33 @@
+replicaCount: 1
+image:
+  repository: suitecrm/frontend
+  tag: latest
+nameOverride: frontend
+service:
+  port: 80
+  targetPort: 80
+resources:
+  limits: { cpu: 300m, memory: 256Mi }
+  requests: { cpu: 100m, memory: 128Mi }
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+spring:
+  profiles: ""
+  datasource:
+    url: ""
+    username: ""
+    password: ""
+eureka:
+  enabled: false
+  uri: ""
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: suitecrm-dev.example.com
+      paths:
+        - path: /
+          pathType: Prefix
