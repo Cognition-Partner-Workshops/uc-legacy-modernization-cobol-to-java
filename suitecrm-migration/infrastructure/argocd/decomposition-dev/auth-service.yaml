@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: suitecrm-auth-service-dev
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: suitecrm
+    environment: dev
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Cognition-Partner-Workshops/uc-legacy-modernization-cobol-to-java.git
+    targetRevision: HEAD
+    path: suitecrm-migration/infrastructure/helm/suitecrm-service
+    helm:
+      valueFiles:
+        - ../../values/dev/auth-service.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: decomposition-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,83 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: suitecrm-dev
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - service: discovery-server
+            port: "8761"
+            dbName: ""
+          - service: config-server
+            port: "8888"
+            dbName: ""
+          - service: api-gateway
+            port: "8080"
+            dbName: ""
+          - service: auth-service
+            port: "8081"
+            dbName: suitecrm_auth
+          - service: contact-service
+            port: "8082"
+            dbName: suitecrm_contacts
+          - service: account-service
+            port: "8083"
+            dbName: suitecrm_accounts
+          - service: opportunity-service
+            port: "8084"
+            dbName: suitecrm_opportunities
+          - service: case-service
+            port: "8085"
+            dbName: suitecrm_cases
+          - service: campaign-service
+            port: "8086"
+            dbName: suitecrm_campaigns
+          - service: activity-service
+            port: "8087"
+            dbName: suitecrm_activities
+          - service: report-service
+            port: "8088"
+            dbName: suitecrm_reports
+          - service: document-service
+            port: "8089"
+            dbName: suitecrm_documents
+          - service: workflow-service
+            port: "8090"
+            dbName: suitecrm_workflows
+          - service: frontend
+            port: "80"
+            dbName: ""
+  template:
+    metadata:
+      name: "suitecrm-{{service}}-dev"
+      namespace: argocd
+      labels:
+        app.kubernetes.io/part-of: suitecrm
+        environment: dev
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/Cognition-Partner-Workshops/uc-legacy-modernization-cobol-to-java.git
+        targetRevision: HEAD
+        path: suitecrm-migration/infrastructure/helm/suitecrm-service
+        helm:
+          valueFiles:
+            - ../../values/dev/{{service}}.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: decomposition-dev
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - PruneLast=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
