@@ -23,4 +23,12 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
             "LOWER(a.industry) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(a.phoneOffice) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<Account> searchAccounts(@Param("search") String search, Pageable pageable);
+
+    Page<Account> findByParentIdAndDeletedFalse(UUID parentId, Pageable pageable);
+    long countByDeletedFalse();
+    Page<Account> findByAccountTypeAndDeletedFalse(String accountType, Pageable pageable);
+    Page<Account> findByIndustryAndDeletedFalse(String industry, Pageable pageable);
+
+    @Query("SELECT a FROM Account a WHERE a.deleted = false AND a.name LIKE CONCAT(:prefix, '%') ORDER BY a.name")
+    Page<Account> findByNameStartingWith(@Param("prefix") String prefix, Pageable pageable);
 }
