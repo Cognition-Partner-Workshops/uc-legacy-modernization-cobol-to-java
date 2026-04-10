@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Account View</title>
+    <style>
+        body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; font-size: 14px; margin: 0; padding: 20px; }
+        .screen { width: 80ch; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #0f0; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 18px; margin: 20px 0; }
+        .form-row { margin: 5px 0; }
+        .form-row label { display: inline-block; width: 25ch; }
+        .form-row input { background: #000; color: #0f0; border: 1px solid #0f0; padding: 2px 5px; font-family: 'Courier New', monospace; font-size: 14px; }
+        .data-row { margin: 3px 0; }
+        .data-label { display: inline-block; width: 25ch; color: #0a0; }
+        .data-value { color: #0f0; }
+        .error { color: #f00; margin: 10px 0; }
+        .footer { border-top: 1px solid #0f0; padding-top: 5px; margin-top: 20px; }
+        .btn { background: #0f0; color: #000; border: none; padding: 5px 15px; cursor: pointer; font-family: 'Courier New', monospace; font-size: 14px; margin: 5px; }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <div class="header">
+        <span th:text="${title01}">AWS CardDemo</span>
+        <span th:text="${currentDate}">MM/DD/YY</span>
+        <span th:text="${currentTime}">HH:MM:SS</span>
+    </div>
+    <div class="header">
+        <span>Tran: <span th:text="${tranId}">CA01</span></span>
+        <span>Pgm: <span th:text="${pgmName}">COACTVWC</span></span>
+    </div>
+    <div class="title">ACCOUNT VIEW</div>
+    <form method="post" th:action="@{/account/view}">
+        <div class="form-row">
+            <label for="acctId">ACCOUNT ID:</label>
+            <input type="text" id="acctId" name="acctId" maxlength="11" autofocus="autofocus"/>
+        </div>
+        <div class="error" th:if="${errorMessage != null and !errorMessage.isEmpty()}" th:text="${errorMessage}"></div>
+        <div th:if="${account != null}" style="margin-top: 15px; border: 1px solid #0f0; padding: 10px;">
+            <div class="data-row"><span class="data-label">Account ID:</span><span class="data-value" th:text="${account.acctId}"></span></div>
+            <div class="data-row"><span class="data-label">Active Status:</span><span class="data-value" th:text="${account.acctActiveStatus}"></span></div>
+            <div class="data-row"><span class="data-label">Current Balance:</span><span class="data-value" th:text="${account.acctCurrBal}"></span></div>
+            <div class="data-row"><span class="data-label">Credit Limit:</span><span class="data-value" th:text="${account.acctCreditLimit}"></span></div>
+            <div class="data-row"><span class="data-label">Cash Credit Limit:</span><span class="data-value" th:text="${account.acctCashCreditLimit}"></span></div>
+            <div class="data-row"><span class="data-label">Open Date:</span><span class="data-value" th:text="${account.acctOpenDate}"></span></div>
+            <div class="data-row"><span class="data-label">Expiration Date:</span><span class="data-value" th:text="${account.acctExpiraionDate}"></span></div>
+            <div class="data-row"><span class="data-label">Reissue Date:</span><span class="data-value" th:text="${account.acctReissueDate}"></span></div>
+            <div class="data-row"><span class="data-label">Cycle Credit:</span><span class="data-value" th:text="${account.acctCurrCycCredit}"></span></div>
+            <div class="data-row"><span class="data-label">Cycle Debit:</span><span class="data-value" th:text="${account.acctCurrCycDebit}"></span></div>
+            <div class="data-row"><span class="data-label">Group ID:</span><span class="data-value" th:text="${account.acctGroupId}"></span></div>
+        </div>
+        <div style="margin-top: 10px;">
+            <button type="submit" class="btn">ENTER</button>
+            <button type="submit" name="action" value="PF3" class="btn">PF3 Back</button>
+        </div>
+    </form>
+    <div class="footer">
+        <span>ENTER = View Account | PF3 = Main Menu</span>
+    </div>
+</div>
+</body>
+</html>

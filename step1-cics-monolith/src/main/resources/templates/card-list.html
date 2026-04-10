@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Card List</title>
+    <style>
+        body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; font-size: 14px; margin: 0; padding: 20px; }
+        .screen { width: 80ch; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #0f0; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 18px; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 3px 5px; border-bottom: 1px solid #030; }
+        th { color: #0a0; }
+        .error { color: #f00; margin: 10px 0; }
+        .footer { border-top: 1px solid #0f0; padding-top: 5px; margin-top: 20px; }
+        .btn { background: #0f0; color: #000; border: none; padding: 5px 15px; cursor: pointer; font-family: 'Courier New', monospace; font-size: 14px; margin: 5px; }
+        a { color: #0f0; }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <div class="header">
+        <span th:text="${title01}">AWS CardDemo</span>
+        <span th:text="${currentDate}">MM/DD/YY</span>
+        <span th:text="${currentTime}">HH:MM:SS</span>
+    </div>
+    <div class="header">
+        <span>Tran: <span th:text="${tranId}">CC01</span></span>
+        <span>Pgm: <span th:text="${pgmName}">COCRDLIC</span></span>
+    </div>
+    <div class="title">CREDIT CARD LIST</div>
+    <form method="post" th:action="@{/card/list}">
+        <input type="hidden" name="page" th:value="${currentPage}"/>
+        <table>
+            <thead>
+                <tr><th>Sel</th><th>Card Number</th><th>Account ID</th><th>Name</th><th>Status</th><th>Exp Date</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="card : ${cards.content}">
+                    <td><input type="radio" name="selectedCard" th:value="${card.cardNum}"/></td>
+                    <td th:text="${card.cardNum}"></td>
+                    <td th:text="${card.cardAcctId}"></td>
+                    <td th:text="${card.cardEmbossedName}"></td>
+                    <td th:text="${card.cardActiveStatus}"></td>
+                    <td th:text="${card.cardExpiraionDate}"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="error" th:if="${errorMessage != null and !errorMessage.isEmpty()}" th:text="${errorMessage}"></div>
+        <div style="margin-top: 10px;">
+            <button type="submit" class="btn">ENTER</button>
+            <button type="submit" name="action" value="PF3" class="btn">PF3 Back</button>
+            <button type="submit" name="action" value="PF7" class="btn">PF7 Prev</button>
+            <button type="submit" name="action" value="PF8" class="btn">PF8 Next</button>
+        </div>
+    </form>
+    <div class="footer">
+        <span>ENTER = Select | PF3 = Menu | PF7 = Prev | PF8 = Next</span>
+    </div>
+</div>
+</body>
+</html>

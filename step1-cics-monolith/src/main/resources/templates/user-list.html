@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - User List</title>
+    <style>
+        body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; font-size: 14px; margin: 0; padding: 20px; }
+        .screen { width: 80ch; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #0f0; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 18px; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 3px 5px; border-bottom: 1px solid #030; }
+        th { color: #0a0; }
+        .error { color: #f00; margin: 10px 0; }
+        .footer { border-top: 1px solid #0f0; padding-top: 5px; margin-top: 20px; }
+        .btn { background: #0f0; color: #000; border: none; padding: 5px 15px; cursor: pointer; font-family: 'Courier New', monospace; font-size: 14px; margin: 5px; }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <div class="header">
+        <span th:text="${title01}">AWS CardDemo</span>
+        <span th:text="${currentDate}">MM/DD/YY</span>
+        <span th:text="${currentTime}">HH:MM:SS</span>
+    </div>
+    <div class="header">
+        <span>Tran: <span th:text="${tranId}">CU00</span></span>
+        <span>Pgm: <span th:text="${pgmName}">COUSR00C</span></span>
+    </div>
+    <div class="title">USER LIST (SECURITY)</div>
+    <form method="post" th:action="@{/admin/user/list}">
+        <table>
+            <thead>
+                <tr><th>Sel</th><th>User ID</th><th>First Name</th><th>Last Name</th><th>Type</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td><input type="radio" name="selectedUser" th:value="${user.secUsrId}"/></td>
+                    <td th:text="${user.secUsrId}"></td>
+                    <td th:text="${user.secUsrFname}"></td>
+                    <td th:text="${user.secUsrLname}"></td>
+                    <td th:text="${user.secUsrType}"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="error" th:if="${errorMessage != null and !errorMessage.isEmpty()}" th:text="${errorMessage}"></div>
+        <div style="margin-top: 10px;">
+            <button type="submit" class="btn">ENTER</button>
+            <button type="submit" name="action" value="PF3" class="btn">PF3 Back</button>
+        </div>
+    </form>
+    <div class="footer">
+        <span>ENTER = Select | PF3 = Admin Menu</span>
+    </div>
+</div>
+</body>
+</html>
