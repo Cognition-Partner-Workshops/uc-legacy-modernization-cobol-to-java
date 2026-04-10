@@ -45,7 +45,7 @@ spring:
     activate:
       on-profile: h2
   datasource:
-    url: jdbc:h2:mem:carddemo_db;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:carddemo_db;DB_CLOSE_DELAY=-1;NON_KEYWORDS=TRANSACTION
     username: sa
     password:
     driver-class-name: org.h2.Driver
@@ -66,11 +66,13 @@ spring:
     activate:
       on-profile: test
   datasource:
-    url: jdbc:h2:mem:carddemo_test;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:carddemo_test;DB_CLOSE_DELAY=-1;NON_KEYWORDS=TRANSACTION
     username: sa
     password:
     driver-class-name: org.h2.Driver
   jpa:
+    hibernate:
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect

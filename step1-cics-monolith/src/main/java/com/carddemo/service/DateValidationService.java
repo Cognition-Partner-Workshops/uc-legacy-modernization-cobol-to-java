@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 
 /**
  * Mirrors CSUTLDTC.cbl - Date validation utility.
@@ -35,11 +36,14 @@ public class DateValidationService {
         try {
             DateTimeFormatter formatter;
             if ("YYYY-MM-DD".equalsIgnoreCase(format)) {
-                formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd")
+                    .withResolverStyle(ResolverStyle.STRICT);
             } else if ("MM/DD/YY".equalsIgnoreCase(format)) {
-                formatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+                formatter = DateTimeFormatter.ofPattern("MM/dd/uu")
+                    .withResolverStyle(ResolverStyle.STRICT);
             } else {
-                formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd")
+                    .withResolverStyle(ResolverStyle.STRICT);
             }
 
             LocalDate date = LocalDate.parse(dateStr.trim(), formatter);

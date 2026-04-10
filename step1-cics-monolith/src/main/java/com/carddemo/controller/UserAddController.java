@@ -76,9 +76,15 @@ public class UserAddController {
             return "user-add";
         }
 
+        String normalizedUserId = userId.toUpperCase().trim();
+        if (userSecurityRepository.existsById(normalizedUserId)) {
+            model.addAttribute("errorMessage", "User already exists...");
+            return "user-add";
+        }
+
         try {
             UserSecurity user = new UserSecurity();
-            user.setSecUsrId(userId.toUpperCase().trim());
+            user.setSecUsrId(normalizedUserId);
             user.setSecUsrFname(firstName.trim());
             user.setSecUsrLname(lastName.trim());
             user.setSecUsrPwd(password.toUpperCase().trim());
