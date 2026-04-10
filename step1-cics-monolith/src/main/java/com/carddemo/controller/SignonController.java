@@ -4,10 +4,15 @@ import com.carddemo.model.commarea.CardDemoCommarea;
 import com.carddemo.model.entity.UserSecurity;
 import com.carddemo.repository.UserSecurityRepository;
 import com.carddemo.service.CicsNavigationService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,11 +35,13 @@ public class SignonController {
 
     private final UserSecurityRepository userSecurityRepository;
     private final CicsNavigationService navigationService;
+    private final SecurityContextRepository securityContextRepository;
 
     public SignonController(UserSecurityRepository userSecurityRepository,
                            CicsNavigationService navigationService) {
         this.userSecurityRepository = userSecurityRepository;
         this.navigationService = navigationService;
+        this.securityContextRepository = new HttpSessionSecurityContextRepository();
     }
 
     @GetMapping("/signon")
@@ -49,7 +56,8 @@ public class SignonController {
     @PostMapping("/signon")
     public String processSignon(@RequestParam(defaultValue = "") String userId,
                                 @RequestParam(defaultValue = "") String password,
-                                Model model, HttpSession session) {
+                                Model model, HttpSession session,
+                                HttpServletRequest request, HttpServletResponse response) {
         populateHeaderInfo(model);
 
         // Validate input - mirrors PROCESS-ENTER-KEY
@@ -77,7 +85,7 @@ public class SignonController {
         UserSecurity user = userOpt.get();
 
         // Plaintext password comparison - mirrors line 223
-        if (!upperPassword.equals(user.getSecUsrPwd().trim())) {
+        if (user.getSecUsrPwd() == null || !upperPassword.equals(user.getSecUsrPwd().trim())) {
             model.addAttribute("errorMessage", "Wrong Password. Try again ...");
             return "signon";
         }
@@ -92,13 +100,16 @@ public class SignonController {
 
         session.setAttribute("CARDDEMO_COMMAREA", commarea);
 
-        // Set Spring Security authentication
+        // Set Spring Security authentication and persist to session (Spring Security 6.x)
         List<SimpleGrantedAuthority> authorities = List.of(
             new SimpleGrantedAuthority("A".equals(user.getSecUsrType()) ? "ROLE_ADMIN" : "ROLE_USER")
         );
         UsernamePasswordAuthenticationToken auth =
             new UsernamePasswordAuthenticationToken(upperUserId, null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(auth);
+        SecurityContextHolder.setContext(securityContext);
+        securityContextRepository.saveContext(securityContext, request, response);
 
         // XCTL based on user type - mirrors lines 230-240
         if ("A".equals(user.getSecUsrType())) {

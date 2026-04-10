@@ -23,13 +23,17 @@ public class AuthController {
         String userId = credentials.get("userId");
         String password = credentials.get("password");
 
+        if (userId == null || userId.isBlank() || password == null || password.isBlank()) {
+            return ResponseEntity.status(401).body(Map.of("error", "Missing credentials"));
+        }
+
         Optional<UserSecurity> userOpt = userSecurityRepository.findById(userId);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(401).body(Map.of("error", "User not found"));
         }
 
         UserSecurity user = userOpt.get();
-        if (!user.getSecUsrPwd().equals(password)) {
+        if (user.getSecUsrPwd() == null || !user.getSecUsrPwd().equals(password)) {
             return ResponseEntity.status(401).body(Map.of("error", "Wrong password"));
         }
 

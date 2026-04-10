@@ -102,10 +102,20 @@ public class TransactionPostingJob {
                     continue;
                 }
 
+                // Reject if amount is null
+                if (dt.getDalytranAmt() == null) {
+                    rejected++;
+                    continue;
+                }
+
+                // Null-safe balance defaults
+                BigDecimal acctBal = account.getAcctCurrBal() != null ? account.getAcctCurrBal() : BigDecimal.ZERO;
+                BigDecimal creditLimit = account.getAcctCreditLimit() != null ? account.getAcctCreditLimit() : BigDecimal.ZERO;
+
                 // Check credit limit for purchases
-                if (dt.getDalytranAmt() != null && dt.getDalytranAmt().compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal newBal = account.getAcctCurrBal().add(dt.getDalytranAmt());
-                    if (newBal.compareTo(account.getAcctCreditLimit()) > 0) {
+                if (dt.getDalytranAmt().compareTo(BigDecimal.ZERO) > 0) {
+                    BigDecimal newBal = acctBal.add(dt.getDalytranAmt());
+                    if (newBal.compareTo(creditLimit) > 0) {
                         rejected++;
                         continue;
                     }
@@ -118,7 +128,8 @@ public class TransactionPostingJob {
                 Optional<TransactionCatBal> catBalOpt = transactionCatBalRepository.findById(catBalId);
                 if (catBalOpt.isPresent()) {
                     TransactionCatBal catBal = catBalOpt.get();
-                    catBal.setTranCatBal(catBal.getTranCatBal().add(dt.getDalytranAmt()));
+                    BigDecimal currentCatBal = catBal.getTranCatBal() != null ? catBal.getTranCatBal() : BigDecimal.ZERO;
+                    catBal.setTranCatBal(currentCatBal.add(dt.getDalytranAmt()));
                     transactionCatBalRepository.save(catBal);
                 } else {
                     TransactionCatBal newCatBal = new TransactionCatBal();
@@ -130,7 +141,7 @@ public class TransactionPostingJob {
                 }
 
                 // Update account balance
-                account.setAcctCurrBal(account.getAcctCurrBal().add(dt.getDalytranAmt()));
+                account.setAcctCurrBal(acctBal.add(dt.getDalytranAmt()));
                 accountRepository.save(account);
 
                 // Write to TRANSACT file (transaction table)
