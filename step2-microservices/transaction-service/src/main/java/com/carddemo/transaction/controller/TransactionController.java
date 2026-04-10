@@ -36,6 +36,20 @@ public class TransactionController {
 
     @PostMapping
     public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
+        // Auto-generate transaction ID if not provided
+        if (transaction.getTranId() == null || transaction.getTranId().isBlank()) {
+            String nextId = transactionRepository.findMaxTranId()
+                .map(maxId -> {
+                    try {
+                        long id = Long.parseLong(maxId.trim());
+                        return String.format("%016d", id + 1);
+                    } catch (NumberFormatException e) {
+                        return String.format("%016d", System.currentTimeMillis());
+                    }
+                })
+                .orElse("0000000000000001");
+            transaction.setTranId(nextId);
+        }
         return ResponseEntity.ok(transactionRepository.save(transaction));
     }
 }
