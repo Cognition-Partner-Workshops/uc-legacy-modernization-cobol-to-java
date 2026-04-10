@@ -7,6 +7,7 @@ import com.carddemo.model.entity.Transaction;
 import com.carddemo.repository.AccountRepository;
 import com.carddemo.repository.CardXrefRepository;
 import com.carddemo.repository.TransactionRepository;
+import com.carddemo.service.TransactionIdService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,13 +32,16 @@ public class BillPaymentController {
     private final AccountRepository accountRepository;
     private final CardXrefRepository cardXrefRepository;
     private final TransactionRepository transactionRepository;
+    private final TransactionIdService transactionIdService;
 
     public BillPaymentController(AccountRepository accountRepository,
                                  CardXrefRepository cardXrefRepository,
-                                 TransactionRepository transactionRepository) {
+                                 TransactionRepository transactionRepository,
+                                 TransactionIdService transactionIdService) {
         this.accountRepository = accountRepository;
         this.cardXrefRepository = cardXrefRepository;
         this.transactionRepository = transactionRepository;
+        this.transactionIdService = transactionIdService;
     }
 
     @GetMapping("/bill-payment")
@@ -99,20 +103,17 @@ public class BillPaymentController {
         }
 
         if ("Y".equalsIgnoreCase(confirm)) {
+            if (paymentAmt.compareTo(BigDecimal.ZERO) <= 0) {
+                model.addAttribute("errorMessage", "Payment amount must be positive...");
+                return "bill-payment";
+            }
             Account account = acctOpt.get();
             BigDecimal currentBal = account.getAcctCurrBal() != null ? account.getAcctCurrBal() : BigDecimal.ZERO;
             account.setAcctCurrBal(currentBal.subtract(paymentAmt));
             accountRepository.save(account);
 
             // Create payment transaction
-            Optional<String> maxId = transactionRepository.findMaxTranId();
-            String nextId = "0000000000000001";
-            if (maxId.isPresent()) {
-                try {
-                    long id = Long.parseLong(maxId.get().trim());
-                    nextId = String.format("%016d", id + 1);
-                } catch (NumberFormatException ignored) {}
-            }
+            String nextId = transactionIdService.generateNextTranId();
 
             Transaction tran = new Transaction();
             tran.setTranId(nextId);

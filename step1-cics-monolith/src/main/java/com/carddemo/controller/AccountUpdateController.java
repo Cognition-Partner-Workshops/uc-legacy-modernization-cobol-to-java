@@ -92,10 +92,22 @@ public class AccountUpdateController {
                     account.setAcctActiveStatus(acctActiveStatus.trim());
                 }
                 if (!acctCreditLimit.isBlank()) {
-                    account.setAcctCreditLimit(new BigDecimal(acctCreditLimit.trim()));
+                    try {
+                        account.setAcctCreditLimit(new BigDecimal(acctCreditLimit.trim()));
+                    } catch (NumberFormatException ex) {
+                        model.addAttribute("errorMessage", "Credit Limit must be numeric...");
+                        model.addAttribute("account", account);
+                        return "account-update";
+                    }
                 }
                 if (!acctCashCreditLimit.isBlank()) {
-                    account.setAcctCashCreditLimit(new BigDecimal(acctCashCreditLimit.trim()));
+                    try {
+                        account.setAcctCashCreditLimit(new BigDecimal(acctCashCreditLimit.trim()));
+                    } catch (NumberFormatException ex) {
+                        model.addAttribute("errorMessage", "Cash Credit Limit must be numeric...");
+                        model.addAttribute("account", account);
+                        return "account-update";
+                    }
                 }
                 accountRepository.save(account);
                 model.addAttribute("errorMessage", "Account updated successfully...");

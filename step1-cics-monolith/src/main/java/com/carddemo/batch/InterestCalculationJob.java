@@ -10,6 +10,7 @@ import com.carddemo.repository.CardXrefRepository;
 import com.carddemo.repository.DisclosureGroupRepository;
 import com.carddemo.repository.TransactionCatBalRepository;
 import com.carddemo.repository.TransactionRepository;
+import com.carddemo.service.TransactionIdService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -43,17 +44,20 @@ public class InterestCalculationJob {
     private final CardXrefRepository cardXrefRepository;
     private final DisclosureGroupRepository disclosureGroupRepository;
     private final TransactionRepository transactionRepository;
+    private final TransactionIdService transactionIdService;
 
     public InterestCalculationJob(TransactionCatBalRepository transactionCatBalRepository,
                                   AccountRepository accountRepository,
                                   CardXrefRepository cardXrefRepository,
                                   DisclosureGroupRepository disclosureGroupRepository,
-                                  TransactionRepository transactionRepository) {
+                                  TransactionRepository transactionRepository,
+                                  TransactionIdService transactionIdService) {
         this.transactionCatBalRepository = transactionCatBalRepository;
         this.accountRepository = accountRepository;
         this.cardXrefRepository = cardXrefRepository;
         this.disclosureGroupRepository = disclosureGroupRepository;
         this.transactionRepository = transactionRepository;
+        this.transactionIdService = transactionIdService;
     }
 
     @Bean
@@ -138,7 +142,7 @@ public class InterestCalculationJob {
         accountRepository.save(account);
 
         // Write interest transaction
-        String nextTranId = generateNextTranId();
+        String nextTranId = transactionIdService.generateNextTranId();
         Transaction tran = new Transaction();
         tran.setTranId(nextTranId);
         tran.setTranTypeCd("01");
@@ -157,16 +161,4 @@ public class InterestCalculationJob {
         transactionRepository.save(tran);
     }
 
-    private String generateNextTranId() {
-        Optional<String> maxId = transactionRepository.findMaxTranId();
-        if (maxId.isPresent()) {
-            try {
-                long id = Long.parseLong(maxId.get().trim());
-                return String.format("%016d", id + 1);
-            } catch (NumberFormatException e) {
-                return String.format("%016d", System.currentTimeMillis());
-            }
-        }
-        return "0000000000000001";
-    }
 }

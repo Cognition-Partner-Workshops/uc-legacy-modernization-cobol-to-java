@@ -10,6 +10,7 @@ import com.carddemo.repository.CardXrefRepository;
 import com.carddemo.repository.DailyTransactionRepository;
 import com.carddemo.repository.TransactionCatBalRepository;
 import com.carddemo.repository.TransactionRepository;
+import com.carddemo.service.TransactionIdService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -41,17 +42,20 @@ public class TransactionPostingJob {
     private final AccountRepository accountRepository;
     private final TransactionCatBalRepository transactionCatBalRepository;
     private final TransactionRepository transactionRepository;
+    private final TransactionIdService transactionIdService;
 
     public TransactionPostingJob(DailyTransactionRepository dailyTransactionRepository,
                                  CardXrefRepository cardXrefRepository,
                                  AccountRepository accountRepository,
                                  TransactionCatBalRepository transactionCatBalRepository,
-                                 TransactionRepository transactionRepository) {
+                                 TransactionRepository transactionRepository,
+                                 TransactionIdService transactionIdService) {
         this.dailyTransactionRepository = dailyTransactionRepository;
         this.cardXrefRepository = cardXrefRepository;
         this.accountRepository = accountRepository;
         this.transactionCatBalRepository = transactionCatBalRepository;
         this.transactionRepository = transactionRepository;
+        this.transactionIdService = transactionIdService;
     }
 
     @Bean
@@ -145,7 +149,7 @@ public class TransactionPostingJob {
                 accountRepository.save(account);
 
                 // Write to TRANSACT file (transaction table)
-                String nextTranId = generateNextTranId();
+                String nextTranId = transactionIdService.generateNextTranId();
                 Transaction tran = new Transaction();
                 tran.setTranId(nextTranId);
                 tran.setTranTypeCd(dt.getDalytranTypeCd());
@@ -170,16 +174,4 @@ public class TransactionPostingJob {
         };
     }
 
-    private String generateNextTranId() {
-        Optional<String> maxId = transactionRepository.findMaxTranId();
-        if (maxId.isPresent()) {
-            try {
-                long id = Long.parseLong(maxId.get().trim());
-                return String.format("%016d", id + 1);
-            } catch (NumberFormatException e) {
-                return String.format("%016d", System.currentTimeMillis());
-            }
-        }
-        return "0000000000000001";
-    }
 }

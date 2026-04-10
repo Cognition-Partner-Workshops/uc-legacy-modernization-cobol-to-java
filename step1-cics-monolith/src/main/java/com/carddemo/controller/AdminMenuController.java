@@ -34,6 +34,9 @@ public class AdminMenuController {
         if (commarea == null) {
             return "redirect:/signon";
         }
+        if (!commarea.isAdmin()) {
+            return "redirect:/menu";
+        }
 
         commarea.setPgmContext(1);
         session.setAttribute("CARDDEMO_COMMAREA", commarea);
@@ -51,6 +54,9 @@ public class AdminMenuController {
         CardDemoCommarea commarea = getCommarea(session);
         if (commarea == null) {
             return "redirect:/signon";
+        }
+        if (!commarea.isAdmin()) {
+            return "redirect:/menu";
         }
 
         if ("PF3".equals(action)) {

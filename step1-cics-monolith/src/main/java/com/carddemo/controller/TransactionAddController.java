@@ -6,6 +6,7 @@ import com.carddemo.model.entity.Transaction;
 import com.carddemo.repository.CardXrefRepository;
 import com.carddemo.repository.TransactionRepository;
 import com.carddemo.service.DateValidationService;
+import com.carddemo.service.TransactionIdService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,13 +32,16 @@ public class TransactionAddController {
     private final TransactionRepository transactionRepository;
     private final CardXrefRepository cardXrefRepository;
     private final DateValidationService dateValidationService;
+    private final TransactionIdService transactionIdService;
 
     public TransactionAddController(TransactionRepository transactionRepository,
                                     CardXrefRepository cardXrefRepository,
-                                    DateValidationService dateValidationService) {
+                                    DateValidationService dateValidationService,
+                                    TransactionIdService transactionIdService) {
         this.transactionRepository = transactionRepository;
         this.cardXrefRepository = cardXrefRepository;
         this.dateValidationService = dateValidationService;
+        this.transactionIdService = transactionIdService;
     }
 
     @GetMapping("/transaction/add")
@@ -135,7 +139,7 @@ public class TransactionAddController {
         // Confirm handling - mirrors lines 169-188
         if ("Y".equalsIgnoreCase(confirm) || "y".equals(confirm)) {
             // ADD-TRANSACTION - generate next TRAN-ID
-            String nextTranId = generateNextTranId();
+            String nextTranId = transactionIdService.generateNextTranId();
 
             Transaction tran = new Transaction();
             tran.setTranId(nextTranId);
@@ -208,23 +212,6 @@ public class TransactionAddController {
         if (!merchantId.trim().matches("\\d+")) return "Merchant ID must be Numeric...";
 
         return null;
-    }
-
-    /**
-     * Generate next TRAN-ID by reading last record and adding 1.
-     * Mirrors COTRN02C.cbl lines 442-451 (STARTBR HIGH-VALUES, READPREV).
-     */
-    private String generateNextTranId() {
-        Optional<String> maxId = transactionRepository.findMaxTranId();
-        if (maxId.isPresent()) {
-            try {
-                long id = Long.parseLong(maxId.get().trim());
-                return String.format("%016d", id + 1);
-            } catch (NumberFormatException e) {
-                return String.format("%016d", System.currentTimeMillis());
-            }
-        }
-        return "0000000000000001";
     }
 
     private void preserveFormData(Model model, String acctId, String cardNum,
