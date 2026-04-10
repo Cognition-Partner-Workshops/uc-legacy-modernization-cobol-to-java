@@ -1,17 +1,21 @@
 package com.carddemo.service;
 
+import com.carddemo.model.entity.Transaction;
 import com.carddemo.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 /**
- * Centralized service for generating unique transaction IDs.
- * Consolidates the duplicated generateNextTranId() logic from
- * TransactionAddController, BillPaymentController, InterestCalculationJob,
- * and TransactionPostingJob into a single synchronized method to prevent
- * race conditions that could produce duplicate primary keys.
+ * Centralized service for generating unique transaction IDs and persisting
+ * transactions atomically. The generate-and-save must happen inside the same
+ * synchronized block so that no other thread can read the same MAX(tran_id)
+ * before the new row is flushed to the database.
+ *
+ * Note: @Transactional is intentionally omitted because combining it with
+ * synchronized is a well-known anti-pattern — the CGLIB proxy method is not
+ * synchronized, so the transaction boundary extends beyond the lock, creating
+ * a window where another thread can read uncommitted data.
  */
 @Service
 public class TransactionIdService {
@@ -23,13 +27,22 @@ public class TransactionIdService {
     }
 
     /**
-     * Generate the next transaction ID atomically.
-     * Uses synchronized to prevent concurrent threads from reading the same
-     * max ID and generating duplicates. The method reads the current max
-     * tran_id, increments by 1, and returns the zero-padded 16-digit string.
+     * Generate the next transaction ID, assign it to the given Transaction,
+     * and save it — all within a single synchronized block.
+     * This prevents the race condition where Thread A generates an ID, releases
+     * the lock, and Thread B generates the same ID before Thread A's save()
+     * has committed.
+     *
+     * @param transaction the Transaction entity (all fields set except tranId)
+     * @return the saved Transaction with its generated tranId
      */
-    @Transactional
-    public synchronized String generateNextTranId() {
+    public synchronized Transaction generateIdAndSave(Transaction transaction) {
+        String nextId = computeNextId();
+        transaction.setTranId(nextId);
+        return transactionRepository.save(transaction);
+    }
+
+    private String computeNextId() {
         Optional<String> maxId = transactionRepository.findMaxTranId();
         if (maxId.isPresent()) {
             try {

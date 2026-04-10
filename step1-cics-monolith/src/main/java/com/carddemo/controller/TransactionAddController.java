@@ -138,11 +138,8 @@ public class TransactionAddController {
 
         // Confirm handling - mirrors lines 169-188
         if ("Y".equalsIgnoreCase(confirm) || "y".equals(confirm)) {
-            // ADD-TRANSACTION - generate next TRAN-ID
-            String nextTranId = transactionIdService.generateNextTranId();
-
+            // ADD-TRANSACTION - generate next TRAN-ID and save atomically
             Transaction tran = new Transaction();
-            tran.setTranId(nextTranId);
             tran.setTranTypeCd(typeCd.trim());
             tran.setTranCatCd(Integer.parseInt(catCd.trim()));
             tran.setTranSource(source.trim());
@@ -156,8 +153,8 @@ public class TransactionAddController {
             tran.setTranMerchantCity(merchantCity.trim());
             tran.setTranMerchantZip(merchantZip.trim());
 
-            transactionRepository.save(tran);
-            model.addAttribute("errorMessage", "Transaction added successfully. ID: " + nextTranId);
+            Transaction saved = transactionIdService.generateIdAndSave(tran);
+            model.addAttribute("errorMessage", "Transaction added successfully. ID: " + saved.getTranId());
         } else if ("N".equalsIgnoreCase(confirm)) {
             model.addAttribute("errorMessage", "Transaction cancelled.");
         } else {

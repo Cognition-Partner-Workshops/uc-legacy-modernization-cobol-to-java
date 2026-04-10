@@ -148,10 +148,8 @@ public class TransactionPostingJob {
                 account.setAcctCurrBal(acctBal.add(dt.getDalytranAmt()));
                 accountRepository.save(account);
 
-                // Write to TRANSACT file (transaction table)
-                String nextTranId = transactionIdService.generateNextTranId();
+                // Write to TRANSACT file — generate ID and save atomically
                 Transaction tran = new Transaction();
-                tran.setTranId(nextTranId);
                 tran.setTranTypeCd(dt.getDalytranTypeCd());
                 tran.setTranCatCd(dt.getDalytranCatCd());
                 tran.setTranSource(dt.getDalytranSource());
@@ -165,7 +163,7 @@ public class TransactionPostingJob {
                 tran.setTranOrigTs(dt.getDalytranOrigTs());
                 tran.setTranProcTs(LocalDateTime.now().format(
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
-                transactionRepository.save(tran);
+                transactionIdService.generateIdAndSave(tran);
 
                 processed++;
             }

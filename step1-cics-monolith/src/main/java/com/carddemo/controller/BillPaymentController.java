@@ -112,11 +112,8 @@ public class BillPaymentController {
             account.setAcctCurrBal(currentBal.subtract(paymentAmt));
             accountRepository.save(account);
 
-            // Create payment transaction
-            String nextId = transactionIdService.generateNextTranId();
-
+            // Create payment transaction — generate ID and save atomically
             Transaction tran = new Transaction();
-            tran.setTranId(nextId);
             tran.setTranTypeCd("02");
             tran.setTranCatCd(1);
             tran.setTranSource("ONLINE");
@@ -126,7 +123,7 @@ public class BillPaymentController {
             xref.ifPresent(x -> tran.setTranCardNum(x.getXrefCardNum()));
             tran.setTranOrigTs(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
             tran.setTranProcTs(tran.getTranOrigTs());
-            transactionRepository.save(tran);
+            transactionIdService.generateIdAndSave(tran);
 
             model.addAttribute("errorMessage", "Payment processed successfully...");
         } else {

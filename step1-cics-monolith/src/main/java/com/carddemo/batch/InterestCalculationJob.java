@@ -141,10 +141,8 @@ public class InterestCalculationJob {
         account.setAcctCurrBal(currentBal.add(totalInterest));
         accountRepository.save(account);
 
-        // Write interest transaction
-        String nextTranId = transactionIdService.generateNextTranId();
+        // Write interest transaction — generate ID and save atomically
         Transaction tran = new Transaction();
-        tran.setTranId(nextTranId);
         tran.setTranTypeCd("01");
         tran.setTranCatCd(5);
         tran.setTranSource("INTEREST");
@@ -158,7 +156,7 @@ public class InterestCalculationJob {
         Optional<CardXref> xref = cardXrefRepository.findByXrefAcctId(account.getAcctId());
         xref.ifPresent(x -> tran.setTranCardNum(x.getXrefCardNum()));
 
-        transactionRepository.save(tran);
+        transactionIdService.generateIdAndSave(tran);
     }
 
 }
