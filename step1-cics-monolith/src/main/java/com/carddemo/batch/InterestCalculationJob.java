@@ -133,7 +133,8 @@ public class InterestCalculationJob {
 
     private void applyInterest(Account account, BigDecimal totalInterest) {
         // Update account balance
-        account.setAcctCurrBal(account.getAcctCurrBal().add(totalInterest));
+        BigDecimal currentBal = account.getAcctCurrBal() != null ? account.getAcctCurrBal() : BigDecimal.ZERO;
+        account.setAcctCurrBal(currentBal.add(totalInterest));
         accountRepository.save(account);
 
         // Write interest transaction

@@ -27,19 +27,22 @@ public class AuthController {
             return ResponseEntity.status(401).body(Map.of("error", "Missing credentials"));
         }
 
-        Optional<UserSecurity> userOpt = userSecurityRepository.findById(userId);
+        String normalizedUserId = userId.toUpperCase().trim();
+        String normalizedPassword = password.toUpperCase().trim();
+
+        Optional<UserSecurity> userOpt = userSecurityRepository.findById(normalizedUserId);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(401).body(Map.of("error", "User not found"));
         }
 
         UserSecurity user = userOpt.get();
-        if (user.getSecUsrPwd() == null || !user.getSecUsrPwd().equals(password)) {
+        if (user.getSecUsrPwd() == null || !normalizedPassword.equals(user.getSecUsrPwd().trim())) {
             return ResponseEntity.status(401).body(Map.of("error", "Wrong password"));
         }
 
         return ResponseEntity.ok(Map.of(
             "userId", user.getSecUsrId(),
-            "userType", user.getSecUsrType(),
+            "userType", user.getSecUsrType() != null ? user.getSecUsrType() : "",
             "firstName", user.getSecUsrFname() != null ? user.getSecUsrFname() : "",
             "lastName", user.getSecUsrLname() != null ? user.getSecUsrLname() : ""
         ));

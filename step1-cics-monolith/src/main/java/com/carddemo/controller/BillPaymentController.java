@@ -100,7 +100,8 @@ public class BillPaymentController {
 
         if ("Y".equalsIgnoreCase(confirm)) {
             Account account = acctOpt.get();
-            account.setAcctCurrBal(account.getAcctCurrBal().subtract(paymentAmt));
+            BigDecimal currentBal = account.getAcctCurrBal() != null ? account.getAcctCurrBal() : BigDecimal.ZERO;
+            account.setAcctCurrBal(currentBal.subtract(paymentAmt));
             accountRepository.save(account);
 
             // Create payment transaction
@@ -123,6 +124,7 @@ public class BillPaymentController {
             Optional<CardXref> xref = cardXrefRepository.findByXrefAcctId(acctIdNum);
             xref.ifPresent(x -> tran.setTranCardNum(x.getXrefCardNum()));
             tran.setTranOrigTs(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
+            tran.setTranProcTs(tran.getTranOrigTs());
             transactionRepository.save(tran);
 
             model.addAttribute("errorMessage", "Payment processed successfully...");

@@ -51,6 +51,7 @@ public class UserListController {
                                   Model model, HttpSession session) {
         CardDemoCommarea commarea = getCommarea(session);
         if (commarea == null) return "redirect:/signon";
+        if (!commarea.isAdmin()) return "redirect:/menu";
 
         if ("PF3".equals(action)) return "redirect:/admin";
 
