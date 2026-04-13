@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Main Menu</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00FF00; margin: 0; padding: 20px; }
+        .screen { max-width: 80ch; margin: 0 auto; background-color: #000040; padding: 20px; border: 2px solid #00FF00; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #00FF00; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 1.2em; font-weight: bold; margin: 10px 0; color: #FFFF00; }
+        .content { margin: 10px 0; }
+        .footer { border-top: 1px solid #00FF00; padding-top: 5px; margin-top: 10px; }
+        a { color: #00FFFF; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .menu-item { margin: 5px 0; padding: 3px 0; }
+        .btn { font-family: 'Courier New', monospace; background-color: #004000; color: #00FF00; border: 1px solid #00FF00; padding: 5px 15px; cursor: pointer; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="screen">
+        <div class="header">
+            <div>
+                <span>Tran: </span><span th:text="${tranName}">CM00</span>
+                <span> Pgm: </span><span th:text="${pgmName}">COMEN01C</span>
+            </div>
+            <div>
+                <span>User: </span><span th:text="${userId}"></span>
+                <span> </span>
+                <span th:text="${#dates.format(new java.util.Date(), 'MM/dd/yy HH:mm:ss')}"></span>
+            </div>
+        </div>
+        <div class="title">
+            <div>CardDemo - Main Menu</div>
+        </div>
+        <div class="content">
+            <div th:each="option : ${menuOptions}" class="menu-item">
+                <span th:text="${option.num}" style="display:inline-block;width:4ch;text-align:right;"></span>
+                <span>. </span>
+                <a th:href="${option.url}" th:text="${option.name}">Menu Option</a>
+                <span style="color:#808080;"> (</span>
+                <span style="color:#808080;" th:text="${option.program}">XXXXXXXX</span>
+                <span style="color:#808080;">)</span>
+            </div>
+            <div th:if="${isAdmin}" class="menu-item" style="margin-top: 15px;">
+                <a href="/admin" class="btn">Admin Menu</a>
+            </div>
+        </div>
+        <div class="footer">
+            <div>Enter option number and press Enter. PF3 = <a th:href="@{/logout}">Sign Off</a></div>
+        </div>
+    </div>
+</body>
+</html>

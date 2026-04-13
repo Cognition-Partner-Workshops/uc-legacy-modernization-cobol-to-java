@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo Application</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00FF00; margin: 0; padding: 20px; }
+        .screen { max-width: 80ch; margin: 0 auto; background-color: #000040; padding: 20px; border: 2px solid #00FF00; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #00FF00; padding-bottom: 5px; margin-bottom: 10px; }
+        .header-left { text-align: left; }
+        .header-right { text-align: right; }
+        .title { text-align: center; font-size: 1.2em; font-weight: bold; margin: 10px 0; color: #FFFF00; }
+        .content { margin: 10px 0; }
+        .footer { border-top: 1px solid #00FF00; padding-top: 5px; margin-top: 10px; }
+        .error { color: #FF0000; font-weight: bold; }
+        .info { color: #00FFFF; }
+        input, select { font-family: 'Courier New', monospace; background-color: #000040; color: #00FF00; border: 1px solid #00FF00; padding: 2px 5px; }
+        input:focus { background-color: #000080; }
+        button, .btn { font-family: 'Courier New', monospace; background-color: #004000; color: #00FF00; border: 1px solid #00FF00; padding: 5px 15px; cursor: pointer; text-decoration: none; }
+        button:hover, .btn:hover { background-color: #006000; }
+        a { color: #00FFFF; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 3px 8px; text-align: left; border-bottom: 1px solid #004000; }
+        th { color: #FFFF00; }
+        .form-group { margin: 8px 0; }
+        .form-group label { display: inline-block; width: 25ch; }
+    </style>
+</head>
+<body>
+    <div class="screen" th:fragment="layout(content)">
+        <div class="header">
+            <div class="header-left">
+                <span>Tran: </span><span th:text="${tranName}">XXXX</span>
+                <span> Pgm: </span><span th:text="${pgmName}">XXXXXXXX</span>
+            </div>
+            <div class="header-right">
+                <span th:text="${#dates.format(new java.util.Date(), 'MM/dd/yy')}">01/01/24</span>
+                <span> </span>
+                <span th:text="${#dates.format(new java.util.Date(), 'HH:mm:ss')}">12:00:00</span>
+            </div>
+        </div>
+        <div class="title">
+            <div>CardDemo - Credit Card Demo Application</div>
+        </div>
+        <div class="content" th:insert="${content}">
+        </div>
+        <div class="footer">
+            <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+            <div class="info" th:if="${infoMessage}" th:text="${infoMessage}"></div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Card Update</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00FF00; margin: 0; padding: 20px; }
+        .screen { max-width: 80ch; margin: 0 auto; background-color: #000040; padding: 20px; border: 2px solid #00FF00; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #00FF00; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 1.2em; font-weight: bold; margin: 10px 0; color: #FFFF00; }
+        .content { margin: 10px 0; }
+        .footer { border-top: 1px solid #00FF00; padding-top: 5px; margin-top: 10px; }
+        .error { color: #FF0000; } .info { color: #00FFFF; }
+        a { color: #00FFFF; text-decoration: none; }
+        input, select { font-family: 'Courier New', monospace; background-color: #000040; color: #00FF00; border: 1px solid #00FF00; padding: 2px 5px; }
+        button { font-family: 'Courier New', monospace; background-color: #004000; color: #00FF00; border: 1px solid #00FF00; padding: 5px 15px; cursor: pointer; }
+        .form-group { margin: 8px 0; } .form-group label { display: inline-block; width: 25ch; color: #FFFF00; }
+    </style>
+</head>
+<body>
+    <div class="screen">
+        <div class="header">
+            <div><span>Tran: </span><span th:text="${tranName}"></span> <span>Pgm: </span><span th:text="${pgmName}"></span></div>
+            <div th:text="${#dates.format(new java.util.Date(), 'MM/dd/yy HH:mm:ss')}"></div>
+        </div>
+        <div class="title">Credit Card Update</div>
+        <div class="content" th:if="${card}">
+            <form th:action="@{'/cards/' + ${card.cardNum}}" method="post">
+                <div class="form-group"><label>Card Number:</label><span th:text="${card.cardNum}"></span></div>
+                <div class="form-group"><label>Account ID:</label><span th:text="${card.acctId}"></span></div>
+                <div class="form-group">
+                    <label for="embossedName">Embossed Name:</label>
+                    <input type="text" id="embossedName" name="embossedName" maxlength="50" size="50" th:value="${card.embossedName}"/>
+                </div>
+                <div class="form-group">
+                    <label for="expirationDate">Expiration Date:</label>
+                    <input type="text" id="expirationDate" name="expirationDate" maxlength="10" size="10" th:value="${card.expirationDate}" placeholder="YYYY-MM-DD"/>
+                </div>
+                <div class="form-group">
+                    <label for="activeStatus">Active Status:</label>
+                    <select id="activeStatus" name="activeStatus">
+                        <option value="Y" th:selected="${card.activeStatus == 'Y'}">Y - Active</option>
+                        <option value="N" th:selected="${card.activeStatus == 'N'}">N - Inactive</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top:15px;">
+                    <button type="submit">Update [Enter]</button>
+                    <a th:href="@{'/cards/' + ${card.cardNum}}" style="margin-left:20px;">Cancel</a>
+                </div>
+            </form>
+        </div>
+        <div class="footer">
+            <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+            <div><a href="/menu">PF3 - Return to Menu</a></div>
+        </div>
+    </div>
+</body>
+</html>

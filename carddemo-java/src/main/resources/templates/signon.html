@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Sign On</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00FF00; margin: 0; padding: 20px; }
+        .screen { max-width: 80ch; margin: 0 auto; background-color: #000040; padding: 20px; border: 2px solid #00FF00; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #00FF00; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 1.2em; font-weight: bold; margin: 10px 0; color: #FFFF00; }
+        .content { margin: 20px 0; }
+        .footer { border-top: 1px solid #00FF00; padding-top: 5px; margin-top: 10px; }
+        .error { color: #FF0000; font-weight: bold; }
+        .info { color: #00FFFF; }
+        input { font-family: 'Courier New', monospace; background-color: #000040; color: #00FF00; border: 1px solid #00FF00; padding: 2px 5px; }
+        button { font-family: 'Courier New', monospace; background-color: #004000; color: #00FF00; border: 1px solid #00FF00; padding: 5px 15px; cursor: pointer; }
+        .form-group { margin: 10px 0; }
+        .form-group label { display: inline-block; width: 20ch; }
+    </style>
+</head>
+<body>
+    <div class="screen">
+        <div class="header">
+            <div>
+                <span>Tran: </span><span th:text="${tranName}">CC00</span>
+                <span> Pgm: </span><span th:text="${pgmName}">COSGN00C</span>
+            </div>
+            <div>
+                <span th:text="${#dates.format(new java.util.Date(), 'MM/dd/yy HH:mm:ss')}"></span>
+            </div>
+        </div>
+        <div class="title">
+            <div>CardDemo - Credit Card Demo Application</div>
+            <div>Sign On</div>
+        </div>
+        <div class="content">
+            <form th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label for="username">User ID:</label>
+                    <input type="text" id="username" name="username" maxlength="8" size="8" autofocus="autofocus"/>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" maxlength="8" size="8"/>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <button type="submit">Sign On [Enter]</button>
+                </div>
+            </form>
+        </div>
+        <div class="footer">
+            <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+            <div class="info" th:if="${infoMessage}" th:text="${infoMessage}"></div>
+            <div style="margin-top: 5px;">PF3 - Exit</div>
+        </div>
+    </div>
+</body>
+</html>
