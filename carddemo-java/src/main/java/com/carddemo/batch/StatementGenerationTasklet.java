@@ -86,10 +86,15 @@ public class StatementGenerationTasklet implements Tasklet {
 
             for (Transaction txn : transactions) {
                 writer.printf("%-16s %12.2f  %s%n",
-                        txn.getOrigTimestamp() != null ? txn.getOrigTimestamp().substring(0, 10) : "",
+                        safeDateSubstring(txn.getOrigTimestamp()),
                         txn.getAmount(), txn.getDescription());
             }
         }
+    }
+
+    private String safeDateSubstring(String timestamp) {
+        if (timestamp == null) return "";
+        return timestamp.length() >= 10 ? timestamp.substring(0, 10) : timestamp;
     }
 
     private void generateHtmlStatement(Path dir, Account account, List<Transaction> transactions) throws IOException {
@@ -105,7 +110,7 @@ public class StatementGenerationTasklet implements Tasklet {
 
             for (Transaction txn : transactions) {
                 writer.printf("<tr><td>%s</td><td>%.2f</td><td>%s</td></tr>%n",
-                        txn.getOrigTimestamp() != null ? txn.getOrigTimestamp().substring(0, 10) : "",
+                        safeDateSubstring(txn.getOrigTimestamp()),
                         txn.getAmount(), txn.getDescription());
             }
 
