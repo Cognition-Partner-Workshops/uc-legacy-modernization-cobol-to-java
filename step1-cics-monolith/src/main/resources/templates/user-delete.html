@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - User Delete</title>
+    <style>
+        body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; font-size: 14px; margin: 0; padding: 20px; }
+        .screen { width: 80ch; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #0f0; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 18px; margin: 20px 0; }
+        .form-row { margin: 5px 0; }
+        .form-row label { display: inline-block; width: 25ch; }
+        .form-row input { background: #000; color: #0f0; border: 1px solid #0f0; padding: 2px 5px; font-family: 'Courier New', monospace; font-size: 14px; }
+        .data-row { margin: 3px 0; }
+        .data-label { display: inline-block; width: 25ch; color: #0a0; }
+        .error { color: #f00; margin: 10px 0; }
+        .footer { border-top: 1px solid #0f0; padding-top: 5px; margin-top: 20px; }
+        .btn { background: #0f0; color: #000; border: none; padding: 5px 15px; cursor: pointer; font-family: 'Courier New', monospace; font-size: 14px; margin: 5px; }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <div class="header">
+        <span th:text="${title01}">AWS CardDemo</span>
+        <span th:text="${currentDate}">MM/DD/YY</span>
+        <span th:text="${currentTime}">HH:MM:SS</span>
+    </div>
+    <div class="header">
+        <span>Tran: <span th:text="${tranId}">CU03</span></span>
+        <span>Pgm: <span th:text="${pgmName}">COUSR03C</span></span>
+    </div>
+    <div class="title">USER DELETE</div>
+    <form method="post" th:action="@{/admin/user/delete}">
+        <div class="form-row">
+            <label for="userId">USER ID:</label>
+            <input type="text" id="userId" name="userId" maxlength="8" autofocus="autofocus"/>
+        </div>
+        <div th:if="${user != null}" style="margin-top: 15px; border: 1px solid #0f0; padding: 10px;">
+            <div class="data-row"><span class="data-label">User ID:</span><span th:text="${user.secUsrId}"></span></div>
+            <div class="data-row"><span class="data-label">First Name:</span><span th:text="${user.secUsrFname}"></span></div>
+            <div class="data-row"><span class="data-label">Last Name:</span><span th:text="${user.secUsrLname}"></span></div>
+            <div class="data-row"><span class="data-label">Type:</span><span th:text="${user.secUsrType}"></span></div>
+            <div class="form-row" style="margin-top: 10px;">
+                <label for="confirm">CONFIRM DELETE (Y/N):</label>
+                <input type="text" id="confirm" name="confirm" maxlength="1"/>
+            </div>
+        </div>
+        <div class="error" th:if="${errorMessage != null and !errorMessage.isEmpty()}" th:text="${errorMessage}"></div>
+        <div style="margin-top: 10px;">
+            <button type="submit" class="btn">ENTER</button>
+            <button type="submit" name="action" value="PF3" class="btn">PF3 Back</button>
+        </div>
+    </form>
+    <div class="footer">
+        <span>ENTER = Delete | PF3 = User List</span>
+    </div>
+</div>
+</body>
+</html>

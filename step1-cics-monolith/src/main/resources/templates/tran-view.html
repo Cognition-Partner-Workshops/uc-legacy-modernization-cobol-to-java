@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Transaction View</title>
+    <style>
+        body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; font-size: 14px; margin: 0; padding: 20px; }
+        .screen { width: 80ch; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #0f0; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 18px; margin: 20px 0; }
+        .form-row { margin: 5px 0; }
+        .form-row label { display: inline-block; width: 25ch; }
+        .form-row input { background: #000; color: #0f0; border: 1px solid #0f0; padding: 2px 5px; font-family: 'Courier New', monospace; font-size: 14px; }
+        .data-row { margin: 3px 0; }
+        .data-label { display: inline-block; width: 25ch; color: #0a0; }
+        .error { color: #f00; margin: 10px 0; }
+        .footer { border-top: 1px solid #0f0; padding-top: 5px; margin-top: 20px; }
+        .btn { background: #0f0; color: #000; border: none; padding: 5px 15px; cursor: pointer; font-family: 'Courier New', monospace; font-size: 14px; margin: 5px; }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <div class="header">
+        <span th:text="${title01}">AWS CardDemo</span>
+        <span th:text="${currentDate}">MM/DD/YY</span>
+        <span th:text="${currentTime}">HH:MM:SS</span>
+    </div>
+    <div class="header">
+        <span>Tran: <span th:text="${tranId}">CT01</span></span>
+        <span>Pgm: <span th:text="${pgmName}">COTRN01C</span></span>
+    </div>
+    <div class="title">TRANSACTION VIEW</div>
+    <form method="post" th:action="@{/transaction/view}">
+        <div class="form-row">
+            <label for="tranId">TRANSACTION ID:</label>
+            <input type="text" id="tranId" name="tranId" maxlength="16" autofocus="autofocus"/>
+        </div>
+        <div class="error" th:if="${errorMessage != null and !errorMessage.isEmpty()}" th:text="${errorMessage}"></div>
+        <div th:if="${transaction != null}" style="margin-top: 15px; border: 1px solid #0f0; padding: 10px;">
+            <div class="data-row"><span class="data-label">Transaction ID:</span><span th:text="${transaction.tranId}"></span></div>
+            <div class="data-row"><span class="data-label">Type Code:</span><span th:text="${transaction.tranTypeCd}"></span></div>
+            <div class="data-row"><span class="data-label">Category Code:</span><span th:text="${transaction.tranCatCd}"></span></div>
+            <div class="data-row"><span class="data-label">Source:</span><span th:text="${transaction.tranSource}"></span></div>
+            <div class="data-row"><span class="data-label">Description:</span><span th:text="${transaction.tranDesc}"></span></div>
+            <div class="data-row"><span class="data-label">Amount:</span><span th:text="${transaction.tranAmt}"></span></div>
+            <div class="data-row"><span class="data-label">Card Number:</span><span th:text="${transaction.tranCardNum}"></span></div>
+            <div class="data-row"><span class="data-label">Merchant ID:</span><span th:text="${transaction.tranMerchantId}"></span></div>
+            <div class="data-row"><span class="data-label">Merchant Name:</span><span th:text="${transaction.tranMerchantName}"></span></div>
+            <div class="data-row"><span class="data-label">Merchant City:</span><span th:text="${transaction.tranMerchantCity}"></span></div>
+            <div class="data-row"><span class="data-label">Merchant Zip:</span><span th:text="${transaction.tranMerchantZip}"></span></div>
+            <div class="data-row"><span class="data-label">Orig Timestamp:</span><span th:text="${transaction.tranOrigTs}"></span></div>
+            <div class="data-row"><span class="data-label">Proc Timestamp:</span><span th:text="${transaction.tranProcTs}"></span></div>
+        </div>
+        <div style="margin-top: 10px;">
+            <button type="submit" class="btn">ENTER</button>
+            <button type="submit" name="action" value="PF3" class="btn">PF3 Back</button>
+        </div>
+    </form>
+    <div class="footer">
+        <span>ENTER = View | PF3 = Transaction List</span>
+    </div>
+</div>
+</body>
+</html>

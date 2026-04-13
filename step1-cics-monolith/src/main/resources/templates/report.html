@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Reports</title>
+    <style>
+        body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; font-size: 14px; margin: 0; padding: 20px; }
+        .screen { width: 80ch; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #0f0; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 18px; margin: 20px 0; }
+        .form-row { margin: 10px 0; }
+        .form-row label { display: inline-block; width: 25ch; }
+        .form-row input, .form-row select { background: #000; color: #0f0; border: 1px solid #0f0; padding: 2px 5px; font-family: 'Courier New', monospace; font-size: 14px; }
+        .error { color: #f00; margin: 10px 0; }
+        .success { color: #ff0; margin: 10px 0; }
+        .footer { border-top: 1px solid #0f0; padding-top: 5px; margin-top: 20px; }
+        .btn { background: #0f0; color: #000; border: none; padding: 5px 15px; cursor: pointer; font-family: 'Courier New', monospace; font-size: 14px; margin: 5px; }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <div class="header">
+        <span th:text="${title01}">AWS CardDemo</span>
+        <span th:text="${currentDate}">MM/DD/YY</span>
+        <span th:text="${currentTime}">HH:MM:SS</span>
+    </div>
+    <div class="header">
+        <span>Tran: <span th:text="${tranId}">CR00</span></span>
+        <span>Pgm: <span th:text="${pgmName}">CORPT00C</span></span>
+    </div>
+    <div class="title">TRANSACTION REPORTS</div>
+    <form method="post" th:action="@{/report}">
+        <div class="form-row">
+            <label for="reportType">REPORT TYPE:</label>
+            <select id="reportType" name="reportType">
+                <option value="monthly">Monthly Statement</option>
+                <option value="transaction">Transaction Report</option>
+                <option value="yearly">Yearly Summary</option>
+            </select>
+        </div>
+        <div class="error" th:if="${errorMessage != null and !errorMessage.isEmpty()}" th:text="${errorMessage}"></div>
+        <div style="margin-top: 10px;">
+            <button type="submit" class="btn">ENTER</button>
+            <button type="submit" name="action" value="PF3" class="btn">PF3 Back</button>
+        </div>
+    </form>
+    <div class="footer">
+        <span>ENTER = Generate | PF3 = Main Menu</span>
+    </div>
+</div>
+</body>
+</html>
