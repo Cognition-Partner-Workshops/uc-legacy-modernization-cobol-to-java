@@ -118,7 +118,7 @@ public class BillPaymentController {
             tran.setTranCatCd(1);
             tran.setTranSource("ONLINE");
             tran.setTranDesc("Bill Payment");
-            tran.setTranAmt(paymentAmt);
+            tran.setTranAmt(paymentAmt.negate());
             Optional<CardXref> xref = cardXrefRepository.findByXrefAcctId(acctIdNum);
             xref.ifPresent(x -> tran.setTranCardNum(x.getXrefCardNum()));
             tran.setTranOrigTs(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));

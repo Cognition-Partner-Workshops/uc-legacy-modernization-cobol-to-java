@@ -1,18 +1,20 @@
 package com.carddemo.transaction.service;
 
 import com.carddemo.transaction.model.Transaction;
-import com.carddemo.transaction.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 /**
  * Centralized service for generating unique transaction IDs and persisting
  * transactions atomically. The generate-and-save must happen inside the same
  * synchronized block so that no other thread can read the same MAX(tran_id)
- * before the new row is flushed to the database.
+ * before the new row is committed to the database.
  *
  * Mirrors the step1-cics-monolith TransactionIdService pattern.
+ *
+ * The actual persistence is delegated to TransactionIdPersister, which uses
+ * {@code @Transactional(propagation = REQUIRES_NEW)} to ensure the save always
+ * commits in its own independent transaction. The delegation to a separate bean
+ * is necessary because Spring's CGLIB proxy cannot intercept self-invocation.
  *
  * Note: synchronized only serializes within a single JVM. For multi-instance
  * deployments, use a database sequence or SELECT ... FOR UPDATE instead.
@@ -20,38 +22,23 @@ import java.util.Optional;
 @Service
 public class TransactionIdService {
 
-    private final TransactionRepository transactionRepository;
+    private final TransactionIdPersister persister;
 
-    public TransactionIdService(TransactionRepository transactionRepository) {
-        this.transactionRepository = transactionRepository;
+    public TransactionIdService(TransactionIdPersister persister) {
+        this.persister = persister;
     }
 
     /**
      * Generate the next transaction ID, assign it to the given Transaction,
-     * and save it — all within a single synchronized block.
-     * This prevents the race condition where Thread A generates an ID, releases
-     * the lock, and Thread B generates the same ID before Thread A's save()
-     * has committed.
+     * and save it — all within a single synchronized block. The save happens
+     * in a REQUIRES_NEW transaction (via TransactionIdPersister) so the row
+     * is committed before the lock releases, even when called from within
+     * an outer transaction.
      *
      * @param transaction the Transaction entity (all fields set except tranId)
      * @return the saved Transaction with its generated tranId
      */
     public synchronized Transaction generateIdAndSave(Transaction transaction) {
-        String nextId = computeNextId();
-        transaction.setTranId(nextId);
-        return transactionRepository.save(transaction);
-    }
-
-    private String computeNextId() {
-        Optional<String> maxId = transactionRepository.findMaxTranId();
-        if (maxId.isPresent()) {
-            try {
-                long id = Long.parseLong(maxId.get().trim());
-                return String.format("%016d", id + 1);
-            } catch (NumberFormatException e) {
-                return String.format("%016d", System.currentTimeMillis());
-            }
-        }
-        return "0000000000000001";
+        return persister.computeAndSave(transaction);
     }
 }
