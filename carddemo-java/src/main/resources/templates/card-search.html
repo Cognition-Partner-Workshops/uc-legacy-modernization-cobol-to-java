@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Card Search</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00FF00; margin: 0; padding: 20px; }
+        .screen { max-width: 80ch; margin: 0 auto; background-color: #000040; padding: 20px; border: 2px solid #00FF00; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #00FF00; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 1.2em; font-weight: bold; margin: 10px 0; color: #FFFF00; }
+        .content { margin: 10px 0; }
+        .footer { border-top: 1px solid #00FF00; padding-top: 5px; margin-top: 10px; }
+        .error { color: #FF0000; } .info { color: #00FFFF; }
+        a { color: #00FFFF; text-decoration: none; }
+        table { width: 100%; border-collapse: collapse; } th, td { padding: 3px 8px; text-align: left; }
+        th { color: #FFFF00; border-bottom: 1px solid #00FF00; } td { border-bottom: 1px solid #004000; }
+        input { font-family: 'Courier New', monospace; background-color: #000040; color: #00FF00; border: 1px solid #00FF00; padding: 2px 5px; }
+        .btn { font-family: 'Courier New', monospace; background-color: #004000; color: #00FF00; border: 1px solid #00FF00; padding: 5px 15px; cursor: pointer; }
+        .form-group { margin: 8px 0; } .form-group label { display: inline-block; width: 20ch; color: #FFFF00; }
+        .field-row { margin: 4px 0; } .field-label { display: inline-block; width: 25ch; color: #FFFF00; }
+    </style>
+</head>
+<body>
+    <div class="screen">
+        <div class="header">
+            <div><span>Tran: </span><span th:text="${tranName}"></span> <span>Pgm: </span><span th:text="${pgmName}"></span></div>
+            <div th:text="${#dates.format(new java.util.Date(), 'MM/dd/yy HH:mm:ss')}"></div>
+        </div>
+        <div class="title">Credit Card Search/Detail</div>
+        <div class="content">
+            <form action="/cards/search" method="get" style="margin-bottom:15px;">
+                <div class="form-group"><label>Card Number:</label><input type="text" name="cardNum" maxlength="16" size="16"/></div>
+                <div class="form-group"><label>Account ID:</label><input type="number" name="acctId" size="11"/></div>
+                <div class="form-group"><button type="submit" class="btn">Search</button></div>
+            </form>
+            <div th:if="${card}">
+                <div class="field-row"><span class="field-label">Card Number:</span><span th:text="${card.cardNum}"></span></div>
+                <div class="field-row"><span class="field-label">Account ID:</span><span th:text="${card.acctId}"></span></div>
+                <div class="field-row"><span class="field-label">CVV Code:</span><span th:text="${card.cvvCode}"></span></div>
+                <div class="field-row"><span class="field-label">Embossed Name:</span><span th:text="${card.embossedName}"></span></div>
+                <div class="field-row"><span class="field-label">Expiration Date:</span><span th:text="${card.expirationDate}"></span></div>
+                <div class="field-row"><span class="field-label">Active Status:</span><span th:text="${card.activeStatus}"></span></div>
+                <div style="margin-top:10px;"><a th:href="@{'/cards/' + ${card.cardNum} + '/edit'}" class="btn">Edit Card</a></div>
+            </div>
+            <div th:if="${cards}">
+                <table>
+                    <tr><th>Card Number</th><th>Acct ID</th><th>Status</th><th>Expiry</th><th>Name</th></tr>
+                    <tr th:each="c : ${cards}">
+                        <td><a th:href="@{'/cards/' + ${c.cardNum}}" th:text="${c.cardNum}"></a></td>
+                        <td th:text="${c.acctId}"></td>
+                        <td th:text="${c.activeStatus}"></td>
+                        <td th:text="${c.expirationDate}"></td>
+                        <td th:text="${c.embossedName}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+            <div class="info" th:if="${infoMessage}" th:text="${infoMessage}"></div>
+            <div><a href="/menu">PF3 - Return to Menu</a></div>
+        </div>
+    </div>
+</body>
+</html>

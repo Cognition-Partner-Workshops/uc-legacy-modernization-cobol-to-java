@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Transaction View</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00FF00; margin: 0; padding: 20px; }
+        .screen { max-width: 80ch; margin: 0 auto; background-color: #000040; padding: 20px; border: 2px solid #00FF00; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #00FF00; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 1.2em; font-weight: bold; margin: 10px 0; color: #FFFF00; }
+        .content { margin: 10px 0; }
+        .footer { border-top: 1px solid #00FF00; padding-top: 5px; margin-top: 10px; }
+        .error { color: #FF0000; } .info { color: #00FFFF; }
+        a { color: #00FFFF; text-decoration: none; }
+        .field-row { margin: 4px 0; } .field-label { display: inline-block; width: 25ch; color: #FFFF00; }
+    </style>
+</head>
+<body>
+    <div class="screen">
+        <div class="header">
+            <div><span>Tran: </span><span th:text="${tranName}"></span> <span>Pgm: </span><span th:text="${pgmName}"></span></div>
+            <div th:text="${#dates.format(new java.util.Date(), 'MM/dd/yy HH:mm:ss')}"></div>
+        </div>
+        <div class="title">Transaction Detail</div>
+        <div class="content" th:if="${transaction}">
+            <div class="field-row"><span class="field-label">Card Number:</span><span th:text="${transaction.cardNum}"></span></div>
+            <div class="field-row"><span class="field-label">Transaction ID:</span><span th:text="${transaction.tranId}"></span></div>
+            <div class="field-row"><span class="field-label">Type Code:</span><span th:text="${transaction.typeCd}"></span></div>
+            <div class="field-row"><span class="field-label">Category Code:</span><span th:text="${transaction.catCd}"></span></div>
+            <div class="field-row"><span class="field-label">Source:</span><span th:text="${transaction.source}"></span></div>
+            <div class="field-row"><span class="field-label">Description:</span><span th:text="${transaction.description}"></span></div>
+            <div class="field-row"><span class="field-label">Amount:</span><span th:text="${#numbers.formatDecimal(transaction.amount, 1, 2)}"></span></div>
+            <div class="field-row"><span class="field-label">Merchant ID:</span><span th:text="${transaction.merchantId}"></span></div>
+            <div class="field-row"><span class="field-label">Merchant Name:</span><span th:text="${transaction.merchantName}"></span></div>
+            <div class="field-row"><span class="field-label">Merchant City:</span><span th:text="${transaction.merchantCity}"></span></div>
+            <div class="field-row"><span class="field-label">Merchant Zip:</span><span th:text="${transaction.merchantZip}"></span></div>
+            <div class="field-row"><span class="field-label">Original Timestamp:</span><span th:text="${transaction.origTimestamp}"></span></div>
+            <div class="field-row"><span class="field-label">Processed Timestamp:</span><span th:text="${transaction.procTimestamp}"></span></div>
+        </div>
+        <div class="footer">
+            <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+            <div><a th:href="@{'/transactions?cardNum=' + ${transaction?.cardNum}}">Back to List</a> | <a href="/menu">PF3 - Return to Menu</a></div>
+        </div>
+    </div>
+</body>
+</html>

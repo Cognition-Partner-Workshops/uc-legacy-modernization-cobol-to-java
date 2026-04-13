@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Admin Menu</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00FF00; margin: 0; padding: 20px; }
+        .screen { max-width: 80ch; margin: 0 auto; background-color: #000040; padding: 20px; border: 2px solid #00FF00; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #00FF00; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 1.2em; font-weight: bold; margin: 10px 0; color: #FFFF00; }
+        .content { margin: 10px 0; }
+        .footer { border-top: 1px solid #00FF00; padding-top: 5px; margin-top: 10px; }
+        a { color: #00FFFF; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .menu-item { margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="screen">
+        <div class="header">
+            <div>
+                <span>Tran: </span><span th:text="${tranName}">CA00</span>
+                <span> Pgm: </span><span th:text="${pgmName}">COADM01C</span>
+            </div>
+            <div>
+                <span>User: </span><span th:text="${userId}"></span>
+            </div>
+        </div>
+        <div class="title">
+            <div>CardDemo - Administration Menu</div>
+        </div>
+        <div class="content">
+            <div class="menu-item">1. <a href="/admin/users">User Management - List Users</a></div>
+            <div class="menu-item">2. <a href="/admin/users/add">User Management - Add User</a></div>
+            <div style="margin-top: 20px;">
+                <a href="/menu">Back to Main Menu</a>
+            </div>
+        </div>
+        <div class="footer">
+            <div>PF3 = <a href="/menu">Back</a></div>
+        </div>
+    </div>
+</body>
+</html>

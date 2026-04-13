@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Account View</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00FF00; margin: 0; padding: 20px; }
+        .screen { max-width: 80ch; margin: 0 auto; background-color: #000040; padding: 20px; border: 2px solid #00FF00; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #00FF00; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 1.2em; font-weight: bold; margin: 10px 0; color: #FFFF00; }
+        .content { margin: 10px 0; }
+        .footer { border-top: 1px solid #00FF00; padding-top: 5px; margin-top: 10px; }
+        .error { color: #FF0000; font-weight: bold; }
+        .info { color: #00FFFF; }
+        a { color: #00FFFF; text-decoration: none; }
+        .field-row { margin: 4px 0; }
+        .field-label { display: inline-block; width: 25ch; color: #FFFF00; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 3px 8px; text-align: left; }
+        th { color: #FFFF00; border-bottom: 1px solid #00FF00; }
+        td { border-bottom: 1px solid #004000; }
+        .btn { font-family: 'Courier New', monospace; background-color: #004000; color: #00FF00; border: 1px solid #00FF00; padding: 5px 15px; cursor: pointer; text-decoration: none; }
+        input { font-family: 'Courier New', monospace; background-color: #000040; color: #00FF00; border: 1px solid #00FF00; padding: 2px 5px; }
+    </style>
+</head>
+<body>
+    <div class="screen">
+        <div class="header">
+            <div>
+                <span>Tran: </span><span th:text="${tranName}">CAVW</span>
+                <span> Pgm: </span><span th:text="${pgmName}">COACTVWC</span>
+            </div>
+            <div th:text="${#dates.format(new java.util.Date(), 'MM/dd/yy HH:mm:ss')}"></div>
+        </div>
+        <div class="title">Account View</div>
+        <div class="content">
+            <!-- Search form -->
+            <div style="margin-bottom: 15px;">
+                <form th:action="@{/accounts}" method="get" style="display:inline;">
+                    <label>Account ID: </label>
+                    <input type="number" name="id" placeholder="Account ID" size="11"/>
+                    <button type="submit" class="btn" onclick="this.form.action='/accounts/' + this.form.id.value;">View</button>
+                </form>
+            </div>
+            <!-- Account details -->
+            <div th:if="${account}">
+                <div class="field-row"><span class="field-label">Account ID:</span><span th:text="${account.acctId}"></span></div>
+                <div class="field-row"><span class="field-label">Active Status:</span><span th:text="${account.activeStatus}"></span></div>
+                <div class="field-row"><span class="field-label">Current Balance:</span><span th:text="${#numbers.formatDecimal(account.currentBalance, 1, 2)}"></span></div>
+                <div class="field-row"><span class="field-label">Credit Limit:</span><span th:text="${#numbers.formatDecimal(account.creditLimit, 1, 2)}"></span></div>
+                <div class="field-row"><span class="field-label">Cash Credit Limit:</span><span th:text="${#numbers.formatDecimal(account.cashCreditLimit, 1, 2)}"></span></div>
+                <div class="field-row"><span class="field-label">Open Date:</span><span th:text="${account.openDate}"></span></div>
+                <div class="field-row"><span class="field-label">Expiration Date:</span><span th:text="${account.expirationDate}"></span></div>
+                <div class="field-row"><span class="field-label">Reissue Date:</span><span th:text="${account.reissueDate}"></span></div>
+                <div class="field-row"><span class="field-label">Current Cycle Credit:</span><span th:text="${#numbers.formatDecimal(account.currentCycleCredit, 1, 2)}"></span></div>
+                <div class="field-row"><span class="field-label">Current Cycle Debit:</span><span th:text="${#numbers.formatDecimal(account.currentCycleDebit, 1, 2)}"></span></div>
+                <div class="field-row"><span class="field-label">Group ID:</span><span th:text="${account.groupId}"></span></div>
+                <div style="margin-top: 10px;">
+                    <a th:href="@{'/accounts/' + ${account.acctId} + '/edit'}" class="btn">Edit Account</a>
+                </div>
+                <!-- Associated Cards -->
+                <div th:if="${cards}" style="margin-top: 15px;">
+                    <div style="color:#FFFF00;">Associated Cards:</div>
+                    <table>
+                        <tr><th>Card Number</th><th>Status</th><th>Expiry</th><th>Name</th></tr>
+                        <tr th:each="card : ${cards}">
+                            <td><a th:href="@{'/cards/' + ${card.cardNum}}" th:text="${card.cardNum}"></a></td>
+                            <td th:text="${card.activeStatus}"></td>
+                            <td th:text="${card.expirationDate}"></td>
+                            <td th:text="${card.embossedName}"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <!-- Account list -->
+            <div th:if="${accounts}">
+                <table>
+                    <tr><th>Acct ID</th><th>Status</th><th>Balance</th><th>Credit Limit</th></tr>
+                    <tr th:each="acct : ${accounts.content}">
+                        <td><a th:href="@{'/accounts/' + ${acct.acctId}}" th:text="${acct.acctId}"></a></td>
+                        <td th:text="${acct.activeStatus}"></td>
+                        <td th:text="${#numbers.formatDecimal(acct.currentBalance, 1, 2)}"></td>
+                        <td th:text="${#numbers.formatDecimal(acct.creditLimit, 1, 2)}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+            <div class="info" th:if="${infoMessage}" th:text="${infoMessage}"></div>
+            <div><a href="/menu">PF3 - Return to Menu</a></div>
+        </div>
+    </div>
+</body>
+</html>

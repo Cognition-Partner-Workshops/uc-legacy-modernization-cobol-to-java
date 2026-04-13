@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CardDemo - Transaction List</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #000080; color: #00FF00; margin: 0; padding: 20px; }
+        .screen { max-width: 80ch; margin: 0 auto; background-color: #000040; padding: 20px; border: 2px solid #00FF00; }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #00FF00; padding-bottom: 5px; margin-bottom: 10px; }
+        .title { text-align: center; font-size: 1.2em; font-weight: bold; margin: 10px 0; color: #FFFF00; }
+        .content { margin: 10px 0; }
+        .footer { border-top: 1px solid #00FF00; padding-top: 5px; margin-top: 10px; }
+        .error { color: #FF0000; } .info { color: #00FFFF; }
+        a { color: #00FFFF; text-decoration: none; }
+        table { width: 100%; border-collapse: collapse; } th, td { padding: 3px 6px; text-align: left; font-size: 0.9em; }
+        th { color: #FFFF00; border-bottom: 1px solid #00FF00; } td { border-bottom: 1px solid #004000; }
+        input { font-family: 'Courier New', monospace; background-color: #000040; color: #00FF00; border: 1px solid #00FF00; padding: 2px 5px; }
+        .btn { font-family: 'Courier New', monospace; background-color: #004000; color: #00FF00; border: 1px solid #00FF00; padding: 5px 15px; cursor: pointer; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="screen">
+        <div class="header">
+            <div><span>Tran: </span><span th:text="${tranName}"></span> <span>Pgm: </span><span th:text="${pgmName}"></span></div>
+            <div th:text="${#dates.format(new java.util.Date(), 'MM/dd/yy HH:mm:ss')}"></div>
+        </div>
+        <div class="title">Transaction List</div>
+        <div class="content">
+            <form action="/transactions" method="get" style="margin-bottom:15px;">
+                <label>Card Number: </label>
+                <input type="text" name="cardNum" maxlength="16" size="16" th:value="${cardNum}"/>
+                <button type="submit" class="btn">List</button>
+                <a href="/transactions/add" class="btn" style="margin-left:10px;">Add New</a>
+            </form>
+            <div th:if="${transactions}">
+                <table>
+                    <tr><th>Tran ID</th><th>Type</th><th>Amount</th><th>Description</th><th>Timestamp</th></tr>
+                    <tr th:each="txn : ${transactions.content}">
+                        <td><a th:href="@{'/transactions/' + ${txn.cardNum} + '/' + ${txn.tranId}}" th:text="${txn.tranId}"></a></td>
+                        <td th:text="${txn.typeCd}"></td>
+                        <td th:text="${#numbers.formatDecimal(txn.amount, 1, 2)}"></td>
+                        <td th:text="${txn.description}"></td>
+                        <td th:text="${txn.origTimestamp}"></td>
+                    </tr>
+                </table>
+                <div th:if="${transactions.totalPages > 1}" style="margin-top:10px;">
+                    <span>Page <span th:text="${transactions.number + 1}"></span> of <span th:text="${transactions.totalPages}"></span></span>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+            <div class="info" th:if="${infoMessage}" th:text="${infoMessage}"></div>
+            <div><a href="/menu">PF3 - Return to Menu</a></div>
+        </div>
+    </div>
+</body>
+</html>
