@@ -18,6 +18,7 @@ CardDemo is a comprehensive mainframe application that simulates a credit card m
   - [Application Inventory](#application-inventory)
   - [Application Screens](#application-screens)
 - [Technical Highlights](#technical-highlights)
+- [Modernization Demo](#modernization-demo)
 - [Support](#support)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -349,6 +350,16 @@ Admin users can perform the following functions:
 |:----------|:----------------|:-------------------|
 | **Base Application** | Customer<br>Account<br>Card<br>Transaction<br>Bill Payment<br>Statement/Report | COBOL<br>CICS<br>JCL (Batch)<br>VSAM (KSDS with AIX) |
 | **Optional Features** | Authorization<br>Fraud<br>Transaction Type (Extension) | DB2<br>MQ<br>IMS DB<br>JCL Utilities<br>Complex data formats<br>Various dataset types<br>Advanced copybook structures |
+
+## Modernization Demo
+
+The `demo/` directory contains a **working modernized version** of the Card Management screens (List, Detail, Update) built with **React** and **Spring Boot**, demonstrating the COBOL-to-Java modernization flow.
+
+- **[DEMO.md](./DEMO.md)** — Demo script and talking points for the CTO presentation, including the architecture flow diagram and phase-by-phase walkthrough
+- **[demo/README.md](./demo/README.md)** — How to run the modernized application locally
+- **[demo/business-rules/](./demo/business-rules/)** — Extracted business rule documentation mapping COBOL programs to Java services
+
+The demo replaces the original BMS green screen terminals (`COCRDLI`, `COCRDSL`, `COCRDUP`) and COBOL programs (`COCRDLIC`, `COCRDSLC`, `COCRDUPC`) with a React SPA frontend and Spring Boot REST API backend, using H2 in place of VSAM for data storage. Seed data is derived from the original mainframe data files in `app/data/ASCII/`.
 
 ## Support
 
