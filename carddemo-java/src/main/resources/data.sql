@@ -1,0 +1,9 @@
+-- Seed data matching COBOL USRSEC file sample users
+-- Actual data is seeded via DataInitializer using BCrypt at runtime.
+-- This file documents the equivalent SQL for reference:
+--
+-- INSERT INTO users (user_id, first_name, last_name, password, user_type)
+-- VALUES ('ADMIN001', 'ADMIN', 'USER', '<bcrypt hash of PASSWORD>', 'A');
+--
+-- INSERT INTO users (user_id, first_name, last_name, password, user_type)
+-- VALUES ('USER0001', 'REGULAR', 'USER', '<bcrypt hash of PASSWORD>', 'U');
