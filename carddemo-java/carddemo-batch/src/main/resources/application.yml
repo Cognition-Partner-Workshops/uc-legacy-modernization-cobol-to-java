@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: carddemo-batch
+  datasource:
+    url: jdbc:postgresql://localhost:5432/carddemo
+    username: carddemo
+    password: carddemo
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  batch:
+    jdbc:
+      initialize-schema: always
+
+logging:
+  level:
+    com.cardemo: DEBUG
+    org.springframework.batch: INFO
