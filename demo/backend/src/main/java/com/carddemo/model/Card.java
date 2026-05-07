@@ -1,9 +1,11 @@
 package com.carddemo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 /**
  * JPA entity mapped from COBOL copybook CVACT02Y.cpy (Card Record, RECLN 150).
@@ -27,6 +29,10 @@ public class Card {
     @Column(name = "account_id", length = 11, nullable = false)
     private String accountId;
 
+    // Equivalent to COBOL behavior: CVV is stored in VSAM record but never
+    // displayed on any BMS screen (COCRDSL.bms / COCRDUP.bms).
+    // @JsonIgnore prevents CVV from appearing in API responses (PCI DSS).
+    @JsonIgnore
     @Column(name = "cvv_code", length = 3)
     private String cvvCode;
 
@@ -38,6 +44,14 @@ public class Card {
 
     @Column(name = "active_status", length = 1)
     private String activeStatus;
+
+    // Equivalent to 9300-CHECK-CHANGE-IN-REC in COCRDUPC.cbl
+    // COBOL checks all field values before/after to detect concurrent modification.
+    // JPA @Version provides optimistic locking — throws OptimisticLockException
+    // if another transaction modified the record between read and write.
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     public Card() {}
 
@@ -68,4 +82,7 @@ public class Card {
 
     public String getActiveStatus() { return activeStatus; }
     public void setActiveStatus(String activeStatus) { this.activeStatus = activeStatus; }
+
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
 }

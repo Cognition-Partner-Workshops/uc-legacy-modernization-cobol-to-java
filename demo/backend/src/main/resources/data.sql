@@ -1,17 +1,5 @@
 -- Seed data converted from app/data/ASCII/carddata.txt and app/data/ASCII/acctdata.txt
--- Card records: cardNumber(16) | accountId(11) | cvvCode(3) | embossedName(50) | expirationDate(10) | activeStatus(1)
-
-INSERT INTO cards (card_number, account_id, cvv_code, embossed_name, expiration_date, active_status) VALUES
-('0500024453765740', '00000000050', '747', 'Aniya Von',              '2023-03-09', 'Y'),
-('0683586198171516', '00000000027', '567', 'Ward Jones',             '2025-07-13', 'Y'),
-('0923877193247330', '00000000002', '028', 'Enrico Rosenbaum',       '2024-08-11', 'Y'),
-('0927987108636232', '00000000020', '003', 'Carter Veum',            '2024-03-13', 'Y'),
-('0982496213629795', '00000000012', '075', 'Maci Robel',             '2023-07-07', 'Y'),
-('1014086565224350', '00000000044', '640', 'Irving Emard',           '2024-01-17', 'Y'),
-('1142167692878931', '00000000037', '625', 'Shany Walker',           '2023-10-24', 'Y'),
-('1561409106491600', '00000000035', '031', 'Angelica Dach',          '2025-09-23', 'Y'),
-('2745303720002090', '00000000039', '033', 'Aliyah Berge',           '2025-09-08', 'Y'),
-('2760836797107565', '00000000024', '859', 'Stefanie Dickinson',     '2025-02-11', 'Y');
+-- Accounts must be inserted first due to foreign key constraint (fk_cards_account)
 
 -- Account records from app/data/ASCII/acctdata.txt
 -- accountId(11) | activeStatus(1) | currentBalance | creditLimit | cashCreditLimit | openDate | expirationDate | reissueDate
@@ -31,6 +19,21 @@ INSERT INTO accounts (account_id, active_status, current_balance, credit_limit, 
 ('00000000039', 'Y', 48000.00, 698600.00, 372300.00, '2011-12-14', '2025-07-23', '2025-07-23'),
 ('00000000044', 'Y', 60500.00, 610400.00, 131800.00, '2012-01-04', '2024-05-20', '2024-05-20'),
 ('00000000050', 'Y', 34500.00, 381900.00, 243000.00, '2012-10-03', '2025-03-09', '2025-03-09');
+
+-- Card records: cardNumber(16) | accountId(11) | cvvCode(3) | embossedName(50) | expirationDate(10) | activeStatus(1)
+-- Note: expirationDate day component is always "01" per COBOL EXPDAY convention (DRK,PROT field)
+
+INSERT INTO cards (card_number, account_id, cvv_code, embossed_name, expiration_date, active_status, version) VALUES
+('0500024453765740', '00000000050', '747', 'Aniya Von',              '2023-03-01', 'Y', 0),
+('0683586198171516', '00000000027', '567', 'Ward Jones',             '2025-07-01', 'Y', 0),
+('0923877193247330', '00000000002', '028', 'Enrico Rosenbaum',       '2024-08-01', 'Y', 0),
+('0927987108636232', '00000000020', '003', 'Carter Veum',            '2024-03-01', 'Y', 0),
+('0982496213629795', '00000000012', '075', 'Maci Robel',             '2023-07-01', 'Y', 0),
+('1014086565224350', '00000000044', '640', 'Irving Emard',           '2024-01-01', 'Y', 0),
+('1142167692878931', '00000000037', '625', 'Shany Walker',           '2023-10-01', 'Y', 0),
+('1561409106491600', '00000000035', '031', 'Angelica Dach',          '2025-09-01', 'Y', 0),
+('2745303720002090', '00000000039', '033', 'Aliyah Berge',           '2025-09-01', 'Y', 0),
+('2760836797107565', '00000000024', '859', 'Stefanie Dickinson',     '2025-02-01', 'Y', 0);
 
 -- Cross-reference records from app/data/ASCII/cardxref.txt
 INSERT INTO card_xref (card_number, customer_id, account_id) VALUES

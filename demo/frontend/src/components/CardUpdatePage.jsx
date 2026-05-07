@@ -96,6 +96,32 @@ const styles = {
     fontSize: '14px',
   },
   loading: { textAlign: 'center', padding: '40px', color: '#999' },
+  hint: { color: '#888', fontSize: '11px', marginTop: '2px' },
+  confirmOverlay: {
+    position: 'fixed',
+    top: 0, left: 0, right: 0, bottom: 0,
+    background: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  confirmBox: {
+    background: '#fff',
+    borderRadius: '8px',
+    padding: '32px',
+    maxWidth: '420px',
+    width: '90%',
+    boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
+  },
+  confirmTitle: {
+    fontSize: '18px',
+    fontWeight: 700,
+    color: '#1a237e',
+    marginBottom: '12px',
+  },
+  confirmText: { fontSize: '14px', color: '#555', marginBottom: '20px' },
+  confirmActions: { display: 'flex', gap: '12px', justifyContent: 'flex-end' },
 };
 
 function CardUpdatePage() {
@@ -113,6 +139,8 @@ function CardUpdatePage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState(null);
+  // Equivalent to 2000-DECIDE-ACTION PF5 confirmation in COCRDUPC.cbl
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     const fetchCard = async () => {
@@ -128,28 +156,51 @@ function CardUpdatePage() {
     fetchCard();
   }, [cardNumber]);
 
+  // Validation — equivalent to 1230-EDIT-NAME, 1240-EDIT-CARDSTATUS,
+  // 1250-EDIT-EXPIRY-MON, 1260-EDIT-EXPIRY-YEAR in COCRDUPC.cbl
   const validate = () => {
     const errs = {};
+
+    // Equivalent to 1230-EDIT-NAME in COCRDUPC.cbl — name is required
     if (!form.embossedName || form.embossedName.trim() === '') {
       errs.embossedName = 'Name on card is required';
+    } else if (!/^[A-Za-z ]+$/.test(form.embossedName.trim())) {
+      // Equivalent to INSPECT CONVERTING in 1230-EDIT-NAME — alpha + space only
+      errs.embossedName = 'Name must contain only letters and spaces';
     }
+
+    // Equivalent to 1240-EDIT-CARDSTATUS — FLG-YES-NO-VALID VALUES 'Y', 'N'
     if (form.activeStatus !== 'Y' && form.activeStatus !== 'N') {
       errs.activeStatus = 'Active status must be Y or N';
     }
+
+    // Equivalent to 1250-EDIT-EXPIRY-MON + 1260-EDIT-EXPIRY-YEAR in COCRDUPC.cbl
     if (!form.expirationDate || !/^\d{4}-\d{2}-\d{2}$/.test(form.expirationDate)) {
       errs.expirationDate = 'Expiry date must be in YYYY-MM-DD format';
     } else {
-      const month = parseInt(form.expirationDate.split('-')[1], 10);
-      const year = parseInt(form.expirationDate.split('-')[0], 10);
-      if (month < 1 || month > 12) errs.expirationDate = 'Month must be 01-12';
+      const parts = form.expirationDate.split('-');
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      const day = parseInt(parts[2], 10);
       if (year < 1950 || year > 2099) errs.expirationDate = 'Year must be 1950-2099';
+      else if (month < 1 || month > 12) errs.expirationDate = 'Month must be 01-12';
+      // Equivalent to EXPDAY field (DRK,PROT) in COCRDUP.bms — day must be "01"
+      else if (day !== 1) errs.expirationDate = 'Day must be 01 (first of month per COBOL convention)';
     }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  const handleSave = async () => {
+  // Step 1: Validate, then show confirmation dialog (equivalent to PF5 in COCRDUPC.cbl)
+  const handleSaveClick = () => {
     if (!validate()) return;
+    setShowConfirm(true);
+  };
+
+  // Step 2: User confirms — proceed with actual save
+  const handleConfirmedSave = async () => {
+    setShowConfirm(false);
     setSaving(true);
     setServerError(null);
     setSuccess(false);
@@ -158,8 +209,13 @@ function CardUpdatePage() {
       setSuccess(true);
       setTimeout(() => navigate(`/cards/${cardNumber}`), 1200);
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data || 'Update failed';
-      setServerError(typeof msg === 'string' ? msg : JSON.stringify(msg));
+      const data = err.response?.data;
+      const msg = data?.message || data || 'Update failed';
+      if (err.response?.status === 409) {
+        setServerError('Record was modified by another user. Please refresh and try again.');
+      } else {
+        setServerError(typeof msg === 'string' ? msg : JSON.stringify(msg));
+      }
     } finally {
       setSaving(false);
     }
@@ -198,6 +254,7 @@ function CardUpdatePage() {
             onChange={(e) => setForm({ ...form, embossedName: e.target.value })}
             maxLength={50}
           />
+          <div style={styles.hint}>Letters and spaces only (per COBOL INSPECT CONVERTING rule)</div>
           {errors.embossedName && <div style={styles.errorText}>{errors.embossedName}</div>}
         </div>
         <div style={styles.fieldGroup}>
@@ -211,23 +268,48 @@ function CardUpdatePage() {
           {errors.activeStatus && <div style={styles.errorText}>{errors.activeStatus}</div>}
         </div>
         <div style={styles.fieldGroup}>
-          <label style={styles.label}>Expiry Date (YYYY-MM-DD)</label>
+          <label style={styles.label}>Expiry Date (YYYY-MM-01)</label>
           <input
             style={errors.expirationDate ? styles.inputError : styles.input}
             value={form.expirationDate}
             onChange={(e) => setForm({ ...form, expirationDate: e.target.value })}
-            placeholder="YYYY-MM-DD"
+            placeholder="YYYY-MM-01"
           />
+          <div style={styles.hint}>Day must be 01 (COBOL EXPDAY field is dark/protected)</div>
           {errors.expirationDate && <div style={styles.errorText}>{errors.expirationDate}</div>}
         </div>
 
         <div style={styles.actions}>
-          <button style={styles.btn} onClick={handleSave} disabled={saving}>
+          <button style={styles.btn} onClick={handleSaveClick} disabled={saving}>
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
           <Link to={`/cards/${cardNumber}`} style={styles.btnCancel}>Cancel</Link>
         </div>
       </div>
+
+      {/* Equivalent to 2000-DECIDE-ACTION PF5 confirmation in COCRDUPC.cbl */}
+      {showConfirm && (
+        <div style={styles.confirmOverlay}>
+          <div style={styles.confirmBox}>
+            <div style={styles.confirmTitle}>Confirm Update</div>
+            <div style={styles.confirmText}>
+              Are you sure you want to update card <strong>{cardNumber}</strong>?
+              This is equivalent to pressing PF5 in the COBOL CICS application.
+            </div>
+            <div style={styles.confirmActions}>
+              <button
+                style={styles.btnCancel}
+                onClick={() => setShowConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button style={styles.btn} onClick={handleConfirmedSave}>
+                Confirm Update
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
