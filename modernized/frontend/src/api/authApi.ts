@@ -13,7 +13,7 @@ api.interceptors.request.use((config) => {
 export interface LoginResponse {
   token: string;
   userId: string;
-  role: string;
+  userType: string;
 }
 
 export const authApi = {

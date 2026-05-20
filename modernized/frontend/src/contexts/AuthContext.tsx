@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (userId: string, password: string) => {
     const response: LoginResponse = await authApi.login(userId, password);
     localStorage.setItem('token', response.token);
-    const userData = { userId: response.userId, role: response.role };
+    const userData = { userId: response.userId, role: response.userType === 'A' ? 'ADMIN' : 'USER' };
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
   }, []);
@@ -55,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         isAuthenticated: !!user,
         isAdmin: user?.role === 'ADMIN',
+
       }}
     >
       {children}
