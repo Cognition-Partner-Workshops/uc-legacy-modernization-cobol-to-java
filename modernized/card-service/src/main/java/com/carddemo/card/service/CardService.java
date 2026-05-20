@@ -53,6 +53,10 @@ public class CardService {
         Card card = cardRepository.findById(cardNum)
                 .orElseThrow(() -> new ResourceNotFoundException("Card", "cardNum", cardNum));
 
+        if (request.getVersion() != null && !request.getVersion().equals(card.getVersion())) {
+            throw new ValidationException("Card " + cardNum + " was modified by another transaction");
+        }
+
         if (request.getEmbossedName() != null) {
             validateEmbossedName(request.getEmbossedName());
             card.setEmbossedName(request.getEmbossedName());
