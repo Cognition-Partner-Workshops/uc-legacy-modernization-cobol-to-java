@@ -1,0 +1,22 @@
+CREATE TABLE customer.customers (
+    cust_id               VARCHAR(9) PRIMARY KEY,
+    first_name            VARCHAR(25) NOT NULL,
+    middle_name           VARCHAR(25),
+    last_name             VARCHAR(25) NOT NULL,
+    addr_line_1           VARCHAR(50),
+    addr_line_2           VARCHAR(50),
+    addr_line_3           VARCHAR(50),
+    addr_state_cd         CHAR(2),
+    addr_country_cd       CHAR(3),
+    addr_zip              VARCHAR(10),
+    phone_num_1           VARCHAR(15),
+    phone_num_2           VARCHAR(15),
+    ssn                   VARCHAR(9) UNIQUE,
+    govt_issued_id        VARCHAR(20),
+    dob                   DATE,
+    eft_account_id        VARCHAR(10),
+    pri_card_holder_ind   CHAR(1),
+    fico_credit_score     INTEGER,
+    created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

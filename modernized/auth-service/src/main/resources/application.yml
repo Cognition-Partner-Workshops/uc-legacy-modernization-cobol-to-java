@@ -1,0 +1,23 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/carddemo
+    username: carddemo
+    password: carddemo
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        default_schema: auth
+  flyway:
+    schemas:
+      - auth
+
+jwt:
+  secret: CardDemoSecretKeyForJWTTokenGenerationMustBeAtLeast256Bits!!
+  expiration-ms: 3600000
