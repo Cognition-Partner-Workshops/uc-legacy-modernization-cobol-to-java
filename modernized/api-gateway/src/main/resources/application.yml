@@ -10,10 +10,10 @@ spring:
     password: carddemo
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     properties:
       hibernate:
-        default_schema: api-gateway
+        default_schema: api_gateway
   flyway:
     schemas:
-      - api-gateway
+      - api_gateway
