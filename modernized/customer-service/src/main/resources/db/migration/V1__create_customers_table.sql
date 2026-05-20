@@ -11,7 +11,7 @@ CREATE TABLE customer.customers (
     addr_zip              VARCHAR(10),
     phone_num_1           VARCHAR(15),
     phone_num_2           VARCHAR(15),
-    ssn                   VARCHAR(9),
+    ssn                   VARCHAR(9) UNIQUE,
     govt_issued_id        VARCHAR(20),
     dob                   DATE,
     eft_account_id        VARCHAR(10),
