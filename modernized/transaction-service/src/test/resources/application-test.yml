@@ -1,0 +1,10 @@
+jwt:
+  secret: CardDemoSecretKeyForJWTTokenGenerationMustBeAtLeast256Bits!!
+  expiration-ms: 3600000
+
+spring:
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false

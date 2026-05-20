@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: data-loader
+  datasource:
+    url: jdbc:postgresql://localhost:5432/carddemo
+    username: carddemo
+    password: carddemo
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: true
+
+data:
+  dir: ../app/data/ASCII

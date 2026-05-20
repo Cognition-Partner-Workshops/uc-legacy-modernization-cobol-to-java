@@ -6,3 +6,6 @@ batch-app/markers/*
 /.idea/
 .DS_Store
 **/.DS_Store
+**/target/
+**/node_modules/
+modernized/frontend/dist/
