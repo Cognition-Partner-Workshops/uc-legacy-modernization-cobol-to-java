@@ -13,10 +13,10 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        default_schema: authorization
+        default_schema: '"authorization"'
   flyway:
     schemas:
-      - authorization
+      - '"authorization"'
 
 jwt:
   secret: CardDemoSecretKeyForJWTTokenGenerationMustBeAtLeast256Bits!!

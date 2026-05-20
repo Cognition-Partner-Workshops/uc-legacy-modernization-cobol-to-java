@@ -1,4 +1,4 @@
-CREATE TABLE authorization.pending_authorizations (
+CREATE TABLE "authorization".pending_authorizations (
     auth_id         SERIAL PRIMARY KEY,
     card_num        VARCHAR(16) NOT NULL,
     transaction_id  VARCHAR(16),
@@ -11,5 +11,5 @@ CREATE TABLE authorization.pending_authorizations (
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_pending_auth_card ON authorization.pending_authorizations(card_num);
-CREATE INDEX idx_pending_auth_status ON authorization.pending_authorizations(status);
+CREATE INDEX idx_pending_auth_card ON "authorization".pending_authorizations(card_num);
+CREATE INDEX idx_pending_auth_status ON "authorization".pending_authorizations(status);
