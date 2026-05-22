@@ -1,0 +1,66 @@
+{
+  "source_file": "trantype.txt",
+  "copybook": "CVTRA03Y.cpy",
+  "record_length": 60,
+  "record_count": 7,
+  "fields": [
+    {
+      "name": "TRAN-TYPE",
+      "type": "alphanumeric",
+      "offset": 0,
+      "length": 2,
+      "scale": 0
+    },
+    {
+      "name": "TRAN-TYPE-DESC",
+      "type": "alphanumeric",
+      "offset": 2,
+      "length": 50,
+      "scale": 0
+    },
+    {
+      "name": "FILLER",
+      "type": "alphanumeric",
+      "offset": 52,
+      "length": 8,
+      "scale": 0
+    }
+  ],
+  "records": [
+    {
+      "TRAN-TYPE": "01",
+      "TRAN-TYPE-DESC": "Purchase",
+      "FILLER": "00000000"
+    },
+    {
+      "TRAN-TYPE": "02",
+      "TRAN-TYPE-DESC": "Payment",
+      "FILLER": "00000000"
+    },
+    {
+      "TRAN-TYPE": "03",
+      "TRAN-TYPE-DESC": "Credit",
+      "FILLER": "00000000"
+    },
+    {
+      "TRAN-TYPE": "04",
+      "TRAN-TYPE-DESC": "Authorization",
+      "FILLER": "00000000"
+    },
+    {
+      "TRAN-TYPE": "05",
+      "TRAN-TYPE-DESC": "Refund",
+      "FILLER": "00000000"
+    },
+    {
+      "TRAN-TYPE": "06",
+      "TRAN-TYPE-DESC": "Reversal",
+      "FILLER": "00000000"
+    },
+    {
+      "TRAN-TYPE": "07",
+      "TRAN-TYPE-DESC": "Adjustment",
+      "FILLER": "00000000"
+    }
+  ]
+}
