@@ -202,7 +202,7 @@ Deploy bidirectional ACL for the transition period:
 - All XREF consumers validated
 - Reporting service producing identical output to mainframe
 - 10 additional programs retired (7,605 LOC)
-- Running total: 17 programs retired (10,228 LOC)
+- Running total: 18 programs retired (10,269 LOC)
 
 ---
 
@@ -260,7 +260,7 @@ Deploy bidirectional ACL for the transition period:
 - Balance adjustments go through Account Service API with optimistic locking
 - Dual-write validation passed for account and transaction operations
 - 6 additional programs retired (7,561 LOC)
-- Running total: 23 programs retired (17,789 LOC)
+- Running total: 24 programs retired (17,830 LOC)
 - **All BMS maps and CICS transactions can be decommissioned**
 
 ---
@@ -325,7 +325,7 @@ Deploy bidirectional ACL for the transition period:
 - Full-month reconciliation passed with zero financial discrepancies
 - Control-M fully decommissioned
 - 3 additional programs retired (1,877 LOC)
-- Running total: 26 programs retired (19,666 LOC)
+- Running total: 27 programs retired (19,707 LOC)
 
 ---
 

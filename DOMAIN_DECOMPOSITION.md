@@ -15,13 +15,13 @@ This document identifies bounded contexts within the CardDemo mainframe applicat
 │  ┌─────────────┐    ┌──────────────────┐    ┌────────────────────────┐  │
 │  │  Identity &  │    │   Account        │    │  Transaction           │  │
 │  │  Access      │───>│   Management     │<───│  Processing            │  │
-│  │  (BC-1)      │    │   (BC-2)         │    │  (BC-3)                │  │
+│  │  (BC-1)      │    │   (BC-2)         │    │  (BC-5)                │  │
 │  └─────────────┘    └────────┬─────────┘    └───────────┬────────────┘  │
 │         │                    │                           │               │
 │         │           ┌────────┴─────────┐    ┌───────────┴────────────┐  │
 │         │           │   Card           │    │  Financial             │  │
 │         │           │   Management     │<───│  Calculations          │  │
-│         │           │   (BC-3)         │    │  (BC-5)                │  │
+│         │           │   (BC-3)         │    │  (BC-6)                │  │
 │         │           └────────┬─────────┘    └───────────┬────────────┘  │
 │         │                    │                           │               │
 │         │           ┌────────┴──────────────────────────┴────────────┐  │
@@ -30,15 +30,15 @@ This document identifies bounded contexts within the CardDemo mainframe applicat
 │         │           └────────────────────────────────────────────────┘  │
 │         │                                                               │
 │  ┌──────┴──────┐    ┌──────────────────┐    ┌────────────────────────┐  │
-│  │ User Admin  │    │  Reporting &     │    │  Authorization         │  │
+│  │ User Admin  │    │  Reporting &     │    │  Bill Payment          │  │
 │  │ (BC-1)      │    │  Statements      │    │  (BC-7)                │  │
-│  │             │    │  (BC-6)          │    │  [Optional Module]     │  │
+│  │             │    │  (BC-9)          │    │                        │  │
 │  └─────────────┘    └──────────────────┘    └────────────────────────┘  │
 │                                                                          │
-│  ┌─────────────┐    ┌──────────────────┐                                │
-│  │ Reference   │    │  Data Migration  │                                │
-│  │ Data (BC-8) │    │  (BC-9)          │                                │
-│  └─────────────┘    └──────────────────┘                                │
+│  ┌─────────────┐    ┌──────────────────┐    ┌────────────────────────┐  │
+│  │ Reference   │    │  Data Migration  │    │  Authorization         │  │
+│  │ Data (BC-8) │    │  (BC-10)         │    │  (BC-11) [Optional]    │  │
+│  └─────────────┘    └──────────────────┘    └────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -106,7 +106,7 @@ This document identifies bounded contexts within the CardDemo mainframe applicat
 - **Outbound Dependencies**: `CVACT03Y` cross-reference for card-to-account lookups
 - **Cross-Context Writers**: Transaction Processing, Interest Calculation, Bill Payment
 - **Extraction Approach**: Create an Account Service API with dedicated balance-update endpoints. Other contexts call `POST /accounts/{id}/adjustments` instead of directly writing VSAM. Use optimistic locking (version field) to replace CICS ENQUEUE.
-- **Seam Quality**: **Moderate** — The balance-update coupling with BC-3, BC-5, and BC-9 (Bill Payment) must be resolved via an API contract. The cross-reference (`CVACT03Y`) is a shared lookup that spans BC-2, BC-3, and BC-4.
+- **Seam Quality**: **Moderate** — The balance-update coupling with BC-5, BC-6, and BC-7 (Bill Payment) must be resolved via an API contract. The cross-reference (`CVACT03Y`) is a shared lookup that spans BC-2, BC-3, and BC-4.
 
 ---
 
