@@ -116,7 +116,7 @@ public record AccountRecord(
         boolean neg = value.signum() < 0;
         BigDecimal abs = value.abs().setScale(2);
         String digits = abs.toPlainString().replace(".", "");
-        String padded = "0".repeat(Math.max(0, 13 - digits.length())) + digits;
+        String padded = "0".repeat(Math.max(0, 12 - digits.length())) + digits;
         return (neg ? "-" : "+") + padded;
     }
 }
