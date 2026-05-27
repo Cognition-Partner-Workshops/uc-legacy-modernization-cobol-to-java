@@ -1,0 +1,623 @@
+{
+  "metadata": {
+    "source_file": "app/data/ASCII/discgrp.txt",
+    "copybook": "CVTRA02Y.cpy",
+    "record_length": 50,
+    "total_records": 51,
+    "layout_name": "discgrp"
+  },
+  "records": [
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 1,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 25.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 2,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 25.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 3,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 4,
+      "DIS-INT-RATE": 25.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 4,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "02",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 5,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "02",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 6,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "02",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 7,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "03",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 8,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "03",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 9,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "03",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 10,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "04",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 11,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "04",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 12,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "04",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 13,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "05",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 14,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "06",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 15,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "06",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 16,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "A000000000",
+      "DIS-TRAN-TYPE-CD": "07",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 17,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 18,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 25.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 19,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 25.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 20,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 4,
+      "DIS-INT-RATE": 25.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 21,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "02",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 22,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "02",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 23,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "02",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 24,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "03",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 25,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "03",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 26,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "03",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 27,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "04",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 28,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "04",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 29,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "04",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 30,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "05",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 31,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "06",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 32,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "06",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 15.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 33,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "DEFAULT",
+      "DIS-TRAN-TYPE-CD": "07",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 34,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 35,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 36,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 37,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "01",
+      "DIS-TRAN-CAT-CD": 4,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 38,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "02",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 39,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "02",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 40,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "02",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 41,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "03",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 42,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "03",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 43,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "03",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 44,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "04",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 45,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "04",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 46,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "04",
+      "DIS-TRAN-CAT-CD": 3,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 47,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "05",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 48,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "06",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 49,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "06",
+      "DIS-TRAN-CAT-CD": 2,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 50,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    },
+    {
+      "DIS-ACCT-GROUP-ID": "ZEROAPR",
+      "DIS-TRAN-TYPE-CD": "07",
+      "DIS-TRAN-CAT-CD": 1,
+      "DIS-INT-RATE": 0.0,
+      "_meta": {
+        "source_file": "discgrp.txt",
+        "line_number": 51,
+        "record_length": 50,
+        "expected_length": 50
+      }
+    }
+  ]
+}

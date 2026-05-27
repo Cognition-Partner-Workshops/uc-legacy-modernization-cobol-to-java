@@ -1,0 +1,11 @@
+# Generated reports (created at runtime)
+reports/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/

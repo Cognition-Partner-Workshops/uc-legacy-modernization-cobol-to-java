@@ -1,0 +1,209 @@
+{
+  "metadata": {
+    "source_file": "app/data/ASCII/trancatg.txt",
+    "copybook": "CVTRA04Y.cpy",
+    "record_length": 60,
+    "total_records": 18,
+    "layout_name": "trancatg"
+  },
+  "records": [
+    {
+      "TRAN-TYPE-CD": "01",
+      "TRAN-CAT-CD": 1,
+      "TRAN-CAT-TYPE-DESC": "Regular Sales Draft",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 1,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "01",
+      "TRAN-CAT-CD": 2,
+      "TRAN-CAT-TYPE-DESC": "Regular Cash Advance",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 2,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "01",
+      "TRAN-CAT-CD": 3,
+      "TRAN-CAT-TYPE-DESC": "Convenience Check Debit",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 3,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "01",
+      "TRAN-CAT-CD": 4,
+      "TRAN-CAT-TYPE-DESC": "ATM Cash Advance",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 4,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "01",
+      "TRAN-CAT-CD": 5,
+      "TRAN-CAT-TYPE-DESC": "Interest Amount",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 5,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "02",
+      "TRAN-CAT-CD": 1,
+      "TRAN-CAT-TYPE-DESC": "Cash payment",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 6,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "02",
+      "TRAN-CAT-CD": 2,
+      "TRAN-CAT-TYPE-DESC": "Electronic payment",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 7,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "02",
+      "TRAN-CAT-CD": 3,
+      "TRAN-CAT-TYPE-DESC": "Check payment",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 8,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "03",
+      "TRAN-CAT-CD": 1,
+      "TRAN-CAT-TYPE-DESC": "Credit to Account",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 9,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "03",
+      "TRAN-CAT-CD": 2,
+      "TRAN-CAT-TYPE-DESC": "Credit to Purchase balance",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 10,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "03",
+      "TRAN-CAT-CD": 3,
+      "TRAN-CAT-TYPE-DESC": "Credit to Cash balance",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 11,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "04",
+      "TRAN-CAT-CD": 1,
+      "TRAN-CAT-TYPE-DESC": "Zero dollar authorization",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 12,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "04",
+      "TRAN-CAT-CD": 2,
+      "TRAN-CAT-TYPE-DESC": "Online purchase authorization",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 13,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "04",
+      "TRAN-CAT-CD": 3,
+      "TRAN-CAT-TYPE-DESC": "Travel booking authorization",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 14,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "05",
+      "TRAN-CAT-CD": 1,
+      "TRAN-CAT-TYPE-DESC": "Refund credit",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 15,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "06",
+      "TRAN-CAT-CD": 1,
+      "TRAN-CAT-TYPE-DESC": "Fraud reversal",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 16,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "06",
+      "TRAN-CAT-CD": 2,
+      "TRAN-CAT-TYPE-DESC": "Non-fraud reversal",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 17,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE-CD": "07",
+      "TRAN-CAT-CD": 1,
+      "TRAN-CAT-TYPE-DESC": "Sales draft credit adjustment",
+      "_meta": {
+        "source_file": "trancatg.txt",
+        "line_number": 18,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    }
+  ]
+}

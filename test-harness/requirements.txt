@@ -1,0 +1,6 @@
+# CardDemo Migration Test Harness
+# No external dependencies required - uses Python 3.10+ standard library only
+#
+# Optional dependencies for enhanced reporting:
+# tabulate>=0.9.0    # Pretty-printed table output
+# rich>=13.0.0       # Terminal formatting and progress bars

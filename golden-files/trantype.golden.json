@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "source_file": "app/data/ASCII/trantype.txt",
+    "copybook": "CVTRA03Y.cpy",
+    "record_length": 60,
+    "total_records": 7,
+    "layout_name": "trantype"
+  },
+  "records": [
+    {
+      "TRAN-TYPE": "01",
+      "TRAN-TYPE-DESC": "Purchase",
+      "_meta": {
+        "source_file": "trantype.txt",
+        "line_number": 1,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE": "02",
+      "TRAN-TYPE-DESC": "Payment",
+      "_meta": {
+        "source_file": "trantype.txt",
+        "line_number": 2,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE": "03",
+      "TRAN-TYPE-DESC": "Credit",
+      "_meta": {
+        "source_file": "trantype.txt",
+        "line_number": 3,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE": "04",
+      "TRAN-TYPE-DESC": "Authorization",
+      "_meta": {
+        "source_file": "trantype.txt",
+        "line_number": 4,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE": "05",
+      "TRAN-TYPE-DESC": "Refund",
+      "_meta": {
+        "source_file": "trantype.txt",
+        "line_number": 5,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE": "06",
+      "TRAN-TYPE-DESC": "Reversal",
+      "_meta": {
+        "source_file": "trantype.txt",
+        "line_number": 6,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    },
+    {
+      "TRAN-TYPE": "07",
+      "TRAN-TYPE-DESC": "Adjustment",
+      "_meta": {
+        "source_file": "trantype.txt",
+        "line_number": 7,
+        "record_length": 60,
+        "expected_length": 60
+      }
+    }
+  ]
+}
