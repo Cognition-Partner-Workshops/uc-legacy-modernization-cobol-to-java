@@ -9,7 +9,7 @@
 | COBOL Programs (Core) | 31 |
 | COBOL Programs (Optional Modules) | 13 |
 | Copybooks (Core) | 30 |
-| Copybooks (Optional Modules) | 12 |
+| Copybooks (Optional Modules) | 15 |
 | BMS Maps (Core) | 17 |
 | BMS Maps (Optional Modules) | 4 |
 | JCL Jobs (Core) | 38 |
@@ -17,7 +17,7 @@
 | Assembler Modules | 2 |
 | Procedures | 2 |
 | Scheduler Definitions | 2 |
-| **Total Artifacts** | **159** |
+| **Total Artifacts** | **162** |
 
 ---
 

@@ -39,7 +39,7 @@ Each module is scored across three dimensions (1-10 scale):
 
 | Metric | Value | Assessment |
 |:-------|:------|:-----------|
-| Lines of Code | 4,236 | Largest program in codebase (2.7× next largest) |
+| Lines of Code | 4,236 | Largest program in codebase (2.0× next largest) |
 | Control Flow Statements | 470 | Extremely high branching |
 | Paragraphs/Sections | 91 | Deeply structured |
 | CICS API Calls | 17 | Heavy platform coupling |
