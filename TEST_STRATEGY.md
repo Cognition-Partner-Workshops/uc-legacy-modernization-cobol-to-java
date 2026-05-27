@@ -75,7 +75,7 @@ Verify data integrity invariants that must hold after batch processing. These ar
 |-----|-------|-------------|
 | POSTTRAN | Balance update | Account current balance = previous + credits - debits |
 | POSTTRAN | Category rollup | Sum of `tcatbal` records per account = account current cycle totals |
-| INTCALC | Interest calc | Interest amount = balance × (rate / 365) × days |
+| INTCALC | Interest calc | Interest amount = balance × (rate / 36500) × days |
 | TRANBKP | Record count | Backup file record count matches source transaction count |
 | CBEXPORT | Completeness | Export file contains all accounts in the input set |
 | DALYREJS | Rejection tracking | Rejected transactions + processed = total input transactions |
