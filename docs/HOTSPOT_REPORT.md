@@ -20,16 +20,16 @@ Each module is scored across three dimensions (1-10 scale):
 
 | Rank | Program | LOC | Priority Score | Complexity | Risk | Impact | Recommendation |
 |:----:|:--------|----:|:--------------:|:----------:|:----:|:------:|:---------------|
-| 1 | COACTUPC | 4,236 | **9.1** | 10 | 9 | 8 | Decompose into sub-modules |
-| 2 | COTRTLIC | 2,098 | **8.2** | 9 | 8 | 7 | Isolate DB2 logic |
-| 3 | COCRDUPC | 1,560 | **7.8** | 8 | 8 | 7 | Extract validation logic |
-| 4 | COCRDLIC | 1,459 | **7.5** | 8 | 7 | 7 | Modularize browse logic |
-| 5 | CBTRN02C | 731 | **7.4** | 7 | 9 | 7 | High-risk batch; add checkpoints |
-| 6 | COTRTUPC | 1,702 | **7.3** | 8 | 7 | 6 | Isolate DB2 CRUD |
-| 7 | CBACT04C | 652 | **7.2** | 7 | 8 | 8 | Critical financial calc |
-| 8 | CBSTM03A | 924 | **7.0** | 7 | 7 | 7 | Complex output formatting |
-| 9 | COACTVWC | 941 | **6.8** | 7 | 7 | 6 | Multi-file joins |
-| 10 | COTRN02C | 783 | **6.6** | 6 | 7 | 7 | Date validation dependency |
+| 1 | COACTUPC | 4,236 | **9.15** | 10 | 9 | 8 | Decompose into sub-modules |
+| 2 | COTRTLIC | 2,098 | **8.15** | 9 | 8 | 7 | Isolate DB2 logic |
+| 3 | COCRDUPC | 1,560 | **7.75** | 8 | 8 | 7 | Extract validation logic |
+| 4 | CBTRN02C | 731 | **7.70** | 7 | 9 | 7 | High-risk batch; add checkpoints |
+| 5 | CBACT04C | 652 | **7.60** | 7 | 8 | 8 | Critical financial calc |
+| 6 | COCRDLIC | 1,459 | **7.40** | 8 | 7 | 7 | Modularize browse logic |
+| 7 | COTRTUPC | 1,702 | **7.15** | 8 | 7 | 6 | Isolate DB2 CRUD |
+| 8 | CBSTM03A | 924 | **7.00** | 7 | 7 | 7 | Complex output formatting |
+| 9 | COACTVWC | 941 | **6.75** | 7 | 7 | 6 | Multi-file joins |
+| 10 | COTRN02C | 783 | **6.60** | 6 | 7 | 7 | Date validation dependency |
 
 ---
 
@@ -98,26 +98,7 @@ Each module is scored across three dimensions (1-10 scale):
 
 ---
 
-### #4 — COCRDLIC (Credit Card List)
-
-| Metric | Value | Assessment |
-|:-------|:------|:-----------|
-| Lines of Code | 1,459 | Large |
-| Control Flow Statements | 191 | High |
-| CICS API Calls | 18 | Highest CICS call count |
-| Browse Operations | STARTBR, READNEXT, READPREV, ENDBR | Full browse pattern |
-
-**Why it's #4**:
-- Implements forward/backward VSAM browse with pagination
-- 18 CICS calls = high platform coupling
-- Navigation hub — dispatches to Card Detail or Card Update
-- Complex key management for browse positioning
-
-**Migration Recommendation**: Replace VSAM browse with indexed query. Separate list pagination from navigation dispatch.
-
----
-
-### #5 — CBTRN02C (Post Daily Transactions) ⚠️ HIGH RISK
+### #4 — CBTRN02C (Post Daily Transactions) ⚠️ HIGH RISK
 
 | Metric | Value | Assessment |
 |:-------|:------|:-----------|
@@ -126,7 +107,7 @@ Each module is scored across three dimensions (1-10 scale):
 | Files Accessed | 6 (input: DALYTRAN, XREFFILE; output: TRANSACT, DALYREJS, ACCTFILE, TCATBALF) | Most files of any batch |
 | Batch Impact | Updates account balances | Financial integrity critical |
 
-**Why it's #5**:
+**Why it's #4**:
 - Core daily batch — processes ALL daily transactions
 - Writes to 4 output files simultaneously (complex commit logic)
 - Rejected transactions written to DALYREJS (error path complexity)
@@ -137,26 +118,7 @@ Each module is scored across three dimensions (1-10 scale):
 
 ---
 
-### #6 — COTRTUPC (Transaction Type Maintenance — DB2)
-
-| Metric | Value | Assessment |
-|:-------|:------|:-----------|
-| Lines of Code | 1,702 | Large |
-| Control Flow Statements | 193 | High |
-| CICS + SQL Calls | 19 | Heavy DB2 integration |
-| Module | Optional (DB2) | DB2 dependency |
-
-**Why it's #6**:
-- INSERT and UPDATE to DB2 tables
-- Complex field validation for transaction type codes
-- Screen-driven CRUD with error handling for SQL states
-- Paired with COTRTLIC — migration must handle both together
-
-**Migration Recommendation**: Convert to REST API with standard CRUD operations. SQL logic maps directly to JPA/Spring Data.
-
----
-
-### #7 — CBACT04C (Interest Calculation) ⚠️ FINANCIAL
+### #5 — CBACT04C (Interest Calculation) ⚠️ FINANCIAL
 
 | Metric | Value | Assessment |
 |:-------|:------|:-----------|
@@ -165,7 +127,7 @@ Each module is scored across three dimensions (1-10 scale):
 | Files Accessed | 5 (TCATBALF, XREFFILE, DISCGRP, ACCTFILE, TRANSACT) | Complex data joins |
 | Financial Impact | Calculates interest charges | Revenue-critical |
 
-**Why it's #7**:
+**Why it's #5**:
 - Implements interest rate calculation algorithm
 - Joins 5 different data sources (complex data assembly)
 - Directly modifies ACCTFILE (account balance updates)
@@ -173,6 +135,44 @@ Each module is scored across three dimensions (1-10 scale):
 - Errors directly impact customer bills
 
 **Migration Recommendation**: Extract calculation engine with comprehensive unit tests. Implement decimal arithmetic precision testing. This module requires the highest test coverage during migration.
+
+---
+
+### #6 — COCRDLIC (Credit Card List)
+
+| Metric | Value | Assessment |
+|:-------|:------|:-----------|
+| Lines of Code | 1,459 | Large |
+| Control Flow Statements | 191 | High |
+| CICS API Calls | 18 | Highest CICS call count |
+| Browse Operations | STARTBR, READNEXT, READPREV, ENDBR | Full browse pattern |
+
+**Why it's #6**:
+- Implements forward/backward VSAM browse with pagination
+- 18 CICS calls = high platform coupling
+- Navigation hub — dispatches to Card Detail or Card Update
+- Complex key management for browse positioning
+
+**Migration Recommendation**: Replace VSAM browse with indexed query. Separate list pagination from navigation dispatch.
+
+---
+
+### #7 — COTRTUPC (Transaction Type Maintenance — DB2)
+
+| Metric | Value | Assessment |
+|:-------|:------|:-----------|
+| Lines of Code | 1,702 | Large |
+| Control Flow Statements | 193 | High |
+| CICS + SQL Calls | 19 | Heavy DB2 integration |
+| Module | Optional (DB2) | DB2 dependency |
+
+**Why it's #7**:
+- INSERT and UPDATE to DB2 tables
+- Complex field validation for transaction type codes
+- Screen-driven CRUD with error handling for SQL states
+- Paired with COTRTLIC — migration must handle both together
+
+**Migration Recommendation**: Convert to REST API with standard CRUD operations. SQL logic maps directly to JPA/Spring Data.
 
 ---
 
@@ -241,16 +241,16 @@ Each module is scored across three dimensions (1-10 scale):
                           │
          ┌────────────────┼────────────────┐
          │                │                │
-         │  CBACT04C(#7)  │  COACTUPC(#1)  │
-         │  CBTRN02C(#5)  │  COCRDUPC(#3)  │
+         │  CBACT04C(#5)  │  COACTUPC(#1)  │
+         │  CBTRN02C(#4)  │  COCRDUPC(#3)  │
          │                │  COTRN02C(#10) │
          │                │                │
 HIGH ────┼────────────────┼────────────────┤──── HIGH
 RISK     │                │                │    COMPLEXITY
          │                │                │
          │  CBSTM03A(#8)  │  COTRTLIC(#2)  │
-         │                │  COTRTUPC(#6)  │
-         │                │  COCRDLIC(#4)  │
+         │                │  COTRTUPC(#7)  │
+         │                │  COCRDLIC(#6)  │
          │  COACTVWC(#9)  │                │
          │                │                │
          └────────────────┼────────────────┘
