@@ -4,7 +4,7 @@
 
 ---
 
-## 1. Online CICS Programs (20 programs)
+## 1. Online CICS Programs (25 programs)
 
 ### Core Application
 
@@ -53,7 +53,7 @@
 
 ---
 
-## 2. Batch COBOL Programs (16 programs)
+## 2. Batch COBOL Programs (19 programs)
 
 ### Core Batch
 
@@ -100,7 +100,7 @@
 
 ---
 
-## 4. Copybooks (30 core + 13 extension)
+## 4. Copybooks (30 core + 11 extension)
 
 ### Core Copybooks (`app/cpy/`)
 
@@ -162,7 +162,7 @@
 
 ---
 
-## 5. BMS Maps (22 maps)
+## 5. BMS Maps (21 maps)
 
 ### Core Maps (`app/bms/`)
 
