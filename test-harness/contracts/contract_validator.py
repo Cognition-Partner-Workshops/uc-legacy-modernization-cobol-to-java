@@ -271,14 +271,14 @@ def validate_field(value, constraint: dict, field_name: str, record_index: int) 
                 actual=type(value).__name__,
             ))
         else:
-            if "length" in constraint and len(value.rstrip()) > constraint["length"]:
+            if "length" in constraint and len(value.rstrip()) != constraint["length"]:
                 violations.append(ContractViolation(
                     record_index=record_index,
                     field_name=field_name,
                     constraint="exact_length",
                     expected=str(constraint["length"]),
                     actual=str(len(value.rstrip())),
-                    severity="warning",
+                    severity="error",
                 ))
             if "max_length" in constraint and len(value.rstrip()) > constraint["max_length"]:
                 violations.append(ContractViolation(
