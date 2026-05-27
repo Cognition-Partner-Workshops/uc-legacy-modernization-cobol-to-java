@@ -1,0 +1,311 @@
+{
+  "metadata": {
+    "source_file": "cardxref.txt",
+    "copybook": "CVACT03Y.cpy",
+    "record_name": "CARD-XREF-RECORD",
+    "record_length": 50,
+    "record_count": 50
+  },
+  "records": [
+    {
+      "XREF-CARD-NUM": "0500024453765740",
+      "XREF-CUST-ID": 50,
+      "XREF-ACCT-ID": 50,
+      "_line_number": 1
+    },
+    {
+      "XREF-CARD-NUM": "0683586198171516",
+      "XREF-CUST-ID": 27,
+      "XREF-ACCT-ID": 27,
+      "_line_number": 2
+    },
+    {
+      "XREF-CARD-NUM": "0923877193247330",
+      "XREF-CUST-ID": 2,
+      "XREF-ACCT-ID": 2,
+      "_line_number": 3
+    },
+    {
+      "XREF-CARD-NUM": "0927987108636232",
+      "XREF-CUST-ID": 20,
+      "XREF-ACCT-ID": 20,
+      "_line_number": 4
+    },
+    {
+      "XREF-CARD-NUM": "0982496213629795",
+      "XREF-CUST-ID": 12,
+      "XREF-ACCT-ID": 12,
+      "_line_number": 5
+    },
+    {
+      "XREF-CARD-NUM": "1014086565224350",
+      "XREF-CUST-ID": 44,
+      "XREF-ACCT-ID": 44,
+      "_line_number": 6
+    },
+    {
+      "XREF-CARD-NUM": "1142167692878931",
+      "XREF-CUST-ID": 37,
+      "XREF-ACCT-ID": 37,
+      "_line_number": 7
+    },
+    {
+      "XREF-CARD-NUM": "1561409106491600",
+      "XREF-CUST-ID": 35,
+      "XREF-ACCT-ID": 35,
+      "_line_number": 8
+    },
+    {
+      "XREF-CARD-NUM": "2745303720002090",
+      "XREF-CUST-ID": 39,
+      "XREF-ACCT-ID": 39,
+      "_line_number": 9
+    },
+    {
+      "XREF-CARD-NUM": "2760836797107565",
+      "XREF-CUST-ID": 24,
+      "XREF-ACCT-ID": 24,
+      "_line_number": 10
+    },
+    {
+      "XREF-CARD-NUM": "2871968252812490",
+      "XREF-CUST-ID": 6,
+      "XREF-ACCT-ID": 6,
+      "_line_number": 11
+    },
+    {
+      "XREF-CARD-NUM": "2940139362300449",
+      "XREF-CUST-ID": 22,
+      "XREF-ACCT-ID": 22,
+      "_line_number": 12
+    },
+    {
+      "XREF-CARD-NUM": "2988091353094312",
+      "XREF-CUST-ID": 4,
+      "XREF-ACCT-ID": 4,
+      "_line_number": 13
+    },
+    {
+      "XREF-CARD-NUM": "3260763612337560",
+      "XREF-CUST-ID": 10,
+      "XREF-ACCT-ID": 10,
+      "_line_number": 14
+    },
+    {
+      "XREF-CARD-NUM": "3766281984155154",
+      "XREF-CUST-ID": 41,
+      "XREF-ACCT-ID": 41,
+      "_line_number": 15
+    },
+    {
+      "XREF-CARD-NUM": "3940246016141489",
+      "XREF-CUST-ID": 19,
+      "XREF-ACCT-ID": 19,
+      "_line_number": 16
+    },
+    {
+      "XREF-CARD-NUM": "3999169246375885",
+      "XREF-CUST-ID": 3,
+      "XREF-ACCT-ID": 3,
+      "_line_number": 17
+    },
+    {
+      "XREF-CARD-NUM": "4011500891777367",
+      "XREF-CUST-ID": 13,
+      "XREF-ACCT-ID": 13,
+      "_line_number": 18
+    },
+    {
+      "XREF-CARD-NUM": "4385271476627819",
+      "XREF-CUST-ID": 34,
+      "XREF-ACCT-ID": 34,
+      "_line_number": 19
+    },
+    {
+      "XREF-CARD-NUM": "4534784102713951",
+      "XREF-CUST-ID": 36,
+      "XREF-ACCT-ID": 36,
+      "_line_number": 20
+    },
+    {
+      "XREF-CARD-NUM": "4859452612877065",
+      "XREF-CUST-ID": 7,
+      "XREF-ACCT-ID": 7,
+      "_line_number": 21
+    },
+    {
+      "XREF-CARD-NUM": "5407099850479866",
+      "XREF-CUST-ID": 21,
+      "XREF-ACCT-ID": 21,
+      "_line_number": 22
+    },
+    {
+      "XREF-CARD-NUM": "5656830544981216",
+      "XREF-CUST-ID": 46,
+      "XREF-ACCT-ID": 46,
+      "_line_number": 23
+    },
+    {
+      "XREF-CARD-NUM": "5671184478505844",
+      "XREF-CUST-ID": 18,
+      "XREF-ACCT-ID": 18,
+      "_line_number": 24
+    },
+    {
+      "XREF-CARD-NUM": "5787351228879339",
+      "XREF-CUST-ID": 47,
+      "XREF-ACCT-ID": 47,
+      "_line_number": 25
+    },
+    {
+      "XREF-CARD-NUM": "5975117516616077",
+      "XREF-CUST-ID": 42,
+      "XREF-ACCT-ID": 42,
+      "_line_number": 26
+    },
+    {
+      "XREF-CARD-NUM": "6009619150674526",
+      "XREF-CUST-ID": 5,
+      "XREF-ACCT-ID": 5,
+      "_line_number": 27
+    },
+    {
+      "XREF-CARD-NUM": "6349250331648509",
+      "XREF-CUST-ID": 15,
+      "XREF-ACCT-ID": 15,
+      "_line_number": 28
+    },
+    {
+      "XREF-CARD-NUM": "6503535181795992",
+      "XREF-CUST-ID": 48,
+      "XREF-ACCT-ID": 48,
+      "_line_number": 29
+    },
+    {
+      "XREF-CARD-NUM": "6509230362553816",
+      "XREF-CUST-ID": 30,
+      "XREF-ACCT-ID": 30,
+      "_line_number": 30
+    },
+    {
+      "XREF-CARD-NUM": "6723000463207764",
+      "XREF-CUST-ID": 28,
+      "XREF-ACCT-ID": 28,
+      "_line_number": 31
+    },
+    {
+      "XREF-CARD-NUM": "6727055190616014",
+      "XREF-CUST-ID": 16,
+      "XREF-ACCT-ID": 16,
+      "_line_number": 32
+    },
+    {
+      "XREF-CARD-NUM": "6832676047698087",
+      "XREF-CUST-ID": 33,
+      "XREF-ACCT-ID": 33,
+      "_line_number": 33
+    },
+    {
+      "XREF-CARD-NUM": "7026637615032277",
+      "XREF-CUST-ID": 31,
+      "XREF-ACCT-ID": 31,
+      "_line_number": 34
+    },
+    {
+      "XREF-CARD-NUM": "7058267261837752",
+      "XREF-CUST-ID": 43,
+      "XREF-ACCT-ID": 43,
+      "_line_number": 35
+    },
+    {
+      "XREF-CARD-NUM": "7094142751055551",
+      "XREF-CUST-ID": 32,
+      "XREF-ACCT-ID": 32,
+      "_line_number": 36
+    },
+    {
+      "XREF-CARD-NUM": "7251508149188883",
+      "XREF-CUST-ID": 29,
+      "XREF-ACCT-ID": 29,
+      "_line_number": 37
+    },
+    {
+      "XREF-CARD-NUM": "7379335634661142",
+      "XREF-CUST-ID": 45,
+      "XREF-ACCT-ID": 45,
+      "_line_number": 38
+    },
+    {
+      "XREF-CARD-NUM": "7427684863423209",
+      "XREF-CUST-ID": 11,
+      "XREF-ACCT-ID": 11,
+      "_line_number": 39
+    },
+    {
+      "XREF-CARD-NUM": "7443870988897530",
+      "XREF-CUST-ID": 38,
+      "XREF-ACCT-ID": 38,
+      "_line_number": 40
+    },
+    {
+      "XREF-CARD-NUM": "8040580410348680",
+      "XREF-CUST-ID": 26,
+      "XREF-ACCT-ID": 26,
+      "_line_number": 41
+    },
+    {
+      "XREF-CARD-NUM": "8112545834239735",
+      "XREF-CUST-ID": 23,
+      "XREF-ACCT-ID": 23,
+      "_line_number": 42
+    },
+    {
+      "XREF-CARD-NUM": "8262593602473076",
+      "XREF-CUST-ID": 49,
+      "XREF-ACCT-ID": 49,
+      "_line_number": 43
+    },
+    {
+      "XREF-CARD-NUM": "8517866958206008",
+      "XREF-CUST-ID": 14,
+      "XREF-ACCT-ID": 14,
+      "_line_number": 44
+    },
+    {
+      "XREF-CARD-NUM": "8931369351894783",
+      "XREF-CUST-ID": 8,
+      "XREF-ACCT-ID": 8,
+      "_line_number": 45
+    },
+    {
+      "XREF-CARD-NUM": "9056297931664011",
+      "XREF-CUST-ID": 25,
+      "XREF-ACCT-ID": 25,
+      "_line_number": 46
+    },
+    {
+      "XREF-CARD-NUM": "9349107475869214",
+      "XREF-CUST-ID": 17,
+      "XREF-ACCT-ID": 17,
+      "_line_number": 47
+    },
+    {
+      "XREF-CARD-NUM": "9501733721429893",
+      "XREF-CUST-ID": 9,
+      "XREF-ACCT-ID": 9,
+      "_line_number": 48
+    },
+    {
+      "XREF-CARD-NUM": "9680294154603697",
+      "XREF-CUST-ID": 1,
+      "XREF-ACCT-ID": 1,
+      "_line_number": 49
+    },
+    {
+      "XREF-CARD-NUM": "9805583408996588",
+      "XREF-CUST-ID": 40,
+      "XREF-ACCT-ID": 40,
+      "_line_number": 50
+    }
+  ]
+}
