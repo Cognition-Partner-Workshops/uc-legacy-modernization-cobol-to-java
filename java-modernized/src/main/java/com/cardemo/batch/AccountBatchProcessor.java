@@ -58,7 +58,8 @@ public class AccountBatchProcessor {
         try (AccountFileReader reader = new AccountFileReader(inputFile);
              CsvFileWriter outWriter = new CsvFileWriter(outFile, OutputAccountRecord.csvHeader());
              CsvFileWriter arrWriter = new CsvFileWriter(arrayFile, ArrayRecord.csvHeader());
-             CsvFileWriter vbWriter = new CsvFileWriter(vbFile, "RECORD_TYPE," + VbRecord2.csvHeader())) {
+             CsvFileWriter vbWriter = new CsvFileWriter(vbFile,
+                     "RECORD_TYPE,ACCT_ID,ACTIVE_STATUS,CURR_BAL,CREDIT_LIMIT,REISSUE_YYYY")) {
 
             AccountRecord account;
             while ((account = reader.readNext()) != null) {
@@ -72,8 +73,9 @@ public class AccountBatchProcessor {
 
                 VbRecord1 vb1 = populateVbRecord1(account);
                 VbRecord2 vb2 = populateVbRecord2(account);
-                vbWriter.writeLine("VB1," + vb1.acctId() + "," + vb1.activeStatus() + ",,");
-                vbWriter.writeLine("VB2," + vb2.toCsv());
+                vbWriter.writeLine("VB1," + vb1.acctId() + "," + vb1.activeStatus() + ",,,");
+                vbWriter.writeLine("VB2," + vb2.acctId() + ",," + vb2.currBal().toPlainString()
+                        + "," + vb2.creditLimit().toPlainString() + "," + vb2.reissueYear());
 
                 recordCount++;
             }

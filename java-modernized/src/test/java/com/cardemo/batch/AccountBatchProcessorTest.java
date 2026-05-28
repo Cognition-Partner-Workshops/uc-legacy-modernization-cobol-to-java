@@ -215,11 +215,39 @@ class AccountBatchProcessorTest {
         List<String> lines = Files.readAllLines(vbFile);
         // header + 2 accounts × 2 VB records each = 5 lines
         assertEquals(5, lines.size());
+        assertEquals("RECORD_TYPE,ACCT_ID,ACTIVE_STATUS,CURR_BAL,CREDIT_LIMIT,REISSUE_YYYY",
+                lines.get(0));
 
         long vb1Count = lines.stream().skip(1).filter(l -> l.startsWith("VB1")).count();
         long vb2Count = lines.stream().skip(1).filter(l -> l.startsWith("VB2")).count();
         assertEquals(2, vb1Count);
         assertEquals(2, vb2Count);
+    }
+
+    @Test
+    void vbFileColumnAlignmentCorrect() throws IOException {
+        processor.process();
+        List<String> lines = Files.readAllLines(vbFile);
+
+        // VB1 row: RECORD_TYPE,ACCT_ID,ACTIVE_STATUS,CURR_BAL,CREDIT_LIMIT,REISSUE_YYYY
+        String[] vb1Fields = lines.get(1).split(",", -1);
+        assertEquals(6, vb1Fields.length);
+        assertEquals("VB1", vb1Fields[0]);
+        assertEquals("1", vb1Fields[1]);          // ACCT_ID
+        assertEquals("Y", vb1Fields[2]);           // ACTIVE_STATUS (correct column)
+        assertEquals("", vb1Fields[3]);            // CURR_BAL empty for VB1
+        assertEquals("", vb1Fields[4]);            // CREDIT_LIMIT empty for VB1
+        assertEquals("", vb1Fields[5]);            // REISSUE_YYYY empty for VB1
+
+        // VB2 row
+        String[] vb2Fields = lines.get(2).split(",", -1);
+        assertEquals(6, vb2Fields.length);
+        assertEquals("VB2", vb2Fields[0]);
+        assertEquals("1", vb2Fields[1]);           // ACCT_ID
+        assertEquals("", vb2Fields[2]);            // ACTIVE_STATUS empty for VB2
+        assertEquals("194.00", vb2Fields[3]);      // CURR_BAL
+        assertEquals("2020.00", vb2Fields[4]);     // CREDIT_LIMIT
+        assertEquals("2025", vb2Fields[5]);        // REISSUE_YYYY
     }
 
     @Test
