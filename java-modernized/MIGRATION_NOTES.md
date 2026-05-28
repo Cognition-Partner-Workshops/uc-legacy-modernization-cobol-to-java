@@ -62,12 +62,16 @@ IF  ACCT-CURR-CYC-DEBIT EQUAL TO ZERO
     MOVE 2525.00 TO OUT-ACCT-CURR-CYC-DEBIT
 END-IF.
 ```
-Preserved as:
+
+> **COBOL bug fix:** The original COBOL has no `MOVE ACCT-CURR-CYC-DEBIT TO OUT-ACCT-CURR-CYC-DEBIT` for the non-zero case. When the debit is non-zero, the FD output buffer retains whatever value was left from the previous `WRITE` (undefined for the first record). This is almost certainly a missing unconditional MOVE or ELSE clause. The Java version intentionally corrects this by always populating the field:
+
 ```java
 BigDecimal cycDebit = acct.currCycDebit().compareTo(BigDecimal.ZERO) == 0
         ? DEFAULT_CYC_DEBIT   // 2525.00
         : acct.currCycDebit();
 ```
+
+> **Equivalence note:** The sample `acctdata.txt` has zero debits for all records, so output is identical for the sample data. For records with non-zero debits, the Java output will differ from COBOL (Java writes the actual debit; COBOL writes stale buffer data). This is a deliberate improvement.
 
 ### 3.4 Array Record Population (OCCURS 5 TIMES)
 The COBOL `1400-POPUL-ARRAY-RECORD` paragraph fills 5 balance slots with a mix of actual data and hardcoded test values:
