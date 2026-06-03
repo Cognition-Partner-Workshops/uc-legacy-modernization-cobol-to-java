@@ -1,0 +1,95 @@
+[
+  {
+    "job_name": "DAILYTRAN_INPUT",
+    "passed": true,
+    "summary": "DAILYTRAN_INPUT: 3/3 checks passed",
+    "checks": [
+      {
+        "name": "transaction_cards_in_xref",
+        "description": "All transaction card numbers exist in cross-reference",
+        "passed": true,
+        "expected_value": 0,
+        "actual_value": 0,
+        "details": ""
+      },
+      {
+        "name": "xref_accounts_exist",
+        "description": "All XREF account IDs exist in account master",
+        "passed": true,
+        "expected_value": 0,
+        "actual_value": 0,
+        "details": ""
+      },
+      {
+        "name": "no_zero_amount_transactions",
+        "description": "All transactions have non-zero amounts",
+        "passed": true,
+        "expected_value": 0,
+        "actual_value": 0,
+        "details": ""
+      }
+    ]
+  },
+  {
+    "job_name": "CREASTMT",
+    "passed": true,
+    "summary": "CREASTMT: 3/3 checks passed",
+    "checks": [
+      {
+        "name": "active_accounts_have_xref",
+        "description": "All active accounts have card cross-reference entries",
+        "passed": true,
+        "expected_value": 0,
+        "actual_value": 0,
+        "details": ""
+      },
+      {
+        "name": "xref_customers_exist",
+        "description": "All XREF customer IDs exist in customer master",
+        "passed": true,
+        "expected_value": 0,
+        "actual_value": 0,
+        "details": ""
+      },
+      {
+        "name": "active_accounts_have_open_date",
+        "description": "All active accounts have a non-blank open date",
+        "passed": true,
+        "expected_value": 0,
+        "actual_value": 0,
+        "details": ""
+      }
+    ]
+  },
+  {
+    "job_name": "INTCALC",
+    "passed": true,
+    "summary": "INTCALC: 3/3 checks passed",
+    "checks": [
+      {
+        "name": "account_count_preserved",
+        "description": "Record count should be 50",
+        "passed": true,
+        "expected_value": 50,
+        "actual_value": 50,
+        "details": ""
+      },
+      {
+        "name": "positive_interest_rates",
+        "description": "All disclosure group interest rates are non-negative",
+        "passed": true,
+        "expected_value": 0,
+        "actual_value": 0,
+        "details": ""
+      },
+      {
+        "name": "category_balances_have_accounts",
+        "description": "All category balance account IDs exist in account master",
+        "passed": true,
+        "expected_value": 0,
+        "actual_value": 0,
+        "details": ""
+      }
+    ]
+  }
+]
