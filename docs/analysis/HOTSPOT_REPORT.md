@@ -29,6 +29,7 @@ Metrics are extracted statically from the COBOL source:
 | COPAUS0C | 1032 | 50 | 22 | 46 | 96 |
 | CBACT04C | 652 | 86 | 0 | 0 | 86 |
 | COACTVWC | 941 | 57 | 10 | 16 | 73 |
+| CBSTM03A | 924 | 30 | 9 | 16 | 46 |
 | COPAUA0C | 1026 | 53 | 10 | 21 | 74 |
 | COUSR00C | 695 | 50 | 16 | 52 | 102 |
 | COTRN00C | 699 | 52 | 16 | 50 | 102 |
@@ -143,9 +144,18 @@ Metrics are extracted statically from the COBOL source:
 | **Multi-runtime integration** | COPAUA0C, COPAUS0C/1C/2C, CODATE01, COACCT01 | Isolate MQ/IMS/DB2 plumbing behind interfaces; mock for tests |
 | **Monolithic edit programs** | COACTUPC, COCRDUPC, COTRTUPC | Decompose validation vs persistence; golden-master tests |
 | **Sensitive data (PCI/PII)** | COCRDUPC, COCRDLIC, COCRDSLC, COSGN00C | Mask PAN/CVV/SSN; replace plaintext `SEC-USR-PWD` with hashing |
-| **Missing dependency** | CREASTMT → CBSTM03A (not in repo) | Source CBSTM03A before claiming full batch parity |
+| **Statement output sub-chain** | CBSTM03A (924 LOC) → CBSTM03B, then FTPJCL/TXT2PDF1 | Scope statement generation + distribution as one unit; sizable batch program |
+| **IMS provisioning utilities** | PAUDBLOD, PAUDBUNL, DBUNLDGS | Needed for IMS data migration; migrate with Auth module |
 | **Duplicate layouts** | CVCUS01Y vs CUSTREC | Consolidate to one canonical Customer model |
 | **Source typos in field names** | `ACCT-EXPIRAION-DATE`, `CARD-EXPIRAION-DATE` | Preserve mapping but correct names in target schema |
+
+## Honorable Mentions (outside top 10)
+
+- **CBSTM03A (924 LOC)** — account-statement print; moderate complexity (46 decision pts) and lower
+  money-movement risk than the top 10, but a large batch program with its own output sub-chain
+  (CBSTM03B + FTP/PDF). Scope deliberately.
+- **COACTVWC (941 LOC)** — account view; high LOC but read-only, so lower integrity risk.
+- **COTRN02C / COUSR00C (783 / 695 LOC)** — high `WHEN`/`EVALUATE` density but contained scope.
 
 ## Suggested Migration Sequencing
 

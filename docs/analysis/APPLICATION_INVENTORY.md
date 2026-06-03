@@ -8,9 +8,9 @@
 
 | Artifact Type | Count | Location(s) |
 |:--------------|------:|:------------|
-| COBOL programs (`.cbl`) | 39 | `app/cbl`, `app/app-*/cbl` |
-| Copybooks (`.cpy`) | 41 | `app/cpy`, `app/cpy-bms`, `app/app-*/cpy`, `app/app-*/cpy-bms` |
-| JCL jobs (`.jcl`) | 38 | `app/jcl`, `app/app-*/jcl` |
+| COBOL programs (`.cbl`/`.CBL`) | 44 | `app/cbl`, `app/app-*/cbl` |
+| Copybooks (`.cpy`/`.CPY`) | 62 | `app/cpy`, `app/cpy-bms`, `app/app-*/cpy`, `app/app-*/cpy-bms` |
+| JCL jobs (`.jcl`/`.JCL`) | 46 | `app/jcl`, `app/app-*/jcl` |
 | BMS map sets (`.bms`) | 21 | `app/bms`, `app/app-*/bms` |
 | Assembler programs (`.asm`) | 2 | `app/asm` |
 | JCL procedures (`.prc`) | 2 | `app/proc` |
@@ -21,7 +21,10 @@
 | IMS DBD/PSB (`.dbd`/`.psb`/`.DBD`/`.PSB`) | 8 | `app/app-authorization-ims-db2-mq/ims` |
 | Macro library members (`.mac`) | 2 | `app/maclib` |
 | Scheduler definitions | 2 | `app/scheduler` (Control-M XML + CA-7) |
-| Sample data (ASCII / EBCDIC) | 9 / 14 | `app/data/ASCII`, `app/data/EBCDIC` |
+| Sample data (ASCII / EBCDIC) | 9 / 13 | `app/data/ASCII`, `app/data/EBCDIC` |
+
+> File extensions are mixed case in this repo — both `.cbl`/`.CBL`, `.cpy`/`.CPY`, `.jcl`/`.JCL`
+> exist. Counts above are case-insensitive across the whole `app/` tree.
 
 ### Sub-system layout
 
@@ -83,14 +86,16 @@ through the CICS commarea (`COCOM01Y`).
 | CBTRN01C | 494 | Validate daily transactions against masters | (driver) | Base |
 | CBTRN02C | 731 | **Transaction posting** (updates balances, TCATBAL) | POSTTRAN | Base |
 | CBTRN03C | 649 | Transaction detail report | TRANREPT | Base |
+| CBSTM03A | 924 | **Print account statements** from transaction data (calls CBSTM03B) | CREASTMT | Base |
+| CBSTM03B | 230 | Statement file-processing subroutine (called by CBSTM03A) | (subroutine) | Base |
 | CBEXPORT | 582 | Export consolidated data for branch migration (VB out) | CBEXPORT | Base |
 | CBIMPORT | 487 | Import branch-migration export into masters | CBIMPORT | Base |
 | COBSWAIT | 41 | Utility: wait/sleep (calls MVSWAIT assembler) | WAITSTEP | Base |
 | CBPAUP0C | 386 | Purge expired pending authorizations (IMS delete) | CBPAUP0J | Auth (IMS/DB2/MQ) |
+| DBUNLDGS | 366 | IMS GSAM database unload | UNLDGSAM | Auth (IMS/DB2/MQ) |
+| PAUDBLOD | 369 | Load pending-authorization IMS database | LOADPADB | Auth (IMS/DB2/MQ) |
+| PAUDBUNL | 317 | Unload pending-authorization IMS database | UNLDPADB | Auth (IMS/DB2/MQ) |
 | COBTUPDT | 237 | Maintain DB2 transaction-type table from flat file | MNTTRDB2 | Tran-Type (DB2) |
-
-> Note: README also references `CBSTM03A` (statement print, job CREASTMT). That program source is
-> not present in this repository snapshot — flagged as an **external/missing dependency**.
 
 ### Utility / shared sub-programs (called, not job entrypoints)
 
@@ -148,8 +153,11 @@ online screen/menu structures, `CI*Y` = IMS segments, `CC*Y` = MQ message layout
 
 ### 4.3 BMS symbolic map copybooks
 
-`app/cpy-bms/` and the module `cpy-bms/` folders hold the generated symbolic maps for the BMS map
-sets (e.g. `COPAU00`, `COPAU01`, `COTRTLI`, `COTRTUP`). One symbolic copybook per online map.
+The `cpy-bms/` folders hold the generated symbolic maps for the BMS map sets — **21 in total**, one
+per online map: 17 in `app/cpy-bms/` (COSGN00, COMEN01, COADM01, COACTVW, COACTUP, COCRDLI, COCRDSL,
+COCRDUP, COTRN00, COTRN01, COTRN02, CORPT00, COBIL00, COUSR00–03), 2 in
+`app/app-authorization-ims-db2-mq/cpy-bms/` (COPAU00, COPAU01), and 2 in
+`app/app-transaction-type-db2/cpy-bms/` (COTRTLI, COTRTUP). These use the uppercase `.CPY` extension.
 
 ### 4.4 Optional-module copybooks
 
@@ -162,6 +170,8 @@ sets (e.g. `COPAU00`, `COPAU01`, `COTRTLI`, `COTRTUP`). One symbolic copybook pe
 | CCPAUERY | Auth | MQ authorization **error** message |
 | IMSFUNCS | Auth | IMS DL/I function-code constants |
 | COPAU00 / COPAU01 | Auth | BMS symbolic maps for auth screens |
+| PAUTBPCB / PADFLPCB / PASFLPCB | Auth | IMS PCB (program communication block) masks |
+| COSTM01 | Base | Account-statement print layout (used by CBSTM03A) |
 | CSDB2RPY | Tran-Type | Common DB2 PROCEDURE-division logic (SQLCODE handling) |
 | CSDB2RWY | Tran-Type | Common DB2 WORKING-STORAGE (SQLCA etc.) |
 | DCLTRTYP (.dcl) | Tran-Type | DCLGEN for `CARDDEMO.TRANSACTION_TYPE` |
@@ -241,6 +251,10 @@ sets (e.g. `COPAU00`, `COPAU01`, `COTRTLI`, `COTRTUP`). One symbolic copybook pe
 | INTCALC | CBACT04C | Interest calculation |
 | COMBTRAN | SORT | Combine system + daily transactions |
 | TRANREPT | CBTRN03C (+PROC) | Transaction report (submitted from CICS) |
+| CREASTMT | SORT / IDCAMS → CBSTM03A | Create account statements |
+| INTRDRJ1 / INTRDRJ2 | internal reader | Trigger downstream JCL / build IMS DEMODB VSAM |
+| FTPJCL | FTP | Transmit output files |
+| TXT2PDF1 | IKJEFT1B | Convert statement text to PDF |
 | READACCT | CBACT01C | Read/print account file |
 | READCARD | CBACT02C | Read/print card file |
 | READCUST | CBCUS01C | Read/print customer file |
@@ -255,6 +269,9 @@ sets (e.g. `COPAU00`, `COPAU01`, `COTRTLI`, `COTRTUP`). One symbolic copybook pe
 |:----|:----------------|:-------|
 | CBPAUP0J | CBPAUP0C (via DFSRRC00) | Auth — purge expired authorizations |
 | DBPAUTP0 | DFSRRC00 / IEFBR14 | Auth — IMS DB load/unload |
+| LOADPADB | PAUDBLOD (DFSRRC00) | Auth — load pending-auth IMS DB |
+| UNLDPADB | PAUDBUNL (DFSRRC00) | Auth — unload pending-auth IMS DB |
+| UNLDGSAM | DBUNLDGS (DFSRRC00) | Auth — IMS GSAM unload |
 | CREADB21 | IKJEFT01 / DSNTEP4 | Tran-Type — create DB2 DB & load tables |
 | TRANEXTR | IKJEFT01 / DSNTIAUL / IEBGENER | Tran-Type — unload DB2 tran-type data |
 | MNTTRDB2 | IKJEFT01 → COBTUPDT | Tran-Type — maintain tran-type table |

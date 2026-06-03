@@ -79,6 +79,7 @@ These are compile-time-resolved `CALL` targets (utilities and system services).
 | CBACT01C | `COBDATFT` (asm), `CEE3ABD` | date format; LE abend |
 | CORPT00C, COTRN02C | `CSUTLDTC` | date validation (CSUTLDTC → `CEEDAYS`) |
 | COBSWAIT | `MVSWAIT` (asm) | batch wait/timer |
+| CBSTM03A | `CBSTM03B` | statement file-processing subroutine (multiple calls) |
 | All `CBACT0*`, `CBTRN0*`, `CBCUS01C`, `CBEXPORT`, `CBIMPORT` | `CEE3ABD` | LE abend on fatal error |
 | COACCT01, CODATE01, COPAUA0C | `MQOPEN/MQGET/MQPUT/MQPUT1/MQCLOSE` | IBM MQ API |
 
@@ -127,6 +128,7 @@ every `COPY` statement in `app/**/*.cbl`.
 | CBTRN01C (validate) | DALYTRAN, CUSTFILE, XREFFILE, CARDFILE, ACCTFILE, TRANFILE `R` | — |
 | CBTRN02C (**post**) | DALYTRAN `R`, XREFFILE `R` | **TRANSACT `W`**, DALYREJS `W`, **ACCTFILE `U`**, **TCATBALF `U`** |
 | CBTRN03C (report) | TRANSACT, XREFFILE, TRANTYPE, TRANCATG, DATEPARM `R` | TRANREPT `W` |
+| CBSTM03A (statements) | TRNXFILE, XREFFILE, CUSTFILE, ACCTFILE `R` (via CBSTM03B) | STMTFILE, HTMLFILE `W` |
 | CBEXPORT | CUSTFILE, ACCTFILE, XREFFILE, TRANSACT, CARDFILE `R` | EXPFILE `W` (VB export) |
 | CBIMPORT | EXPFILE `R` | CUSTOUT, ACCTOUT, XREFOUT, TRNXOUT, CARDOUT, ERROUT `W` |
 | COBTUPDT | INPFILE `R` (tran-type flat) | DB2 `CARDDEMO.TRANSACTION_TYPE` (update/insert) |
@@ -193,10 +195,9 @@ CLOSEFIL (free VSAM from CICS)
         └▶ TRANCATG → TRANTYPE → DISCGRP → TCATBALF → DUSRSECJ   [reference loads]
               └▶ POSTTRAN  (CBTRN02C)   reads DALYTRAN ▶ writes TRANSACT, updates ACCTDAT+TCATBAL
                     └▶ INTCALC (CBACT04C)  reads TCATBAL+DISCGRP ▶ updates ACCTDAT, writes TRANSACT
-                          └▶ TRANBKP ▶ COMBTRAN (SORT) ▶ CREASTMT (CBSTM03A*) ▶ TRANIDX (AIX)
+                          └▶ TRANBKP ▶ COMBTRAN (SORT) ▶ CREASTMT (CBSTM03A→CBSTM03B) ▶ TRANIDX (AIX)
                                 └▶ OPENFIL (return VSAM to CICS) ▶ WAITSTEP (COBSWAIT)
 ```
-`*` CBSTM03A source not present in repo.
 
 ### 5.2 Control-M schedule (`app/scheduler/CardDemo.controlm`, 17 jobs / 4 folders)
 
@@ -235,7 +236,7 @@ workload — relevant if the target platform standardizes on one scheduler.
 | Assembler services | system | COBDATFT (date), MVSWAIT (timer) |
 | RACF | security | simulated via USRSEC / COSGN00C |
 | Scheduler | orchestration | Control-M + CA-7 |
-| **CBSTM03A** | **missing** | referenced by CREASTMT — not in repo |
+| FTP / TXT2PDF | output delivery | FTPJCL, TXT2PDF1 (statement distribution) |
 
 ---
 
@@ -249,5 +250,7 @@ workload — relevant if the target platform standardizes on one scheduler.
    They are the highest-integrity batch nodes.
 4. **Three optional modules add three different data paradigms** (DB2, IMS, MQ) on top of the VSAM
    base — each can be migrated/retired independently.
-5. **`CBSTM03A` is an unresolved dependency** in the batch chain — must be sourced before a complete
-   end-to-end migration.
+5. **Statement generation (CBSTM03A → CBSTM03B)** plus downstream FTP/PDF jobs (FTPJCL, TXT2PDF1) form
+   a distinct output-distribution sub-chain off the daily batch — migrate as one unit.
+6. **IMS load/unload utilities** (PAUDBLOD, PAUDBUNL, DBUNLDGS via DFSRRC00) sit beside the Auth
+   module and are needed for IMS data provisioning/migration.
