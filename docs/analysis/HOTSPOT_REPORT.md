@@ -48,9 +48,9 @@ Metrics are extracted statically from the COBOL source:
 | 4 | **CBACT04C** — Interest Calculation (batch) | 652 | 7 | 9 | 9 | **8** |
 | 5 | **COCRDUPC** — Credit Card Update | 1560 | 9 | 7 | 8 | **8** |
 | 6 | **COPAUA0C** — Authorization Decision (MQ+IMS) | 1026 | 8 | 10 | 7 | **8** |
-| 7 | **COTRTUPC** — Tran-Type Add/Edit (DB2) | 1702 | 8 | 7 | 6 | **7** |
-| 8 | **COPAUS0C** — Pending-Auth Summary (IMS+VSAM) | 1032 | 8 | 8 | 6 | **7** |
-| 9 | **COBIL00C** — Bill Payment | 572 | 6 | 8 | 9 | **7** |
+| 7 | **COBIL00C** — Bill Payment | 572 | 6 | 8 | 9 | **8** |
+| 8 | **COTRTUPC** — Tran-Type Add/Edit (DB2) | 1702 | 8 | 7 | 6 | **7** |
+| 9 | **COPAUS0C** — Pending-Auth Summary (IMS+VSAM) | 1032 | 8 | 8 | 6 | **7** |
 | 10 | **COCRDLIC** — Credit Card List | 1459 | 8 | 5 | 7 | **7** |
 
 ---
@@ -107,24 +107,24 @@ Metrics are extracted statically from the COBOL source:
 - **Action:** isolate the decision rules from the MQ/IMS plumbing; mock the queues for testing; this is
   the natural seam for an event-driven modernization.
 
-### 7. COTRTUPC — Transaction-Type Add/Edit (DB2)  *(Priority 7)*
-- 1,702 LOC, 105 `WHEN`, 7 `EXEC SQL`. DB2 insert/update for tran-type reference data with a large
-  screen-handling/validation body.
-- **Action:** pairs with COTRTLIC — migrate together as one reference-data service.
-
-### 8. COPAUS0C — Pending-Authorization Summary (IMS + VSAM)  *(Priority 7)*
-- 1,032 LOC, 6 `EXEC DLI`. Reads IMS summary/detail segments and joins with ACCTDAT/CUSTDAT for a
-  consolidated view.
-- **Risk:** IMS hierarchical navigation logic that does not map cleanly to relational/object models.
-- **Action:** model the IMS hierarchy explicitly before re-platforming; consider a read projection.
-
-### 9. COBIL00C — Bill Payment  *(Priority 7)*
+### 7. COBIL00C — Bill Payment  *(Priority 8)*
 - 572 LOC. Lower complexity but **high business impact**: pays an account balance in full, writing a
   TRANSACT row and updating ACCTDAT (`REWRITE`). Direct money movement from a customer action.
 - **Risk:** financial write from the online tier; needs the same balance-integrity guarantees as
   posting.
 - **Action:** route through the same posting/account service introduced for CBTRN02C to avoid two code
   paths mutating balances.
+
+### 8. COTRTUPC — Transaction-Type Add/Edit (DB2)  *(Priority 7)*
+- 1,702 LOC, 105 `WHEN`, 7 `EXEC SQL`. DB2 insert/update for tran-type reference data with a large
+  screen-handling/validation body.
+- **Action:** pairs with COTRTLIC — migrate together as one reference-data service.
+
+### 9. COPAUS0C — Pending-Authorization Summary (IMS + VSAM)  *(Priority 7)*
+- 1,032 LOC, 6 `EXEC DLI`. Reads IMS summary/detail segments and joins with ACCTDAT/CUSTDAT for a
+  consolidated view.
+- **Risk:** IMS hierarchical navigation logic that does not map cleanly to relational/object models.
+- **Action:** model the IMS hierarchy explicitly before re-platforming; consider a read projection.
 
 ### 10. COCRDLIC — Credit Card List  *(Priority 7)*
 - 1,459 LOC, 122 `IF`. Browse with `STARTBR`/`READNEXT`/`READPREV` paging over CARDDAT — VSAM-specific
