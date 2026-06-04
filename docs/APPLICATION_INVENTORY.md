@@ -6,11 +6,11 @@
 
 | Category | Count |
 |----------|------:|
-| COBOL Programs (Online) | 20 |
-| COBOL Programs (Batch) | 18 |
+| COBOL Programs (Online) | 25 |
+| COBOL Programs (Batch) | 19 |
 | Assembler Programs | 2 |
-| Copybooks (Data) | 29 |
-| Copybooks (BMS-generated) | 19 |
+| Copybooks (Data) | 41 |
+| Copybooks (BMS-generated) | 21 |
 | BMS Maps | 21 |
 | JCL Jobs | 46 |
 | Procedures (PROC) | 2 |

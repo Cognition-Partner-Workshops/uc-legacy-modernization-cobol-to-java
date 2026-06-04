@@ -32,9 +32,9 @@ normalized = complexity_raw / max(all_modules) * 10
 | 5 | **COCRDLIC** | 1,459 | 175 | 4.5 | 7.0 | 8.0 | 7.0 | **6.6** |
 | 6 | **COTRTUPC** | 1,702 | 170 | 5.0 | 6.5 | 6.0 | 9.5 | **6.5** |
 | 7 | **CBACT04C** | 652 | 144 | 3.0 | 8.5 | 9.0 | 5.0 | **6.4** |
-| 8 | **CBSTM03A** | 924 | 73 | 2.5 | 5.0 | 8.0 | 6.0 | **5.5** |
-| 9 | **COPAUA0C** | 1,026 | 102 | 3.2 | 6.0 | 7.0 | 9.0 | **6.1** |
-| 10 | **COACTVWC** | 941 | 89 | 2.7 | 8.0 | 7.0 | 6.0 | **5.7** |
+| 8 | **COPAUA0C** | 1,026 | 102 | 3.2 | 6.0 | 7.0 | 9.0 | **6.1** |
+| 9 | **COACTVWC** | 941 | 89 | 2.7 | 8.0 | 7.0 | 6.0 | **5.7** |
+| 10 | **CBSTM03A** | 924 | 73 | 2.5 | 5.0 | 8.0 | 6.0 | **5.5** |
 
 ---
 
@@ -145,24 +145,9 @@ normalized = complexity_raw / max(all_modules) * 10
 
 ---
 
-### #8 CBSTM03A - Statement Generation (Score: 5.5)
+### #8 COPAUA0C - Process Authorization Requests (Score: 6.1)
 
-**Why it's #8:** Complex report generator that calls subroutine CBSTM03B 13 times. Produces customer-facing financial statements.
-
-| Factor | Details |
-|--------|---------|
-| **Complexity** | 924 lines. 73 control-flow statements. 13 CALL sites to CBSTM03B. Multi-format output. |
-| **Coupling** | Calls CBSTM03B (subroutine). Reads sorted transaction input + CARDXREF + CUSTDATA. Writes formatted report output. |
-| **Business Impact** | Customer-facing billing statement. Regulatory requirement to produce accurate statements. |
-| **Migration Risk** | Report formatting logic (column alignment, page breaks). CALL/subroutine interface. GDG output for versioning. |
-
-**Recommendation:** Replace with a template-based PDF generation engine (e.g., Apache FOP, Jasper). The subroutine pattern maps to method calls in a ReportBuilder class.
-
----
-
-### #9 COPAUA0C - Process Authorization Requests (Score: 6.1)
-
-**Why it's #9:** Most technically complex integration point. MQ trigger program that reads requests, queries IMS DB, and writes to DB2.
+**Why it's #8:** Most technically complex integration point. MQ trigger program that reads requests, queries IMS DB, and writes to DB2.
 
 | Factor | Details |
 |--------|---------|
@@ -175,9 +160,9 @@ normalized = complexity_raw / max(all_modules) * 10
 
 ---
 
-### #10 COACTVWC - Account View (Score: 5.7)
+### #9 COACTVWC - Account View (Score: 5.7)
 
-**Why it's #10:** Read-only but highly coupled program that joins data from 4 VSAM files for display.
+**Why it's #9:** Read-only but highly coupled program that joins data from 4 VSAM files for display.
 
 | Factor | Details |
 |--------|---------|
@@ -187,6 +172,21 @@ normalized = complexity_raw / max(all_modules) * 10
 | **Migration Risk** | Four-file "join" logic in procedural COBOL. XCTL back-navigation. CSSTRPFY string processing. |
 
 **Recommendation:** Good early migration candidate (read-only, no writes). Maps to a simple REST GET endpoint backed by a SQL JOIN query. Low risk, high visibility win.
+
+---
+
+### #10 CBSTM03A - Statement Generation (Score: 5.5)
+
+**Why it's #10:** Complex report generator that calls subroutine CBSTM03B 13 times. Produces customer-facing financial statements.
+
+| Factor | Details |
+|--------|---------|
+| **Complexity** | 924 lines. 73 control-flow statements. 13 CALL sites to CBSTM03B. Multi-format output. |
+| **Coupling** | Calls CBSTM03B (subroutine). Reads sorted transaction input + CARDXREF + CUSTDATA. Writes formatted report output. |
+| **Business Impact** | Customer-facing billing statement. Regulatory requirement to produce accurate statements. |
+| **Migration Risk** | Report formatting logic (column alignment, page breaks). CALL/subroutine interface. GDG output for versioning. |
+
+**Recommendation:** Replace with a template-based PDF generation engine (e.g., Apache FOP, Jasper). The subroutine pattern maps to method calls in a ReportBuilder class.
 
 ---
 
