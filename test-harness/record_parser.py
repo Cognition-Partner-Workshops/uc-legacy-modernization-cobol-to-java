@@ -12,7 +12,10 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from .copybook_parser import FieldDescriptor
+try:
+    from .copybook_parser import FieldDescriptor
+except ImportError:
+    from copybook_parser import FieldDescriptor
 
 # ---------------------------------------------------------------------------
 # COBOL sign-overpunch decoding (ASCII representation)

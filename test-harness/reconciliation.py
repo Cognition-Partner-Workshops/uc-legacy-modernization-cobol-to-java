@@ -169,21 +169,28 @@ def check_balance_integrity(
         bal = c.get("TRAN-CAT-BAL", 0) or 0
         cat_sums[acct_id] = cat_sums.get(acct_id, 0.0) + bal
 
+    # Verify every account that has transactions also has category-balance
+    # entries, and vice versa.  A full delta check (PT-2) requires pre/post
+    # run state; here we validate structural consistency and flag accounts
+    # that appear in one dataset but not the other.
     mismatches: List[str] = []
-    for acct_id in sorted(set(acct_sums) | set(cat_sums)):
+    all_accts = sorted(set(acct_sums) | set(cat_sums))
+    for acct_id in all_accts:
         tran_sum = acct_sums.get(acct_id, 0.0)
         cat_sum = cat_sums.get(acct_id, 0.0)
-        # Note: category balance may include prior balances, so we check
-        # that at least the transaction sums are non-negative or the
-        # category balances exist.  A full check requires pre/post state.
-        # For golden-file baseline, we just verify the structures load.
+        if acct_id in acct_sums and acct_id not in cat_sums:
+            mismatches.append(f"acct {acct_id}: has transactions (Σ={tran_sum:.2f}) but no category-balance entry")
+        elif acct_id not in acct_sums and acct_id in cat_sums:
+            mismatches.append(f"acct {acct_id}: has category-balance (Σ={cat_sum:.2f}) but no transactions")
 
+    passed = len(mismatches) == 0 and unmapped == 0
     return CheckResult(
         check_name="balance_integrity:dailytran_vs_tcatbal",
-        passed=True,
-        expected=f"{len(acct_sums)} accounts with transactions",
-        actual=f"{len(acct_sums)} accounts, {unmapped} unmapped cards",
-        message="Structural cross-check passed; full delta check requires pre/post run state",
+        passed=passed,
+        expected=f"{len(acct_sums)} accounts with transactions, 0 unmapped cards, 0 mismatches",
+        actual=f"{len(acct_sums)} accounts, {unmapped} unmapped cards, {len(mismatches)} mismatch(es)"
+               + (f": {mismatches[:3]}" if mismatches else ""),
+        message="Structural cross-check " + ("passed" if passed else "FAILED"),
         tolerance=tolerance,
     )
 
@@ -272,7 +279,10 @@ def run_all_checks(golden_dir: str | Path) -> List[CheckResult]:
     results: List[CheckResult] = []
 
     # Key uniqueness
-    from .copybook_parser import COPYBOOK_REGISTRY
+    try:
+        from .copybook_parser import COPYBOOK_REGISTRY
+    except ImportError:
+        from copybook_parser import COPYBOOK_REGISTRY
     for ds_name, meta in COPYBOOK_REGISTRY.items():
         stem = ds_name.replace(".txt", "")
         try:

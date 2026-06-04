@@ -21,13 +21,14 @@ import json
 import sys
 from pathlib import Path
 
-# Ensure the package is importable when run via ``python -m``
 _HERE = Path(__file__).resolve().parent
-if str(_HERE.parent) not in sys.path:
-    sys.path.insert(0, str(_HERE.parent))
 
-from test_harness.copybook_parser import COPYBOOK_REGISTRY, parse_copybook_file
-from test_harness.record_parser import parse_file
+# Use relative imports so the script works regardless of whether the
+# package directory is named ``test-harness`` (hyphen) or ``test_harness``.
+sys.path.insert(0, str(_HERE))
+
+from copybook_parser import COPYBOOK_REGISTRY, parse_copybook_file  # noqa: E402
+from record_parser import parse_file  # noqa: E402
 
 
 def generate(
