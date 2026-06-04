@@ -20,7 +20,8 @@ class CopybookModelTest {
         assertEquals("20230309", dt.curdateN());
         assertEquals("03/09/23", dt.curdateMmDdYy());
         assertEquals("23:15:58", dt.curtimeHhMmSs());
-        assertEquals("2023-03-09 23:15:58", dt.timestamp());
+        assertEquals("2023-03-09 23:15:58.420000", dt.timestamp());
+        assertEquals(26, dt.timestamp().length());
         assertEquals(42, dt.milsec());
     }
 

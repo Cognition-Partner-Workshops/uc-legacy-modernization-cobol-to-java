@@ -34,7 +34,7 @@ public record CsDat01y(int year, int month, int day,
     private static final DateTimeFormatter HH_MM_SS =
             DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final DateTimeFormatter TIMESTAMP =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
 
     /**
      * Builds a {@link CsDat01y} from a {@link LocalDateTime}, populating the
@@ -76,7 +76,11 @@ public record CsDat01y(int year, int month, int day,
         return toLocalDateTime().format(HH_MM_SS);
     }
 
-    /** @return the {@code WS-TIMESTAMP} rendering: {@code YYYY-MM-DD HH:MM:SS}. */
+    /**
+     * @return the {@code WS-TIMESTAMP} rendering: the 26-character
+     *         {@code YYYY-MM-DD HH:MM:SS.MMMMMM} layout (including the 6-digit
+     *         fractional-seconds field {@code WS-TIMESTAMP-TM-MS6}).
+     */
     public String timestamp() {
         return toLocalDateTime().format(TIMESTAMP);
     }
