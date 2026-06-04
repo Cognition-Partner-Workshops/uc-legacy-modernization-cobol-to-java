@@ -4,6 +4,7 @@ import com.carddemo.auth.dto.UserDto;
 import com.carddemo.auth.model.User;
 import com.carddemo.auth.repository.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -83,10 +84,11 @@ public class UserController {
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto dto,
                                               UriComponentsBuilder uriBuilder) {
         String userId = dto.userId().toUpperCase();
+        // Fast-path pre-check; the primary-key constraint is the real guard
+        // (the catch below keeps two concurrent creates from leaking a 500).
         if (userRepository.existsById(userId)) {
             // Legacy: "User ID already exist..."
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "User ID already exist...");
+            throw duplicateUser();
         }
 
         User user = new User(
@@ -95,11 +97,22 @@ public class UserController {
                 dto.lastName(),
                 passwordEncoder.encode(dto.password()),
                 dto.userType());
-        User saved = userRepository.save(user);
+
+        User saved;
+        try {
+            saved = userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException ex) {
+            // Lost the race: another request inserted the same key first.
+            throw duplicateUser();
+        }
 
         URI location = uriBuilder.path("/api/users/{id}")
                 .buildAndExpand(saved.getUserId()).toUri();
         return ResponseEntity.created(location).body(UserDto.fromEntity(saved));
+    }
+
+    private static ResponseStatusException duplicateUser() {
+        return new ResponseStatusException(HttpStatus.CONFLICT, "User ID already exist...");
     }
 
     /**
