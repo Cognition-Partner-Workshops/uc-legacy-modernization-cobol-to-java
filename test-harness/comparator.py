@@ -36,7 +36,8 @@ class ComparisonResult:
     @property
     def passed(self) -> bool:
         return (
-            not self.missing_records
+            self.total_records_expected == self.total_records_actual
+            and not self.missing_records
             and not self.extra_records
             and not self.field_diffs
         )

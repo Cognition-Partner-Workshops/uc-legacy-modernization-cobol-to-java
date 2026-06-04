@@ -23,7 +23,7 @@ _PIC_RE = re.compile(
     re.IGNORECASE,
 )
 
-_EXPAND_RE = re.compile(r"([9XZA\-\+,\.])\((\d+)\)")
+_EXPAND_RE = re.compile(r"([9XZA\-\+,\.])\((\d+)\)", re.IGNORECASE)
 
 _OCCURS_RE = re.compile(r"OCCURS\s+(\d+)\s+TIMES", re.IGNORECASE)
 
