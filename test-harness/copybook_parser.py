@@ -136,8 +136,8 @@ def parse_copybook(source: str) -> List[FieldDescriptor]:
     offset = 0
     # Track named-field offsets so REDEFINES can reset
     name_offsets: dict[str, int] = {}
-    # Stack for REDEFINES offset tracking
-    redefines_base_offset: Optional[int] = None
+    # Deferred restore for group-level REDEFINES: (saved_offset, level)
+    _deferred_restore: Optional[tuple] = None
 
     for raw_line in source.splitlines():
         # Strip sequence numbers (cols 1-6) if present
@@ -161,6 +161,13 @@ def parse_copybook(source: str) -> List[FieldDescriptor]:
         name = m.group(2).upper()
         is_filler = name == "FILLER"
 
+        # Check if we've exited a group-level REDEFINES scope.  If the
+        # current field's level is <= the REDEFINES group level, we have
+        # left that group and should restore the running offset.
+        if _deferred_restore is not None and level <= _deferred_restore[1]:
+            offset = _deferred_restore[0]
+            _deferred_restore = None
+
         # PIC clause
         pic_match = _PIC_RE.search(stripped)
         pic_raw = pic_match.group("pic").rstrip(".") if pic_match else ""
@@ -172,7 +179,7 @@ def parse_copybook(source: str) -> List[FieldDescriptor]:
 
         # REDEFINES
         redefines_match = _REDEFINES_RE.search(stripped)
-        redefines_target = redefines_match.group(1).upper() if redefines_match else None
+        redefines_target = redefines_match.group(1).rstrip(".").upper() if redefines_match else None
 
         # COMP / COMP-3
         comp_match = _COMP_RE.search(stripped)
@@ -191,8 +198,9 @@ def parse_copybook(source: str) -> List[FieldDescriptor]:
             length = 0  # group item — children will contribute
 
         # Handle REDEFINES: save the current running offset, then reset to
-        # the redefined field's start.  After processing, restore the saved
-        # offset so subsequent fields are not corrupted.
+        # the redefined field's start.  For elementary fields (has PIC),
+        # restore immediately.  For group fields (no PIC), defer restoration
+        # until we exit the group scope (detected by level number).
         saved_offset: Optional[int] = None
         if redefines_target and redefines_target in name_offsets:
             saved_offset = offset
@@ -222,10 +230,14 @@ def parse_copybook(source: str) -> List[FieldDescriptor]:
             if redefines_target is None:
                 offset += length * occurs
 
-        # Restore offset after REDEFINES so subsequent fields continue from
-        # the correct position.
+        # Restore offset after REDEFINES processing.
         if saved_offset is not None:
-            offset = saved_offset
+            if pic_expanded:
+                # Elementary REDEFINES: restore immediately.
+                offset = saved_offset
+            else:
+                # Group REDEFINES: defer until we leave the group scope.
+                _deferred_restore = (saved_offset, level)
 
     return fields
 
