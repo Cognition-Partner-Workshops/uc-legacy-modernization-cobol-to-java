@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  *   <li>{@link ResourceNotFoundException} &rarr; 404 Not Found</li>
  *   <li>{@link ReferentialIntegrityException} &rarr; 409 Conflict</li>
  *   <li>{@link DuplicateResourceException} &rarr; 409 Conflict</li>
- *   <li>Bean Validation failures &rarr; 400 Bad Request</li>
+ *   <li>Bean Validation failures and {@link IllegalArgumentException}
+ *       &rarr; 400 Bad Request</li>
  * </ul>
  */
 @RestControllerAdvice
@@ -38,6 +39,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<Map<String, Object>> handleDuplicate(DuplicateResourceException ex) {
         return build(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(
+            IllegalArgumentException ex) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

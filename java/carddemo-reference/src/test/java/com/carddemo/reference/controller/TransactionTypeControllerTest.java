@@ -165,6 +165,20 @@ class TransactionTypeControllerTest {
     }
 
     @Test
+    void batchInsertWithBlankDescriptionReturns400() throws Exception {
+        // description is null -> passes bean validation (@Size allows null) but the
+        // service rejects it; must surface as 400, not 500.
+        String json = "[{\"action\":\"INSERT\",\"typeCode\":\"12\",\"description\":null}]";
+        mockMvc.perform(post("/api/transaction-types/batch")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/api/transaction-types/12"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void batchRollsBackOnFailure() throws Exception {
         // Second op fails (deleting type 01 which has categories); the INSERT of
         // type 11 must be rolled back, mirroring COBTUPDT all-or-nothing semantics.
