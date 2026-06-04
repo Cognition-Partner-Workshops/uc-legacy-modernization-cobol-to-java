@@ -190,8 +190,12 @@ def parse_copybook(source: str) -> List[FieldDescriptor]:
         else:
             length = 0  # group item — children will contribute
 
-        # Handle REDEFINES: reset offset to the redefined field
+        # Handle REDEFINES: save the current running offset, then reset to
+        # the redefined field's start.  After processing, restore the saved
+        # offset so subsequent fields are not corrupted.
+        saved_offset: Optional[int] = None
         if redefines_target and redefines_target in name_offsets:
+            saved_offset = offset
             offset = name_offsets[redefines_target]
 
         # Record the offset for this name
@@ -217,6 +221,11 @@ def parse_copybook(source: str) -> List[FieldDescriptor]:
             fields.append(fd)
             if redefines_target is None:
                 offset += length * occurs
+
+        # Restore offset after REDEFINES so subsequent fields continue from
+        # the correct position.
+        if saved_offset is not None:
+            offset = saved_offset
 
     return fields
 

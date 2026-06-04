@@ -190,8 +190,11 @@ def _check_numeric_precision(
             if val is None:
                 continue
             if nf.decimal_places > 0 and isinstance(val, (int, float)):
-                # Check that the value doesn't exceed the PIC's integer digits
-                int_digits = nf.length - nf.decimal_places
+                # Check that the value doesn't exceed the PIC's integer digits.
+                # Use digit count from PIC (not byte-length) so COMP/COMP-3
+                # fields are handled correctly.
+                total_digits = sum(1 for c in nf.pic_expanded.upper() if c == '9')
+                int_digits = total_digits - nf.decimal_places
                 max_val = 10 ** int_digits
                 if abs(val) >= max_val:
                     violations.append(ContractViolation(
