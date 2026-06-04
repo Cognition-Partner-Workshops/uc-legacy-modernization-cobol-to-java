@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 /**
  * Sign-on endpoint - the modern replacement for {@code COSGN00C}
  * (CICS transaction {@code CC00}), the entry point of the CardDemo application.
@@ -36,6 +38,16 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    /**
+     * A throwaway BCrypt hash used to spend the same time on a password check
+     * when the user does not exist, so a "user not found" response is not
+     * measurably faster than a "wrong password" one (mitigates user
+     * enumeration via timing). It is a hash of a random value and matches
+     * nothing supplied by a client.
+     */
+    private static final String DUMMY_HASH =
+            "$2b$10$lYTz73vDv1QdTrYk1/k7b.1BVefGj/eMrxOFY7/jEZ/cKw0OwMAMa";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -61,10 +73,16 @@ public class AuthController {
         // Legacy COSGN00C upper-cases the user ID (FUNCTION UPPER-CASE).
         String userId = request.userId().toUpperCase();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+        Optional<User> found = userRepository.findById(userId);
+        if (found.isEmpty()) {
+            // Spend equivalent time on a BCrypt check so a missing user is not
+            // measurably faster than a wrong password (anti-enumeration).
+            passwordEncoder.matches(request.password(), DUMMY_HASH);
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        }
 
+        User user = found.get();
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED, "Invalid credentials");
