@@ -1,0 +1,96 @@
+package com.carddemo.batch;
+
+import com.carddemo.model.Account;
+import com.carddemo.model.Transaction;
+import com.carddemo.repository.AccountRepository;
+import com.carddemo.repository.CardXrefRepository;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.data.RepositoryItemReader;
+import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Sort;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.Map;
+
+@Configuration
+public class PostTransactionJobConfig {
+
+    private final JobRepository jobRepository;
+    private final PlatformTransactionManager transactionManager;
+    private final AccountRepository accountRepository;
+    private final CardXrefRepository cardXrefRepository;
+
+    public PostTransactionJobConfig(JobRepository jobRepository,
+                                    PlatformTransactionManager transactionManager,
+                                    AccountRepository accountRepository,
+                                    CardXrefRepository cardXrefRepository) {
+        this.jobRepository = jobRepository;
+        this.transactionManager = transactionManager;
+        this.accountRepository = accountRepository;
+        this.cardXrefRepository = cardXrefRepository;
+    }
+
+    @Bean
+    public Job postTransactionJob(Step postTransactionStep) {
+        return new JobBuilder("postTransactionJob", jobRepository)
+                .start(postTransactionStep)
+                .build();
+    }
+
+    @Bean
+    public Step postTransactionStep(RepositoryItemReader<Transaction> transactionReader,
+                                    ItemProcessor<Transaction, Transaction> postTransactionProcessor,
+                                    ItemWriter<Transaction> postTransactionWriter) {
+        return new StepBuilder("postTransactionStep", jobRepository)
+                .<Transaction, Transaction>chunk(100, transactionManager)
+                .reader(transactionReader)
+                .processor(postTransactionProcessor)
+                .writer(postTransactionWriter)
+                .build();
+    }
+
+    @Bean
+    public RepositoryItemReader<Transaction> transactionReader(
+            com.carddemo.repository.TransactionRepository transactionRepository) {
+        return new RepositoryItemReaderBuilder<Transaction>()
+                .name("transactionReader")
+                .repository(transactionRepository)
+                .methodName("findAll")
+                .sorts(Map.of("tranId", Sort.Direction.ASC))
+                .pageSize(100)
+                .build();
+    }
+
+    @Bean
+    public ItemProcessor<Transaction, Transaction> postTransactionProcessor() {
+        return transaction -> {
+            var cardOpt = cardXrefRepository.findById(transaction.getCardNum());
+            if (cardOpt.isPresent()) {
+                var card = cardOpt.get();
+                var accountOpt = accountRepository.findById(card.getAcctId());
+                if (accountOpt.isPresent()) {
+                    Account account = accountOpt.get();
+                    if (transaction.getTranAmount() != null) {
+                        account.setCurrentBalance(
+                                account.getCurrentBalance().add(transaction.getTranAmount()));
+                    }
+                    accountRepository.save(account);
+                }
+            }
+            return transaction;
+        };
+    }
+
+    @Bean
+    public ItemWriter<Transaction> postTransactionWriter() {
+        return items -> {};
+    }
+}
