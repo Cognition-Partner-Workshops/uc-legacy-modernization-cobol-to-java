@@ -4,6 +4,7 @@ import com.carddemo.model.Account;
 import com.carddemo.model.Transaction;
 import com.carddemo.repository.AccountRepository;
 import com.carddemo.repository.CardXrefRepository;
+import com.carddemo.repository.TransactionRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -27,15 +28,18 @@ public class PostTransactionJobConfig {
     private final PlatformTransactionManager transactionManager;
     private final AccountRepository accountRepository;
     private final CardXrefRepository cardXrefRepository;
+    private final TransactionRepository transactionRepository;
 
     public PostTransactionJobConfig(JobRepository jobRepository,
                                     PlatformTransactionManager transactionManager,
                                     AccountRepository accountRepository,
-                                    CardXrefRepository cardXrefRepository) {
+                                    CardXrefRepository cardXrefRepository,
+                                    TransactionRepository transactionRepository) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.accountRepository = accountRepository;
         this.cardXrefRepository = cardXrefRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Bean
@@ -58,12 +62,11 @@ public class PostTransactionJobConfig {
     }
 
     @Bean
-    public RepositoryItemReader<Transaction> transactionReader(
-            com.carddemo.repository.TransactionRepository transactionRepository) {
+    public RepositoryItemReader<Transaction> transactionReader() {
         return new RepositoryItemReaderBuilder<Transaction>()
                 .name("transactionReader")
                 .repository(transactionRepository)
-                .methodName("findAll")
+                .methodName("findByPostedFalse")
                 .sorts(Map.of("tranId", Sort.Direction.ASC))
                 .pageSize(100)
                 .build();
@@ -86,12 +89,17 @@ public class PostTransactionJobConfig {
                     accountRepository.save(account);
                 }
             }
+            transaction.setPosted(true);
             return transaction;
         };
     }
 
     @Bean
     public ItemWriter<Transaction> postTransactionWriter() {
-        return items -> {};
+        return chunk -> {
+            for (Transaction t : chunk) {
+                transactionRepository.save(t);
+            }
+        };
     }
 }

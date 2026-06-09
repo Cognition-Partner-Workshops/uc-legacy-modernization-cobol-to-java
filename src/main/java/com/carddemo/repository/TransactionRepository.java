@@ -16,4 +16,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     List<Transaction> findByTranTypeCode(String typeCode);
 
     Page<Transaction> findByCardNumOrderByOriginTimestampDesc(String cardNum, Pageable pageable);
+
+    Page<Transaction> findByPostedFalse(Pageable pageable);
 }

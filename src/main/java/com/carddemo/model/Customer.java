@@ -63,6 +63,7 @@ public class Customer {
     private String phoneNumber2;
 
     @Column(name = "ssn")
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     private long ssn;
 
     @Size(max = 20)

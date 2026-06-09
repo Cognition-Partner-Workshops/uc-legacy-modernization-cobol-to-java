@@ -43,9 +43,9 @@ public class PaymentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Account", card.getAcctId()));
 
         BigDecimal currentBalance = account.getCurrentBalance() != null ? account.getCurrentBalance() : BigDecimal.ZERO;
-        BigDecimal currentCycleDebit = account.getCurrentCycleDebit() != null ? account.getCurrentCycleDebit() : BigDecimal.ZERO;
-        account.setCurrentBalance(currentBalance.add(request.amount()));
-        account.setCurrentCycleDebit(currentCycleDebit.add(request.amount()));
+        BigDecimal currentCycleCredit = account.getCurrentCycleCredit() != null ? account.getCurrentCycleCredit() : BigDecimal.ZERO;
+        account.setCurrentBalance(currentBalance.subtract(request.amount()));
+        account.setCurrentCycleCredit(currentCycleCredit.add(request.amount()));
         accountRepository.save(account);
 
         String now = LocalDateTime.now().format(TS_FORMAT);
@@ -65,6 +65,7 @@ public class PaymentService {
         transaction.setCardNum(request.cardNum());
         transaction.setOriginTimestamp(now);
         transaction.setProcessedTimestamp(now);
+        transaction.setPosted(true);
         transactionRepository.save(transaction);
 
         return new PaymentResponse(tranId, request.cardNum(), request.amount(), "APPROVED", now);

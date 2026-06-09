@@ -64,6 +64,9 @@ public class Transaction {
     @Column(name = "proc_ts", length = 26)
     private String processedTimestamp;
 
+    @Column(name = "posted", nullable = false)
+    private boolean posted = false;
+
     public Transaction() {}
 
     public String getTranId() { return tranId; }
@@ -104,6 +107,9 @@ public class Transaction {
 
     public String getProcessedTimestamp() { return processedTimestamp; }
     public void setProcessedTimestamp(String processedTimestamp) { this.processedTimestamp = processedTimestamp; }
+
+    public boolean isPosted() { return posted; }
+    public void setPosted(boolean posted) { this.posted = posted; }
 
     @Override
     public boolean equals(Object o) {
