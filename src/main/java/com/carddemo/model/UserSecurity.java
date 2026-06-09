@@ -30,6 +30,7 @@ public class UserSecurity {
     @NotNull
     @Size(max = 60)
     @Column(name = "password", length = 60, nullable = false)
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotNull

@@ -12,6 +12,7 @@ import com.carddemo.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -41,8 +42,10 @@ public class PaymentService {
         Account account = accountRepository.findById(card.getAcctId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", card.getAcctId()));
 
-        account.setCurrentBalance(account.getCurrentBalance().add(request.amount()));
-        account.setCurrentCycleDebit(account.getCurrentCycleDebit().add(request.amount()));
+        BigDecimal currentBalance = account.getCurrentBalance() != null ? account.getCurrentBalance() : BigDecimal.ZERO;
+        BigDecimal currentCycleDebit = account.getCurrentCycleDebit() != null ? account.getCurrentCycleDebit() : BigDecimal.ZERO;
+        account.setCurrentBalance(currentBalance.add(request.amount()));
+        account.setCurrentCycleDebit(currentCycleDebit.add(request.amount()));
         accountRepository.save(account);
 
         String now = LocalDateTime.now().format(TS_FORMAT);

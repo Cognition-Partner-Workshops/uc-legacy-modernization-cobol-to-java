@@ -79,8 +79,9 @@ public class PostTransactionJobConfig {
                 if (accountOpt.isPresent()) {
                     Account account = accountOpt.get();
                     if (transaction.getTranAmount() != null) {
-                        account.setCurrentBalance(
-                                account.getCurrentBalance().add(transaction.getTranAmount()));
+                        java.math.BigDecimal balance = account.getCurrentBalance() != null
+                                ? account.getCurrentBalance() : java.math.BigDecimal.ZERO;
+                        account.setCurrentBalance(balance.add(transaction.getTranAmount()));
                     }
                     accountRepository.save(account);
                 }

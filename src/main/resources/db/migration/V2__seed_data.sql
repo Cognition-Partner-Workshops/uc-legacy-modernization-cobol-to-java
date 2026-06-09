@@ -23,13 +23,13 @@ INSERT INTO customers (cust_id, first_name, middle_name, last_name, addr_line_1,
 (4, 'Delbert', 'Kaia', 'Parisian', '638 Blanda Gateway', 'Apt. 076', 'Lake Virginie', 'MI', 'USA', '39035-0455', '(801)603-4121', '(156)074-6837', 660354258, '000000000', '1985-01-13', '0040802739', 'Y', 776),
 (5, 'Treva', 'Manley', 'Schowalter', '5653 Legros Plaza', 'Apt. 968', 'Alvinaport', 'MI', 'USA', '02251-1698', '(978)775-4633', '(439)943-7644', 611264288, '000000000', '1971-09-29', '0006365573', 'Y', 529);
 
--- Card Cross References (from CARDXREF VSAM)
+-- Card Cross References (from CARDXREF VSAM, acct_ids aligned to seeded accounts)
 INSERT INTO card_xref (card_num, cust_id, acct_id) VALUES
-('0500024453765740', 5, 50),
-('0683586198171516', 2, 27),
-('0923877193247330', 2, 2),
-('0927987108636232', 2, 20),
-('0982496213629795', 1, 12);
+('0500024453765740', 5, 5),
+('0683586198171516', 2, 2),
+('0923877193247330', 2, 3),
+('0927987108636232', 2, 2),
+('0982496213629795', 1, 1);
 
 -- Transactions (from DAILYTRAN VSAM)
 INSERT INTO transactions (tran_id, tran_type_cd, tran_cat_cd, tran_source, tran_desc, tran_amt, merchant_id, merchant_name, merchant_city, merchant_zip, card_num, orig_ts, proc_ts) VALUES
