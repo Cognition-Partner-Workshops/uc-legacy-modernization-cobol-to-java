@@ -57,10 +57,11 @@ public class AdminController {
                 .toJobParameters();
         JobExecution execution = jobLauncher.run(job, params);
         String executionId = String.valueOf(execution.getId());
+        String status = execution.getStatus().name();
         if (execution.getStatus() == BatchStatus.FAILED) {
             return ResponseEntity.internalServerError().body(
-                    Map.of("status", "FAILED", "job", jobName, "executionId", executionId));
+                    Map.of("status", status, "job", jobName, "executionId", executionId));
         }
-        return ResponseEntity.ok(Map.of("status", "COMPLETED", "job", jobName, "executionId", executionId));
+        return ResponseEntity.ok(Map.of("status", status, "job", jobName, "executionId", executionId));
     }
 }
