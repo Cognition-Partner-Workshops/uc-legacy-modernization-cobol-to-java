@@ -90,19 +90,23 @@ public class PostTransactionJobConfig {
     public ItemProcessor<Transaction, Transaction> postTransactionProcessor() {
         return transaction -> {
             var cardOpt = cardXrefRepository.findById(transaction.getCardNum());
-            if (cardOpt.isPresent()) {
-                var card = cardOpt.get();
-                var accountOpt = accountRepository.findById(card.getAcctId());
-                if (accountOpt.isPresent()) {
-                    Account account = accountOpt.get();
-                    if (transaction.getTranAmount() != null) {
-                        java.math.BigDecimal balance = account.getCurrentBalance() != null
-                                ? account.getCurrentBalance() : java.math.BigDecimal.ZERO;
-                        account.setCurrentBalance(balance.add(transaction.getTranAmount()));
-                    }
-                    accountRepository.save(account);
-                }
+            if (cardOpt.isEmpty()) {
+                // Card not found — skip item (stays unposted for investigation/retry)
+                return null;
             }
+            var card = cardOpt.get();
+            var accountOpt = accountRepository.findById(card.getAcctId());
+            if (accountOpt.isEmpty()) {
+                // Account not found — skip item (stays unposted for investigation/retry)
+                return null;
+            }
+            Account account = accountOpt.get();
+            if (transaction.getTranAmount() != null) {
+                java.math.BigDecimal balance = account.getCurrentBalance() != null
+                        ? account.getCurrentBalance() : java.math.BigDecimal.ZERO;
+                account.setCurrentBalance(balance.add(transaction.getTranAmount()));
+            }
+            accountRepository.save(account);
             transaction.setPosted(true);
             return transaction;
         };
