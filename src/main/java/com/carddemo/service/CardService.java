@@ -42,6 +42,9 @@ public class CardService {
 
     @Transactional
     public CardXref create(CardXref card) {
+        if (card.getCardNum() != null && cardXrefRepository.existsById(card.getCardNum())) {
+            throw new IllegalArgumentException("Card already exists with number: " + card.getCardNum());
+        }
         return cardXrefRepository.save(card);
     }
 

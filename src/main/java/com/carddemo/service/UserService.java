@@ -36,6 +36,9 @@ public class UserService {
         if (user.getPassword() == null || user.getPassword().isBlank()) {
             throw new IllegalArgumentException("Password is required for new users");
         }
+        if (user.getUserId() != null && userRepository.existsById(user.getUserId())) {
+            throw new IllegalArgumentException("User already exists with id: " + user.getUserId());
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }

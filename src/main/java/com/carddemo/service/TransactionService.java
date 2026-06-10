@@ -35,6 +35,9 @@ public class TransactionService {
 
     @Transactional
     public Transaction create(Transaction transaction) {
+        if (transaction.getTranId() != null && transactionRepository.existsById(transaction.getTranId())) {
+            throw new IllegalArgumentException("Transaction already exists with id: " + transaction.getTranId());
+        }
         return transactionRepository.save(transaction);
     }
 }

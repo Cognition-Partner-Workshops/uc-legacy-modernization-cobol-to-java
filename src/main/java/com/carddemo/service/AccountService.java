@@ -47,6 +47,9 @@ public class AccountService {
 
     @Transactional
     public Account create(Account account) {
+        if (account.getAcctId() != 0 && accountRepository.existsById(account.getAcctId())) {
+            throw new IllegalArgumentException("Account already exists with id: " + account.getAcctId());
+        }
         return accountRepository.save(account);
     }
 }
