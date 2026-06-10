@@ -44,7 +44,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public UserSecurity updateUser(@PathVariable String userId, @RequestBody UserSecurity user) {
+    public UserSecurity updateUser(@PathVariable String userId, @Valid @RequestBody UserSecurity user) {
         return userService.update(userId, user);
     }
 

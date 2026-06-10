@@ -33,6 +33,9 @@ public class UserService {
 
     @Transactional
     public UserSecurity create(UserSecurity user) {
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Password is required for new users");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }

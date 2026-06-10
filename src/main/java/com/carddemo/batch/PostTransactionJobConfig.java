@@ -63,24 +63,25 @@ public class PostTransactionJobConfig {
     }
 
     @Bean
+    @org.springframework.batch.core.configuration.annotation.StepScope
     public ItemReader<Transaction> transactionReader() {
-        // Custom reader that always fetches page 0 of unposted transactions.
-        // Since the writer marks items as posted=true, they drop out of the result set,
-        // so the next batch of unposted items is always at page 0.
+        // Loads all unposted transaction IDs upfront, then yields them one by one.
+        // This avoids page-drift and within-chunk re-fetch issues entirely.
         return new ItemReader<>() {
-            private Iterator<Transaction> currentBatch = null;
+            private java.util.List<Transaction> items = null;
+            private int index = 0;
 
             @Override
             public Transaction read() {
-                if (currentBatch == null || !currentBatch.hasNext()) {
-                    Page<Transaction> page = transactionRepository.findByPostedFalse(
-                            PageRequest.of(0, 100, Sort.by("tranId").ascending()));
-                    if (page.isEmpty()) {
-                        return null;
-                    }
-                    currentBatch = page.getContent().iterator();
+                if (items == null) {
+                    items = transactionRepository.findByPostedFalse(
+                            PageRequest.of(0, Integer.MAX_VALUE, Sort.by("tranId").ascending()))
+                            .getContent();
                 }
-                return currentBatch.hasNext() ? currentBatch.next() : null;
+                if (index < items.size()) {
+                    return items.get(index++);
+                }
+                return null;
             }
         };
     }
