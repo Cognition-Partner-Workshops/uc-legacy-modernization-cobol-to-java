@@ -57,7 +57,7 @@ public class PaymentService {
         transaction.setTranCategoryCode(1);
         transaction.setTranSource("ONLINE");
         transaction.setTranDescription(request.description() != null ? request.description() : "Bill Payment");
-        transaction.setTranAmount(request.amount());
+        transaction.setTranAmount(request.amount().negate());
         transaction.setMerchantId(0L);
         transaction.setMerchantName("PAYMENT");
         transaction.setMerchantCity("");
