@@ -1,6 +1,8 @@
 package com.carddemo.controller;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -36,28 +38,29 @@ public class AdminController {
 
     @PostMapping("/jobs/post-transactions")
     public ResponseEntity<Map<String, String>> runPostTransactions() throws Exception {
-        JobParameters params = new JobParametersBuilder()
-                .addLong("time", System.currentTimeMillis())
-                .toJobParameters();
-        jobLauncher.run(postTransactionJob, params);
-        return ResponseEntity.ok(Map.of("status", "Job started: postTransactionJob"));
+        return launchJob(postTransactionJob, "postTransactionJob");
     }
 
     @PostMapping("/jobs/interest-calculation")
     public ResponseEntity<Map<String, String>> runInterestCalculation() throws Exception {
-        JobParameters params = new JobParametersBuilder()
-                .addLong("time", System.currentTimeMillis())
-                .toJobParameters();
-        jobLauncher.run(interestCalculationJob, params);
-        return ResponseEntity.ok(Map.of("status", "Job started: interestCalculationJob"));
+        return launchJob(interestCalculationJob, "interestCalculationJob");
     }
 
     @PostMapping("/jobs/statement-generation")
     public ResponseEntity<Map<String, String>> runStatementGeneration() throws Exception {
+        return launchJob(statementGenerationJob, "statementGenerationJob");
+    }
+
+    private ResponseEntity<Map<String, String>> launchJob(Job job, String jobName) throws Exception {
         JobParameters params = new JobParametersBuilder()
                 .addLong("time", System.currentTimeMillis())
                 .toJobParameters();
-        jobLauncher.run(statementGenerationJob, params);
-        return ResponseEntity.ok(Map.of("status", "Job started: statementGenerationJob"));
+        JobExecution execution = jobLauncher.run(job, params);
+        String executionId = String.valueOf(execution.getId());
+        if (execution.getStatus() == BatchStatus.FAILED) {
+            return ResponseEntity.internalServerError().body(
+                    Map.of("status", "FAILED", "job", jobName, "executionId", executionId));
+        }
+        return ResponseEntity.ok(Map.of("status", "COMPLETED", "job", jobName, "executionId", executionId));
     }
 }
