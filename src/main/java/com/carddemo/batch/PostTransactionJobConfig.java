@@ -11,15 +11,16 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.data.RepositoryItemReader;
-import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.util.Map;
+import java.util.Iterator;
 
 @Configuration
 public class PostTransactionJobConfig {
@@ -50,7 +51,7 @@ public class PostTransactionJobConfig {
     }
 
     @Bean
-    public Step postTransactionStep(RepositoryItemReader<Transaction> transactionReader,
+    public Step postTransactionStep(ItemReader<Transaction> transactionReader,
                                     ItemProcessor<Transaction, Transaction> postTransactionProcessor,
                                     ItemWriter<Transaction> postTransactionWriter) {
         return new StepBuilder("postTransactionStep", jobRepository)
@@ -62,14 +63,26 @@ public class PostTransactionJobConfig {
     }
 
     @Bean
-    public RepositoryItemReader<Transaction> transactionReader() {
-        return new RepositoryItemReaderBuilder<Transaction>()
-                .name("transactionReader")
-                .repository(transactionRepository)
-                .methodName("findByPostedFalse")
-                .sorts(Map.of("tranId", Sort.Direction.ASC))
-                .pageSize(100)
-                .build();
+    public ItemReader<Transaction> transactionReader() {
+        // Custom reader that always fetches page 0 of unposted transactions.
+        // Since the writer marks items as posted=true, they drop out of the result set,
+        // so the next batch of unposted items is always at page 0.
+        return new ItemReader<>() {
+            private Iterator<Transaction> currentBatch = null;
+
+            @Override
+            public Transaction read() {
+                if (currentBatch == null || !currentBatch.hasNext()) {
+                    Page<Transaction> page = transactionRepository.findByPostedFalse(
+                            PageRequest.of(0, 100, Sort.by("tranId").ascending()));
+                    if (page.isEmpty()) {
+                        return null;
+                    }
+                    currentBatch = page.getContent().iterator();
+                }
+                return currentBatch.hasNext() ? currentBatch.next() : null;
+            }
+        };
     }
 
     @Bean

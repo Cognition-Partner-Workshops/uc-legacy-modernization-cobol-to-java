@@ -31,10 +31,10 @@ INSERT INTO card_xref (card_num, cust_id, acct_id) VALUES
 ('0927987108636232', 2, 2),
 ('0982496213629795', 1, 1);
 
--- Transactions (from DAILYTRAN VSAM)
+-- Transactions (from DAILYTRAN VSAM, card_nums aligned to seeded card_xref entries)
 INSERT INTO transactions (tran_id, tran_type_cd, tran_cat_cd, tran_source, tran_desc, tran_amt, merchant_id, merchant_name, merchant_city, merchant_zip, card_num, orig_ts, proc_ts) VALUES
-('0000000000683580', '01', 1, 'POS TERM', 'Purchase at Abshire-Lowe', 504.78, 800000000, 'Abshire-Lowe', 'North Enoshaven', '72112', '4859452612877065', '2022-06-10 19:27:53.000000', NULL),
+('0000000000683580', '01', 1, 'POS TERM', 'Purchase at Abshire-Lowe', 504.78, 800000000, 'Abshire-Lowe', 'North Enoshaven', '72112', '0982496213629795', '2022-06-10 19:27:53.000000', NULL),
 ('0000000001774260', '03', 1, 'OPERATOR', 'Return item at Nitzsche, Nicolas and Lowe', -919.00, 800000000, 'Nitzsche, Nicolas and Lowe', 'Fidelshire', '53378', '0927987108636232', '2022-06-10 19:27:53.000000', NULL),
-('0000000006292564', '01', 1, 'POS TERM', 'Purchase at Ernser, Roob and Gleason', 67.88, 800000000, 'Ernser, Roob and Gleason', 'North Makenziemouth', '78487-7965', '6009619150674526', '2022-06-10 19:27:53.000000', NULL),
-('0000000009101861', '01', 1, 'POS TERM', 'Purchase at Guann LLC', 281.78, 800000000, 'Guann LLC', 'South Lynn', '51508-9166', '8040580410348680', '2022-06-10 19:27:53.000000', NULL),
-('0000000010142252', '01', 1, 'POS TERM', 'Purchase at Kertzmann-Schoen', 454.65, 800000000, 'Kertzmann-Schoen', 'East Eulahstad', '98754-1089', '5656830544981216', '2022-06-10 19:27:53.000000', NULL);
+('0000000006292564', '01', 1, 'POS TERM', 'Purchase at Ernser, Roob and Gleason', 67.88, 800000000, 'Ernser, Roob and Gleason', 'North Makenziemouth', '78487-7965', '0683586198171516', '2022-06-10 19:27:53.000000', NULL),
+('0000000009101861', '01', 1, 'POS TERM', 'Purchase at Guann LLC', 281.78, 800000000, 'Guann LLC', 'South Lynn', '51508-9166', '0923877193247330', '2022-06-10 19:27:53.000000', NULL),
+('0000000010142252', '01', 1, 'POS TERM', 'Purchase at Kertzmann-Schoen', 454.65, 800000000, 'Kertzmann-Schoen', 'East Eulahstad', '98754-1089', '0500024453765740', '2022-06-10 19:27:53.000000', NULL);
