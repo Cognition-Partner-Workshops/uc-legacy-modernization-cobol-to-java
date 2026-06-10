@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
@@ -57,6 +58,10 @@ public class Account {
     @Column(name = "group_id", length = 10)
     private String groupId;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     public Account() {}
 
     public long getAcctId() { return acctId; }
@@ -94,6 +99,9 @@ public class Account {
 
     public String getGroupId() { return groupId; }
     public void setGroupId(String groupId) { this.groupId = groupId; }
+
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
 
     @Override
     public boolean equals(Object o) {

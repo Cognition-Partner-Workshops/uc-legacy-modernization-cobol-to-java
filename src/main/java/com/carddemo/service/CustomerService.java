@@ -30,6 +30,9 @@ public class CustomerService {
 
     @Transactional
     public Customer create(Customer customer) {
+        if (customer.getCustId() != 0 && customerRepository.existsById(customer.getCustId())) {
+            throw new IllegalArgumentException("Customer already exists with id: " + customer.getCustId());
+        }
         return customerRepository.save(customer);
     }
 
