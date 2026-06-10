@@ -37,12 +37,12 @@ public class CardController {
         return cardService.findByCardNum(cardNum);
     }
 
-    @GetMapping(params = "custId")
+    @GetMapping(params = {"custId", "!acctId"})
     public List<CardXref> getCardsByCustomer(@RequestParam long custId) {
         return cardService.findByCustomerId(custId);
     }
 
-    @GetMapping(params = "acctId")
+    @GetMapping(params = {"acctId", "!custId"})
     public List<CardXref> getCardsByAccount(@RequestParam long acctId) {
         return cardService.findByAccountId(acctId);
     }
