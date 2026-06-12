@@ -8,10 +8,12 @@ import com.cardemo.auth.entity.User.UserType;
 import com.cardemo.auth.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
@@ -34,6 +36,7 @@ public class UserService {
         return UserResponse.from(user);
     }
 
+    @Transactional
     public UserResponse createUser(CreateUserRequest request) {
         if (userRepository.existsByUserId(request.userId())) {
             throw new UserAlreadyExistsException("User already exists: " + request.userId());
@@ -51,6 +54,7 @@ public class UserService {
         return UserResponse.from(saved);
     }
 
+    @Transactional
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
@@ -72,6 +76,7 @@ public class UserService {
         return UserResponse.from(saved);
     }
 
+    @Transactional
     public void deleteUser(String userId) {
         if (!userRepository.existsByUserId(userId)) {
             throw new UserNotFoundException("User not found: " + userId);

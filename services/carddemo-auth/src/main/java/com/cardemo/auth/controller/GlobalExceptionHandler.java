@@ -3,6 +3,7 @@ package com.cardemo.auth.controller;
 import com.cardemo.auth.service.AuthService.AuthenticationException;
 import com.cardemo.auth.service.UserService.UserAlreadyExistsException;
 import com.cardemo.auth.service.UserService.UserNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,6 +31,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "Resource conflict"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
