@@ -55,16 +55,16 @@ public class UserService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
 
-        if (request.firstName() != null) {
+        if (request.firstName() != null && !request.firstName().isBlank()) {
             user.setFirstName(request.firstName());
         }
-        if (request.lastName() != null) {
+        if (request.lastName() != null && !request.lastName().isBlank()) {
             user.setLastName(request.lastName());
         }
-        if (request.password() != null) {
+        if (request.password() != null && !request.password().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.password()));
         }
-        if (request.userType() != null) {
+        if (request.userType() != null && !request.userType().isBlank()) {
             user.setUserType(UserType.valueOf(request.userType()));
         }
 
