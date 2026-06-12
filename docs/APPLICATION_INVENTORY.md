@@ -8,19 +8,19 @@
 
 | Artifact Type         | Count |
 |:----------------------|------:|
-| COBOL Programs (Core) |    30 |
+| COBOL Programs (Core) |    31 |
 | COBOL Programs (Opt.) |    13 |
 | Copybooks (Core)      |    30 |
-| Copybooks (Optional)  |    13 |
+| Copybooks (Optional)  |    11 |
 | BMS Maps (Core)       |    17 |
 | BMS Maps (Optional)   |     4 |
-| BMS Copybooks         |    19 |
-| JCL Jobs (Core)       |    34 |
+| BMS Copybooks         |    21 |
+| JCL Jobs (Core)       |    38 |
 | JCL Jobs (Optional)   |     8 |
 | Assembler Modules     |     2 |
 | Procedures (PROC)     |     2 |
 | Scheduler Definitions |     2 |
-| **Total**             | **174** |
+| **Total**             | **179** |
 
 ---
 
