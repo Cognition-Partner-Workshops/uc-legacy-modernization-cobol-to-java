@@ -8,17 +8,18 @@
 CardDemo is a credit-card management system delivered as two execution surfaces over a shared VSAM data store:
 
 - **Online (CICS)** — ~25 pseudo-conversational COBOL programs driven by BMS 3270 maps, navigated via `EXEC CICS XCTL` and a shared `COMMAREA` (`COCOM01Y`). Entry point is the signon transaction `CC00` (`COSGN00C`).
-- **Batch (JCL)** — ~38 jobs orchestrated by Control-M / CA-7 (`app/scheduler/CardDemo.controlm`, `CardDemo.ca7`). Posting (`CBTRN02C`), interest (`CBACT04C`), statements (`CBSTM03A`) and reporting (`CBTRN03C`) run as a nightly stream.
+- **Batch (JCL)** — ~46 jobs orchestrated by Control-M / CA-7 (`app/scheduler/CardDemo.controlm`, `CardDemo.ca7`). Posting (`CBTRN02C`), interest (`CBACT04C`), statements (`CBSTM03A`) and reporting (`CBTRN03C`) run as a nightly stream.
 - **Optional modules** — Authorizations (IMS DB + DB2 + IBM MQ), Transaction-Type management (DB2), and account/date inquiry over MQ.
 
 ### Source inventory (counts)
 
 | Artifact | Count | Location |
 |:--|--:|:--|
-| COBOL programs (`.cbl`/`.CBL`) | 39 | `app/cbl`, `app/app-*/cbl` |
-| Copybooks (`.cpy`) | 41 | `app/cpy` |
-| JCL jobs | 38 | `app/jcl`, `app/app-*/jcl` |
+| COBOL programs (`.cbl`/`.CBL`) | 44 | `app/cbl`, `app/app-*/cbl` |
+| Copybooks (`.cpy`/`.CPY`) | 62 | `app/cpy`, `app/cpy-bms`, `app/app-*/cpy` (incl. ~17 BMS field copybooks) |
+| JCL jobs (`.jcl`/`.JCL`) | 46 | `app/jcl`, `app/app-*/jcl` |
 | BMS maps | 21 | `app/bms` |
+| Assembler (`.asm`) | 2 | `app/asm` (`COBDATFT`, `MVSWAIT`) |
 | DB2 DDL/DCL | 9 | `app/app-*/ddl`, `app/app-*/dcl` |
 
 ### Persistence model (primary VSAM stores)
@@ -165,15 +166,15 @@ Each area is scored on the legacy traits that drive strategy choice. Recommendat
 **Recommendation: Rewrite** as small REST/event endpoints once Account is migrated; retire MQ-specific plumbing.
 
 ### 3.11 Branch Migration / Export-Import & Utilities
-**Programs:** `CBEXPORT`/`CBIMPORT` (`CVEXPORT`), date utils `CSUTLDTC`/`COBDATFT`, timer `COBSWAIT`/`MVSWAIT`
+**COBOL programs:** `CBEXPORT`/`CBIMPORT` (`CVEXPORT`), date validation `CSUTLDTC`, timer driver `COBSWAIT` · **Assembler modules:** `COBDATFT` (date-format conversion), `MVSWAIT` (timer control) — these live in `app/asm`, not COBOL.
 
-- `CBEXPORT`/`CBIMPORT` are data-movement tools; date/timer utilities are infrastructure.
+- `CBEXPORT`/`CBIMPORT` are data-movement tools; the date/timer utilities are infrastructure. Note the two **assembler** modules require a different migration approach than COBOL transpilation.
 
-**Recommendation: Rewrite/retire.** Replace export/import with standard ETL or the migration tooling itself; replace date utilities with `java.time`; drop mainframe timer waits (scheduler-native in the new platform).
+**Recommendation: Rewrite/retire.** Replace export/import with standard ETL or the migration tooling itself; replace date utilities with `java.time`; drop the assembler timer/date modules (`MVSWAIT`, `COBDATFT`) entirely — their behavior is provided natively by the JVM and the new scheduler.
 
 ## 4. Strategy Summary Matrix
 
-The final column references the execution **phase** numbers defined in `CUTOVER_PLAN.md` (Phases 0–8) so the two documents stay 1:1. (Those phases roll up into delivery Waves A–D in `CUTOVER_PLAN.md` §5.)
+The final column references the execution **phase** numbers defined in `CUTOVER_PLAN.md` (Phases 0–8) so the two documents stay 1:1. (Those phases roll up into delivery Waves A–D in `CUTOVER_PLAN.md` §5.) This matrix scores risk **per functional area**; the `CUTOVER_PLAN.md` phase table scores risk **per phase**, taking the *highest-risk area* in a phase — so where a phase bundles multiple areas (e.g. Phase 4 = Card + Account, Phase 6 = Billing + Authorization), its phase-level rating equals the riskiest member (Account → Med–High; Authorization → High).
 
 | Functional area | Recommended strategy | Migration risk | Cutover phase |
 |:--|:--|:--|:--|

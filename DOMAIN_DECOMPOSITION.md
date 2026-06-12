@@ -101,8 +101,8 @@ The monolith integrates **through shared files**, not interfaces. The decomposit
 - **Notes:** Already has an async (MQ) boundary — the cleanest existing seam in the whole system.
 
 ### BC-9 — Platform / Shared Kernel
-- **Responsibility:** cross-cutting utilities — date validation/conversion (`CSUTLDTC`, `COBDATFT`), timer waits (`COBSWAIT`/`MVSWAIT`), branch export/import (`CBEXPORT`/`CBIMPORT`, `CVEXPORT`), and the shared `COMMAREA` (`COCOM01Y`).
-- **Notes:** Not a business domain. Decompose into shared libraries (`java.time`, scheduler-native waits) and migration tooling; **do not** let `COCOM01Y` leak into new service contracts.
+- **Responsibility:** cross-cutting utilities — COBOL date validation (`CSUTLDTC`), COBOL timer driver (`COBSWAIT`), **assembler** modules `COBDATFT` (date-format conversion) and `MVSWAIT` (timer control) in `app/asm`, branch export/import (`CBEXPORT`/`CBIMPORT`, `CVEXPORT`), and the shared `COMMAREA` (`COCOM01Y`).
+- **Notes:** Not a business domain. Decompose into shared libraries (`java.time`, scheduler-native waits) and migration tooling; **do not** let `COCOM01Y` leak into new service contracts. The two assembler modules are not COBOL and aren't candidates for COBOL→Java transpilation — retire them and rely on JVM/scheduler-native equivalents.
 
 ## 4. Extraction Seam Analysis
 

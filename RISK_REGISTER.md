@@ -81,7 +81,7 @@
 - Treat as its own phase (CP Phase 6) with extra SME time.
 
 ### R9 — Batch scheduling parity *(Medium)*
-**Description:** ~38 JCL jobs run as an ordered stream under Control-M/CA-7 (`app/scheduler/CardDemo.controlm`, `.ca7`) with file-lock wrap jobs (CLOSEFIL/OPENFIL) and GDG versioning. Re-expressing dependencies on a new scheduler can drop ordering constraints.
+**Description:** ~46 JCL jobs run as an ordered stream under Control-M/CA-7 (`app/scheduler/CardDemo.controlm`, `.ca7`) with file-lock wrap jobs (CLOSEFIL/OPENFIL) and GDG versioning. Re-expressing dependencies on a new scheduler can drop ordering constraints.
 **Mitigations:**
 - Reverse-engineer the dependency DAG from the scheduler definitions; encode explicitly in the new orchestrator.
 - Replace CICS file-lock wrap pattern and mainframe timer waits (`COBSWAIT`/`MVSWAIT`) with platform-native concurrency controls.

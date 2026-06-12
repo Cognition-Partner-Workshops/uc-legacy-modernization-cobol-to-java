@@ -24,15 +24,17 @@
 
 ## 3. Phase Sequence (lowest → highest risk)
 
+The **Risk** column is per phase and equals the highest-risk functional area bundled into that phase (per-area ratings live in `MODERNIZATION_BLUEPRINT.md` §4).
+
 | Phase | Context(s) | Strategy | Risk | Why here |
 |:--|:--|:--|:--|:--|
 | 0 | Foundation/bridge | — | — | Enables everything |
-| 1 | Identity & Access (BC-1) | Rewrite (gateway) | Low | Thin logic; becomes the strangler front door |
+| 1 | Identity & Access (BC-1) | Rewrite (gateway) | Low–Med | Thin logic; becomes the strangler front door |
 | 2 | Reference Data (BC-6) | Refactor→Rewrite | Low | High fan-in; unblocks all consumers; DB2 DDL already exists |
 | 3 | Customer (BC-2) | Refactor | Low–Med | Near-pure master data; mostly reads downstream |
-| 4 | Card + XREF (BC-4) & Account (BC-3) | Refactor | Med–High | Must be paired — they share the XREF join and balance edits |
+| 4 | Card + XREF (BC-4) & Account (BC-3) | Refactor | Med–High | Must be paired — they share the XREF join and balance edits (Account drives the rating) |
 | 5 | Transaction capture/inquiry (BC-5) | Strangler + Rewrite API | Medium | Producer of DALYTRAN; bridge keeps posting fed |
-| 6 | Billing/Statements/Reporting + Authorization (BC-7 read paths, BC-8) | Rewrite / Strangler | Med–High | Output + the MQ-seam auth module |
+| 6 | Billing/Statements/Reporting + Authorization (BC-7 read paths, BC-8) | Rewrite / Strangler | High | Output + the MQ-seam auth module (Authorization drives the rating) |
 | 7 | **Posting & Interest core (BC-7 write paths)** | Refactor + parity | **High** | Money math; co-writes account balances; migrate last |
 | 8 | Decommission | — | Med | Retire CICS/VSAM/IMS/MQ + bridges |
 
