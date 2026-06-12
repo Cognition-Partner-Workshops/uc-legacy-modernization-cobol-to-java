@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private static final String DUMMY_PASSWORD_HASH =
-            "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012";
+            "$2a$10$rhHOQO1x/QuoVnvXOo5CXOo.U7K9lWWmqF12O2JrryMXHibr5/dE6";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
