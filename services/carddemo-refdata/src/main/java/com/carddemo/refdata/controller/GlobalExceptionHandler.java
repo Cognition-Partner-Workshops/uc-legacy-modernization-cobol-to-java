@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.carddemo.refdata.service.DuplicateEntityException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -27,5 +28,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleDuplicate(DuplicateEntityException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", ex.getMessage() != null ? ex.getMessage() : "Conflict"));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "Entity already exists or constraint violation"));
     }
 }
