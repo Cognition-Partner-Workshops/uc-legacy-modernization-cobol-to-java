@@ -59,6 +59,7 @@ class AuthServiceTest {
     @Test
     void authenticate_withInvalidUserId_throwsException() {
         when(userRepository.findByUserId("INVALID")).thenReturn(Optional.empty());
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
         assertThrows(AuthenticationException.class,
                 () -> authService.authenticate(new LoginRequest("INVALID", "password")));

@@ -19,5 +19,5 @@ server:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:default-dev-secret-key-change-in-production-must-be-at-least-256-bits}
+    secret: ${JWT_SECRET}
     expiration-ms: 86400000

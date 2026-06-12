@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
+    private static final String DUMMY_PASSWORD_HASH =
+            "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012";
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
@@ -24,8 +27,13 @@ public class AuthService {
     }
 
     public LoginResponse authenticate(LoginRequest request) {
-        User user = userRepository.findByUserId(request.userId())
-                .orElseThrow(() -> new AuthenticationException("Invalid credentials"));
+        User user = userRepository.findByUserId(request.userId()).orElse(null);
+
+        if (user == null) {
+            // Perform dummy BCrypt comparison to prevent timing-based user enumeration
+            passwordEncoder.matches(request.password(), DUMMY_PASSWORD_HASH);
+            throw new AuthenticationException("Invalid credentials");
+        }
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new AuthenticationException("Invalid credentials");
