@@ -65,7 +65,9 @@ Each area is scored on the legacy traits that drive strategy choice. Recommendat
 **Recommendation: Rewrite**, delivered early as a shared auth service / gateway that also becomes the strangler front door. Migrate `USRSEC` users into an identity store with forced password reset.
 
 ### 3.2 Reference Data (Transaction Types, Categories, Disclosure Groups)
-**Programs:** `COTRTLIC`/`COTRTUPC`/`COBTUPDT` (DB2 module) · **Data:** `TRANTYPE`, `TRANCATG`, `DISCGRP`, `TCATBALF`
+**Programs:** `COTRTLIC`/`COTRTUPC`/`COBTUPDT` (DB2 module) · **Data:** `TRANTYPE`, `TRANCATG`, `DISCGRP`
+
+> Note: `TCATBALF` (category balances, `CVTRA01Y`) is **not** reference data — it is owned by Billing/Interest/Posting (see §3.7 and `DOMAIN_DECOMPOSITION.md` BC-7). It is read/written only by `CBTRN02C` and `CBACT04C`.
 
 - Already partly relational (DB2 DDL exists: `TRNTYPE.ddl`, `TRNTYCAT.ddl`). Low business logic, high fan-in (read by posting, interest, reporting).
 - Small, stable, self-contained — ideal "first real slice."
@@ -171,19 +173,21 @@ Each area is scored on the legacy traits that drive strategy choice. Recommendat
 
 ## 4. Strategy Summary Matrix
 
-| Functional area | Recommended strategy | Migration risk | Suggested wave |
+The final column references the execution **phase** numbers defined in `CUTOVER_PLAN.md` (Phases 0–8) so the two documents stay 1:1. (Those phases roll up into delivery Waves A–D in `CUTOVER_PLAN.md` §5.)
+
+| Functional area | Recommended strategy | Migration risk | Cutover phase |
 |:--|:--|:--|:--|
 | Security & Sign-on | **Rewrite** (auth gateway / strangler front door) | Low–Med | 1 |
-| Reference Data | **Refactor → Rewrite** (CRUD service) | Low | 1 |
-| Customer | **Refactor** (master data + PII controls) | Low–Med | 2 |
-| Card (+ XREF seam) | **Refactor** | Medium | 3 |
-| Account | **Refactor (assisted)** | Med–High | 3 |
-| Transaction capture/inquiry | **Strangler + Rewrite API** | Medium | 4 |
-| Billing/Statements/Reporting | **Rewrite** | Medium | 4 |
-| Authorizations (IMS/DB2/MQ) | **Strangler + Rewrite** | High | 5 |
-| MQ inquiry endpoints | **Rewrite** | Low | 5 |
-| Posting & Interest (batch core) | **Refactor + parity harness** | **High** | 6 (last) |
-| Export/Import & utilities | **Rewrite / retire** | Low | spread across waves |
+| Reference Data | **Refactor → Rewrite** (CRUD service) | Low | 2 |
+| Customer | **Refactor** (master data + PII controls) | Low–Med | 3 |
+| Card (+ XREF seam) | **Refactor** | Medium | 4 |
+| Account | **Refactor (assisted)** | Med–High | 4 |
+| Transaction capture/inquiry | **Strangler + Rewrite API** | Medium | 5 |
+| Billing/Statements/Reporting | **Rewrite** | Medium | 6 |
+| Authorizations (IMS/DB2/MQ) | **Strangler + Rewrite** | High | 6 |
+| MQ inquiry endpoints | **Rewrite** | Low | 6 |
+| Posting & Interest (batch core) | **Refactor + parity harness** | **High** | 7 (last) |
+| Export/Import & utilities | **Rewrite / retire** | Low | spread across phases |
 
 ## 5. Cross-Cutting Recommendations
 
