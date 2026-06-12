@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,7 +68,7 @@ class TransactionTypeServiceTest {
     void create_duplicate_throws() {
         TransactionType tt = new TransactionType("SA", "Sale");
         when(repository.existsById("SA")).thenReturn(true);
-        assertThrows(IllegalArgumentException.class, () -> service.create(tt));
+        assertThrows(DuplicateEntityException.class, () -> service.create(tt));
         verify(repository, never()).save(any());
     }
 

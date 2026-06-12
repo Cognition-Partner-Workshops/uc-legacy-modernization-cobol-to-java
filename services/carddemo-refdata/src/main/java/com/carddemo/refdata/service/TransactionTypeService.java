@@ -27,7 +27,7 @@ public class TransactionTypeService {
 
     public TransactionType create(TransactionType entity) {
         if (repository.existsById(entity.getTypeCode())) {
-            throw new IllegalArgumentException("Transaction type already exists: " + entity.getTypeCode());
+            throw new DuplicateEntityException("Transaction type already exists: " + entity.getTypeCode());
         }
         return repository.save(entity);
     }

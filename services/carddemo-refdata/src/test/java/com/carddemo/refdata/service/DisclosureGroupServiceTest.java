@@ -69,7 +69,7 @@ class DisclosureGroupServiceTest {
     void create_duplicate_throws() {
         DisclosureGroup dg = new DisclosureGroup("GRP001", "SA", 1001, new BigDecimal("12.50"));
         when(repository.existsById(any())).thenReturn(true);
-        assertThrows(IllegalArgumentException.class, () -> service.create(dg));
+        assertThrows(DuplicateEntityException.class, () -> service.create(dg));
         verify(repository, never()).save(any());
     }
 

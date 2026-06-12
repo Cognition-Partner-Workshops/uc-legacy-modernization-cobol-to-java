@@ -29,7 +29,7 @@ public class TransactionCategoryService {
     public TransactionCategory create(TransactionCategory entity) {
         TransactionCategoryId id = new TransactionCategoryId(entity.getTypeCode(), entity.getCategoryCode());
         if (repository.existsById(id)) {
-            throw new IllegalArgumentException(
+            throw new DuplicateEntityException(
                     "Transaction category already exists: " + entity.getTypeCode() + "/" + entity.getCategoryCode());
         }
         return repository.save(entity);

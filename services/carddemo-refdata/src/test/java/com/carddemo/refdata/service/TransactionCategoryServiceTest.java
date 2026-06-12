@@ -68,7 +68,7 @@ class TransactionCategoryServiceTest {
     void create_duplicate_throws() {
         TransactionCategory cat = new TransactionCategory("SA", 1001, "Online Sale");
         when(repository.existsById(any())).thenReturn(true);
-        assertThrows(IllegalArgumentException.class, () -> service.create(cat));
+        assertThrows(DuplicateEntityException.class, () -> service.create(cat));
         verify(repository, never()).save(any());
     }
 

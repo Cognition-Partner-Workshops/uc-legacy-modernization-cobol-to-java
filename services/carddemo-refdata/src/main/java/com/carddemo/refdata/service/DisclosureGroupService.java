@@ -32,7 +32,7 @@ public class DisclosureGroupService {
                 entity.getTransactionTypeCode(),
                 entity.getTransactionCategoryCode());
         if (repository.existsById(id)) {
-            throw new IllegalArgumentException("Disclosure group already exists: "
+            throw new DuplicateEntityException("Disclosure group already exists: "
                     + entity.getAccountGroupId() + "/" + entity.getTransactionTypeCode()
                     + "/" + entity.getTransactionCategoryCode());
         }
