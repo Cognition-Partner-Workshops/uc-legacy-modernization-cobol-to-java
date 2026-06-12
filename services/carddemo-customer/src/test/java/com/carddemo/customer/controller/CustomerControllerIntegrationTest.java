@@ -51,7 +51,7 @@ class CustomerControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].accountId", is(10000000001L)))
-                .andExpect(jsonPath("$[0].cardNumber", is("4111111111111111")));
+                .andExpect(jsonPath("$[0].cardNumberMasked", is("************1111")));
     }
 
     @Test

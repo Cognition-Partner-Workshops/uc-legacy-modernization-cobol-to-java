@@ -2,18 +2,26 @@ package com.carddemo.customer.dto;
 
 /**
  * DTO representing a linked account via the XREF cross-reference.
+ * Card number is masked to show only the last 4 digits (PCI-DSS compliance).
  */
 public class AccountXrefDto {
 
     private Long accountId;
-    private String cardNumber;
+    private String cardNumberMasked;
 
     public AccountXrefDto() {
     }
 
     public AccountXrefDto(Long accountId, String cardNumber) {
         this.accountId = accountId;
-        this.cardNumber = cardNumber;
+        this.cardNumberMasked = maskCardNumber(cardNumber);
+    }
+
+    public static String maskCardNumber(String cardNumber) {
+        if (cardNumber == null || cardNumber.length() < 4) {
+            return "************";
+        }
+        return "************" + cardNumber.substring(cardNumber.length() - 4);
     }
 
     public Long getAccountId() {
@@ -24,11 +32,11 @@ public class AccountXrefDto {
         this.accountId = accountId;
     }
 
-    public String getCardNumber() {
-        return cardNumber;
+    public String getCardNumberMasked() {
+        return cardNumberMasked;
     }
 
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
+    public void setCardNumberMasked(String cardNumberMasked) {
+        this.cardNumberMasked = cardNumberMasked;
     }
 }
