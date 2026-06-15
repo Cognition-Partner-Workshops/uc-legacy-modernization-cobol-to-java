@@ -118,7 +118,18 @@ The COBOL program contains several hardcoded numeric constants (1005.00, 1525.00
 named constants in the Java code. Their business meaning is undocumented in the
 original source.
 
-### 6. Error Handling
+### 6. Debit Substitution — Intentional Behavioral Fix
+
+The COBOL `1300-POPUL-ACCT-RECORD` only moves a value to `OUT-ACCT-CURR-CYC-DEBIT` when
+the input debit equals zero (substituting 2525.00). There is no `ELSE` branch — when the
+debit is non-zero, the output field retains whatever stale/undefined value was left in
+the FD buffer from the previous WRITE. This is a latent bug in the original COBOL.
+
+The Java translation **always** sets the output debit: either the actual non-zero value
+or the 2525.00 substitution. This is an intentional correctness improvement. All records
+in the test fixture have zero debits, so this divergence is not exercised by tests.
+
+### 7. Error Handling
 
 The COBOL program calls `CEE3ABD` (Language Environment abend) on I/O errors. The Java
 version throws `IOException` which propagates to the caller. A production system would

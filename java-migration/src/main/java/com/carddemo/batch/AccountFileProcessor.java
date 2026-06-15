@@ -84,7 +84,7 @@ public class AccountFileProcessor {
         System.out.println("ACCT-ACTIVE-STATUS      :" + record.acctActiveStatus());
         System.out.println("ACCT-CURR-BAL           :" + record.acctCurrBal());
         System.out.println("ACCT-CREDIT-LIMIT       :" + record.acctCreditLimit());
-        System.out.println("ACCT-CASH-CREDIT-LIMIT  :" + record.acctCurrCycCredit());
+        System.out.println("ACCT-CASH-CREDIT-LIMIT  :" + record.acctCashCreditLimit());
         System.out.println("ACCT-OPEN-DATE          :" + record.acctOpenDate());
         System.out.println("ACCT-EXPIRAION-DATE     :" + record.acctExpirationDate());
         System.out.println("ACCT-REISSUE-DATE       :" + record.acctReissueDate());
