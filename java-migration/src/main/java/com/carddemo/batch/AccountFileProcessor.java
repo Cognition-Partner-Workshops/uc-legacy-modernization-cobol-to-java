@@ -13,7 +13,7 @@ import com.carddemo.model.VbrcRecord2;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.BufferedWriter;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -173,34 +173,34 @@ public class AccountFileProcessor {
     }
 
     private void writeOutputFile() throws IOException {
-        try (final PrintWriter writer = new PrintWriter(Files.newBufferedWriter(outputFile))) {
+        try (final BufferedWriter writer = Files.newBufferedWriter(outputFile)) {
             for (final OutputAccountRecord rec : outputRecords) {
-                writer.print(CobolFieldParser.formatUnsignedNumeric(rec.acctId(), 11));
-                writer.print(CobolFieldParser.formatAlphanumeric(rec.acctActiveStatus(), 1));
-                writer.print(CobolFieldParser.formatSignedDecimal(rec.acctCurrBal(), 12, 2));
-                writer.print(CobolFieldParser.formatSignedDecimal(rec.acctCreditLimit(), 12, 2));
-                writer.print(CobolFieldParser.formatSignedDecimal(rec.acctCashCreditLimit(), 12, 2));
-                writer.print(CobolFieldParser.formatAlphanumeric(rec.acctOpenDate(), 10));
-                writer.print(CobolFieldParser.formatAlphanumeric(rec.acctExpirationDate(), 10));
-                writer.print(CobolFieldParser.formatAlphanumeric(rec.acctReissueDate(), 10));
-                writer.print(CobolFieldParser.formatSignedDecimal(rec.acctCurrCycCredit(), 12, 2));
-                writer.print(formatComp3AsHex(rec.acctCurrCycDebit(), 12, 2));
-                writer.print(CobolFieldParser.formatAlphanumeric(rec.acctGroupId(), 10));
-                writer.println();
+                writer.write(CobolFieldParser.formatUnsignedNumeric(rec.acctId(), 11));
+                writer.write(CobolFieldParser.formatAlphanumeric(rec.acctActiveStatus(), 1));
+                writer.write(CobolFieldParser.formatSignedDecimal(rec.acctCurrBal(), 12, 2));
+                writer.write(CobolFieldParser.formatSignedDecimal(rec.acctCreditLimit(), 12, 2));
+                writer.write(CobolFieldParser.formatSignedDecimal(rec.acctCashCreditLimit(), 12, 2));
+                writer.write(CobolFieldParser.formatAlphanumeric(rec.acctOpenDate(), 10));
+                writer.write(CobolFieldParser.formatAlphanumeric(rec.acctExpirationDate(), 10));
+                writer.write(CobolFieldParser.formatAlphanumeric(rec.acctReissueDate(), 10));
+                writer.write(CobolFieldParser.formatSignedDecimal(rec.acctCurrCycCredit(), 12, 2));
+                writer.write(formatComp3AsHex(rec.acctCurrCycDebit(), 12, 2));
+                writer.write(CobolFieldParser.formatAlphanumeric(rec.acctGroupId(), 10));
+                writer.newLine();
             }
         }
     }
 
     private void writeArrayFile() throws IOException {
-        try (final PrintWriter writer = new PrintWriter(Files.newBufferedWriter(arrayFile))) {
+        try (final BufferedWriter writer = Files.newBufferedWriter(arrayFile)) {
             for (final ArrayRecord rec : arrayRecords) {
-                writer.print(CobolFieldParser.formatUnsignedNumeric(rec.acctId(), 11));
+                writer.write(CobolFieldParser.formatUnsignedNumeric(rec.acctId(), 11));
                 for (final ArrayEntry entry : rec.entries()) {
-                    writer.print(CobolFieldParser.formatSignedDecimal(entry.acctCurrBal(), 12, 2));
-                    writer.print(formatComp3AsHex(entry.acctCurrCycDebit(), 12, 2));
+                    writer.write(CobolFieldParser.formatSignedDecimal(entry.acctCurrBal(), 12, 2));
+                    writer.write(formatComp3AsHex(entry.acctCurrCycDebit(), 12, 2));
                 }
-                writer.print(CobolFieldParser.formatAlphanumeric("", 4));
-                writer.println();
+                writer.write(CobolFieldParser.formatAlphanumeric("", 4));
+                writer.newLine();
             }
         }
     }
