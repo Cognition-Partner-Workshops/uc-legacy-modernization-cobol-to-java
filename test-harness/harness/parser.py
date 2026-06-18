@@ -277,7 +277,10 @@ def parse_field(raw: str, field: FieldDef) -> Any:
         return raw.rstrip()
 
     if field.is_signed:
-        int_value = decode_signed_numeric(raw)
+        try:
+            int_value = decode_signed_numeric(raw)
+        except ValueError:
+            return raw.rstrip()
     else:
         try:
             int_value = float(raw)
