@@ -18,31 +18,31 @@ Each program is scored across five dimensions. Within each dimension, programs a
 
 | Rank | Program | LOC | Copybooks | I/O Ops | Logic (IF/EVAL) | Dependencies | Composite | Classification |
 |------|---------|----:|----------:|--------:|----------------:|-------------:|----------:|----------------|
-| **1** | **COACTUPC.cbl** | 4,236 | 58 | 35 | 194 | 6 (XCTL + CICS file) | **48** | Online (CICS) |
-| **2** | **COTRTLIC.cbl** | 2,098 | 12 | 57 | 131 | 3 (XCTL) | **40** | Online (CICS+DB2) |
-| **3** | **COTRTUPC.cbl** | 1,702 | 15 | 50 | 134 | 2 (SYNCPOINT) | **39** | Online (CICS+DB2) |
-| **4** | **COCRDUPC.cbl** | 1,560 | 16 | 18 | 167 | 2 (XCTL) | **36** | Online (CICS) |
-| **5** | **COCRDLIC.cbl** | 1,459 | 14 | 25 | 149 | 6 (XCTL + browse) | **35** | Online (CICS) |
-| **6** | **COPAUA0C.cbl** | 1,026 | 17 | 31 | 62 | 8 (MQ+DLI+CICS) | **34** | Online (CICS+MQ+IMS) |
-| **7** | **CBSTM03A.CBL** | 924 | 4 | 119 | 30 | 15 (CALL CBSTM03B ×13) | **33** | Batch |
-| **8** | **CBTRN02C.cbl** | 731 | 8 | 29 | 93 | 1 (CEE3ABD) | **30** | Batch |
-| **9** | **COPAUS0C.cbl** | 1,032 | 15 | 22 | 47 | 4 (DLI+CICS) | **29** | Online (CICS+IMS) |
-| **10** | **CBACT04C.cbl** | 652 | 5 | 24 | 86 | 1 (CEE3ABD) | **28** | Batch |
+| **1** | **COACTUPC.cbl** | 4,236 | 58 | 35 | 194 | 6 (XCTL + CICS file) | **44** | Online (CICS) |
+| **2** | **COTRTLIC.cbl** | 2,098 | 12 | 57 | 131 | 3 (XCTL) | **33** | Online (CICS+DB2) |
+| **3** | **COTRTUPC.cbl** | 1,702 | 15 | 50 | 134 | 2 (SYNCPOINT) | **33** | Online (CICS+DB2) |
+| **4** | **COCRDLIC.cbl** | 1,459 | 14 | 25 | 149 | 6 (XCTL + browse) | **31** | Online (CICS) |
+| **5** | **COPAUA0C.cbl** | 1,026 | 17 | 31 | 62 | 8 (MQ+DLI+CICS) | **31** | Online (CICS+MQ+IMS) |
+| **6** | **COCRDUPC.cbl** | 1,560 | 16 | 18 | 167 | 2 (XCTL) | **29** | Online (CICS) |
+| **7** | **CBSTM03A.CBL** | 924 | 4 | 119 | 30 | 15 (CALL CBSTM03B ×13) | **25** | Batch |
+| **8** | **COPAUS0C.cbl** | 1,032 | 15 | 22 | 47 | 4 (DLI+CICS) | **21** | Online (CICS+IMS) |
+| **9** | **CBTRN02C.cbl** | 731 | 8 | 29 | 93 | 1 (CEE3ABD) | **17** | Batch |
+| **10** | **CBACT04C.cbl** | 652 | 5 | 24 | 86 | 1 (CEE3ABD) | **11** | Batch |
 
 ### Detailed Dimension Rankings
 
 | Program | LOC Rank | Copy Rank | I/O Rank | Logic Rank | Deps Rank |
 |---------|---------|----------|---------|-----------|----------|
-| COACTUPC | 10 | 10 | 8 | 10 | 10 |
-| COTRTLIC | 9 | 5 | 10 | 7 | 9 |
-| COTRTUPC | 8 | 7 | 9 | 8 | 7 |
-| COCRDUPC | 7 | 8 | 5 | 9 | 7 |
-| COCRDLIC | 6 | 6 | 6 | 8 | 9 |
-| COPAUA0C | 4 | 9 | 7 | 5 | 9 |
-| CBSTM03A | 3 | 2 | 10 | 3 | 10 |
-| CBTRN02C | 2 | 4 | 7 | 6 | 4 |
-| COPAUS0C | 5 | 7 | 5 | 4 | 8 |
-| CBACT04C | 1 | 3 | 6 | 6 | 4 |
+| COACTUPC | 10 | 10 | 7 | 10 | 7 |
+| COTRTLIC | 9 | 4 | 9 | 6 | 5 |
+| COTRTUPC | 8 | 7 | 8 | 7 | 3 |
+| COCRDLIC | 6 | 5 | 4 | 8 | 8 |
+| COPAUA0C | 4 | 9 | 6 | 3 | 9 |
+| COCRDUPC | 7 | 8 | 1 | 9 | 4 |
+| CBSTM03A | 3 | 1 | 10 | 1 | 10 |
+| COPAUS0C | 5 | 6 | 2 | 2 | 6 |
+| CBTRN02C | 2 | 3 | 5 | 5 | 2 |
+| CBACT04C | 1 | 2 | 3 | 4 | 1 |
 
 ---
 

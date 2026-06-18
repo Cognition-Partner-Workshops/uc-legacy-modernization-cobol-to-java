@@ -2,7 +2,7 @@
 
 ## Overview
 
-The CardDemo estate comprises **44 COBOL programs** (30 in `app/cbl/`, 8 in `app-authorization-ims-db2-mq`, 3 in `app-transaction-type-db2`, 2 in `app-vsam-mq`) and **45 JCL jobs** (37 in `app/jcl/`, 5 in `app-authorization-ims-db2-mq/jcl`, 3 in `app-transaction-type-db2/jcl`). Programs are split between online CICS transactions and batch file-processing jobs.
+The CardDemo estate comprises **44 COBOL programs** (31 in `app/cbl/`, 8 in `app-authorization-ims-db2-mq`, 3 in `app-transaction-type-db2`, 2 in `app-vsam-mq`) and **46 JCL jobs** (38 in `app/jcl/`, 5 in `app-authorization-ims-db2-mq/jcl`, 3 in `app-transaction-type-db2/jcl`). Programs are split between online CICS transactions and batch file-processing jobs.
 
 ---
 

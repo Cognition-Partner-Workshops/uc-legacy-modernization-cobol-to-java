@@ -384,10 +384,10 @@ Programs and the copybooks they reference (COPY statements).
 | CSUTLDPY | Date validation PD | COACTUPC, COTRTUPC |
 | CSLKPCDY | Lookup codes | COACTUPC |
 | CSSETATY | Attribute template | COACTUPC, COTRTUPC |
-| CSDB2RWY | DB2 working storage | COTRTLIC, COTRTUPC |
-| CSDB2RPY | DB2 priming query | COTRTLIC, COTRTUPC |
+| CSDB2RWY | DB2 working storage (in `app-transaction-type-db2/cpy/`) | COTRTLIC, COTRTUPC |
+| CSDB2RPY | DB2 priming query (in `app-transaction-type-db2/cpy/`) | COTRTLIC, COTRTUPC |
 | CODATECN | Date conversion | CBACT01C |
-| IMSFUNCS | IMS function codes | CBPAUP0C, DBUNLDGS, PAUDBLOD, PAUDBUNL |
+| IMSFUNCS | IMS function codes (in `app-authorization-ims-db2-mq/cpy/`) | CBPAUP0C, DBUNLDGS, PAUDBLOD, PAUDBUNL |
 
 ### BMS Map Copybooks (Screen Layouts)
 
