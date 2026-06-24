@@ -98,7 +98,15 @@ function api(method, path, body) {
   };
   if (body) opts.body = JSON.stringify(body);
   return fetch(API_BASE_URL + path, opts)
-    .then(function (r) { return r.json(); })
+    .then(function (r) {
+      if (!r.ok) {
+        return r.json().catch(function () { return {}; }).then(function (errJson) {
+          var msg = (errJson && (errJson.error || errJson.message)) || ('HTTP error ' + r.status);
+          throw new Error(msg);
+        });
+      }
+      return r.json();
+    })
     .then(function (json) {
       var payload = json.body || json;
       if (payload.error) throw new Error(payload.error);
