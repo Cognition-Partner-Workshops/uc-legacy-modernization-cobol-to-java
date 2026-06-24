@@ -9,14 +9,14 @@ class DateConverterTest {
     @Test
     void convertYyyyMmDdToYyyymmdd() {
         String result = DateConverter.convert("2025-06-20", DateConverter.YYYY_MM_DD,
-                DateConverter.YYYY_MM_DD);
+                DateConverter.YYYYMMDD);
         assertEquals("20250620", result);
     }
 
     @Test
     void convertYyyymmddToYyyyMmDd() {
         String result = DateConverter.convert("20250620", DateConverter.YYYYMMDD,
-                DateConverter.YYYYMMDD);
+                DateConverter.YYYY_MM_DD);
         assertEquals("2025-06-20", result);
     }
 
@@ -24,12 +24,26 @@ class DateConverterTest {
     void convertYyyyMmDdRoundTrip() {
         String original = "2023-12-31";
         String compact = DateConverter.convert(original, DateConverter.YYYY_MM_DD,
-                DateConverter.YYYY_MM_DD);
+                DateConverter.YYYYMMDD);
         assertEquals("20231231", compact);
 
         String expanded = DateConverter.convert(compact, DateConverter.YYYYMMDD,
-                DateConverter.YYYYMMDD);
+                DateConverter.YYYY_MM_DD);
         assertEquals(original, expanded);
+    }
+
+    @Test
+    void convertSameFormat_yyyymmddToYyyymmdd() {
+        String result = DateConverter.convert("20250620", DateConverter.YYYYMMDD,
+                DateConverter.YYYYMMDD);
+        assertEquals("20250620", result);
+    }
+
+    @Test
+    void convertSameFormat_yyyyMmDdToYyyyMmDd() {
+        String result = DateConverter.convert("2025-06-20", DateConverter.YYYY_MM_DD,
+                DateConverter.YYYY_MM_DD);
+        assertEquals("2025-06-20", result);
     }
 
     @Test
@@ -48,6 +62,6 @@ class DateConverterTest {
     void shortInput_throwsException() {
         assertThrows(IllegalArgumentException.class,
                 () -> DateConverter.convert("2025", DateConverter.YYYY_MM_DD,
-                        DateConverter.YYYY_MM_DD));
+                        DateConverter.YYYYMMDD));
     }
 }

@@ -146,7 +146,7 @@ public class AccountFileProcessor {
      */
     OutAccountRecord populateOutRecord(AccountRecord acct) {
         String reissueDate = DateConverter.convert(
-                acct.reissueDate(), DateConverter.YYYY_MM_DD, DateConverter.YYYY_MM_DD);
+                acct.reissueDate(), DateConverter.YYYY_MM_DD, DateConverter.YYYYMMDD);
 
         BigDecimal cycleDebit = acct.currentCycleDebit();
         if (cycleDebit.compareTo(BigDecimal.ZERO) == 0) {

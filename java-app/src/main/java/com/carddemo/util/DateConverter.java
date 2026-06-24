@@ -20,7 +20,7 @@ public final class DateConverter {
      *
      * @param inputDate  the source date string
      * @param inputType  1 for YYYYMMDD, 2 for YYYY-MM-DD
-     * @param outputType 1 for YYYY-MM-DD, 2 for YYYYMMDD
+     * @param outputType 1 for YYYYMMDD, 2 for YYYY-MM-DD
      * @return the reformatted date string
      * @throws IllegalArgumentException on invalid type codes or unparseable input
      */
@@ -52,8 +52,8 @@ public final class DateConverter {
         }
 
         return switch (outputType) {
-            case YYYYMMDD -> yyyy + "-" + mm + "-" + dd;
-            case YYYY_MM_DD -> yyyy + mm + dd;
+            case YYYYMMDD -> yyyy + mm + dd;
+            case YYYY_MM_DD -> yyyy + "-" + mm + "-" + dd;
             default -> throw new IllegalArgumentException("Unknown output type: " + outputType);
         };
     }
