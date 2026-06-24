@@ -229,13 +229,21 @@ def _get_transaction_categories(event):
 
 
 def _post_batch_process_daily(event):
-    """Process daily batch: iterate transactions and update account balances."""
+    """Process daily batch: iterate unprocessed transactions and update account balances.
+
+    Only processes transactions where 'batch_processed' is not set.
+    Separates credits (positive amounts) from debits (negative amounts).
+    """
     txn_table = transactions_table()
     acct_table = accounts_table()
 
-    balance_updates = {}
-    scan_params = {}
+    credit_totals = {}
+    debit_totals = {}
+    scan_params = {
+        "FilterExpression": "attribute_not_exists(batch_processed)",
+    }
     total_processed = 0
+    processed_keys = []
 
     while True:
         response = txn_table.scan(**scan_params)
@@ -247,21 +255,48 @@ def _post_batch_process_daily(event):
             if not acct_id or tran_amt is None:
                 continue
             amt = Decimal(str(tran_amt))
-            balance_updates[acct_id] = balance_updates.get(acct_id, Decimal("0")) + amt
+            if amt >= 0:
+                credit_totals[acct_id] = credit_totals.get(acct_id, Decimal("0")) + amt
+            else:
+                debit_totals[acct_id] = debit_totals.get(acct_id, Decimal("0")) + abs(amt)
             total_processed += 1
+            processed_keys.append({
+                "tran_id": txn["tran_id"],
+                "tran_orig_ts": txn["tran_orig_ts"],
+            })
 
         if "LastEvaluatedKey" not in response:
             break
         scan_params["ExclusiveStartKey"] = response["LastEvaluatedKey"]
 
+    all_acct_ids = set(list(credit_totals.keys()) + list(debit_totals.keys()))
     accounts_updated = 0
-    for acct_id, total_amt in balance_updates.items():
+    for acct_id in all_acct_ids:
+        credit_amt = credit_totals.get(acct_id, Decimal("0"))
+        debit_amt = debit_totals.get(acct_id, Decimal("0"))
+        net_amt = credit_amt - debit_amt
         acct_table.update_item(
             Key={"acct_id": acct_id},
-            UpdateExpression="SET curr_bal = if_not_exists(curr_bal, :zero) + :amt, curr_cyc_debit = if_not_exists(curr_cyc_debit, :zero) + :amt",
-            ExpressionAttributeValues={":amt": total_amt, ":zero": Decimal("0")},
+            UpdateExpression=(
+                "SET curr_bal = if_not_exists(curr_bal, :zero) + :net, "
+                "curr_cyc_credit = if_not_exists(curr_cyc_credit, :zero) + :credit, "
+                "curr_cyc_debit = if_not_exists(curr_cyc_debit, :zero) + :debit"
+            ),
+            ExpressionAttributeValues={
+                ":net": net_amt,
+                ":credit": credit_amt,
+                ":debit": debit_amt,
+                ":zero": Decimal("0"),
+            },
         )
         accounts_updated += 1
+
+    for key in processed_keys:
+        txn_table.update_item(
+            Key=key,
+            UpdateExpression="SET batch_processed = :val",
+            ExpressionAttributeValues={":val": True},
+        )
 
     return _success({
         "transactions_processed": total_processed,
@@ -269,18 +304,26 @@ def _post_batch_process_daily(event):
     })
 
 
+def _count_all(table):
+    """Count all items in a table, handling pagination."""
+    total = 0
+    params = {"Select": "COUNT"}
+    while True:
+        resp = table.scan(**params)
+        total += resp["Count"]
+        if "LastEvaluatedKey" not in resp:
+            break
+        params["ExclusiveStartKey"] = resp["LastEvaluatedKey"]
+    return total
+
+
 def _get_dashboard(event):
     """Return summary stats across all tables."""
-    acct_resp = accounts_table().scan(Select="COUNT")
-    cust_resp = customers_table().scan(Select="COUNT")
-    txn_resp = transactions_table().scan(Select="COUNT")
-    card_resp = cards_table().scan(Select="COUNT")
-
     return _success({
-        "total_accounts": acct_resp["Count"],
-        "total_customers": cust_resp["Count"],
-        "total_transactions": txn_resp["Count"],
-        "total_cards": card_resp["Count"],
+        "total_accounts": _count_all(accounts_table()),
+        "total_customers": _count_all(customers_table()),
+        "total_transactions": _count_all(transactions_table()),
+        "total_cards": _count_all(cards_table()),
     })
 
 
