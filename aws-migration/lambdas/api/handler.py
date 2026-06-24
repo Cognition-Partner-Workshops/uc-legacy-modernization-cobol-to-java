@@ -233,6 +233,8 @@ def _post_batch_process_daily(event):
 
     Only processes transactions where 'batch_processed' is not set.
     Separates credits (positive amounts) from debits (negative amounts).
+    Marks transactions as processed BEFORE updating balances to prevent
+    double-counting on retry/failure.
     """
     txn_table = transactions_table()
     acct_table = accounts_table()
@@ -243,7 +245,7 @@ def _post_batch_process_daily(event):
         "FilterExpression": "attribute_not_exists(batch_processed)",
     }
     total_processed = 0
-    processed_keys = []
+    collected_txns = []
 
     while True:
         response = txn_table.scan(**scan_params)
@@ -255,19 +257,33 @@ def _post_batch_process_daily(event):
             if not acct_id or tran_amt is None:
                 continue
             amt = Decimal(str(tran_amt))
-            if amt >= 0:
-                credit_totals[acct_id] = credit_totals.get(acct_id, Decimal("0")) + amt
-            else:
-                debit_totals[acct_id] = debit_totals.get(acct_id, Decimal("0")) + abs(amt)
-            total_processed += 1
-            processed_keys.append({
-                "tran_id": txn["tran_id"],
-                "tran_orig_ts": txn["tran_orig_ts"],
+            collected_txns.append({
+                "key": {"tran_id": txn["tran_id"], "tran_orig_ts": txn["tran_orig_ts"]},
+                "acct_id": acct_id,
+                "amt": amt,
             })
 
         if "LastEvaluatedKey" not in response:
             break
         scan_params["ExclusiveStartKey"] = response["LastEvaluatedKey"]
+
+    # Phase 1: Mark all transactions as processed (prevents double-counting on retry)
+    for txn_info in collected_txns:
+        txn_table.update_item(
+            Key=txn_info["key"],
+            UpdateExpression="SET batch_processed = :val",
+            ExpressionAttributeValues={":val": True},
+        )
+
+    # Phase 2: Aggregate and update account balances
+    for txn_info in collected_txns:
+        acct_id = txn_info["acct_id"]
+        amt = txn_info["amt"]
+        if amt >= 0:
+            credit_totals[acct_id] = credit_totals.get(acct_id, Decimal("0")) + amt
+        else:
+            debit_totals[acct_id] = debit_totals.get(acct_id, Decimal("0")) + abs(amt)
+        total_processed += 1
 
     all_acct_ids = set(list(credit_totals.keys()) + list(debit_totals.keys()))
     accounts_updated = 0
@@ -290,13 +306,6 @@ def _post_batch_process_daily(event):
             },
         )
         accounts_updated += 1
-
-    for key in processed_keys:
-        txn_table.update_item(
-            Key=key,
-            UpdateExpression="SET batch_processed = :val",
-            ExpressionAttributeValues={":val": True},
-        )
 
     return _success({
         "transactions_processed": total_processed,
