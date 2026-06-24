@@ -21,10 +21,14 @@ PREFIX = os.environ.get("TABLE_PREFIX", "carddemo")
 REGION = os.environ.get("AWS_REGION_NAME", os.environ.get("AWS_DEFAULT_REGION", "us-east-1"))
 
 dynamodb = boto3.resource("dynamodb", region_name=REGION)
+ddb_client = dynamodb.meta.client
 
 tbl_transactions = dynamodb.Table(f"{PREFIX}-transactions")
 tbl_card_xref = dynamodb.Table(f"{PREFIX}-card-xref")
 tbl_accounts = dynamodb.Table(f"{PREFIX}-accounts")
+
+ACCOUNTS_TABLE = f"{PREFIX}-accounts"
+TRANSACTIONS_TABLE = f"{PREFIX}-transactions"
 
 ZERO = Decimal("0")
 
@@ -81,24 +85,34 @@ def _apply_transaction(tran: dict) -> str:
     else:
         return "skip:unsupported_type"
 
-    tbl_accounts.update_item(
-        Key={"acct_id": acct_id},
-        UpdateExpression="SET curr_bal = :bal, curr_cyc_credit = :cc, curr_cyc_debit = :cd",
-        ExpressionAttributeValues={
-            ":bal": str(curr_bal),
-            ":cc": str(cyc_credit),
-            ":cd": str(cyc_debit),
-        },
-    )
-
     now_ts = datetime.now(timezone.utc).isoformat()
-    tbl_transactions.update_item(
-        Key={
-            "tran_id": tran["tran_id"],
-            "tran_orig_ts": tran["tran_orig_ts"],
-        },
-        UpdateExpression="SET tran_proc_ts = :ts",
-        ExpressionAttributeValues={":ts": now_ts},
+
+    ddb_client.transact_write_items(
+        TransactItems=[
+            {
+                "Update": {
+                    "TableName": ACCOUNTS_TABLE,
+                    "Key": {"acct_id": {"S": acct_id}},
+                    "UpdateExpression": "SET curr_bal = :bal, curr_cyc_credit = :cc, curr_cyc_debit = :cd",
+                    "ExpressionAttributeValues": {
+                        ":bal": {"S": str(curr_bal)},
+                        ":cc": {"S": str(cyc_credit)},
+                        ":cd": {"S": str(cyc_debit)},
+                    },
+                }
+            },
+            {
+                "Update": {
+                    "TableName": TRANSACTIONS_TABLE,
+                    "Key": {
+                        "tran_id": {"S": tran["tran_id"]},
+                        "tran_orig_ts": {"S": tran["tran_orig_ts"]},
+                    },
+                    "UpdateExpression": "SET tran_proc_ts = :ts",
+                    "ExpressionAttributeValues": {":ts": {"S": now_ts}},
+                }
+            },
+        ]
     )
 
     return "processed"
