@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CardDemo - AWS Migration Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h1>&#x1F4B3; CardDemo</h1>
+        <span>AWS Migration</span>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-section="dashboard">
+          <span class="icon">&#x1F4CA;</span> Dashboard
+        </button>
+        <button class="nav-item" data-section="accounts">
+          <span class="icon">&#x1F4C1;</span> Accounts
+        </button>
+        <button class="nav-item" data-section="customers">
+          <span class="icon">&#x1F465;</span> Customers
+        </button>
+        <button class="nav-item" data-section="cards">
+          <span class="icon">&#x1F4B3;</span> Cards
+        </button>
+        <button class="nav-item" data-section="transactions">
+          <span class="icon">&#x1F4B8;</span> Transactions
+        </button>
+        <button class="nav-item" data-section="batch">
+          <span class="icon">&#x2699;</span> Batch Processing
+        </button>
+        <button class="nav-item" data-section="system">
+          <span class="icon">&#x1F5A5;</span> System Info
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        COBOL &rarr; AWS Serverless
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <header class="header">
+        <h2 id="section-title">Dashboard</h2>
+        <div id="header-actions"></div>
+      </header>
+      <div class="content" id="content">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Detail / Edit Modal -->
+  <div class="modal-overlay" id="account-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="account-modal-title">Account Details</h3>
+        <button class="modal-close" onclick="closeModal('account-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="account-modal-body"></div>
+      <div class="modal-footer" id="account-modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- Customer Detail Modal -->
+  <div class="modal-overlay" id="customer-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="customer-modal-title">Customer Details</h3>
+        <button class="modal-close" onclick="closeModal('customer-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="customer-modal-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('customer-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Transaction Modal -->
+  <div class="modal-overlay" id="transaction-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>New Transaction</h3>
+        <button class="modal-close" onclick="closeModal('transaction-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="transaction-modal-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('transaction-modal')">Cancel</button>
+        <button class="btn btn-primary" id="submit-transaction-btn">Create Transaction</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
