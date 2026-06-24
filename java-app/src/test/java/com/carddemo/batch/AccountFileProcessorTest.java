@@ -73,12 +73,23 @@ class AccountFileProcessorTest {
         return sb.toString();
     }
 
+    private static final String POSITIVE_OVERPUNCH = "{ABCDEFGHI";
+    private static final String NEGATIVE_OVERPUNCH = "}JKLMNOPQR";
+
+    /**
+     * Format a BigDecimal as a 12-char COBOL zoned-decimal field with trailing
+     * overpunch encoding, matching the production data format.
+     */
     private static String formatSignedDecimal(BigDecimal val) {
         boolean negative = val.signum() < 0;
         BigDecimal abs = val.abs();
         long unscaled = abs.movePointRight(2).longValue();
         String digits = String.format("%012d", unscaled);
-        return (negative ? "-" : "+") + digits.substring(1);
+        int lastDigit = digits.charAt(11) - '0';
+        char overpunch = negative
+                ? NEGATIVE_OVERPUNCH.charAt(lastDigit)
+                : POSITIVE_OVERPUNCH.charAt(lastDigit);
+        return digits.substring(0, 11) + overpunch;
     }
 
     @BeforeEach
@@ -348,6 +359,48 @@ class AccountFileProcessorTest {
     // ------------------------------------------------------------------
     // AccountRecord parsing tests
     // ------------------------------------------------------------------
+
+    @Test
+    void accountRecord_parse_productionDataLine() {
+        // First line from app/data/ASCII/acctdata.txt (trailing overpunch encoded)
+        String line = "00000000001Y00000001940{00000020200{00000010200{" +
+                "2014-11-202025-05-202025-05-2000000000000{00000000000{" +
+                "A000000000" + " ".repeat(178);
+
+        AccountRecord acct = AccountRecord.parse(line);
+        assertEquals(1L, acct.acctId());
+        assertEquals("Y", acct.activeStatus());
+        assertEquals(0, new BigDecimal("194.00").compareTo(acct.currentBalance()));
+        assertEquals(0, new BigDecimal("2020.00").compareTo(acct.creditLimit()));
+        assertEquals(0, new BigDecimal("1020.00").compareTo(acct.cashCreditLimit()));
+        assertEquals("2014-11-20", acct.openDate());
+        assertEquals("2025-05-20", acct.expirationDate());
+        assertEquals("2025-05-20", acct.reissueDate());
+        assertEquals(0, BigDecimal.ZERO.compareTo(acct.currentCycleCredit()));
+        assertEquals(0, BigDecimal.ZERO.compareTo(acct.currentCycleDebit()));
+    }
+
+    @Test
+    void accountRecord_parse_negativeOverpunch() {
+        // Build a line with negative values using overpunch encoding
+        // -1234.56 -> 123456 -> last digit 6 -> O (negative 6) -> 00000012345O
+        String line = "00000000099Y" +
+                "00000012345O" +  // curr bal = -1234.56
+                "00000050000{" +  // credit limit = 5000.00
+                "00000020000{" +  // cash credit limit = 2000.00
+                "2023-01-01" +
+                "2028-01-01" +
+                "2025-06-20" +
+                "00000001000{" +  // cycle credit = 100.00
+                "00000000500}" +  // cycle debit = -50.00 (} = negative 0)
+                "12345     " +
+                "GRP1      " +
+                " ".repeat(178);
+
+        AccountRecord acct = AccountRecord.parse(line);
+        assertEquals(0, new BigDecimal("-1234.56").compareTo(acct.currentBalance()));
+        assertEquals(0, new BigDecimal("-50.00").compareTo(acct.currentCycleDebit()));
+    }
 
     @Test
     void accountRecord_parse_roundTrip() {

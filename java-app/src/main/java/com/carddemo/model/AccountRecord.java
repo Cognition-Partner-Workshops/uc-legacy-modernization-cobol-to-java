@@ -64,10 +64,15 @@ public record AccountRecord(
                 currCycCredit, currCycDebit, addressZip, groupId);
     }
 
+    private static final String POSITIVE_OVERPUNCH = "{ABCDEFGHI";
+    private static final String NEGATIVE_OVERPUNCH = "}JKLMNOPQR";
+
     /**
      * Parse a COBOL S9(10)V99 display-numeric field (12 characters) into a
-     * BigDecimal with scale 2.  Handles leading sign (+/-) or trailing sign
-     * conventions, as well as plain unsigned digits.
+     * BigDecimal with scale 2.  Handles:
+     *   - COBOL zoned-decimal trailing overpunch ({,A-I positive; },J-R negative)
+     *   - Explicit leading/trailing +/- signs
+     *   - Plain unsigned digits
      */
     private static BigDecimal parseSignedDecimal(String raw) {
         String s = raw.trim();
@@ -76,7 +81,17 @@ public record AccountRecord(
         }
 
         boolean negative = false;
-        if (s.startsWith("-")) {
+
+        char lastChar = s.charAt(s.length() - 1);
+        int posIdx = POSITIVE_OVERPUNCH.indexOf(lastChar);
+        int negIdx = NEGATIVE_OVERPUNCH.indexOf(lastChar);
+
+        if (posIdx >= 0) {
+            s = s.substring(0, s.length() - 1) + posIdx;
+        } else if (negIdx >= 0) {
+            negative = true;
+            s = s.substring(0, s.length() - 1) + negIdx;
+        } else if (s.startsWith("-")) {
             negative = true;
             s = s.substring(1);
         } else if (s.startsWith("+")) {
