@@ -19,11 +19,14 @@ Returns ``{transactions_processed, skipped, errors}``.
 
 from __future__ import annotations
 
+import logging
 import os
 from datetime import datetime, timezone
 from decimal import Decimal
 
 import boto3
+
+logger = logging.getLogger(__name__)
 
 ACCOUNTS_TABLE = os.environ.get("ACCOUNTS_TABLE", "carddemo-accounts")
 TRANSACTIONS_TABLE = os.environ.get("TRANSACTIONS_TABLE", "carddemo-transactions")
@@ -125,6 +128,9 @@ def handler(event, context):
 
                 processed += 1
             except Exception:
+                logger.exception(
+                    "failed to process transaction %s", tran.get("tran_id")
+                )
                 errors += 1
 
         start_key = response.get("LastEvaluatedKey")
