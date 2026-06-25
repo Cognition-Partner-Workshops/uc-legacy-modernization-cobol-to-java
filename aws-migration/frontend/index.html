@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CardDemo — AWS Serverless</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">CD</span>
+        <div class="brand-text">
+          <div class="brand-title">CardDemo</div>
+          <div class="brand-sub">AWS Serverless</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a class="nav-item" data-route="dashboard" href="#dashboard">
+          <span class="nav-icon">▦</span> Dashboard
+        </a>
+        <a class="nav-item" data-route="accounts" href="#accounts">
+          <span class="nav-icon">▤</span> Accounts
+        </a>
+        <a class="nav-item" data-route="customers" href="#customers">
+          <span class="nav-icon">☻</span> Customers
+        </a>
+        <a class="nav-item" data-route="cards" href="#cards">
+          <span class="nav-icon">▭</span> Cards
+        </a>
+        <a class="nav-item" data-route="transactions" href="#transactions">
+          <span class="nav-icon">⇄</span> Transactions
+        </a>
+        <a class="nav-item" data-route="batch" href="#batch">
+          <span class="nav-icon">⚙</span> Batch Processing
+        </a>
+        <a class="nav-item" data-route="system" href="#system">
+          <span class="nav-icon">ℹ</span> System Info
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="api-status" id="apiStatus">API: checking…</div>
+        <div class="sidebar-note">COBOL → AWS migration demo</div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="content">
+      <div id="apiBanner" class="api-banner hidden"></div>
+      <header class="topbar">
+        <h1 id="pageTitle">Dashboard</h1>
+        <p id="pageSubtitle" class="page-subtitle"></p>
+      </header>
+      <section id="view" class="view"></section>
+    </main>
+  </div>
+
+  <!-- Modal container -->
+  <div id="modalRoot" class="modal-root hidden">
+    <div class="modal-backdrop" data-modal-close></div>
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="modalTitle">Detail</h2>
+        <button class="modal-close" data-modal-close aria-label="Close">×</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
