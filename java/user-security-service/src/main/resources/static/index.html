@@ -109,6 +109,10 @@
   async function loadUsers() {
     try {
       const result = await call('GET', '/api/users?page=' + page + '&size=' + PAGE_SIZE);
+      if (result.content.length === 0 && page > 0) {
+        page = Math.max(0, result.totalPages - 1);
+        return loadUsers();
+      }
       const rows = result.content.map(u =>
         '<tr><td>' + u.userId + '</td><td>' + u.firstName + '</td><td>' + u.lastName
         + '</td><td>' + u.userType + '</td></tr>').join('');
