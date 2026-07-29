@@ -4,6 +4,8 @@ Spring Boot REST modernization of the CardDemo CICS `COSGN00C`, `COUSR00C`, `COU
 
 ## Run
 
+Requires JDK 17 and Maven. If several JDKs are installed, point `JAVA_HOME` at the 17 install first.
+
 ```bash
 mvn spring-boot:run
 ```
