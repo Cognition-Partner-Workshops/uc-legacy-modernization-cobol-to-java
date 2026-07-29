@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>CardDemo User Security</title>
+  <style>
+    body { font-family: "DejaVu Sans Mono", monospace; background:#0b0b0b; color:#33ff66; margin:0; padding:24px; }
+    h1 { font-size:20px; letter-spacing:2px; }
+    h2 { font-size:15px; color:#8fe3ff; margin-top:28px; }
+    section { border:1px solid #245; padding:16px; margin-bottom:20px; max-width:900px; }
+    label { display:inline-block; width:110px; }
+    input, select { background:#111; color:#33ff66; border:1px solid #245; padding:4px; font-family:inherit; width:180px; }
+    button { background:#123; color:#8fe3ff; border:1px solid #8fe3ff; padding:5px 12px; margin-right:8px; cursor:pointer; font-family:inherit; }
+    table { border-collapse:collapse; margin-top:12px; width:100%; max-width:900px; }
+    th, td { border:1px solid #245; padding:4px 8px; text-align:left; font-size:13px; }
+    th { color:#8fe3ff; }
+    .msg { min-height:20px; margin-top:10px; }
+    .err { color:#ff5566; }
+    .ok { color:#33ff66; }
+  </style>
+</head>
+<body>
+<h1>CARDDEMO &mdash; USER SECURITY (USRSEC)</h1>
+
+<section>
+  <h2>Signon (COSGN00C)</h2>
+  <div><label for="signonUserId">User ID</label><input id="signonUserId" maxlength="8" value="ADMIN001"/></div>
+  <div><label for="signonPassword">Password</label><input id="signonPassword" type="password" maxlength="8" value="PASSWORD"/></div>
+  <div style="margin-top:10px"><button id="signonBtn">Sign On</button></div>
+  <div class="msg" id="signonMsg"></div>
+</section>
+
+<section>
+  <h2>User List (COUSR00C)</h2>
+  <button id="prevBtn">&lt; Prev</button>
+  <button id="nextBtn">Next &gt;</button>
+  <button id="refreshBtn">Refresh</button>
+  <span id="pageInfo"></span>
+  <table>
+    <thead><tr><th>User ID</th><th>First Name</th><th>Last Name</th><th>Type</th></tr></thead>
+    <tbody id="userRows"></tbody>
+  </table>
+  <div class="msg" id="listMsg"></div>
+</section>
+
+<section>
+  <h2>Add / Update / Delete User (COUSR01C / COUSR02C / COUSR03C)</h2>
+  <div><label for="userId">User ID</label><input id="userId" maxlength="8"/></div>
+  <div><label for="firstName">First Name</label><input id="firstName" maxlength="20"/></div>
+  <div><label for="lastName">Last Name</label><input id="lastName" maxlength="20"/></div>
+  <div><label for="password">Password</label><input id="password" maxlength="8"/></div>
+  <div><label for="userType">User Type</label>
+    <select id="userType"><option value="U">U - Regular</option><option value="A">A - Admin</option></select>
+  </div>
+  <div style="margin-top:10px">
+    <button id="lookupBtn">Lookup</button>
+    <button id="addBtn">Add</button>
+    <button id="updateBtn">Update</button>
+    <button id="deleteBtn">Delete</button>
+  </div>
+  <div class="msg" id="crudMsg"></div>
+</section>
+
+<script>
+  const PAGE_SIZE = 10;
+  let page = 0;
+
+  function show(id, text, isError) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'msg ' + (isError ? 'err' : 'ok');
+  }
+
+  async function call(method, url, body) {
+    const options = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) { options.body = JSON.stringify(body); }
+    const response = await fetch(url, options);
+    const text = await response.text();
+    const payload = text ? JSON.parse(text) : null;
+    if (!response.ok) {
+      throw new Error((payload && payload.message) || ('HTTP ' + response.status));
+    }
+    return payload;
+  }
+
+  function form() {
+    return {
+      userId: document.getElementById('userId').value,
+      firstName: document.getElementById('firstName').value,
+      lastName: document.getElementById('lastName').value,
+      password: document.getElementById('password').value,
+      userType: document.getElementById('userType').value
+    };
+  }
+
+  document.getElementById('signonBtn').onclick = async () => {
+    try {
+      const result = await call('POST', '/api/signon', {
+        userId: document.getElementById('signonUserId').value,
+        password: document.getElementById('signonPassword').value
+      });
+      show('signonMsg', 'Signon OK: ' + result.user.userId + ' type ' + result.user.userType
+        + ' -> ' + result.nextProgram, false);
+    } catch (e) {
+      show('signonMsg', e.message, true);
+    }
+  };
+
+  async function loadUsers() {
+    try {
+      const result = await call('GET', '/api/users?page=' + page + '&size=' + PAGE_SIZE);
+      const rows = result.content.map(u =>
+        '<tr><td>' + u.userId + '</td><td>' + u.firstName + '</td><td>' + u.lastName
+        + '</td><td>' + u.userType + '</td></tr>').join('');
+      document.getElementById('userRows').innerHTML = rows;
+      document.getElementById('pageInfo').textContent =
+        ' Page ' + (result.page + 1) + ' of ' + Math.max(result.totalPages, 1)
+        + ' (' + result.totalElements + ' users)';
+      show('listMsg', '', false);
+    } catch (e) {
+      show('listMsg', e.message, true);
+    }
+  }
+
+  document.getElementById('refreshBtn').onclick = loadUsers;
+  document.getElementById('nextBtn').onclick = () => { page += 1; loadUsers(); };
+  document.getElementById('prevBtn').onclick = () => { page = Math.max(0, page - 1); loadUsers(); };
+
+  document.getElementById('lookupBtn').onclick = async () => {
+    try {
+      const user = await call('GET', '/api/users/' + encodeURIComponent(form().userId));
+      document.getElementById('firstName').value = user.firstName;
+      document.getElementById('lastName').value = user.lastName;
+      document.getElementById('userType').value = user.userType;
+      show('crudMsg', 'User ' + user.userId + ' loaded (password not returned)', false);
+    } catch (e) {
+      show('crudMsg', e.message, true);
+    }
+  };
+
+  document.getElementById('addBtn').onclick = async () => {
+    try {
+      const user = await call('POST', '/api/users', form());
+      show('crudMsg', 'User ' + user.userId + ' has been added ...', false);
+      loadUsers();
+    } catch (e) {
+      show('crudMsg', e.message, true);
+    }
+  };
+
+  document.getElementById('updateBtn').onclick = async () => {
+    try {
+      const data = form();
+      const user = await call('PUT', '/api/users/' + encodeURIComponent(data.userId), data);
+      show('crudMsg', 'User ' + user.userId + ' has been updated ...', false);
+      loadUsers();
+    } catch (e) {
+      show('crudMsg', e.message, true);
+    }
+  };
+
+  document.getElementById('deleteBtn').onclick = async () => {
+    try {
+      const id = form().userId;
+      await call('DELETE', '/api/users/' + encodeURIComponent(id));
+      show('crudMsg', 'User ' + id + ' has been deleted ...', false);
+      loadUsers();
+    } catch (e) {
+      show('crudMsg', e.message, true);
+    }
+  };
+
+  loadUsers();
+</script>
+</body>
+</html>
