@@ -5,7 +5,6 @@ import com.cognition.usersecurity.exception.ApiException;
 import com.cognition.usersecurity.model.User;
 import com.cognition.usersecurity.repository.UserRepository;
 import jakarta.validation.Valid;
-import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -20,9 +19,9 @@ public class UserController {
 
     @PostMapping("/auth/signon")
     public SignonResponse signon(@Valid @RequestBody SignonRequest request) {
-        User user = repository.findByIdIgnoreCase(request.userId()).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User ID NOT found..."));
-        if (!user.getPassword().equals(request.password().toUpperCase())) throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid password...");
-        return new SignonResponse(user.getId(), user.getUserType(), "Signon successful");
+        User user = find(request.userId());
+        if (!user.getPassword().equals(request.password())) throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid password...");
+        return new SignonResponse(user.getId(), user.getUserType(), user.getUserType().getCode(), "Signon successful");
     }
     @GetMapping("/users")
     public Page<UserResponse> list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
@@ -34,8 +33,9 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest request) {
         if (request.userType() == null) throw new ApiException(HttpStatus.BAD_REQUEST, "User Type can NOT be empty...");
-        if (repository.existsById(request.userId().toUpperCase())) throw new ApiException(HttpStatus.CONFLICT, "User ID already exists...");
-        User user = new User(request.userId().toUpperCase(), request.firstName(), request.lastName(), request.password(), request.userType());
+        String userId = normalizeId(request.userId());
+        if (repository.existsById(userId)) throw new ApiException(HttpStatus.CONFLICT, "User ID already exists...");
+        User user = new User(userId, request.firstName(), request.lastName(), request.password(), request.userType());
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.from(repository.save(user)));
     }
     @PutMapping("/users/{id}")
@@ -46,5 +46,8 @@ public class UserController {
     }
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) { repository.delete(find(id)); return ResponseEntity.noContent().build(); }
-    private User find(String id) { return repository.findByIdIgnoreCase(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User ID NOT found...")); }
+    private User find(String id) {
+        return repository.findById(normalizeId(id)).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User ID NOT found..."));
+    }
+    private String normalizeId(String id) { return id.toUpperCase(); }
 }

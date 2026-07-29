@@ -30,6 +30,8 @@ User types mirror `COCOM01Y`: `ADMIN` is persisted as `A`, and `USER` as `U`. Si
 | `ADMIN001` | `PASSWORDA` | ADMIN |
 | `USER0001` | `PASSWORDU` | USER |
 
+The credentials above intentionally show the complete 9-character values from the JCL demo data. In the original `CSUSR01Y.cpy` layout, `SEC-USR-PWD` is `PIC X(08)` followed by the one-character `SEC-USR-TYPE`; the trailing `A` or `U` in the fixed-width JCL record is therefore the type field. This REST service retains the explicitly specified `PASSWORDA` and `PASSWORDU` values as seeded passwords.
+
 The remaining eight users are seeded from `app/jcl/ESDSRRDS.jcl`.
 
 ## Demo recording
