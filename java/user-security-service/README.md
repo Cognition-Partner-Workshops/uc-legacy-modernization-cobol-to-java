@@ -38,4 +38,13 @@ The remaining eight users are seeded from `app/jcl/ESDSRRDS.jcl`.
 
 ## Demo recording
 
-The demo recording will be available at `docs/demo.mp4`.
+The completed demo recording is available at [`docs/demo.mp4`](docs/demo.mp4).
+
+The demonstrated flow is:
+
+1. Admin signon with `ADMIN001` / `PASSWORDA` → `200`, `userType: ADMIN`.
+2. `GET /api/users` → the 10 seeded users.
+3. `POST /api/users` creating `DEMO0001` → `201`.
+4. `PUT /api/users/DEMO0001` → `200`, updated fields, and type flipped to `ADMIN`.
+5. `DELETE /api/users/DEMO0001` → `204`.
+6. Follow-up `GET /api/users/DEMO0001` → `404`, `User ID NOT found...`.
