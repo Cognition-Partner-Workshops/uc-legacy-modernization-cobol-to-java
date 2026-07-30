@@ -2,7 +2,6 @@ package com.carddemo.viewer;
 
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +24,7 @@ public class StatementController {
     }
 
     @GetMapping("/statements/{accountId}")
-    public String detail(@PathVariable String accountId, Model model, HttpServletResponse response) throws IOException {
+    public String detail(@PathVariable String accountId, Model model, HttpServletResponse response) {
         return repository.findByAccountId(accountId)
                 .map(statement -> {
                     model.addAttribute("statement", statement);
