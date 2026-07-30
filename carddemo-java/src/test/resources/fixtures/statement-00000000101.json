@@ -1,0 +1,15 @@
+{
+  "accountId": "00000000101",
+  "customer": {
+    "firstName": "Ava",
+    "lastName": "Morgan",
+    "addressLines": ["1 Test Street", "Suite 2", "Testville NY USA 10001"]
+  },
+  "cardNumber": "**-**-****-1010",
+  "currentBalance": 100.00,
+  "ficoScore": 700,
+  "transactions": [
+    {"transactionId": "0000000000000101", "description": "Test purchase", "amount": -10.25}
+  ],
+  "totalAmount": -10.25
+}

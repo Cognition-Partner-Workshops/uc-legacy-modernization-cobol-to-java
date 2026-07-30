@@ -1,0 +1,13 @@
+{
+  "accountId": "00000000022",
+  "customer": {
+    "firstName": "Renee",
+    "lastName": "Mendoza",
+    "addressLines": ["44 Harbor View", "", "Port Sterling CA USA 94105"]
+  },
+  "cardNumber": "**-**-****-9876",
+  "currentBalance": 2840.00,
+  "ficoScore": 721,
+  "transactions": [],
+  "totalAmount": 0.00
+}
