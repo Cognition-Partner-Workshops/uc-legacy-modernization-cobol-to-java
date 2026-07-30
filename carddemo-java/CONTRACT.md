@@ -92,4 +92,7 @@ required, is `HALF_UP`.
 
 The machine-readable schema lives next to this file at
 [`statement.schema.json`](statement.schema.json) (JSON Schema draft 2020-12).
+An identical classpath copy also exists at
+`src/main/resources/statement.schema.json`; it must remain byte-for-byte
+identical to the authoritative schema next to this contract.
 Both the generator and the viewer validate their fixtures/output against it.
