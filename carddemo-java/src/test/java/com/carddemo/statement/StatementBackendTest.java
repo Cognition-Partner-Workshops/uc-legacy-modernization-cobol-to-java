@@ -1,6 +1,7 @@
 package com.carddemo.statement;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,9 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.Test;
 
 class StatementBackendTest {
+    @TempDir
+    Path temporaryDirectory;
+
     @Test
     void parsesOverpunchAndUnsignedValues() {
         assertEquals(new BigDecimal("504.77"), FixedWidth.amount("0000005047G"));
@@ -27,6 +32,7 @@ class StatementBackendTest {
 
     @Test
     void parsesAllFixedWidthLayouts() {
+        assertEquals("00000000011", RecordParsers.account(accountLine("11")).id());
         assertEquals("00000000001", RecordParsers.account(
                 "00000000001Y00000001940{00000020200{00000010200{2014-11-202025-05-202025-05-2000000000000{00000000000{A000000000").id());
         String customer = "000000001Immanuel                 Madeline                 Kessler                  "
@@ -87,8 +93,39 @@ class StatementBackendTest {
         }
     }
 
+    @Test
+    void writerUsesCollisionNamesAndWritesPrettySchemaValidJson() throws Exception {
+        List<Statement> statements = StatementGenerator.generate(
+                List.of(xrefLine("1234567890123456", "000000001", "11"),
+                        xrefLine("9876543210987654", "000000001", "11")),
+                List.of(customerLine("000000001")), List.of(accountLine("11")),
+                List.of(transaction("1234567890123456", "TX1", "0000000194{"),
+                        transaction("9876543210987654", "TX2", "0000000001{")));
+        Path output = temporaryDirectory.resolve("statements");
+        assertEquals(2, new StatementJsonWriter().write(statements, output));
+
+        Path first = output.resolve("statement-00000000011.json");
+        Path second = output.resolve("statement-00000000011-7654.json");
+        assertTrue(Files.exists(first));
+        assertTrue(Files.exists(second));
+        String json = Files.readString(first);
+        assertTrue(json.contains("\"addressLines\" : [\n"));
+        assertTrue(json.contains("\"transactions\" : [\n"));
+        assertTrue(json.contains("194.00"));
+        assertFalse(json.contains("E+"));
+
+        JsonSchema schema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012)
+                .getSchema(getClass().getResourceAsStream("/statement.schema.json"));
+        JsonNode written = new ObjectMapper().readTree(first.toFile());
+        assertTrue(schema.validate(written).isEmpty());
+    }
+
     private static String accountLine(String id) {
-        return id + "Y00000001940{00000020200{00000010200{2014-11-202025-05-202025-05-2000000000000{00000000000{A000000000";
+        return pad(id, 11) + "Y00000001940{00000020200{00000010200{2014-11-202025-05-202025-05-2000000000000{00000000000{A000000000";
+    }
+
+    private static String xrefLine(String card, String customer, String account) {
+        return pad(card, 16) + pad(customer, 9) + pad(account, 11);
     }
 
     private static String customerLine(String id) {

@@ -17,6 +17,17 @@ final class FixedWidth {
         return field(line, start, end).trim();
     }
 
+    static String accountId(String raw) {
+        String value = raw.trim();
+        if (!value.matches("\\d+")) {
+            throw new IllegalArgumentException("Account id must contain digits: " + raw);
+        }
+        if (value.length() > 11) {
+            throw new IllegalArgumentException("Account id must be at most 11 digits: " + raw);
+        }
+        return "0".repeat(11 - value.length()) + value;
+    }
+
     static BigDecimal amount(String raw) {
         String value = raw.trim();
         if (value.isEmpty()) return BigDecimal.ZERO.setScale(2);

@@ -4,7 +4,7 @@ public final class RecordParsers {
     private RecordParsers() {}
 
     public static Account account(String line) {
-        return new Account(FixedWidth.trimmed(line, 1, 11),
+        return new Account(FixedWidth.accountId(FixedWidth.field(line, 1, 11)),
                 FixedWidth.amount(FixedWidth.field(line, 13, 24)));
     }
 
@@ -25,7 +25,7 @@ public final class RecordParsers {
     public static Xref xref(String line) {
         return new Xref(FixedWidth.trimmed(line, 1, 16),
                 FixedWidth.trimmed(line, 17, 25),
-                FixedWidth.trimmed(line, 26, 36));
+                FixedWidth.accountId(FixedWidth.field(line, 26, 36)));
     }
 
     public static Transaction transaction(String line) {

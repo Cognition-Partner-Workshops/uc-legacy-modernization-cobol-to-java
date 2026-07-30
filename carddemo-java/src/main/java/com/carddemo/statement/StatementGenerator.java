@@ -48,7 +48,7 @@ public final class StatementGenerator {
                     new Statement.CustomerDetails(customer.firstName(), customer.lastName(),
                             List.of(customer.address1(), customer.address2(), address3)),
                     maskCard(xref.cardNumber()), account.currentBalance().setScale(2, RoundingMode.HALF_UP),
-                    customer.ficoScore(), details, total));
+                    customer.ficoScore(), details, total, xref.cardNumber()));
         }
         return statements;
     }
