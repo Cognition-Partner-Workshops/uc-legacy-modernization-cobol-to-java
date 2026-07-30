@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${'Statement ' + statement.accountId}">Statement</title>
+    <link rel="stylesheet" th:href="@{/css/site.css}">
+</head>
+<body>
+<main class="page-shell">
+    <a class="back-link" href="/">← All statements</a>
+    <header class="hero detail-hero">
+        <p class="eyebrow">ACCOUNT STATEMENT</p>
+        <h1 th:text="${statement.customer.firstName + ' ' + statement.customer.lastName}">Immanuel Kessler</h1>
+        <p class="lede mono" th:text="${statement.accountId}">00000000011</p>
+    </header>
+    <section class="summary-grid">
+        <div class="panel summary-card"><p class="eyebrow">CURRENT BALANCE</p><strong th:classappend="${statement.currentBalance.signum() < 0} ? 'negative'" th:text="${@moneyFormatter.format(statement.currentBalance)}">$0.00</strong></div>
+        <div class="panel summary-card"><p class="eyebrow">FICO SCORE</p><strong th:text="${statement.ficoScore}">688</strong></div>
+        <div class="panel summary-card"><p class="eyebrow">CARD</p><strong class="mono" th:text="${statement.cardNumber}">**-**-****-1234</strong></div>
+    </section>
+    <section class="content-grid">
+        <div class="panel">
+            <div class="section-heading"><div><p class="eyebrow">CUSTOMER PROFILE</p><h2>Contact details</h2></div></div>
+            <p class="customer-name" th:text="${statement.customer.firstName + ' ' + statement.customer.lastName}">Immanuel Kessler</p>
+            <address>
+                <span th:each="line : ${statement.customer.addressLines}" th:text="${line}">Address line</span>
+            </address>
+        </div>
+        <div class="panel transactions-panel">
+            <div class="section-heading"><div><p class="eyebrow">ACCOUNT ACTIVITY</p><h2>Transactions</h2></div></div>
+            <div class="empty-state compact" th:if="${#lists.isEmpty(statement.transactions)}"><p>No transactions recorded for this statement.</p></div>
+            <div class="table-wrap" th:unless="${#lists.isEmpty(statement.transactions)}">
+                <table>
+                    <thead><tr><th>Tran ID</th><th>Tran Details</th><th class="amount">Amount</th></tr></thead>
+                    <tbody><tr th:each="transaction : ${statement.transactions}">
+                        <td class="mono" th:text="${transaction.transactionId}">0000000000683580</td>
+                        <td th:text="${transaction.description}">Purchase</td>
+                        <td class="amount" th:classappend="${transaction.amount.signum() < 0} ? 'negative'" th:text="${@moneyFormatter.format(transaction.amount)}">$0.00</td>
+                    </tr></tbody>
+                    <tfoot><tr><th colspan="2">Total</th><th class="amount" th:classappend="${statement.totalAmount.signum() < 0} ? 'negative'" th:text="${@moneyFormatter.format(statement.totalAmount)}">$0.00</th></tr></tfoot>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

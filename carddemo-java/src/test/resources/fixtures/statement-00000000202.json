@@ -1,0 +1,13 @@
+{
+  "accountId": "00000000202",
+  "customer": {
+    "firstName": "Noah",
+    "lastName": "Lee",
+    "addressLines": ["2 Test Street", "", "Testville WA USA 98001"]
+  },
+  "cardNumber": "**-**-****-2020",
+  "currentBalance": 0.00,
+  "ficoScore": 650,
+  "transactions": [],
+  "totalAmount": 0.00
+}

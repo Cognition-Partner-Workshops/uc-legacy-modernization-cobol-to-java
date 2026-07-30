@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CardDemo Statements</title>
+    <link rel="stylesheet" th:href="@{/css/site.css}">
+</head>
+<body>
+<main class="page-shell">
+    <header class="hero">
+        <p class="eyebrow">CARDDEMO / CUSTOMER SERVICES</p>
+        <h1>Statement center</h1>
+        <p class="lede">A clear view of account activity, balances, and customer details.</p>
+    </header>
+    <section class="panel">
+        <div class="section-heading">
+            <div><p class="eyebrow">AVAILABLE RECORDS</p><h2>Customer statements</h2></div>
+            <span class="count" th:text="${#lists.size(statements)} + ' statement(s)'">0 statements</span>
+        </div>
+        <div class="empty-state" th:if="${#lists.isEmpty(statements)}">
+            <h3>No statements available</h3>
+            <p>Generated statements will appear here when they are available.</p>
+        </div>
+        <div class="table-wrap" th:unless="${#lists.isEmpty(statements)}">
+            <table>
+                <thead><tr><th>Account</th><th>Customer</th><th>Card</th><th class="amount">Total</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="statement : ${statements}">
+                    <td class="mono" th:text="${statement.accountId}">00000000011</td>
+                    <td th:text="${statement.customer.firstName + ' ' + statement.customer.lastName}">Immanuel Kessler</td>
+                    <td class="mono" th:text="${statement.cardNumber}">**-**-****-1234</td>
+                    <td class="amount" th:classappend="${statement.totalAmount.signum() < 0} ? 'negative'" th:text="${@moneyFormatter.format(statement.totalAmount)}">$0.00</td>
+                    <td class="action"><a th:href="@{'/statements/' + ${statement.accountId}}">View statement <span aria-hidden="true">→</span></a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>
