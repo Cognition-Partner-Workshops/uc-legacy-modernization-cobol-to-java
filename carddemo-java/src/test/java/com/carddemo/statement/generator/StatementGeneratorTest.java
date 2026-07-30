@@ -17,7 +17,7 @@ class StatementGeneratorTest {
         + "1 Main St                                          " + " ".repeat(50) + "Town".concat(" ".repeat(46))
         + "NYUSA10001     " + " ".repeat(500 - 9 - 25 - 25 - 25 - 50 - 50 - 50 - 2 - 3 - 10));
     Files.writeString(data.resolve("acctdata.txt"), "00000000001" + " ".repeat(289));
-    String tx = "TX00000000000001" + " ".repeat(16 + 4 + 10)
+    String tx = "TX00000000000001" + " ".repeat(16)
         + "First purchase".concat(" ".repeat(100 - 14)) + "0000000100{"
         + " ".repeat(9 + 50 + 50 + 10 + 16 + 26 + 26 + 20);
     Files.writeString(data.resolve("dailytran.txt"), tx + "\n" + tx.replace("TX00000000000001", "TX00000000000002"));
