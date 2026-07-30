@@ -1,0 +1,9 @@
+{
+  "accountId": "00000000033",
+  "customer": {"firstName": "Alex", "lastName": "Brown", "addressLines": ["9 River Road", "Unit 2", "Chicago IL USA 60601"]},
+  "cardNumber": "****-****-****-9012",
+  "transactions": [
+    {"transactionId": "TX000000000000005", "description": "TRANSIT PASS", "amount": -20.00}
+  ],
+  "totalAmount": -20.00
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CardDemo Statements</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #243447; }
+        a { color: #1261a0; } li { margin: .75rem 0; }
+        .card { border: 1px solid #d8dee4; border-radius: 8px; padding: 1rem 1.25rem; }
+    </style>
+</head>
+<body>
+<h1>CardDemo statements</h1>
+<div class="card">
+    <p th:if="${#lists.isEmpty(statements)}">No statements are available.</p>
+    <ul th:unless="${#lists.isEmpty(statements)}">
+        <li th:each="statement : ${statements}">
+            <a th:href="@{/statements/{accountId}(accountId=${statement.accountId})}"
+               th:text="${statement.accountId}">00000000011</a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

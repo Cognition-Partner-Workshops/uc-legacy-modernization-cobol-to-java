@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${'Statement ' + statement.accountId}">Statement</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; color: #243447; }
+        a { color: #1261a0; } .summary { line-height: 1.6; }
+        table { border-collapse: collapse; width: 100%; margin-top: 1.5rem; }
+        th, td { border-bottom: 1px solid #d8dee4; padding: .65rem; text-align: left; }
+        th:last-child, td:last-child { text-align: right; } .total { font-weight: 700; }
+    </style>
+</head>
+<body>
+<p><a href="/">&#8592; All statements</a></p>
+<h1 th:text="${'Statement for account ' + statement.accountId}">Statement</h1>
+<section class="summary">
+    <h2 th:text="${statement.customer.firstName + ' ' + statement.customer.lastName}">Customer Name</h2>
+    <div th:each="line : ${statement.customer.addressLines}" th:text="${line}">Address</div>
+    <p>Card: <span th:text="${statement.cardNumber}">****-****-****-1234</span></p>
+</section>
+<table>
+    <thead><tr><th>Transaction ID</th><th>Description</th><th>Amount</th></tr></thead>
+    <tbody>
+    <tr th:each="transaction : ${statement.transactions}">
+        <td th:text="${transaction.transactionId}">TX0001</td>
+        <td th:text="${transaction.description}">PURCHASE</td>
+        <td th:text="${#numbers.formatDecimal(transaction.amount, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+    </tr>
+    </tbody>
+    <tfoot><tr class="total"><td colspan="2">Total</td><td th:text="${#numbers.formatDecimal(statement.totalAmount, 1, 'COMMA', 2, 'POINT')}">0.00</td></tr></tfoot>
+</table>
+</body>
+</html>

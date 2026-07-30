@@ -1,0 +1,10 @@
+{
+  "accountId": "00000000011",
+  "customer": {"firstName": "John", "lastName": "Doe", "addressLines": ["123 Main Street", "Apt 4B", "Springfield IL USA 62701"]},
+  "cardNumber": "****-****-****-1234",
+  "transactions": [
+    {"transactionId": "TX000000000000001", "description": "GROCERY STORE PURCHASE", "amount": -123.45},
+    {"transactionId": "TX000000000000002", "description": "PAYMENT CREDIT", "amount": 50.00}
+  ],
+  "totalAmount": -73.45
+}
