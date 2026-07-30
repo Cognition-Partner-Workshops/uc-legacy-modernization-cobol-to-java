@@ -1,0 +1,10 @@
+{
+  "accountId": "00000000022",
+  "customer": {"firstName": "Jane", "lastName": "Smith", "addressLines": ["45 Oak Avenue"]},
+  "cardNumber": "****-****-****-5678",
+  "transactions": [
+    {"transactionId": "TX000000000000003", "description": "COFFEE SHOP", "amount": -6.25},
+    {"transactionId": "TX000000000000004", "description": "REFUND CREDIT", "amount": 6.25}
+  ],
+  "totalAmount": 0.00
+}
