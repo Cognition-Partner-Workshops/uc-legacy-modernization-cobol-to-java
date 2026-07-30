@@ -151,7 +151,8 @@
              88  HTML-L02 VALUE '<html lang="en">'.
              88  HTML-L03 VALUE '<head>'.
              88  HTML-L04 VALUE '<meta charset="utf-8">'.
-             88  HTML-L05 VALUE '<title>HTML Table Layout</title>'.
+             88  HTML-L05
+               VALUE '<title>CardDemo Account Statement</title>'.
              88  HTML-L06 VALUE '</head>'.
              88  HTML-L07 VALUE '<body style="margin:0px;">'.
              88  HTML-L08 VALUE '<table  align="center" frame="box" styl
@@ -210,8 +211,8 @@
              88  HTML-L79 VALUE '</body>'.
              88  HTML-L80 VALUE '</html>'.
            05  HTML-L11.
-               10  FILLER   PIC X(34)
-                          VALUE '<h3>Statement for Account Number: '.
+               10  FILLER   PIC X(35)
+                          VALUE '<h3>Account Statement for Account: '.
                10  L11-ACCT PIC X(20).
                10  FILLER   PIC X(05) VALUE '</h3>'.
            05  HTML-L23.
