@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Cognition-Partner-Workshops/uc-legacy-modernization-cobol-to-java/carddemo-java/docs/statement-contract.schema.json",
+  "title": "CardDemo Statement",
+  "description": "Statement JSON contract per Jira DJ-69. One file per account, named statement-<accountId>.json, written to carddemo-java/output/statements/. Field sources: TRNX-RECORD in app/cpy/COSTM01.CPY, customer in app/cpy/CUSTREC.cpy, account in app/cpy/CVACT01Y.cpy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["accountId", "customer", "cardNumber", "transactions", "totalAmount"],
+  "properties": {
+    "accountId": {
+      "type": "string",
+      "description": "Account identifier (ACCT-ID), zero-padded 11-digit string"
+    },
+    "customer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["firstName", "lastName", "addressLines"],
+      "properties": {
+        "firstName": { "type": "string", "description": "CUST-FIRST-NAME" },
+        "lastName": { "type": "string", "description": "CUST-LAST-NAME" },
+        "addressLines": {
+          "type": "array",
+          "description": "Address lines from CUST-ADDR-LINE-1/2 and CUST-ADDR-LINE-3 + STATE-CD + COUNTRY-CD + ZIP",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "maxItems": 3
+        }
+      }
+    },
+    "cardNumber": {
+      "type": "string",
+      "description": "Masked card number, only last 4 digits visible, e.g. ****-****-****-1234"
+    },
+    "transactions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["transactionId", "description", "amount"],
+        "properties": {
+          "transactionId": { "type": "string", "description": "TRNX-ID" },
+          "description": { "type": "string", "description": "TRNX-DESC" },
+          "amount": { "type": "number", "description": "TRNX-AMT, signed decimal" }
+        }
+      }
+    },
+    "totalAmount": {
+      "type": "number",
+      "description": "Sum of all transaction amounts for the account"
+    }
+  }
+}
