@@ -12,14 +12,16 @@ class StatementGeneratorTest {
   @Test
   void joinsAggregatesAndConformsToContract(@TempDir Path temp) throws Exception {
     Path data = Files.createDirectory(temp.resolve("data"));
-    Files.writeString(data.resolve("cardxref.txt"), "11112222333344440000000010000000001\n");
+    Files.writeString(data.resolve("cardxref.txt"),
+        "1111222233334444" + "000000001" + "00000000001\n");
     Files.writeString(data.resolve("custdata.txt"), "000000001John                     Q                       Doe                     "
         + "1 Main St                                          " + " ".repeat(50) + "Town".concat(" ".repeat(46))
         + "NYUSA10001     " + " ".repeat(500 - 9 - 25 - 25 - 25 - 50 - 50 - 50 - 2 - 3 - 10));
     Files.writeString(data.resolve("acctdata.txt"), "00000000001" + " ".repeat(289));
     String tx = "TX00000000000001" + " ".repeat(16)
         + "First purchase".concat(" ".repeat(100 - 14)) + "0000000100{"
-        + " ".repeat(9 + 50 + 50 + 10 + 16 + 26 + 26 + 20);
+        + " ".repeat(9 + 50 + 50 + 10) + "1111222233334444"
+        + " ".repeat(26 + 26 + 20);
     Files.writeString(data.resolve("dailytran.txt"), tx + "\n" + tx.replace("TX00000000000001", "TX00000000000002"));
     Path output = temp.resolve("output");
     var report = new StatementGenerator().generate(data, output);

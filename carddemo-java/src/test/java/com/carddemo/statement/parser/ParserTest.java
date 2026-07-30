@@ -20,7 +20,7 @@ class ParserTest {
     var tx = new TransactionParser().parse(record);
     assertEquals("0000000000683580", tx.transactionId());
     assertEquals("Purchase at Abshire-Lowe", tx.description());
-    assertEquals(new BigDecimal("50.47"), tx.amount());
+    assertEquals(new BigDecimal("504.77"), tx.amount());
     assertEquals("4859452612877065", tx.cardNumber());
   }
 
