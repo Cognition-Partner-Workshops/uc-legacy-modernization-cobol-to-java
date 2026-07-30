@@ -15,7 +15,7 @@
         <p class="lede mono" th:text="${statement.accountId}">00000000011</p>
     </header>
     <section class="summary-grid">
-        <div class="panel summary-card"><p class="eyebrow">CURRENT BALANCE</p><strong th:classappend="${statement.currentBalance.signum() < 0} ? 'negative'" th:text="${'$' + #numbers.formatDecimal(statement.currentBalance, 1, 2)}">$0.00</strong></div>
+        <div class="panel summary-card"><p class="eyebrow">CURRENT BALANCE</p><strong th:classappend="${statement.currentBalance.signum() < 0} ? 'negative'" th:text="${@moneyFormatter.format(statement.currentBalance)}">$0.00</strong></div>
         <div class="panel summary-card"><p class="eyebrow">FICO SCORE</p><strong th:text="${statement.ficoScore}">688</strong></div>
         <div class="panel summary-card"><p class="eyebrow">CARD</p><strong class="mono" th:text="${statement.cardNumber}">**-**-****-1234</strong></div>
     </section>
@@ -36,9 +36,9 @@
                     <tbody><tr th:each="transaction : ${statement.transactions}">
                         <td class="mono" th:text="${transaction.transactionId}">0000000000683580</td>
                         <td th:text="${transaction.description}">Purchase</td>
-                        <td class="amount" th:classappend="${transaction.amount.signum() < 0} ? 'negative'" th:text="${'$' + #numbers.formatDecimal(transaction.amount, 1, 2)}">$0.00</td>
+                        <td class="amount" th:classappend="${transaction.amount.signum() < 0} ? 'negative'" th:text="${@moneyFormatter.format(transaction.amount)}">$0.00</td>
                     </tr></tbody>
-                    <tfoot><tr><th colspan="2">Total</th><th class="amount" th:classappend="${statement.totalAmount.signum() < 0} ? 'negative'" th:text="${'$' + #numbers.formatDecimal(statement.totalAmount, 1, 2)}">$0.00</th></tr></tfoot>
+                    <tfoot><tr><th colspan="2">Total</th><th class="amount" th:classappend="${statement.totalAmount.signum() < 0} ? 'negative'" th:text="${@moneyFormatter.format(statement.totalAmount)}">$0.00</th></tr></tfoot>
                 </table>
             </div>
         </div>

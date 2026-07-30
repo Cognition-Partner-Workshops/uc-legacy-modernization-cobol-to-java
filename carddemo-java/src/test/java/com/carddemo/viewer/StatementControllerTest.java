@@ -37,6 +37,7 @@ class StatementControllerTest {
                 .andExpect(view().name("detail"))
                 .andExpect(content().string(containsString("Ava Morgan")))
                 .andExpect(content().string(containsString("Test purchase")))
+                .andExpect(content().string(containsString("-$123.45")))
                 .andExpect(content().string(containsString("Testville NY USA 10001")));
     }
 
@@ -54,7 +55,7 @@ class StatementControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", org.hamcrest.Matchers.hasSize(2)))
                 .andExpect(jsonPath("$[0].accountId").value("00000000101"))
-                .andExpect(jsonPath("$[0].totalAmount").value(-10.25))
+                .andExpect(jsonPath("$[0].totalAmount").value(-123.45))
                 .andExpect(jsonPath("$[0].currentBalance").value(100.00));
     }
 

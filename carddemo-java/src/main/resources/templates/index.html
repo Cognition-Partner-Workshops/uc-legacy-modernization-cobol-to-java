@@ -30,7 +30,7 @@
                     <td class="mono" th:text="${statement.accountId}">00000000011</td>
                     <td th:text="${statement.customer.firstName + ' ' + statement.customer.lastName}">Immanuel Kessler</td>
                     <td class="mono" th:text="${statement.cardNumber}">**-**-****-1234</td>
-                    <td class="amount" th:classappend="${statement.totalAmount.signum() < 0} ? 'negative'" th:text="${'$' + #numbers.formatDecimal(statement.totalAmount, 1, 2)}">$0.00</td>
+                    <td class="amount" th:classappend="${statement.totalAmount.signum() < 0} ? 'negative'" th:text="${@moneyFormatter.format(statement.totalAmount)}">$0.00</td>
                     <td class="action"><a th:href="@{'/statements/' + ${statement.accountId}}">View statement <span aria-hidden="true">→</span></a></td>
                 </tr>
                 </tbody>

@@ -9,7 +9,7 @@
   "currentBalance": 100.00,
   "ficoScore": 700,
   "transactions": [
-    {"transactionId": "0000000000000101", "description": "Test purchase", "amount": -10.25}
+    {"transactionId": "0000000000000101", "description": "Test purchase", "amount": -123.45}
   ],
-  "totalAmount": -10.25
+  "totalAmount": -123.45
 }
