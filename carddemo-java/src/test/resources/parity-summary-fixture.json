@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-08-18T15:00:00Z",
+  "sourceProgram": "CBSTM03A",
+  "summary": { "total": 5, "match": 2, "diff": 2, "missing": 1 },
+  "accounts": [
+    {
+      "accountId": "00000000001",
+      "customerName": "Immanuel Madeline Kessler",
+      "transactionCount": 4,
+      "totalAmount": 1234.56,
+      "cobolTextPath": "carddemo-java/target/parity/cobol/00000000001.txt",
+      "cobolHtmlPath": "carddemo-java/target/parity/cobol/00000000001.html",
+      "javaTextPath": "carddemo-java/target/parity/java/00000000001.txt",
+      "javaHtmlPath": "carddemo-java/target/parity/java/00000000001.html",
+      "status": "MATCH",
+      "diffLineCount": 0,
+      "firstDiffLine": null
+    },
+    {
+      "accountId": "00000000002",
+      "customerName": "Rosalinda Chandler Yates",
+      "transactionCount": 7,
+      "totalAmount": -482.19,
+      "cobolTextPath": "carddemo-java/target/parity/cobol/00000000002.txt",
+      "cobolHtmlPath": "carddemo-java/target/parity/cobol/00000000002.html",
+      "javaTextPath": "carddemo-java/target/parity/java/00000000002.txt",
+      "javaHtmlPath": "carddemo-java/target/parity/java/00000000002.html",
+      "status": "DIFF",
+      "diffLineCount": 3,
+      "firstDiffLine": 12
+    },
+    {
+      "accountId": "00000000003",
+      "customerName": "Cornelius Abernathy",
+      "transactionCount": 12,
+      "totalAmount": 9087,
+      "cobolTextPath": "carddemo-java/target/parity/cobol/00000000003.txt",
+      "cobolHtmlPath": "carddemo-java/target/parity/cobol/00000000003.html",
+      "javaTextPath": "carddemo-java/target/parity/java/00000000003.txt",
+      "javaHtmlPath": "carddemo-java/target/parity/java/00000000003.html",
+      "status": "MATCH",
+      "diffLineCount": 0,
+      "firstDiffLine": null
+    },
+    {
+      "accountId": "00000000004",
+      "customerName": "Wilhelmina Tarquin Osgood-Reyes",
+      "transactionCount": 0,
+      "totalAmount": 0.00,
+      "cobolTextPath": "carddemo-java/target/parity/cobol/00000000004.txt",
+      "cobolHtmlPath": "carddemo-java/target/parity/cobol/00000000004.html",
+      "javaTextPath": null,
+      "javaHtmlPath": null,
+      "status": "MISSING",
+      "diffLineCount": 0,
+      "firstDiffLine": null
+    },
+    {
+      "accountId": "00000000005",
+      "customerName": "Bartholomew Quincy Ashford",
+      "transactionCount": 23,
+      "totalAmount": 15432.07,
+      "cobolTextPath": "carddemo-java/target/parity/cobol/00000000005.txt",
+      "cobolHtmlPath": "carddemo-java/target/parity/cobol/00000000005.html",
+      "javaTextPath": "carddemo-java/target/parity/java/00000000005.txt",
+      "javaHtmlPath": "carddemo-java/target/parity/java/00000000005.html",
+      "status": "DIFF",
+      "diffLineCount": 41,
+      "firstDiffLine": 5
+    }
+  ]
+}
