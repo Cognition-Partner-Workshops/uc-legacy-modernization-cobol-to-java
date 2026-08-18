@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://carddemo.example/parity-summary.schema.json",
+  "title": "CardDemo statement parity summary (FROZEN CONTRACT)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["generatedAt", "sourceProgram", "summary", "accounts"],
+  "properties": {
+    "generatedAt": { "type": "string" },
+    "sourceProgram": { "type": "string" },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "match", "diff", "missing"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "match": { "type": "integer", "minimum": 0 },
+        "diff": { "type": "integer", "minimum": 0 },
+        "missing": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "accounts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accountId",
+          "customerName",
+          "transactionCount",
+          "totalAmount",
+          "cobolTextPath",
+          "cobolHtmlPath",
+          "javaTextPath",
+          "javaHtmlPath",
+          "status",
+          "diffLineCount",
+          "firstDiffLine"
+        ],
+        "properties": {
+          "accountId": { "type": "string" },
+          "customerName": { "type": "string" },
+          "transactionCount": { "type": "integer", "minimum": 0 },
+          "totalAmount": { "type": "number" },
+          "cobolTextPath": { "type": ["string", "null"] },
+          "cobolHtmlPath": { "type": ["string", "null"] },
+          "javaTextPath": { "type": ["string", "null"] },
+          "javaHtmlPath": { "type": ["string", "null"] },
+          "status": { "type": "string", "enum": ["MATCH", "DIFF", "MISSING"] },
+          "diffLineCount": { "type": "integer", "minimum": 0 },
+          "firstDiffLine": { "type": ["integer", "null"], "minimum": 1 }
+        }
+      }
+    }
+  }
+}
