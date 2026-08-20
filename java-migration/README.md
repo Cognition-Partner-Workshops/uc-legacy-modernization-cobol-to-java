@@ -86,6 +86,18 @@ records in IBM037/CP037 with no line delimiters.  The load is an upsert by
 `sec_usr_id`, so rerunning it does not duplicate rows.  USRSEC contains
 display-character fields only; no packed decimal is decoded by this job.
 
+The batch application exits with code `0` for a completed job and a non-zero
+code for a failed job.  For scheduler-visible exit codes, package and run the
+jar directly; `mvn spring-boot:run` may mask the application exit code:
+
+```bash
+mvn -q -pl batch -am package -DskipTests
+java -jar batch/target/batch-0.1.0-SNAPSHOT.jar \
+  --spring.batch.job.name=usrsecLoadJob \
+  --carddemo.usrsec.input-file=/absolute/path/AWS.M2.CARDDEMO.USRSEC.PS \
+  "--spring.datasource.url=jdbc:h2:file:/absolute/path/carddemo-batch-db;MODE=PostgreSQL"
+```
+
 The default in-memory H2 database disappears when the application exits, so a
 CLI load is meaningful only when the datasource points at a persistent
 database.  For file-based H2, use a URL such as
@@ -123,6 +135,8 @@ remains the schema owner in both H2 and PostgreSQL.
   only while the API is read-only/demo.  Before the first state-changing
   endpoint ships, either enable CSRF tokens or move to a stateless bearer-token
   scheme.
+- **Session fixation:** Successful signon rotates the session ID before the
+  authenticated context is saved.
 
 ## Phased migration
 
