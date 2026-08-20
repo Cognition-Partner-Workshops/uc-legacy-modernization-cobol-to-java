@@ -35,6 +35,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <mainClass>com.carddemo.batch.CardDemoBatchApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -92,6 +92,13 @@ delimiters.  The load is an upsert by `sec_usr_id`, so rerunning it does not
 duplicate rows.  USRSEC contains display-character fields only; no packed
 decimal is decoded by this job.
 
+The default in-memory H2 database disappears when the application exits, so a
+CLI load is meaningful only when the datasource points at a persistent
+database.  For file-based H2, add
+`--spring.datasource.url=jdbc:h2:file:/absolute/path/carddemo-batch-db;MODE=PostgreSQL`
+to the command above.  PostgreSQL can be used by supplying its datasource
+URL, username, and password instead.
+
 ## Database configuration
 
 H2 is the default for local development and tests:
@@ -110,6 +117,19 @@ mvn -pl web -am spring-boot:run \
 
 Use environment/configuration management for real credentials.  Flyway
 remains the schema owner in both H2 and PostgreSQL.
+
+## Security posture (foundation)
+
+- **Plaintext USRSEC credentials:** Passwords are stored and compared in
+  plaintext to preserve `COSGN00C` parity, so the database contains usable
+  credentials and the comparison is not constant-time.  Before any
+  non-demo use, replace `LegacyPasswordEncoder` with a hashing encoder and
+  perform a credential re-issue or migration step for existing rows.
+- **Session-cookie authentication without CSRF:** CSRF protection is disabled
+  while authentication state lives in a session cookie.  This is acceptable
+  only while the API is read-only/demo.  Before the first state-changing
+  endpoint ships, either enable CSRF tokens or move to a stateless bearer-token
+  scheme.
 
 ## Phased migration
 

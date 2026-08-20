@@ -15,7 +15,9 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = CardDemoBatchApplication.class)
+@SpringBootTest(
+        classes = CardDemoBatchApplication.class,
+        properties = "spring.batch.job.enabled=false")
 class UsrsecLoadJobTest {
     private static final Path SEED = Path.of("../../app/data/EBCDIC/AWS.M2.CARDDEMO.USRSEC.PS");
 

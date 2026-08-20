@@ -39,6 +39,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <mainClass>com.carddemo.web.CardDemoWebApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
