@@ -130,18 +130,18 @@ such file.
 |---|---|---:|---|---|---|---|---|
 | ACCTDAT | CVACT01Y account record | 300 | ACCT-ID | `AWS.M2.CARDDEMO.ACCTDATA.PS` (also `ACCDATA.PS` exists) | COACTVWC, COACTUPC, COBIL00C, CBACT01C, CBACT04C, CBTRN01C, CBTRN02C, CBSTM03A | COACTUPC, COBIL00C, CBACT04C | `account` |
 | CARDDAT | CVACT02Y card record | 150 | CARD-NUM | `AWS.M2.CARDDEMO.CARDDATA.PS` | COCRDLIC, COCRDSLC, COCRDUPC, CBACT02C, CBTRN01C | COCRDUPC | `card` |
-| CARDAIX | CVACT02Y via card account alternate path | 150 underlying record | account alternate key | no separate seed; represented by `CARDDATA.PS` | COACTVWC, COCRDSLC | not directly written; maintained by VSAM | index on `card(acct_id)` / `card_xref(acct_id)` is not yet fully migrated |
+| CARDAIX | CVACT02Y via card account alternate path | 150 underlying record | account alternate key | no separate seed; represented by `CARDDATA.PS` | COACTUPC, COACTVWC, COCRDSLC | not directly written; maintained by VSAM | index on `card(acct_id)` / `card_xref(acct_id)` is not yet fully migrated |
 | CCXREF | CVACT03Y card/account/customer xref | 50 | XREF-CARD-NUM | `AWS.M2.CARDDEMO.CARDXREF.PS` | COACTUPC, COACTVWC, COTRN02C, COBIL00C, CBACT03C, CBTRN01C, CBTRN02C, CBTRN03C, CBSTM03A | JCL/IDCAMS load; no direct writer was found in the scanned `app/cbl/` programs | `card_xref` |
 | CXACAIX | CVACT03Y via account alternate key | 50 underlying record | XREF-ACCT-ID | no separate seed; represented by `CARDXREF.PS` | COACTUPC, COBIL00C, COTRN02C | maintained by VSAM | index on `card_xref(acct_id)` |
 | CUSTDAT | CVCUS01Y customer record | 500 | CUST-ID | `AWS.M2.CARDDEMO.CUSTDATA.PS` | COACTVWC, COACTUPC, COCRDSLC, CBCUS01C, CBTRN01C, CBSTM03A | COACTUPC | `customer` |
-| TRANSACT | CVTRA05Y transaction record | 350 | TRAN-ID | no exact `TRANSACT.PS`; `AWS.M2.CARDDEMO.DALYTRAN.PS` is separate | COTRN00C, COTRN01C, COTRN02C, CORPT00C, CBACT04C, CBTRN01C, CBTRN02C, CBTRN03C, CBEXPORT, CBSTM03A | COTRN02C, CBACT04C, CBTRN02C, CBIMPORT | `transaction` |
-| USRSEC | CSUSR01Y security record | 80 | SEC-USR-ID | `AWS.M2.CARDDEMO.USRSEC.PS` | COSGN00C, COUSR00C, COUSR01C, COUSR02C, COUSR03C | COUSR01C, COUSR02C, COUSR03C, DUSRSECJ | `usrsec` |
+| TRANSACT | CVTRA05Y transaction record | 350 | TRAN-ID | no exact `TRANSACT.PS`; `AWS.M2.CARDDEMO.DALYTRAN.PS` is separate | COTRN00C, COTRN01C, COTRN02C, CBACT04C, CBTRN01C, CBTRN02C, CBTRN03C, CBEXPORT, CBSTM03A | COTRN02C, CBACT04C, CBTRN02C, CBIMPORT | `transaction` |
+| USRSEC | CSUSR01Y security record | 80 | SEC-USR-ID | `AWS.M2.CARDDEMO.USRSEC.PS` | COSGN00C, COUSR00C, COUSR01C, COUSR02C, COUSR03C | COUSR01C, COUSR02C, COUSR03C, DUSRSECJ (IEBGENER/JCL) | `usrsec` |
 | DISCGRP | CVTRA02Y disclosure group | 50 | DIS-GROUP-KEY | `AWS.M2.CARDDEMO.DISCGRP.PS` | CBACT04C | JCL/IDCAMS load | not yet migrated |
 | TCATBALF | CVTRA01Y category balance | 50 | TRAN-CAT-KEY | `AWS.M2.CARDDEMO.TCATBALF.PS` | COBIL00C, CBACT04C, CBTRN02C | COBIL00C, CBACT04C, CBTRN02C, JCL/IDCAMS load | `tran_cat_bal` |
 | TRANCATG | CVTRA04Y category type | 60 | TRAN-CAT-KEY | `AWS.M2.CARDDEMO.TRANCATG.PS` | CBTRN03C | JCL/IDCAMS load | not yet migrated |
 | TRANTYPE | CVTRA03Y transaction type | 60 | TRAN-TYPE | `AWS.M2.CARDDEMO.TRANTYPE.PS` | CBTRN03C | JCL/IDCAMS load | not yet migrated |
 | DALYTRAN | CVTRA06Y daily transaction | 350 | DALYTRAN-ID | `AWS.M2.CARDDEMO.DALYTRAN.PS`, `DALYTRAN.PS.INIT` | CBTRN01C, CBTRN02C | upstream extract/JCL; exact COBOL writer not present in `app/cbl/` | not yet migrated |
-| report output | CVTRA07Y formatted report records | layout varies; detail is not a fixed VSAM master | report/date range | not present as an EBCDIC seed | CBTRN03C, CORPT00C | CBTRN03C (`TRANREPT`), CBSTM03A (`STMTFILE`/`HTMLFILE`) | not yet migrated |
+| report output | CVTRA07Y formatted report records | layout varies; detail is not a fixed VSAM master | report/date range | not present as an EBCDIC seed | not determined as a source-file reader | CBTRN03C (`TRANREPT`), CBSTM03A (`STMTFILE`/`HTMLFILE`) | not yet migrated |
 | export output | CVEXPORT multi-record export layout | 500 | record type + sequence | `AWS.M2.CARDDEMO.EXPORT.DATA.PS` | CBIMPORT | CBEXPORT | not yet migrated |
 
 The `CARDAIX` and `CXACAIX` rows are alternate indexes, not independent
