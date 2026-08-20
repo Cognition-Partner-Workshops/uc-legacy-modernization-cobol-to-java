@@ -473,6 +473,7 @@ function ExtensionScreen({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const authorizationId = searchParams.get("id") ?? "";
+  const initialAccountId = context?.accountId?.toString() ?? searchParams.get("accountId") ?? "";
   const map = transactionTypes
     ? update
       ? MAPS.COTRTUP
@@ -482,6 +483,7 @@ function ExtensionScreen({
       : MAPS.COPAU00;
   const [values, setValues] = useState<Record<string, string>>({
     authorizationId,
+    accountId: initialAccountId,
   });
   const [message, setMessage] = useState("");
   const [rows, setRows] = useState<Record<string, unknown>[]>([]);
@@ -521,7 +523,9 @@ function ExtensionScreen({
   }
   useEffect(() => {
     if (update && authorizationId) void submit();
-  }, [update, authorizationId]);
+    else if (!update && transactionTypes) void submit(0);
+    else if (!update && initialAccountId) void submit(0);
+  }, [update, transactionTypes, authorizationId, initialAccountId]);
   return <ScreenState map={map} message={message} context={context} onSubmit={submit}
     onPageUp={!update ? () => { const target = Math.max(0, page - 1); setPage(target); void submit(target); } : undefined}
     onPageDown={!update ? () => { const target = page + 1; setPage(target); void submit(target); } : undefined}>
@@ -533,7 +537,7 @@ function ExtensionScreen({
         transactionTypes
           ? update
             ? ["message"]
-            : ["message", ...Array.from({ length: 8 }, (_, index) => `select${index + 1}`), ...Array.from({ length: 8 }, (_, index) => `type${index + 1}`), ...Array.from({ length: 8 }, (_, index) => `description${index + 1}`)]
+            : ["message", ...Array.from({ length: 7 }, (_, index) => `select${index + 1}`), ...Array.from({ length: 7 }, (_, index) => `type${index + 1}`), ...Array.from({ length: 7 }, (_, index) => `description${index + 1}`)]
           : update
             ? ["message"]
             : ["message", ...Array.from({ length: 5 }, (_, index) => `select${index + 1}`), ...["transactionId", "authDate", "authTime", "authType", "approved", "status", "amount"].flatMap((name) => [1, 2, 3, 4, 5].map((row) => `${name}${row}`))]

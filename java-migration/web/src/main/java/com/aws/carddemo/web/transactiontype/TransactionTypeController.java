@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin/transaction-types")
 public class TransactionTypeController {
-  private static final int PAGE_SIZE = 8;
+  private static final int PAGE_SIZE = 7;
   private final TransactionTypeRepository repository;
 
   public TransactionTypeController(TransactionTypeRepository repository) {

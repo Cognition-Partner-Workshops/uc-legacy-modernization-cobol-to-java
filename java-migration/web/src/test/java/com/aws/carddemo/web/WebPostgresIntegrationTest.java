@@ -72,6 +72,7 @@ class WebPostgresIntegrationTest {
   @Autowired SeedDataLoader loader;
   @Autowired TokenService tokens;
   @Autowired com.aws.carddemo.domain.CardRepository cardRepository;
+  @Autowired com.aws.carddemo.domain.TransactionTypeRepository transactionTypeRepository;
 
   @BeforeAll
   static void start() {
@@ -127,6 +128,33 @@ class WebPostgresIntegrationTest {
         .andExpect(jsonPath("$.data").isArray())
         .andExpect(jsonPath("$.data.length()").value(7))
         .andExpect(jsonPath("$.data[0].typeCd").exists());
+  }
+
+  @Test
+  void transactionTypeListUsesLegacySevenRowPages() throws Exception {
+    loader.loadAll();
+    for (int code = 8; code <= 9; code++) {
+      var value = new com.aws.carddemo.domain.TransactionType();
+      value.setTypeCd(String.format("%02d", code));
+      value.setTypeDesc("Extra type " + code);
+      transactionTypeRepository.save(value);
+    }
+    String token = tokens.issue("ADMIN001", "ROLE_ADMIN");
+    mvc.perform(
+            get("/api/admin/transaction-types")
+                .param("page", "0")
+                .param("direction", "FORWARD")
+                .with(bearer(token)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.length()").value(7));
+    mvc.perform(
+            get("/api/admin/transaction-types")
+                .param("page", "1")
+                .param("direction", "FORWARD")
+                .with(bearer(token)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.length()").value(2))
+        .andExpect(jsonPath("$.data[0].typeCd").value("08"));
   }
 
   @Test

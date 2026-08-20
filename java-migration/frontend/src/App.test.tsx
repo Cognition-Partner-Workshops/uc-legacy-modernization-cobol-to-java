@@ -130,26 +130,25 @@ describe("CardDemo SPA", () => {
 
   it("renders the authorization BMS summary and loads seeded rows", async () => {
     sessionStorage.setItem("carddemo.jwt", "token");
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(response([
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(response([
       { transactionId: "AUTH0001", approvedAmt: 10 },
     ])), { status: 200 }));
-    render(<MemoryRouter initialEntries={["/authorizations"]}><App /></MemoryRouter>);
-    fireEvent.change(screen.getByLabelText("Account ID"), { target: { value: "1" } });
-    fireEvent.click(screen.getByRole("button", { name: /enter/i }));
+    render(<MemoryRouter initialEntries={["/authorizations?accountId=1"]}><App /></MemoryRouter>);
     expect(await screen.findByText("AUTH0001")).toBeInTheDocument();
     expect(screen.getByText("AUTHORIZATION SUMMARY")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("renders the transaction-type BMS list for an administrator", async () => {
     const payload = btoa(JSON.stringify({ sub: "ADMIN001", role: "ROLE_ADMIN", exp: 9999999999 }));
     sessionStorage.setItem("carddemo.jwt", `header.${payload}.signature`);
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(response([
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(response([
       { typeCd: "01", typeDesc: "PURCHASE" },
     ])), { status: 200 }));
     render(<MemoryRouter initialEntries={["/admin/transaction-types"]}><App /></MemoryRouter>);
-    fireEvent.click(screen.getByRole("button", { name: /enter/i }));
     expect(await screen.findByText("PURCHASE")).toBeInTheDocument();
     expect(screen.getByText("TRANSACTION TYPE LIST")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("renders the transaction-type update BMS map and submits its fields", async () => {
@@ -241,6 +240,9 @@ describe("CardDemo SPA", () => {
     await waitFor(() => expect(screen.getByDisplayValue("PURCHASE")).toBeInTheDocument());
     expect(screen.getByDisplayValue("-919.00")).toBeInTheDocument();
     expect(screen.getByDisplayValue("2022-06-10")).toBeInTheDocument();
+    expect(screen.getByLabelText("Transaction ID")).toHaveStyle({ width: "16ch" });
+    expect(screen.getByLabelText("Original Date")).toHaveStyle({ width: "10ch" });
+    expect(screen.getByLabelText("Merchant ID")).toHaveStyle({ width: "9ch" });
   });
 
   it("renders real user rows and keeps admin routes guarded", async () => {

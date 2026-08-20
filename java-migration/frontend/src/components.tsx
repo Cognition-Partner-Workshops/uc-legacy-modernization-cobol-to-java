@@ -123,7 +123,14 @@ export function MapField({
             spec.name === "curdate" ? new Date().toISOString().slice(0, 10).replaceAll("-", "") :
               spec.name === "curtime" ? new Date().toTimeString().slice(0, 8) : "");
   return (
-    <label className="map-field" style={{ gridRow: spec.row, gridColumn: `${Math.max(1, spec.col)} / span ${Math.min(spec.length + 1, 24)}` }}>
+    <label
+      className="map-field"
+      style={{
+        gridRow: spec.row,
+        gridColumn: `${Math.max(1, spec.col)} / span ${Math.min(spec.length + spec.label.length + 2, 80 - Math.max(1, spec.col) + 1)}`,
+        width: "max-content",
+      }}
+    >
       <span>{spec.label}</span>
       <input
         aria-label={spec.label}
@@ -133,6 +140,7 @@ export function MapField({
         readOnly={spec.protected}
         disabled={spec.protected}
         type={spec.password ? "password" : "text"}
+        style={{ width: `${spec.length}ch`, flex: `0 0 ${spec.length}ch` }}
         onChange={(event) => onChange(event.target.value)}
       />
     </label>
