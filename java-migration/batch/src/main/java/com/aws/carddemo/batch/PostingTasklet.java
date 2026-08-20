@@ -1,6 +1,19 @@
 package com.aws.carddemo.batch;
 
-import com.aws.carddemo.domain.*;
+import com.aws.carddemo.domain.Account;
+import com.aws.carddemo.domain.AccountRepository;
+import com.aws.carddemo.domain.CardXref;
+import com.aws.carddemo.domain.CardXrefId;
+import com.aws.carddemo.domain.CardXrefRepository;
+import com.aws.carddemo.domain.DailyTransaction;
+import com.aws.carddemo.domain.DailyTransactionReject;
+import com.aws.carddemo.domain.DailyTransactionRejectRepository;
+import com.aws.carddemo.domain.DailyTransactionRepository;
+import com.aws.carddemo.domain.TranCategoryBalance;
+import com.aws.carddemo.domain.TranCategoryBalanceId;
+import com.aws.carddemo.domain.TranCategoryBalanceRepository;
+import com.aws.carddemo.domain.Transaction;
+import com.aws.carddemo.domain.TransactionRepository;
 import java.math.BigDecimal;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
@@ -44,7 +57,7 @@ class PostingTasklet implements Tasklet {
   public RepeatStatus execute(StepContribution contribution, ChunkContext context) {
     int processed = 0;
     int rejected = 0;
-    for (DailyTransaction daily : dailyTransactions.findByTranIdGreaterThanOrderByTranId("")) {
+    for (DailyTransaction daily : dailyTransactions.findAllByOrderByTranIdAsc()) {
       Validation failure = validate(daily);
       if (failure.code() != 0) {
         rejected++;
@@ -66,12 +79,7 @@ class PostingTasklet implements Tasklet {
         .getJobExecution()
         .getExecutionContext()
         .putInt("rejectedCount", rejected);
-    for (int i = 0; i < processed + rejected; i++) {
-      contribution.incrementReadCount();
-    }
-    for (int i = 0; i < processed; i++) {
-      contribution.incrementWriteCount(1);
-    }
+    contribution.incrementWriteCount(processed);
     if (rejected > 0) {
       contribution.setExitStatus(
           new ExitStatus("COMPLETED WITH REJECTIONS", "return-code=4; rejected=" + rejected));

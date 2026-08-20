@@ -20,6 +20,7 @@ import com.aws.carddemo.domain.TranCategoryBalanceRepository;
 import com.aws.carddemo.domain.TransactionCategory;
 import com.aws.carddemo.domain.TransactionCategoryId;
 import com.aws.carddemo.domain.TransactionCategoryRepository;
+import com.aws.carddemo.domain.TransactionRepository;
 import com.aws.carddemo.domain.TransactionType;
 import com.aws.carddemo.domain.TransactionTypeRepository;
 import com.aws.carddemo.domain.Usrsec;
@@ -46,6 +47,7 @@ public class SeedDataLoader {
   private final CardRepository cardRepository;
   private final CardXrefRepository cardXrefRepository;
   private final DailyTransactionRepository dailyTransactionRepository;
+  private final TransactionRepository transactionRepository;
   private final DisclosureGroupRepository disclosureGroupRepository;
   private final TranCategoryBalanceRepository tranCategoryBalanceRepository;
   private final TransactionCategoryRepository transactionCategoryRepository;
@@ -60,6 +62,7 @@ public class SeedDataLoader {
       CardRepository cardRepository,
       CardXrefRepository cardXrefRepository,
       DailyTransactionRepository dailyTransactionRepository,
+      TransactionRepository transactionRepository,
       DisclosureGroupRepository disclosureGroupRepository,
       TranCategoryBalanceRepository tranCategoryBalanceRepository,
       TransactionCategoryRepository transactionCategoryRepository,
@@ -71,6 +74,7 @@ public class SeedDataLoader {
     this.cardRepository = cardRepository;
     this.cardXrefRepository = cardXrefRepository;
     this.dailyTransactionRepository = dailyTransactionRepository;
+    this.transactionRepository = transactionRepository;
     this.disclosureGroupRepository = disclosureGroupRepository;
     this.tranCategoryBalanceRepository = tranCategoryBalanceRepository;
     this.transactionCategoryRepository = transactionCategoryRepository;
@@ -120,6 +124,7 @@ public class SeedDataLoader {
 
   public void clearAll() {
     dailyTransactionRepository.deleteAllInBatch();
+    transactionRepository.deleteAllInBatch();
     cardXrefRepository.deleteAllInBatch();
     cardRepository.deleteAllInBatch();
     tranCategoryBalanceRepository.deleteAllInBatch();

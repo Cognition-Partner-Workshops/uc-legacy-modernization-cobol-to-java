@@ -163,9 +163,7 @@ class StatementTasklet implements Tasklet {
     }
     Files.writeString(text, plain.toString());
     Files.writeString(html, markup.toString());
-    for (long i = 0; i < xrefs.count(); i++) {
-      contribution.incrementWriteCount(1);
-    }
+    contribution.incrementWriteCount((int) xrefs.count());
     return RepeatStatus.FINISHED;
   }
 

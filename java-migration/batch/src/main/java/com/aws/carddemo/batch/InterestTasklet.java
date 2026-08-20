@@ -100,12 +100,7 @@ class InterestTasklet implements Tasklet {
         accounts.save(current);
       }
     }
-    for (int i = 0; i < rows.size(); i++) {
-      contribution.incrementReadCount();
-    }
-    for (int i = 0; i < suffix; i++) {
-      contribution.incrementWriteCount(1);
-    }
+    contribution.incrementWriteCount(suffix);
     return RepeatStatus.FINISHED;
   }
 

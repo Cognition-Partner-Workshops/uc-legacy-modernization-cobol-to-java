@@ -60,6 +60,36 @@ public class BatchJobConfiguration {
   }
 
   @Bean
+  Job exportJob(JobRepository repository, @Qualifier("exportStep") Step exportStep) {
+    return new JobBuilder("exportJob", repository).start(exportStep).build();
+  }
+
+  @Bean
+  Job importJob(JobRepository repository, @Qualifier("importStep") Step importStep) {
+    return new JobBuilder("importJob", repository).start(importStep).build();
+  }
+
+  @Bean
+  Job combtranJob(JobRepository repository, @Qualifier("combtranStep") Step combtranStep) {
+    return new JobBuilder("combtranJob", repository).start(combtranStep).build();
+  }
+
+  @Bean
+  Job transactionBackupJob(
+      JobRepository repository, @Qualifier("transactionBackupStep") Step transactionBackupStep) {
+    return new JobBuilder("transactionBackupJob", repository).start(transactionBackupStep).build();
+  }
+
+  @Bean
+  Job categoryBalancePrintJob(
+      JobRepository repository,
+      @Qualifier("categoryBalancePrintStep") Step categoryBalancePrintStep) {
+    return new JobBuilder("categoryBalancePrintJob", repository)
+        .start(categoryBalancePrintStep)
+        .build();
+  }
+
+  @Bean
   Step postTransactionsStep(
       JobRepository repository,
       PlatformTransactionManager transactionManager,
@@ -105,6 +135,50 @@ public class BatchJobConfiguration {
       PlatformTransactionManager transactionManager,
       StatementTasklet tasklet) {
     return new StepBuilder("createStatementsStep", repository)
+        .tasklet(tasklet, transactionManager)
+        .build();
+  }
+
+  @Bean
+  Step exportStep(
+      JobRepository repository,
+      PlatformTransactionManager transactionManager,
+      ExportTasklet tasklet) {
+    return new StepBuilder("exportStep", repository).tasklet(tasklet, transactionManager).build();
+  }
+
+  @Bean
+  Step importStep(
+      JobRepository repository,
+      PlatformTransactionManager transactionManager,
+      ImportTasklet tasklet) {
+    return new StepBuilder("importStep", repository).tasklet(tasklet, transactionManager).build();
+  }
+
+  @Bean
+  Step combtranStep(
+      JobRepository repository,
+      PlatformTransactionManager transactionManager,
+      CombtranTasklet tasklet) {
+    return new StepBuilder("combtranStep", repository).tasklet(tasklet, transactionManager).build();
+  }
+
+  @Bean
+  Step transactionBackupStep(
+      JobRepository repository,
+      PlatformTransactionManager transactionManager,
+      TransactionBackupTasklet tasklet) {
+    return new StepBuilder("transactionBackupStep", repository)
+        .tasklet(tasklet, transactionManager)
+        .build();
+  }
+
+  @Bean
+  Step categoryBalancePrintStep(
+      JobRepository repository,
+      PlatformTransactionManager transactionManager,
+      CategoryBalancePrintTasklet tasklet) {
+    return new StepBuilder("categoryBalancePrintStep", repository)
         .tasklet(tasklet, transactionManager)
         .build();
   }

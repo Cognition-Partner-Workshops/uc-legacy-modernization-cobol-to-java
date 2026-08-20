@@ -6,8 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.aws.carddemo.dataload.SeedDataLoader;
 import com.aws.carddemo.domain.Account;
 import com.aws.carddemo.domain.AccountRepository;
+import com.aws.carddemo.domain.CardRepository;
 import com.aws.carddemo.domain.CardXrefId;
 import com.aws.carddemo.domain.CardXrefRepository;
+import com.aws.carddemo.domain.CustomerRepository;
 import com.aws.carddemo.domain.DailyTransaction;
 import com.aws.carddemo.domain.DailyTransactionRejectRepository;
 import com.aws.carddemo.domain.DailyTransactionRepository;
@@ -23,6 +25,7 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -65,9 +68,18 @@ class BatchJobsPostgresTest {
   @Autowired Job dailyTransactionValidateJob;
   @Autowired Job transactionReportJob;
   @Autowired Job createStatementsJob;
+  @Autowired Job accountFilePrintJob;
+  @Autowired Job cardFilePrintJob;
+  @Autowired Job xrefFilePrintJob;
+  @Autowired Job customerFilePrintJob;
+  @Autowired Job exportJob;
+  @Autowired Job importJob;
+  @Autowired Job combtranJob;
   @Autowired DailyTransactionRepository dailyTransactions;
   @Autowired DailyTransactionRejectRepository rejects;
   @Autowired CardXrefRepository xrefs;
+  @Autowired CardRepository cards;
+  @Autowired CustomerRepository customers;
   @Autowired AccountRepository accounts;
   @Autowired TranCategoryBalanceRepository balances;
   @Autowired DisclosureGroupRepository disclosureGroups;
@@ -104,7 +116,7 @@ class BatchJobsPostgresTest {
     Map<Long, BigDecimal> accountDeltas = new HashMap<>();
     Map<TranCategoryBalanceId, BigDecimal> balanceDeltas = new HashMap<>();
     int expectedRejected = 0;
-    for (DailyTransaction daily : dailyTransactions.findByTranIdGreaterThanOrderByTranId("")) {
+    for (DailyTransaction daily : dailyTransactions.findAllByOrderByTranIdAsc()) {
       var xref = xrefs.findById(new CardXrefId(daily.getCardNum())).orElse(null);
       if (xref == null) {
         expectedRejected++;
@@ -266,6 +278,189 @@ class BatchJobsPostgresTest {
     assertTrue(html.contains("TRANSACTION SUMMARY"));
     assertTrue(html.contains("END OF STATEMENT"));
     assertTrue(transactions.count() > 0);
+  }
+
+  @Test
+  void chunkFilePrintJobsProduceCobolDisplayContent() throws Exception {
+    loader.loadAll();
+    Files.createDirectories(OUTPUT);
+    JobExecution account =
+        run(
+            accountFilePrintJob,
+            "print-account-" + System.nanoTime(),
+            new JobParametersBuilder()
+                .addString("outputPath", OUTPUT.resolve("accounts.txt").toString()));
+    JobExecution card =
+        run(
+            cardFilePrintJob,
+            "print-card-" + System.nanoTime(),
+            new JobParametersBuilder()
+                .addString("outputPath", OUTPUT.resolve("cards.txt").toString()));
+    JobExecution xref =
+        run(
+            xrefFilePrintJob,
+            "print-xref-" + System.nanoTime(),
+            new JobParametersBuilder()
+                .addString("outputPath", OUTPUT.resolve("xrefs.txt").toString()));
+    JobExecution customer =
+        run(
+            customerFilePrintJob,
+            "print-customer-" + System.nanoTime(),
+            new JobParametersBuilder()
+                .addString("outputPath", OUTPUT.resolve("customers.txt").toString()));
+    assertEquals("COMPLETED", account.getExitStatus().getExitCode());
+    assertEquals("COMPLETED", card.getExitStatus().getExitCode());
+    assertEquals("COMPLETED", xref.getExitStatus().getExitCode());
+    assertEquals("COMPLETED", customer.getExitStatus().getExitCode());
+    assertTrue(Files.readString(OUTPUT.resolve("accounts.txt")).contains("ACCT-ID"));
+    assertTrue(Files.readString(OUTPUT.resolve("accounts.txt")).contains("ACCT-CURR-BAL"));
+    assertTrue(Files.readString(OUTPUT.resolve("cards.txt")).contains("CARD-RECORD"));
+    assertTrue(Files.readString(OUTPUT.resolve("xrefs.txt")).contains("CARD-XREF-RECORD"));
+    assertTrue(Files.readString(OUTPUT.resolve("customers.txt")).contains("CUSTOMER-RECORD"));
+    assertTrue(Files.readString(OUTPUT.resolve("customers.txt")).contains("START OF EXECUTION"));
+  }
+
+  @Test
+  void exportAndImportRoundTripPreservesExportedTables() throws Exception {
+    loader.loadAll();
+    Map<String, List<String>> before = exportedSnapshot();
+    Path exportPath = OUTPUT.resolve("round-trip.dat");
+    JobExecution export =
+        run(
+            exportJob,
+            "export-" + System.nanoTime(),
+            new JobParametersBuilder().addString("exportPath", exportPath.toString()));
+    assertEquals("COMPLETED", export.getExitStatus().getExitCode());
+    List<String> exportLines = Files.readAllLines(exportPath);
+    assertEquals(200, exportLines.size());
+    assertTrue(exportLines.stream().allMatch(line -> line.length() == ExportCodec.RECORD_LENGTH));
+    transactions.deleteAllInBatch();
+    xrefs.deleteAllInBatch();
+    cards.deleteAllInBatch();
+    balances.deleteAllInBatch();
+    accounts.deleteAllInBatch();
+    customers.deleteAllInBatch();
+    JobExecution imported =
+        run(
+            importJob,
+            "import-" + System.nanoTime(),
+            new JobParametersBuilder().addString("exportPath", exportPath.toString()));
+    assertEquals("COMPLETED", imported.getExitStatus().getExitCode());
+    assertEquals(before, exportedSnapshot());
+  }
+
+  @Test
+  void combtranMergesAndOrdersTransactionInputs() throws Exception {
+    loader.loadAll();
+    Transaction first = transaction("0000000000000002");
+    Transaction second = transaction("0000000000000001");
+    Path backup = OUTPUT.resolve("comb-backup.dat");
+    Path system = OUTPUT.resolve("comb-system.dat");
+    Files.createDirectories(OUTPUT);
+    Files.writeString(backup, ExportCodec.transaction(1, first) + System.lineSeparator());
+    Files.writeString(system, ExportCodec.transaction(2, second) + System.lineSeparator());
+    JobExecution execution =
+        run(
+            combtranJob,
+            "combtran-" + System.nanoTime(),
+            new JobParametersBuilder()
+                .addString("backupPath", backup.toString())
+                .addString("systemPath", system.toString()));
+    assertEquals("COMPLETED", execution.getExitStatus().getExitCode());
+    assertEquals(
+        List.of("0000000000000001", "0000000000000002"),
+        transactions.findAllByOrderByTranIdAsc().stream().map(Transaction::getTranId).toList());
+  }
+
+  private Map<String, List<String>> exportedSnapshot() {
+    Map<String, List<String>> snapshot = new HashMap<>();
+    snapshot.put(
+        "customers",
+        customers.findAll().stream()
+            .sorted((a, b) -> a.getCustId().compareTo(b.getCustId()))
+            .map(
+                c ->
+                    String.join(
+                        "|",
+                        String.valueOf(c.getCustId()),
+                        c.getFirstName(),
+                        c.getLastName(),
+                        c.getAddrZip(),
+                        c.getDobYyyyMmDd(),
+                        String.valueOf(c.getFicoCreditScore())))
+            .toList());
+    snapshot.put(
+        "accounts",
+        accounts.findAll().stream()
+            .sorted((a, b) -> a.getAcctId().compareTo(b.getAcctId()))
+            .map(
+                a ->
+                    String.join(
+                        "|",
+                        String.valueOf(a.getAcctId()),
+                        a.getCurrBal().toString(),
+                        a.getCreditLimit().toString(),
+                        a.getExpiraionDate(),
+                        a.getGroupId()))
+            .toList());
+    snapshot.put(
+        "cards",
+        cards.findAll().stream()
+            .sorted((a, b) -> a.getCardNum().compareTo(b.getCardNum()))
+            .map(
+                c ->
+                    String.join(
+                        "|",
+                        c.getCardNum(),
+                        String.valueOf(c.getAcctId()),
+                        String.valueOf(c.getCvvCd()),
+                        c.getExpiraionDate(),
+                        c.getActiveStatus()))
+            .toList());
+    snapshot.put(
+        "xrefs",
+        xrefs.findAll().stream()
+            .sorted((a, b) -> a.getId().getCardNum().compareTo(b.getId().getCardNum()))
+            .map(
+                x ->
+                    String.join(
+                        "|",
+                        x.getId().getCardNum(),
+                        String.valueOf(x.getCustId()),
+                        String.valueOf(x.getAcctId())))
+            .toList());
+    snapshot.put(
+        "transactions",
+        transactions.findAllByOrderByTranIdAsc().stream()
+            .map(
+                t ->
+                    String.join(
+                        "|",
+                        t.getTranId(),
+                        t.getTypeCd(),
+                        String.valueOf(t.getCatCd()),
+                        t.getSource(),
+                        t.getAmt() == null ? "" : t.getAmt().toString()))
+            .toList());
+    return snapshot;
+  }
+
+  private Transaction transaction(String id) {
+    Transaction row = new Transaction();
+    row.setTranId(id);
+    row.setTypeCd("01");
+    row.setCatCd(1);
+    row.setSource("System");
+    row.setTranDesc("test");
+    row.setAmt(new BigDecimal("1.00"));
+    row.setMerchantId(0);
+    row.setMerchantName("");
+    row.setMerchantCity("");
+    row.setMerchantZip("");
+    row.setCardNum("0000000000000001");
+    row.setOrigTs("2022-07-18-00.00.00.000000");
+    row.setProcTs(row.getOrigTs());
+    return row;
   }
 
   private JobExecution run(Job job, String id) throws Exception {

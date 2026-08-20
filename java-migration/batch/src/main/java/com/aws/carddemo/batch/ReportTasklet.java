@@ -135,12 +135,7 @@ class ReportTasklet implements Tasklet {
     }
     report.append(totalLine("Grand Total", grandTotal)).append('\n');
     Files.writeString(output, report.toString());
-    for (int i = 0; i < selected.size(); i++) {
-      contribution.incrementReadCount();
-    }
-    for (int i = 0; i < detailLines; i++) {
-      contribution.incrementWriteCount(1);
-    }
+    contribution.incrementWriteCount(detailLines);
     return RepeatStatus.FINISHED;
   }
 

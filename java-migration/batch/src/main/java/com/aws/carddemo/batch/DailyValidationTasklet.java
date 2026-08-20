@@ -30,7 +30,7 @@ class DailyValidationTasklet implements Tasklet {
     int checked = 0;
     int missingXref = 0;
     int missingAccount = 0;
-    for (var daily : dailyTransactions.findByTranIdGreaterThanOrderByTranId("")) {
+    for (var daily : dailyTransactions.findAllByOrderByTranIdAsc()) {
       checked++;
       var xref = xrefs.findById(new CardXrefId(daily.getCardNum())).orElse(null);
       if (xref == null) {
@@ -44,9 +44,6 @@ class DailyValidationTasklet implements Tasklet {
     executionContext.putInt("checkedCount", checked);
     executionContext.putInt("missingXrefCount", missingXref);
     executionContext.putInt("missingAccountCount", missingAccount);
-    for (int i = 0; i < checked; i++) {
-      contribution.incrementReadCount();
-    }
     return RepeatStatus.FINISHED;
   }
 }
