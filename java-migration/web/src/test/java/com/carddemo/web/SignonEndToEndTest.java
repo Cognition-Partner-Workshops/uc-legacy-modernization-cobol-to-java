@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.carddemo.domain.entity.Usrsec;
 import com.carddemo.domain.repository.UsrsecRepository;
+import com.carddemo.web.signon.SignonRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.mock.web.MockHttpSession;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,7 +40,8 @@ class SignonEndToEndTest {
     void adminSessionReachesAdminMenu() throws Exception {
         MvcResult signon = signon("admin001", "password");
 
-        mockMvc.perform(get("/api/admin/menu").session(signon.getRequest().getSession(false)))
+        mockMvc.perform(get("/api/admin/menu")
+                        .session((MockHttpSession) signon.getRequest().getSession(false)))
                 .andExpect(status().isOk());
     }
 
@@ -46,7 +49,8 @@ class SignonEndToEndTest {
     void userSessionIsForbiddenFromAdminMenu() throws Exception {
         MvcResult signon = signon("user0001", "password");
 
-        mockMvc.perform(get("/api/admin/menu").session(signon.getRequest().getSession(false)))
+        mockMvc.perform(get("/api/admin/menu")
+                        .session((MockHttpSession) signon.getRequest().getSession(false)))
                 .andExpect(status().isForbidden());
     }
 
