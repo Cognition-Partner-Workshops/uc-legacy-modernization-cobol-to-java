@@ -29,10 +29,7 @@ public class FixedLengthEbcdicReader implements ItemStreamReader<UsrsecRecord> {
         try {
             inputStream = Files.newInputStream(inputPath);
             recordNumber = executionContext.getInt("usrsec.recordNumber", 0);
-            long skipped = inputStream.skip((long) recordNumber * RECORD_LENGTH);
-            if (skipped != (long) recordNumber * RECORD_LENGTH) {
-                throw new IOException("Unable to resume USRSEC reader at record " + recordNumber);
-            }
+            inputStream.skipNBytes((long) recordNumber * RECORD_LENGTH);
         } catch (IOException exception) {
             throw new UncheckedIOException("Unable to open USRSEC input " + inputPath, exception);
         }

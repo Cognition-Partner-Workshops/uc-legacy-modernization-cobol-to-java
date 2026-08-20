@@ -33,14 +33,14 @@ class UsrsecLoadJobTest {
 
     @Test
     void loadsAllFixedLengthEbcdicRecords() throws Exception {
-        JobExecution execution = jobLauncher.run(
+        JobExecution firstExecution = jobLauncher.run(
                 usrsecLoadJob,
                 new JobParametersBuilder()
                         .addString("inputFile", SEED.toAbsolutePath().toString())
                         .addString("run", UUID.randomUUID().toString())
                         .toJobParameters());
 
-        assertThat(execution.getExitStatus().getExitCode()).isEqualTo("COMPLETED");
+        assertThat(firstExecution.getExitStatus().getExitCode()).isEqualTo("COMPLETED");
         assertThat(usrsecRepository.count()).isEqualTo(10);
         Usrsec admin = usrsecRepository.findById("ADMIN001").orElseThrow();
         assertThat(admin.getSecUsrFname()).isEqualTo("MARGARET");
@@ -49,5 +49,15 @@ class UsrsecLoadJobTest {
         assertThat(admin.getSecUsrType()).isEqualTo("A");
         Usrsec user = usrsecRepository.findById("USER0001").orElseThrow();
         assertThat(user.getSecUsrType()).isEqualTo("U");
+
+        JobExecution secondExecution = jobLauncher.run(
+                usrsecLoadJob,
+                new JobParametersBuilder()
+                        .addString("inputFile", SEED.toAbsolutePath().toString())
+                        .addString("run", UUID.randomUUID().toString())
+                        .toJobParameters());
+
+        assertThat(secondExecution.getExitStatus().getExitCode()).isEqualTo("COMPLETED");
+        assertThat(usrsecRepository.count()).isEqualTo(10);
     }
 }

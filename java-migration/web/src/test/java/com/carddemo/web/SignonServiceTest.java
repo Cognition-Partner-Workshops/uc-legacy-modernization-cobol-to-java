@@ -34,7 +34,7 @@ class SignonServiceTest {
         when(usrsecRepository.findById("ADMIN001"))
                 .thenReturn(Optional.of(new Usrsec("ADMIN001", "MARGARET", "GOLD", "PASSWORD", "A")));
 
-        SignonResponse response = service.signon("ADMIN001", "PASSWORD");
+        SignonResponse response = service.signon("ADMIN001", "PASSWORD").response();
 
         assertThat(response.role()).isEqualTo("ROLE_ADMIN");
         assertThat(response.nextProgram()).isEqualTo("COADM01C");
@@ -46,7 +46,7 @@ class SignonServiceTest {
         when(usrsecRepository.findById("USER0001"))
                 .thenReturn(Optional.of(new Usrsec("USER0001", "LAWRENCE", "THOMAS", "PASSWORD", "U")));
 
-        SignonResponse response = service.signon("USER0001", "PASSWORD");
+        SignonResponse response = service.signon("USER0001", "PASSWORD").response();
 
         assertThat(response.role()).isEqualTo("ROLE_USER");
         assertThat(response.nextProgram()).isEqualTo("COMEN01C");
@@ -90,7 +90,7 @@ class SignonServiceTest {
         when(usrsecRepository.findById("ADMIN001"))
                 .thenReturn(Optional.of(new Usrsec("ADMIN001", "MARGARET", "GOLD", "PASSWORD", "A")));
 
-        SignonResponse response = service.signon("admin001", "password");
+        SignonResponse response = service.signon("admin001", "password").response();
 
         assertThat(response.userId()).isEqualTo("ADMIN001");
     }

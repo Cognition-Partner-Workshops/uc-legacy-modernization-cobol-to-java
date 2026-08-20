@@ -9,8 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.carddemo.web.signon.SignonFailureException;
 import com.carddemo.web.signon.SignonController;
 import com.carddemo.web.signon.SignonRequest;
+import com.carddemo.web.signon.SignonOutcome;
 import com.carddemo.web.signon.SignonResponse;
 import com.carddemo.web.signon.SignonService;
+import com.carddemo.web.security.CardDemoUserDetailsService;
+import com.carddemo.web.security.LegacyPasswordEncoder;
+import com.carddemo.web.security.SecurityConfig;
+import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +25,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 @WebMvcTest(controllers = SignonController.class)
 @ContextConfiguration(classes = {SignonController.class,
-        com.carddemo.web.security.SecurityConfig.class,
-        com.carddemo.web.security.LegacyPasswordEncoder.class})
-@Import({com.carddemo.web.security.SecurityConfig.class, com.carddemo.web.security.LegacyPasswordEncoder.class})
+        SecurityConfig.class,
+        LegacyPasswordEncoder.class})
 class SignonControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -33,11 +39,17 @@ class SignonControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private SignonService signonService;
+    @MockBean
+    private CardDemoUserDetailsService userDetailsService;
 
     @Test
     void successfulAdminSignonReturnsTargetProgram() throws Exception {
         when(signonService.signon("ADMIN001", "PASSWORD"))
-                .thenReturn(new SignonResponse("ADMIN001", "MARGARET", "GOLD", "A", "ROLE_ADMIN", "COADM01C"));
+                .thenReturn(new SignonOutcome(
+                        new SignonResponse("ADMIN001", "MARGARET", "GOLD", "A", "ROLE_ADMIN", "COADM01C"),
+                        List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+        when(userDetailsService.loadUserByUsername("ADMIN001"))
+                .thenReturn(User.withUsername("ADMIN001").password("PASSWORD").authorities("ROLE_ADMIN").build());
 
         mockMvc.perform(post("/api/signon")
                         .contentType("application/json")

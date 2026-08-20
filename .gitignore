@@ -1,3 +1,5 @@
+java-migration/**/target/
+java-migration/**/*.log
 mock-data-generator/node_modules/*
 sample/*
 .vscode/*
