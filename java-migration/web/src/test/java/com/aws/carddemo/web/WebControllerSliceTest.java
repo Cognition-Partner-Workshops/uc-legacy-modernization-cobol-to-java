@@ -17,10 +17,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest({SignonController.class, MenuController.class})
 @Import(TestWebSecurityConfiguration.class)
+@ActiveProfiles("test")
 class WebControllerSliceTest {
   @Autowired MockMvc mvc;
 
