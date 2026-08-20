@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: carddemo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: carddemo
+      POSTGRES_USER: carddemo
+      POSTGRES_PASSWORD: carddemo
+    ports:
+      - "5432:5432"
+    volumes:
+      - carddemo-postgres:/var/lib/postgresql/data
+
+volumes:
+  carddemo-postgres:
