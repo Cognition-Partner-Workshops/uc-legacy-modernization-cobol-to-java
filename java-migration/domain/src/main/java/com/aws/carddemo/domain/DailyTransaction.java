@@ -1,0 +1,152 @@
+package com.aws.carddemo.domain;
+
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "daily_transaction")
+public class DailyTransaction {
+  @Id
+  @Column(name = "tran_id", length = 16)
+  String tranId;
+
+  @Column(name = "type_cd", length = 2)
+  String typeCd;
+
+  @Column(name = "cat_cd")
+  Integer catCd;
+
+  @Column(name = "source", length = 10)
+  String source;
+
+  @Column(name = "tran_desc", length = 100)
+  String tranDesc;
+
+  @Column(name = "amt", precision = 11, scale = 2)
+  BigDecimal amt;
+
+  @Column(name = "merchant_id")
+  Integer merchantId;
+
+  @Column(name = "merchant_name", length = 50)
+  String merchantName;
+
+  @Column(name = "merchant_city", length = 50)
+  String merchantCity;
+
+  @Column(name = "merchant_zip", length = 10)
+  String merchantZip;
+
+  @Column(name = "card_num", length = 16)
+  String cardNum;
+
+  @Column(name = "orig_ts", length = 26)
+  String origTs;
+
+  @Column(name = "proc_ts", length = 26)
+  String procTs;
+
+  public String getTranId() {
+    return tranId;
+  }
+
+  public void setTranId(String v) {
+    tranId = v;
+  }
+
+  public String getTypeCd() {
+    return typeCd;
+  }
+
+  public void setTypeCd(String v) {
+    typeCd = v;
+  }
+
+  public Integer getCatCd() {
+    return catCd;
+  }
+
+  public void setCatCd(Integer v) {
+    catCd = v;
+  }
+
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String v) {
+    source = v;
+  }
+
+  public String getTranDesc() {
+    return tranDesc;
+  }
+
+  public void setTranDesc(String v) {
+    tranDesc = v;
+  }
+
+  public BigDecimal getAmt() {
+    return amt;
+  }
+
+  public void setAmt(BigDecimal v) {
+    amt = v;
+  }
+
+  public Integer getMerchantId() {
+    return merchantId;
+  }
+
+  public void setMerchantId(Integer v) {
+    merchantId = v;
+  }
+
+  public String getMerchantName() {
+    return merchantName;
+  }
+
+  public void setMerchantName(String v) {
+    merchantName = v;
+  }
+
+  public String getMerchantCity() {
+    return merchantCity;
+  }
+
+  public void setMerchantCity(String v) {
+    merchantCity = v;
+  }
+
+  public String getMerchantZip() {
+    return merchantZip;
+  }
+
+  public void setMerchantZip(String v) {
+    merchantZip = v;
+  }
+
+  public String getCardNum() {
+    return cardNum;
+  }
+
+  public void setCardNum(String v) {
+    cardNum = v;
+  }
+
+  public String getOrigTs() {
+    return origTs;
+  }
+
+  public void setOrigTs(String v) {
+    origTs = v;
+  }
+
+  public String getProcTs() {
+    return procTs;
+  }
+
+  public void setProcTs(String v) {
+    procTs = v;
+  }
+}

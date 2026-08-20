@@ -1,0 +1,85 @@
+CREATE TABLE transaction_type_category (
+  trc_type_code VARCHAR(2) NOT NULL,
+  trc_type_category VARCHAR(4) NOT NULL,
+  trc_cat_data VARCHAR(50) NOT NULL,
+  PRIMARY KEY (trc_type_code, trc_type_category),
+  CONSTRAINT fk_trc_type FOREIGN KEY (trc_type_code) REFERENCES transaction_type(type_cd)
+);
+
+CREATE TABLE pending_auth_summary (
+  acct_id BIGINT PRIMARY KEY,
+  cust_id INTEGER,
+  auth_status VARCHAR(1),
+  account_status VARCHAR(2) NOT NULL DEFAULT '',
+  credit_limit NUMERIC(11,2),
+  cash_limit NUMERIC(11,2),
+  credit_balance NUMERIC(11,2),
+  cash_balance NUMERIC(11,2),
+  approved_auth_count INTEGER NOT NULL DEFAULT 0,
+  declined_auth_count INTEGER NOT NULL DEFAULT 0,
+  approved_auth_amount NUMERIC(11,2),
+  declined_auth_amount NUMERIC(11,2)
+);
+
+CREATE TABLE pending_auth_detail (
+  id BIGSERIAL PRIMARY KEY,
+  acct_id BIGINT NOT NULL,
+  auth_date VARCHAR(6) NOT NULL,
+  auth_time VARCHAR(6) NOT NULL,
+  card_num VARCHAR(16),
+  auth_type VARCHAR(4),
+  card_expiry_date VARCHAR(4),
+  message_type VARCHAR(6),
+  message_source VARCHAR(6),
+  auth_id_code VARCHAR(6),
+  auth_resp_code VARCHAR(2),
+  auth_resp_reason VARCHAR(4),
+  processing_code VARCHAR(6),
+  transaction_amt NUMERIC(12,2),
+  approved_amt NUMERIC(12,2),
+  merchant_category_code VARCHAR(4),
+  acqr_country_code VARCHAR(3),
+  pos_entry_mode SMALLINT,
+  merchant_id VARCHAR(15),
+  merchant_name VARCHAR(22),
+  merchant_city VARCHAR(13),
+  merchant_state VARCHAR(2),
+  merchant_zip VARCHAR(9),
+  transaction_id VARCHAR(15),
+  match_status VARCHAR(1),
+  auth_fraud VARCHAR(1),
+  fraud_rpt_date VARCHAR(8),
+  cust_id INTEGER,
+  CONSTRAINT uq_pending_auth_key UNIQUE (acct_id, auth_date, auth_time)
+);
+CREATE INDEX idx_pending_auth_acct ON pending_auth_detail(acct_id);
+
+CREATE TABLE authfrds (
+  card_num VARCHAR(16) NOT NULL,
+  auth_ts TIMESTAMP NOT NULL,
+  auth_type VARCHAR(4),
+  card_expiry_date VARCHAR(4),
+  message_type VARCHAR(6),
+  message_source VARCHAR(6),
+  auth_id_code VARCHAR(6),
+  auth_resp_code VARCHAR(2),
+  auth_resp_reason VARCHAR(4),
+  processing_code VARCHAR(6),
+  transaction_amt NUMERIC(12,2),
+  approved_amt NUMERIC(12,2),
+  merchant_catagory_code VARCHAR(4),
+  acqr_country_code VARCHAR(3),
+  pos_entry_mode SMALLINT,
+  merchant_id VARCHAR(15),
+  merchant_name VARCHAR(22),
+  merchant_city VARCHAR(13),
+  merchant_state VARCHAR(2),
+  merchant_zip VARCHAR(9),
+  transaction_id VARCHAR(15),
+  match_status VARCHAR(1),
+  auth_fraud VARCHAR(1),
+  fraud_rpt_date DATE,
+  acct_id BIGINT,
+  cust_id INTEGER,
+  PRIMARY KEY (card_num, auth_ts)
+);

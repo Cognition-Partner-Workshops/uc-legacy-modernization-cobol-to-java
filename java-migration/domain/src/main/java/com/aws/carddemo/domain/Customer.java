@@ -1,0 +1,206 @@
+package com.aws.carddemo.domain;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "customer")
+public class Customer {
+  @Id
+  @Column(name = "cust_id")
+  Integer custId;
+
+  @Column(name = "first_name", length = 25)
+  String firstName;
+
+  @Column(name = "middle_name", length = 25)
+  String middleName;
+
+  @Column(name = "last_name", length = 25)
+  String lastName;
+
+  @Column(name = "addr_line_1", length = 50)
+  String addrLine1;
+
+  @Column(name = "addr_line_2", length = 50)
+  String addrLine2;
+
+  @Column(name = "addr_line_3", length = 50)
+  String addrLine3;
+
+  @Column(name = "addr_state_cd", length = 2)
+  String addrStateCd;
+
+  @Column(name = "addr_country_cd", length = 3)
+  String addrCountryCd;
+
+  @Column(name = "addr_zip", length = 10)
+  String addrZip;
+
+  @Column(name = "phone_num_1", length = 15)
+  String phoneNum1;
+
+  @Column(name = "phone_num_2", length = 15)
+  String phoneNum2;
+
+  @Column(name = "ssn")
+  Integer ssn;
+
+  @Column(name = "govt_issued_id", length = 20)
+  String govtIssuedId;
+
+  @Column(name = "dob_yyyy_mm_dd", length = 10)
+  String dobYyyyMmDd;
+
+  @Column(name = "eft_account_id", length = 10)
+  String eftAccountId;
+
+  @Column(name = "pri_card_holder_ind", length = 1)
+  String priCardHolderInd;
+
+  @Column(name = "fico_credit_score")
+  Integer ficoCreditScore;
+
+  public Integer getCustId() {
+    return custId;
+  }
+
+  public void setCustId(Integer v) {
+    custId = v;
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public void setFirstName(String v) {
+    firstName = v;
+  }
+
+  public String getMiddleName() {
+    return middleName;
+  }
+
+  public void setMiddleName(String v) {
+    middleName = v;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
+
+  public void setLastName(String v) {
+    lastName = v;
+  }
+
+  public String getAddrLine1() {
+    return addrLine1;
+  }
+
+  public void setAddrLine1(String v) {
+    addrLine1 = v;
+  }
+
+  public String getAddrLine2() {
+    return addrLine2;
+  }
+
+  public void setAddrLine2(String v) {
+    addrLine2 = v;
+  }
+
+  public String getAddrLine3() {
+    return addrLine3;
+  }
+
+  public void setAddrLine3(String v) {
+    addrLine3 = v;
+  }
+
+  public String getAddrStateCd() {
+    return addrStateCd;
+  }
+
+  public void setAddrStateCd(String v) {
+    addrStateCd = v;
+  }
+
+  public String getAddrCountryCd() {
+    return addrCountryCd;
+  }
+
+  public void setAddrCountryCd(String v) {
+    addrCountryCd = v;
+  }
+
+  public String getAddrZip() {
+    return addrZip;
+  }
+
+  public void setAddrZip(String v) {
+    addrZip = v;
+  }
+
+  public String getPhoneNum1() {
+    return phoneNum1;
+  }
+
+  public void setPhoneNum1(String v) {
+    phoneNum1 = v;
+  }
+
+  public String getPhoneNum2() {
+    return phoneNum2;
+  }
+
+  public void setPhoneNum2(String v) {
+    phoneNum2 = v;
+  }
+
+  public Integer getSsn() {
+    return ssn;
+  }
+
+  public void setSsn(Integer v) {
+    ssn = v;
+  }
+
+  public String getGovtIssuedId() {
+    return govtIssuedId;
+  }
+
+  public void setGovtIssuedId(String v) {
+    govtIssuedId = v;
+  }
+
+  public String getDobYyyyMmDd() {
+    return dobYyyyMmDd;
+  }
+
+  public void setDobYyyyMmDd(String v) {
+    dobYyyyMmDd = v;
+  }
+
+  public String getEftAccountId() {
+    return eftAccountId;
+  }
+
+  public void setEftAccountId(String v) {
+    eftAccountId = v;
+  }
+
+  public String getPriCardHolderInd() {
+    return priCardHolderInd;
+  }
+
+  public void setPriCardHolderInd(String v) {
+    priCardHolderInd = v;
+  }
+
+  public Integer getFicoCreditScore() {
+    return ficoCreditScore;
+  }
+
+  public void setFicoCreditScore(Integer v) {
+    ficoCreditScore = v;
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "data": {
+    "options": [
+      {
+        "number": 1,
+        "name": "Account View",
+        "program": "COACTVWC",
+        "userType": "U"
+      },
+      {
+        "number": 2,
+        "name": "Credit Card List",
+        "program": "COCRDLIC",
+        "userType": "U"
+      }
+    ]
+  },
+  "message": "",
+  "errorField": "",
+  "nextRoute": "",
+  "context": {
+    "fromProgram": "COMEN01C",
+    "toProgram": "COMEN01C",
+    "fromTransaction": "CCDA",
+    "toTransaction": "CCDA",
+    "userId": "USER0001",
+    "userType": "U",
+    "accountId": null,
+    "cardNumber": null
+  }
+}

@@ -1,0 +1,5 @@
+START OF STATEMENT
+Basic Details
+TRANSACTION SUMMARY
+Tran ID         Tran Details
+END OF STATEMENT
