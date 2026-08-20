@@ -17,7 +17,7 @@ class CardServiceTest {
 
   @Test
   void expiryMonthYearRoundTripPersistsNormalizedDate() {
-    Card card = card("2025-01-01");
+    Card card = card("2025-01-17");
     CardRepository repository = mock(CardRepository.class);
     when(repository.findById(card.getCardNum())).thenReturn(Optional.of(card));
     when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -32,17 +32,17 @@ class CardServiceTest {
                     null,
                     "12",
                     "2030",
-                    new CardService.CardPreImage("ORIGINAL NAME", "Y", null, "01", "2025"),
+                    new CardService.CardPreImage("ORIGINAL NAME", "Y", "2025-01-17", "01", "2025"),
                     true,
                     CONTEXT));
 
     assertEquals("", result.message());
-    assertEquals("2030-12-01", card.getExpiraionDate());
+    assertEquals("2030-12-17", card.getExpiraionDate());
   }
 
   @Test
   void expiryMonthYearNoChangeUsesNormalizedPreImageAndReportsNoChange() {
-    Card card = card("2025-01-01");
+    Card card = card("2025-01-17");
     CardRepository repository = mock(CardRepository.class);
     when(repository.findById(card.getCardNum())).thenReturn(Optional.of(card));
 
@@ -56,7 +56,7 @@ class CardServiceTest {
                     null,
                     "01",
                     "2025",
-                    new CardService.CardPreImage("ORIGINAL NAME", "Y", null, "01", "2025"),
+                    new CardService.CardPreImage("ORIGINAL NAME", "Y", "2025-01-17", "01", "2025"),
                     true,
                     CONTEXT));
 

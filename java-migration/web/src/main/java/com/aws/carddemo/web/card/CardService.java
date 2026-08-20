@@ -77,13 +77,14 @@ public class CardService {
           "Card Name can have alphabets only.", "embossedName", request.context());
     if (blank(request.activeStatus()) || !request.activeStatus().matches("(?i)[YN]"))
       return Response.error("Card Status must be Y or N.", "activeStatus", request.context());
-    String expirationDate = expirationDate(request);
+    String expirationDate = expirationDate(request, card.getExpiraionDate());
     if (expirationDate == null)
       return Response.error("Expiration Date is not valid", "expirationDate", request.context());
     if (request.preImage() == null
         || !Objects.equals(card.getEmbossedName(), request.preImage().embossedName())
         || !Objects.equals(card.getActiveStatus(), request.preImage().activeStatus())
-        || !Objects.equals(card.getExpiraionDate(), preImageDate(request.preImage()))) {
+        || !Objects.equals(
+            card.getExpiraionDate(), preImageDate(request.preImage(), card.getExpiraionDate()))) {
       return Response.error(
           "Record changed by some one else. Please review", "cardNumber", request.context());
     }
@@ -106,14 +107,14 @@ public class CardService {
     return value == null || value.isBlank();
   }
 
-  private static String expirationDate(CardUpdateRequest request) {
+  private static String expirationDate(CardUpdateRequest request, String existingDate) {
     String year = request.expirationYear();
     String month = request.expirationMonth();
     if (year != null
         && month != null
         && year.matches("\\d{4}")
         && month.matches("(0[1-9]|1[0-2])")) {
-      return year + "-" + month + "-01";
+      return year + "-" + month + "-" + existingDay(existingDate);
     }
     if (request.expirationDate() != null
         && request.expirationDate().matches("\\d{4}-\\d{2}-\\d{2}")) {
@@ -122,15 +123,31 @@ public class CardService {
     return null;
   }
 
-  private static String preImageDate(CardPreImage preImage) {
+  private static String preImageDate(CardPreImage preImage, String existingDate) {
     if (preImage == null) return null;
     if (preImage.expirationYear() != null
         && preImage.expirationMonth() != null
         && preImage.expirationYear().matches("\\d{4}")
         && preImage.expirationMonth().matches("(0[1-9]|1[0-2])")) {
-      return preImage.expirationYear() + "-" + preImage.expirationMonth() + "-01";
+      return preImage.expirationYear()
+          + "-"
+          + preImage.expirationMonth()
+          + "-"
+          + existingDay(
+              preImage.expirationDate() == null ? existingDate : preImage.expirationDate());
     }
     return preImage.expirationDate();
+  }
+
+  private static String existingDay(String value) {
+    if (value != null && value.matches("\\d{4}-\\d{2}-\\d{2}")) {
+      try {
+        return String.format("%02d", java.time.LocalDate.parse(value).getDayOfMonth());
+      } catch (java.time.DateTimeException ignored) {
+        // Use the COBOL-compatible first day when the stored value is invalid.
+      }
+    }
+    return "01";
   }
 
   private static Context withCard(Context c, String card, String program) {

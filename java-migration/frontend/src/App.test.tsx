@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { vi, describe, expect, it, beforeEach } from "vitest";
 import App from "./App";
 import menuFixture from "./test-fixtures/menu-user-response.json";
+import { screenResponses } from "./test-fixtures/screen-responses";
 
 function response<T>(data: T, message = "", nextRoute = "") {
   return { data, message, errorField: "", nextRoute, context: { fromProgram: "COMEN01C", userId: "USER001", userType: "U" } };
@@ -14,6 +15,11 @@ beforeEach(() => {
 });
 
 describe("CardDemo SPA", () => {
+  function signedIn(role: "ROLE_USER" | "ROLE_ADMIN" = "ROLE_USER") {
+    const payload = btoa(JSON.stringify({ sub: role === "ROLE_ADMIN" ? "ADMIN001" : "USER0001", role, exp: 9999999999 }));
+    sessionStorage.setItem("carddemo.jwt", `header.${payload}.signature`);
+  }
+
   it("renders the exact server signon failure message", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(response(null, "Wrong Password. Try again ...")), { status: 200 }));
     render(<MemoryRouter initialEntries={["/signon"]}><App /></MemoryRouter>);
@@ -156,5 +162,127 @@ describe("CardDemo SPA", () => {
     fireEvent.click(screen.getByRole("button", { name: /enter/i }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     expect(screen.getByText("TRANSACTION TYPE UPDATE")).toBeInTheDocument();
+  });
+
+  it("maps the nested account payload to every account view BMS field", async () => {
+    signedIn();
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(screenResponses.account), { status: 200 }));
+    render(<MemoryRouter initialEntries={["/accounts/view"]}><App /></MemoryRouter>);
+    fireEvent.change(screen.getByLabelText("Account ID"), { target: { value: "1" } });
+    fireEvent.click(screen.getByRole("button", { name: /enter/i }));
+    expect(await screen.findByDisplayValue("Y")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("1094.10")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("London")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("12345")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("GOV-001")).toBeInTheDocument();
+  });
+
+  it("maps the nested account payload to editable account fields", async () => {
+    signedIn();
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(screenResponses.account), { status: 200 }));
+    render(<MemoryRouter initialEntries={["/accounts/update"]}><App /></MemoryRouter>);
+    fireEvent.change(screen.getByLabelText("Account ID"), { target: { value: "1" } });
+    fireEvent.click(screen.getByRole("button", { name: /enter/i }));
+    expect(await screen.findByDisplayValue("5551112222")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("15")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("5551112222")).toBeInTheDocument();
+  });
+
+  it("renders the fixed card grid and navigates by selected card", async () => {
+    signedIn();
+    const fetchMock = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify(screenResponses.cardPage), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(screenResponses.card), { status: 200 }));
+    render(<MemoryRouter initialEntries={["/cards"]}><App /></MemoryRouter>);
+    expect(await screen.findByText("4000000000000001")).toBeInTheDocument();
+    expect(screen.queryByText("ADA LOVELACE")).not.toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole("button", { name: "Select" })[0]);
+    await waitFor(() => expect(screen.getByDisplayValue("ADA LOVELACE")).toBeInTheDocument());
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("maps the card detail payload including the stored expiry day", async () => {
+    signedIn();
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(screenResponses.card), { status: 200 }));
+    render(<MemoryRouter initialEntries={["/cards/detail?cardNumber=4000000000000001"]}><App /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: /enter/i }));
+    expect(await screen.findByDisplayValue("15")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("ADA LOVELACE")).toBeInTheDocument();
+  });
+
+  it("loads the card update map from the server before submitting edits", async () => {
+    signedIn();
+    const fetchMock = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify(screenResponses.card), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(screenResponses.card), { status: 200 }));
+    render(<MemoryRouter initialEntries={["/cards/update?cardNumber=4000000000000001"]}><App /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: /enter/i }));
+    expect(await screen.findByDisplayValue("ADA LOVELACE")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Confirm"), { target: { value: "Y" } });
+    fireEvent.click(screen.getByRole("button", { name: /enter/i }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(JSON.parse(String(fetchMock.mock.calls[1][1]?.body))).toMatchObject({
+      expirationMonth: "12",
+      expirationYear: "2030",
+      preImage: { expirationDate: "2030-12-15" },
+    });
+  });
+
+  it("maps transaction list and detail payloads to BMS fields", async () => {
+    signedIn();
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify(screenResponses.transactionPage), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(screenResponses.transaction), { status: 200 }));
+    render(<MemoryRouter initialEntries={["/transactions"]}><App /></MemoryRouter>);
+    expect(await screen.findByText("2022071800000001")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Select" }));
+    await waitFor(() => expect(screen.getByDisplayValue("PURCHASE")).toBeInTheDocument());
+    expect(screen.getByDisplayValue("12.34")).toBeInTheDocument();
+  });
+
+  it("renders real user rows and keeps admin routes guarded", async () => {
+    signedIn("ROLE_ADMIN");
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(screenResponses.users), { status: 200 }));
+    render(<MemoryRouter initialEntries={["/admin/users"]}><App /></MemoryRouter>);
+    expect(await screen.findByText("USER0001")).toBeInTheDocument();
+    expect(screen.getByText("Ada")).toBeInTheDocument();
+    expect(screen.getByText("Lovelace")).toBeInTheDocument();
+  });
+
+  it("renders authorization summary and detail fields from server payloads", async () => {
+    signedIn();
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify(screenResponses.authorizationList), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(screenResponses.authorization), { status: 200 }));
+    render(<MemoryRouter initialEntries={["/authorizations"]}><App /></MemoryRouter>);
+    fireEvent.change(screen.getByLabelText("Account ID"), { target: { value: "1" } });
+    fireEvent.click(screen.getByRole("button", { name: /enter/i }));
+    expect(await screen.findByText("AUTH0001")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Select row 1" }));
+    await waitFor(() => expect(screen.getByDisplayValue("AUTH0001")).toBeInTheDocument());
+    expect(screen.getByDisplayValue("00")).toBeInTheDocument();
+  });
+
+  it("renders transaction type rows from the server DTO shape", async () => {
+    signedIn("ROLE_ADMIN");
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(screenResponses.transactionTypes), { status: 200 }));
+    render(<MemoryRouter initialEntries={["/admin/transaction-types"]}><App /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: /enter/i }));
+    expect(await screen.findByText("PURCHASE")).toBeInTheDocument();
+    expect(screen.getByText("01")).toBeInTheDocument();
+  });
+
+  it("keeps real BMS fields visible on add, bill payment, and report screens", () => {
+    signedIn();
+    render(<MemoryRouter initialEntries={["/transactions/add"]}><App /></MemoryRouter>);
+    expect(screen.getByLabelText("Merchant Name")).toBeInTheDocument();
+    expect(screen.getByLabelText("Amount")).toBeInTheDocument();
+  });
+
+  it("keeps every admin CRUD route mapped to its BMS fields", () => {
+    signedIn("ROLE_ADMIN");
+    render(<MemoryRouter initialEntries={["/admin/users/add"]}><App /></MemoryRouter>);
+    expect(screen.getByLabelText("First Name")).toBeInTheDocument();
+    expect(screen.getByLabelText("User Type")).toBeInTheDocument();
   });
 });

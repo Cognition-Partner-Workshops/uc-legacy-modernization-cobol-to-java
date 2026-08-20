@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "./api";
+import { useAuth } from "./auth";
 import { FieldSpec, MapSpec } from "./maps";
 
 const PROGRAM_ROUTES: Record<string, string> = {
@@ -66,6 +67,7 @@ export function BmsScreen({
   onPageDown?: () => void;
 }) {
   const navigate = useNavigate();
+  const { userId } = useAuth();
   const submitting = useRef(false);
   const submit = async () => {
     if (submitting.current || !onSubmit) return;
@@ -87,7 +89,7 @@ export function BmsScreen({
       <div className="terminal-subheader">
         <span>CARDDEMO</span>
         <span>3270 ONLINE APPLICATION</span>
-        <span>USER: {context?.userId || "SIGNON"}</span>
+        <span>USER: {userId || context?.userId || "SIGNON"}</span>
       </div>
       <form className="screen-body" onSubmit={(event) => { event.preventDefault(); void submit(); }}>
         {children}

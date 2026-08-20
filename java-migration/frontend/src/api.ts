@@ -123,7 +123,9 @@ export const api = {
   cards: (params: { accountId?: string; cardNumber?: string; page?: number; direction?: string; context?: Context }) =>
     request<CardPage>(
       `/api/cards?${new URLSearchParams(
-        Object.entries(params).filter((entry): entry is [string, string] => entry[1] !== undefined).map(([key, value]) => [key, String(value)]),
+        Object.entries(params)
+          .filter(([key, value]) => key !== "context" && value !== undefined)
+          .map(([key, value]) => [key, String(value)]),
       )}`,
     ),
   card: (cardNumber: string) =>
@@ -136,7 +138,9 @@ export const api = {
   transactions: (params: Record<string, unknown>) =>
     request<TransactionPage>(
       `/api/transactions?${new URLSearchParams(
-        Object.entries(params).filter((entry): entry is [string, string] => entry[1] !== undefined).map(([key, value]) => [key, String(value)]),
+        Object.entries(params)
+          .filter(([key, value]) => key !== "context" && value !== undefined)
+          .map(([key, value]) => [key, String(value)]),
       )}`,
     ),
   transaction: (id: string) => request<Record<string, unknown>>(`/api/transactions/${id}`),

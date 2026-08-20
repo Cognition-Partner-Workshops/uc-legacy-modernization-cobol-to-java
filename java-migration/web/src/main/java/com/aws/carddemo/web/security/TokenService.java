@@ -20,8 +20,13 @@ public class TokenService {
       @Value("${carddemo.security.jwt-secret:}") String secret, Environment environment) {
     if (secret != null && !secret.isBlank()) {
       this.secret = secret;
-    } else if (java.util.Arrays.stream(environment.getActiveProfiles())
-        .anyMatch(profile -> profile.equals("prod") || profile.equals("production"))) {
+    } else if (!java.util.Arrays.stream(environment.getActiveProfiles())
+        .anyMatch(
+            profile ->
+                profile.equals("local")
+                    || profile.equals("test")
+                    || profile.equals("dev")
+                    || profile.equals("development"))) {
       throw new IllegalStateException(
           "CARDDEMO_JWT_SECRET must be configured outside local/test profiles");
     } else {

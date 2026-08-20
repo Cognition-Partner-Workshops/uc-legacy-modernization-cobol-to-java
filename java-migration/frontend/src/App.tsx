@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 import { api, Context, MenuData } from "./api";
 import { AuthProvider, useAuth } from "./auth";
-import { BmsScreen, MapFields, RecordTable, routeForProgram } from "./components";
+import { BmsScreen, MapFields, routeForProgram } from "./components";
 import { MAPS, MapSpec } from "./maps";
 
 function Guard({ children, admin = false }: { children: React.ReactNode; admin?: boolean }) {
@@ -14,6 +14,174 @@ function Guard({ children, admin = false }: { children: React.ReactNode; admin?:
 
 function ScreenState({ map, children, onSubmit, context, message = "", onBack, onPageUp, onPageDown }: { map: MapSpec; children: React.ReactNode; onSubmit?: () => void; context?: Context | null; message?: string; onBack?: () => void; onPageUp?: () => void; onPageDown?: () => void }) {
   return <BmsScreen map={map} message={message} context={context} onSubmit={onSubmit} onBack={onBack} onPageUp={onPageUp} onPageDown={onPageDown}>{children}</BmsScreen>;
+}
+
+function text(value: unknown): string {
+  return value === null || value === undefined ? "" : String(value);
+}
+
+function datePart(value: unknown, part: "year" | "month" | "day"): string {
+  const date = text(value);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return "";
+  return part === "year" ? date.slice(0, 4) : part === "month" ? date.slice(5, 7) : date.slice(8, 10);
+}
+
+function accountValues(payload: Record<string, unknown>, update: boolean): Record<string, string> {
+  const account = (payload.account as Record<string, unknown> | undefined) ?? payload;
+  const customer = (payload.customer as Record<string, unknown> | undefined) ?? payload;
+  const values: Record<string, string> = {
+    accountId: text(account.acctId ?? payload.accountId),
+    activeStatus: text(account.activeStatus),
+    status: text(account.activeStatus),
+    openDate: text(account.openDate),
+    expirationDate: text(account.expiraionDate),
+    reissueDate: text(account.reissueDate),
+    creditLimit: text(account.creditLimit),
+    cashLimit: text(account.cashCreditLimit),
+    currentBalance: text(account.currBal),
+    cycleCredit: text(account.currCycCredit),
+    cycleDebit: text(account.currCycDebit),
+    groupId: text(account.groupId),
+    customerNumber: text(customer.custId),
+    ssn: text(customer.ssn),
+    dateOfBirth: text(customer.dobYyyyMmDd),
+    ficoScore: text(customer.ficoCreditScore),
+    firstName: text(customer.firstName),
+    middleName: text(customer.middleName),
+    lastName: text(customer.lastName),
+    addressLine1: text(customer.addrLine1),
+    addressLine2: text(customer.addrLine2),
+    city: text(customer.addrLine3),
+    state: text(customer.addrStateCd),
+    zip: text(customer.addrZip),
+    country: text(customer.addrCountryCd),
+    phone1: text(customer.phoneNum1),
+    phone2: text(customer.phoneNum2),
+    governmentId: text(customer.govtIssuedId),
+    eftAccountId: text(customer.eftAccountId),
+    primaryCardHolder: text(customer.priCardHolderInd),
+  };
+  if (update) {
+    values.openYear = datePart(account.openDate, "year");
+    values.openMonth = datePart(account.openDate, "month");
+    values.openDay = datePart(account.openDate, "day");
+    values.expirationYear = datePart(account.expiraionDate, "year");
+    values.expirationMonth = datePart(account.expiraionDate, "month");
+    values.expirationDay = datePart(account.expiraionDate, "day");
+    values.reissueYear = datePart(account.reissueDate, "year");
+    values.reissueMonth = datePart(account.reissueDate, "month");
+    values.reissueDay = datePart(account.reissueDate, "day");
+  }
+  return values;
+}
+
+function cardValues(payload: Record<string, unknown>): Record<string, string> {
+  const expiration = text(payload.expiraionDate);
+  return {
+    accountId: text(payload.acctId),
+    cardNumber: text(payload.cardNum),
+    cardName: text(payload.embossedName),
+    status: text(payload.activeStatus),
+    expirationDate: expiration,
+    expirationYear: datePart(expiration, "year"),
+    expirationMonth: datePart(expiration, "month"),
+    expirationDay: datePart(expiration, "day"),
+  };
+}
+
+function composeDate(values: Record<string, string>, prefix: string): string {
+  const year = values[`${prefix}Year`] ?? "";
+  const month = values[`${prefix}Month`] ?? "";
+  const day = values[`${prefix}Day`] ?? "";
+  return year && month && day ? `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}` : "";
+}
+
+function transactionValues(payload: Record<string, unknown>): Record<string, string> {
+  return {
+    transactionId: text(payload.tranId),
+    cardNumber: text(payload.cardNum),
+    typeCode: text(payload.typeCd),
+    categoryCode: text(payload.catCd),
+    source: text(payload.source),
+    description: text(payload.tranDesc),
+    amount: text(payload.amt),
+    origDate: text(payload.origTs),
+    procDate: text(payload.procTs),
+    merchantId: text(payload.merchantId),
+    merchantName: text(payload.merchantName),
+    merchantCity: text(payload.merchantCity),
+    merchantZip: text(payload.merchantZip),
+  };
+}
+
+function authorizationValues(payload: Record<string, unknown>): Record<string, string> {
+  return {
+    authorizationId: text(payload.id),
+    accountId: text(payload.acctId),
+    cardNumber: text(payload.cardNum),
+    transactionId: text(payload.transactionId),
+    amount: text(payload.approvedAmt ?? payload.transactionAmt),
+    responseCode: text(payload.authRespCode),
+    matchStatus: text(payload.matchStatus),
+    fraud: text(payload.authFraud),
+  };
+}
+
+function accountRequest(values: Record<string, string>, preImage: Record<string, string>, context: Context | null) {
+  return {
+    accountId: values.accountId ? Number(values.accountId) : null,
+    activeStatus: values.activeStatus,
+    creditLimit: values.creditLimit,
+    cashCreditLimit: values.cashLimit,
+    openDate: composeDate(values, "open"),
+    expiraionDate: composeDate(values, "expiration"),
+    reissueDate: composeDate(values, "reissue"),
+    groupId: values.groupId,
+    firstName: values.firstName,
+    middleName: values.middleName,
+    lastName: values.lastName,
+    addressLine1: values.addressLine1,
+    addressLine2: values.addressLine2,
+    city: values.city,
+    state: values.state,
+    country: values.country,
+    zip: values.zip,
+    phone1: values.phone1,
+    phone2: values.phone2,
+    eftAccountId: values.eftAccountId,
+    primaryCardHolder: values.primaryCardHolder || "Y",
+    dob: values.dateOfBirth,
+    ficoScore: values.ficoScore,
+    preImage: {
+      activeStatus: preImage.activeStatus,
+      currBal: preImage.currentBalance,
+      creditLimit: preImage.creditLimit,
+      cashCreditLimit: preImage.cashLimit,
+      openDate: preImage.openDate,
+      expiraionDate: preImage.expirationDate,
+      reissueDate: preImage.reissueDate,
+      currCycCredit: preImage.cycleCredit,
+      currCycDebit: preImage.cycleDebit,
+      groupId: preImage.groupId,
+      firstName: preImage.firstName,
+      middleName: preImage.middleName,
+      lastName: preImage.lastName,
+      addressLine1: preImage.addressLine1,
+      addressLine2: preImage.addressLine2,
+      city: preImage.city,
+      state: preImage.state,
+      country: preImage.country,
+      zip: preImage.zip,
+      phone1: preImage.phone1,
+      phone2: preImage.phone2,
+      eftAccountId: preImage.eftAccountId,
+      primaryCardHolder: preImage.primaryCardHolder,
+      dob: preImage.dateOfBirth,
+      ficoScore: preImage.ficoScore,
+    },
+    confirm: values.confirm === "Y",
+    context,
+  };
 }
 
 function Signon() {
@@ -72,26 +240,31 @@ function AccountView({ update = false }: { update?: boolean }) {
   const map = update ? MAPS.COACTUP : MAPS.COACTVW;
   const { context } = useAuth();
   const [values, setValues] = useState<Record<string, string>>({ accountId: context?.accountId?.toString() ?? "" });
+  const [preImage, setPreImage] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
   const [loaded, setLoaded] = useState(false);
   const set = (name: string, value: string) => setValues((old) => ({ ...old, [name]: value }));
   async function submit() {
-    if (!values.accountId || !/^\d+$/.test(values.accountId)) return setMessage("Account Number if supplied must be a 11 digit Non-Zero Number");
+    if (!values.accountId || !/^\d+$/.test(values.accountId) || Number(values.accountId) <= 0) return setMessage("Account Number if supplied must be a 11 digit Non-Zero Number");
     if (!loaded) {
       const response = await api.account(values.accountId, context ?? undefined);
       setMessage(response.message);
       if (response.data) {
-        const payload = response.data as { account?: Record<string, unknown>; customer?: Record<string, unknown>; card?: Record<string, unknown> };
-        const flattened = { ...(payload.account ?? {}), ...(payload.customer ?? {}), ...(payload.card ?? {}), ...payload };
-        setValues((old) => ({ ...old, ...Object.fromEntries(Object.entries(flattened).map(([key, value]) => [key, String(value ?? "")])) }));
+        const normalized = accountValues(response.data as Record<string, unknown>, update);
+        setValues((old) => ({ ...old, ...normalized }));
+        setPreImage(normalized);
         setLoaded(true);
       }
       return;
     }
     if (update) {
-      const response = await api.updateAccount(values.accountId, { ...values, confirm: values.confirm === "Y", context });
+      const response = await api.updateAccount(values.accountId, accountRequest(values, preImage, context));
       setMessage(response.message);
-      if (!response.message) setLoaded(true);
+      if (response.data) {
+        const normalized = accountValues(response.data as Record<string, unknown>, true);
+        setValues((old) => ({ ...old, ...normalized }));
+        setPreImage(normalized);
+      }
     }
   }
   return <ScreenState map={map} message={message} context={context} onSubmit={submit}><MapFields map={map} values={values} setValue={set} exclude={["message"]} /></ScreenState>;
@@ -103,61 +276,117 @@ function CardList() {
   const [data, setData] = useState<{ cards: Record<string, unknown>[]; nextPage: boolean; previousPage: boolean } | null>(null);
   const [values, setValues] = useState({ accountId: "", cardNumber: "" });
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
   const load = (nextPage: number) => api.cards({ ...values, page: nextPage, context: context ?? undefined }).then((response) => { setData(response.data); setMessage(response.message); setPage(nextPage); }).catch((error: Error) => setMessage(error.message));
   useEffect(() => { load(0); }, []);
   return <ScreenState map={MAPS.COCRDLI} message={message} context={context} onSubmit={() => load(0)} onPageUp={() => load(Math.max(0, page - 1))} onPageDown={() => data?.nextPage && load(page + 1)}>
-    <MapFields map={MAPS.COCRDLI} values={values} setValue={(name, value) => setValues((old) => ({ ...old, [name]: value }))} exclude={["message"]} />
-    <RecordTable rows={data?.cards ?? []} />
+    <MapFields map={MAPS.COCRDLI} values={values} setValue={(name, value) => setValues((old) => ({ ...old, [name]: value }))} exclude={["message", ...Array.from({ length: 7 }, (_, index) => `select${index + 1}`)]} />
+    <div className="record-table">
+      <table aria-label="Credit card list">
+        <thead><tr><th>Select</th><th>Account Number</th><th>Card Number</th><th>Active</th></tr></thead>
+        <tbody>{Array.from({ length: 7 }, (_, index) => data?.cards?.[index] ?? null).map((card, index) => (
+          <tr key={card ? text(card.cardNum) : `empty-${index}`}>
+            <td><button type="button" disabled={!card} onClick={() => card && navigate(`/cards/detail?cardNumber=${encodeURIComponent(text(card.cardNum))}`)}>Select</button></td>
+            <td>{card ? text(card.acctId) : ""}</td><td>{card ? text(card.cardNum) : ""}</td><td>{card ? text(card.activeStatus) : ""}</td>
+          </tr>
+        ))}</tbody>
+      </table>
+    </div>
     <div className="paging"><button type="button" disabled={!data?.previousPage} onClick={() => load(Math.max(0, page - 1))}>PF7 Page Up</button><span>Page {page + 1}</span><button type="button" disabled={!data?.nextPage} onClick={() => load(page + 1)}>PF8 Page Down</button></div>
   </ScreenState>;
 }
 
 function CardScreen({ update = false }: { update?: boolean }) {
   const map = update ? MAPS.COCRDUP : MAPS.COCRDSL;
-  const [values, setValues] = useState<Record<string, string>>({ cardNumber: "" });
+  const [searchParams] = useSearchParams();
+  const cardNumber = searchParams.get("cardNumber") ?? "";
+  const [values, setValues] = useState<Record<string, string>>({ cardNumber });
+  const [preImage, setPreImage] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const requestInFlight = useRef(false);
   const set = (name: string, value: string) => setValues((old) => ({ ...old, [name]: value }));
   async function submit() {
     if (!values.cardNumber) return setMessage("CARD ID FILTER,IF SUPPLIED MUST BE A 16 DIGIT NUMBER");
-    const response = update
-      ? await api.updateCard(values.cardNumber, {
-        embossedName: values.cardName,
-        activeStatus: values.status,
-        expirationMonth: values.expirationMonth,
-        expirationYear: values.expirationYear,
-        preImage: {
-          embossedName: values.cardName,
-          activeStatus: values.status,
-          expirationMonth: values.expirationMonth,
-          expirationYear: values.expirationYear,
-        },
-        confirm: values.confirm === "Y",
-      })
-      : await api.card(values.cardNumber);
-    setMessage(response.message);
-    if (response.data) setValues((old) => ({ ...old, ...Object.fromEntries(Object.entries(response.data ?? {}).map(([key, value]) => [key, String(value ?? "")])) }));
+    if (requestInFlight.current) return;
+    requestInFlight.current = true;
+    try {
+      if (update && !loaded) {
+        const initial = await api.card(values.cardNumber);
+        setMessage(initial.message);
+        if (initial.data) {
+          const normalized = cardValues(initial.data as Record<string, unknown>);
+          setValues((old) => ({ ...old, ...normalized }));
+          setPreImage({ embossedName: normalized.cardName, activeStatus: normalized.status, expirationDate: normalized.expirationDate });
+          setLoaded(true);
+        }
+        return;
+      }
+      const response = update
+        ? await api.updateCard(values.cardNumber, {
+            embossedName: values.cardName,
+            activeStatus: values.status,
+            expirationMonth: values.expirationMonth,
+            expirationYear: values.expirationYear,
+            preImage,
+            confirm: values.confirm === "Y",
+          })
+        : await api.card(values.cardNumber);
+      setMessage(response.message);
+      if (response.data) {
+        const normalized = cardValues(response.data as Record<string, unknown>);
+        setValues((old) => ({ ...old, ...normalized }));
+        setPreImage({ embossedName: normalized.cardName, activeStatus: normalized.status, expirationDate: normalized.expirationDate });
+        setLoaded(true);
+      }
+    } finally {
+      requestInFlight.current = false;
+    }
   }
+  useEffect(() => {
+    if (cardNumber) void submit();
+  }, [cardNumber, update]);
   return <ScreenState map={map} message={message} onSubmit={submit}><MapFields map={map} values={values} setValue={set} exclude={["message"]} /></ScreenState>;
 }
 
 function TransactionList() {
   const { context } = useAuth();
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [data, setData] = useState<{ transactions: Record<string, unknown>[]; nextPage: boolean; previousPage: boolean } | null>(null);
   const [message, setMessage] = useState("");
   const load = (next: number) => api.transactions({ page: next, direction: "FORWARD", context }).then((r) => { setData(r.data); setMessage(r.message); setPage(next); }).catch((e: Error) => setMessage(e.message));
   useEffect(() => { load(0); }, []);
   return <ScreenState map={MAPS.COTRN00} message={message} context={context} onPageUp={() => load(Math.max(page - 1, 0))} onPageDown={() => data?.nextPage && load(page + 1)}>
-    <RecordTable rows={data?.transactions ?? []} />
+    <div className="record-table">
+      <table aria-label="Transaction list">
+        <thead><tr><th>Select</th><th>Transaction ID</th><th>Date</th><th>Description</th><th>Amount</th></tr></thead>
+        <tbody>{(data?.transactions ?? []).map((row) => (
+          <tr key={text(row.tranId)}>
+            <td><button type="button" onClick={() => navigate(`/transactions/view?transactionId=${encodeURIComponent(text(row.tranId))}`)}>Select</button></td>
+            <td>{text(row.tranId)}</td><td>{text(row.procTs)}</td><td>{text(row.tranDesc)}</td><td>{text(row.amt)}</td>
+          </tr>
+        ))}</tbody>
+      </table>
+    </div>
     <div className="paging"><button type="button" disabled={!data?.previousPage} onClick={() => load(Math.max(page - 1, 0))}>PF7 Page Up</button><span>Page {page + 1}</span><button type="button" disabled={!data?.nextPage} onClick={() => load(page + 1)}>PF8 Page Down</button></div>
   </ScreenState>;
 }
 
 function TransactionView() {
-  const [id, setId] = useState("");
-  const [data, setData] = useState<Record<string, unknown> | null>(null);
+  const [searchParams] = useSearchParams();
+  const transactionId = searchParams.get("transactionId") ?? "";
+  const [values, setValues] = useState<Record<string, string>>({ transactionId });
   const [message, setMessage] = useState("");
-  return <ScreenState map={MAPS.COTRN01} message={message} onSubmit={() => api.transaction(id).then((r) => { setMessage(r.message); setData(r.data); }).catch((e: Error) => setMessage(e.message))}><label>Transaction ID<input aria-label="Transaction ID" maxLength={16} value={id} onChange={(e) => setId(e.target.value)} /></label>{data && <RecordTable rows={[data]} />}</ScreenState>;
+  useEffect(() => {
+    if (transactionId) {
+      api.transaction(transactionId).then((r) => {
+        setMessage(r.message);
+        if (r.data) setValues((old) => ({ ...old, ...transactionValues(r.data as Record<string, unknown>) }));
+      }).catch((e: Error) => setMessage(e.message));
+    }
+  }, [transactionId]);
+  return <ScreenState map={MAPS.COTRN01} message={message} onSubmit={() => api.transaction(values.transactionId).then((r) => { setMessage(r.message); if (r.data) setValues((old) => ({ ...old, ...transactionValues(r.data as Record<string, unknown>) })); }).catch((e: Error) => setMessage(e.message))}><MapFields map={MAPS.COTRN01} values={values} setValue={(name, value) => setValues((old) => ({ ...old, [name]: value }))} exclude={["message"]} /></ScreenState>;
 }
 
 function TransactionAdd() {
@@ -176,6 +405,7 @@ function TransactionAdd() {
     if (error) return setMessage(error[0]);
     const response = await api.addTransaction({ ...values, confirm: values.confirm === "Y", context });
     setMessage(response.message);
+    if (response.data) setValues((old) => ({ ...old, ...transactionValues(response.data as Record<string, unknown>) }));
   }
   return <ScreenState map={MAPS.COTRN02} message={message} context={context} onSubmit={submit}><MapFields map={MAPS.COTRN02} values={values} setValue={set} exclude={["message"]} /></ScreenState>;
 }
@@ -184,7 +414,7 @@ function BillPayment() {
   const { context } = useAuth();
   const [values, setValues] = useState({ accountId: "", confirm: "" });
   const [message, setMessage] = useState("");
-  return <ScreenState map={MAPS.COBIL00} message={message} context={context} onSubmit={() => api.billPayment({ accountId: values.accountId ? Number(values.accountId) : null, confirm: values.confirm.toUpperCase() === "Y", context }).then((r) => setMessage(r.message)).catch((e: Error) => setMessage(e.message))}><MapFields map={MAPS.COBIL00} values={values} setValue={(name, value) => setValues((old) => ({ ...old, [name]: value }))} exclude={["message"]} /></ScreenState>;
+  return <ScreenState map={MAPS.COBIL00} message={message} context={context} onSubmit={() => api.billPayment({ accountId: values.accountId ? Number(values.accountId) : null, confirm: values.confirm.toUpperCase() === "Y", context }).then((r) => { setMessage(r.message); if (r.data) setValues((old) => ({ ...old, currentBalance: text((r.data as Record<string, unknown>).remainingBalance) })); }).catch((e: Error) => setMessage(e.message))}><MapFields map={MAPS.COBIL00} values={values} setValue={(name, value) => setValues((old) => ({ ...old, [name]: value }))} exclude={["message"]} /></ScreenState>;
 }
 
 function Reports() {
@@ -196,18 +426,27 @@ function Reports() {
 
 function Users({ mode = "list" }: { mode?: "list" | "add" | "update" | "delete" }) {
   const { context } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState<Record<string, unknown>[]>([]);
-  const [values, setValues] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<Record<string, string>>({ userId: searchParams.get("userId") ?? "" });
   const [message, setMessage] = useState("");
   const set = (name: string, value: string) => setValues((old) => ({ ...old, [name]: value }));
   useEffect(() => { if (mode === "list") api.users(page).then((r) => { setRows(r.data?.users ?? []); setMessage(r.message); }).catch((e: Error) => setMessage(e.message)); }, [mode, page]);
   async function submit() {
     const response = mode === "add" ? await api.addUser({ ...values, context }) : mode === "update" ? await api.updateUser(values.userId, { ...values, confirm: values.confirm === "Y", context }) : await api.deleteUser(values.userId, { confirm: values.confirm === "Y", context });
     setMessage(response.message);
+    if (response.data) {
+      const data = response.data as Record<string, unknown>;
+      setValues((old) => ({ ...old, userId: text(data.secUsrId ?? old.userId), firstName: text(data.secUsrFname ?? old.firstName), lastName: text(data.secUsrLname ?? old.lastName), userType: text(data.secUsrType ?? old.userType) }));
+    }
   }
   const map = mode === "list" ? MAPS.COUSR00 : mode === "add" ? MAPS.COUSR01 : mode === "update" ? MAPS.COUSR02 : MAPS.COUSR03;
-  return <ScreenState map={map} message={message} context={context} onSubmit={mode === "list" ? undefined : submit} onPageUp={mode === "list" ? () => setPage(Math.max(page - 1, 0)) : undefined} onPageDown={mode === "list" ? () => setPage(page + 1) : undefined}><MapFields map={map} values={values} setValue={set} exclude={["message"]} />{mode === "list" && <RecordTable rows={rows} />}</ScreenState>;
+  return <ScreenState map={map} message={message} context={context} onSubmit={mode === "list" ? undefined : submit} onPageUp={mode === "list" ? () => setPage(Math.max(page - 1, 0)) : undefined} onPageDown={mode === "list" ? () => setPage(page + 1) : undefined}>
+    <MapFields map={map} values={values} setValue={set} exclude={mode === "list" ? ["message", ...Array.from({ length: 10 }, (_, index) => `select${index + 1}`)] : ["message"]} />
+    {mode === "list" && <div className="record-table"><table aria-label="User list"><thead><tr><th>Select</th><th>User ID</th><th>First Name</th><th>Last Name</th><th>Type</th></tr></thead><tbody>{rows.map((row) => <tr key={text(row.secUsrId)}><td><button type="button" onClick={() => navigate(`/admin/users/update?userId=${encodeURIComponent(text(row.secUsrId))}`)}>Select</button></td><td>{text(row.secUsrId)}</td><td>{text(row.secUsrFname)}</td><td>{text(row.secUsrLname)}</td><td>{text(row.secUsrType)}</td></tr>)}</tbody></table></div>}
+  </ScreenState>;
 }
 
 function ExtensionScreen({
@@ -220,6 +459,7 @@ function ExtensionScreen({
   const { context } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const authorizationId = searchParams.get("id") ?? "";
   const map = transactionTypes
     ? update
       ? MAPS.COTRTUP
@@ -228,7 +468,7 @@ function ExtensionScreen({
       ? MAPS.COPAU01
       : MAPS.COPAU00;
   const [values, setValues] = useState<Record<string, string>>({
-    authorizationId: searchParams.get("id") ?? "",
+    authorizationId,
   });
   const [message, setMessage] = useState("");
   const [rows, setRows] = useState<Record<string, unknown>[]>([]);
@@ -242,13 +482,20 @@ function ExtensionScreen({
           description: values.description ?? "",
         });
         setMessage(response.message);
+        if (response.data) {
+          const data = response.data as Record<string, unknown>;
+          setValues((old) => ({ ...old, type: text(data.typeCd), description: text(data.typeDesc) }));
+        }
       } else if (transactionTypes) {
         const response = await api.transactionTypes(targetPage);
         setRows(response.data ?? []);
         setMessage(response.message);
       } else if (update) {
         const response = await api.authorization(values.authorizationId ?? values.id ?? "");
-        setRows(response.data ? [response.data] : []);
+        if (response.data) {
+          setRows([response.data]);
+          setValues((old) => ({ ...old, ...authorizationValues(response.data as Record<string, unknown>) }));
+        } else setRows([]);
         setMessage(response.message);
       } else {
         const response = await api.authorizations(values.accountId ?? "", targetPage);
@@ -259,11 +506,31 @@ function ExtensionScreen({
       setMessage(error instanceof Error ? error.message : "Unable to process request");
     }
   }
+  useEffect(() => {
+    if (update && authorizationId) void submit();
+  }, [update, authorizationId]);
   return <ScreenState map={map} message={message} context={context} onSubmit={submit}
     onPageUp={!update ? () => { const target = Math.max(0, page - 1); setPage(target); void submit(target); } : undefined}
     onPageDown={!update ? () => { const target = page + 1; setPage(target); void submit(target); } : undefined}>
-    <MapFields map={map} values={values} setValue={set} exclude={["message"]} />
-    {rows.length > 0 && <RecordTable rows={rows} />}
+    <MapFields
+      map={map}
+      values={values}
+      setValue={set}
+      exclude={
+        transactionTypes
+          ? update
+            ? ["message"]
+            : ["message", ...Array.from({ length: 8 }, (_, index) => `select${index + 1}`), ...Array.from({ length: 8 }, (_, index) => `type${index + 1}`), ...Array.from({ length: 8 }, (_, index) => `description${index + 1}`)]
+          : update
+            ? ["message"]
+            : ["message", ...Array.from({ length: 5 }, (_, index) => `select${index + 1}`), ...["transactionId", "authDate", "authTime", "authType", "approved", "status", "amount"].flatMap((name) => [1, 2, 3, 4, 5].map((row) => `${name}${row}`))]
+      }
+    />
+    {rows.length > 0 && (transactionTypes ? (
+      <div className="record-table"><table aria-label="Transaction type list"><thead><tr><th>Select</th><th>Type</th><th>Description</th></tr></thead><tbody>{rows.map((row) => <tr key={text(row.typeCd)}><td><button type="button" onClick={() => navigate(`/admin/transaction-types/update?type=${encodeURIComponent(text(row.typeCd))}`)}>Select</button></td><td>{text(row.typeCd)}</td><td>{text(row.typeDesc)}</td></tr>)}</tbody></table></div>
+    ) : (
+      <div className="record-table"><table aria-label="Authorization summary"><thead><tr><th>Select</th><th>Auth Date</th><th>Auth Time</th><th>Card Number</th><th>Transaction ID</th><th>Amount</th><th>Status</th></tr></thead><tbody>{rows.map((row) => <tr key={text(row.id)}><td><button type="button" onClick={() => navigate(`/authorizations/detail?id=${encodeURIComponent(text(row.id))}`)}>Select</button></td><td>{text(row.authDate)}</td><td>{text(row.authTime)}</td><td>{text(row.cardNum)}</td><td>{text(row.transactionId)}</td><td>{text(row.approvedAmt)}</td><td>{text(row.matchStatus)}</td></tr>)}</tbody></table></div>
+    ))}
     {!transactionTypes && !update && rows.length > 0 && (
       <div className="extension-controls">
         {rows.map((row, index) => (
