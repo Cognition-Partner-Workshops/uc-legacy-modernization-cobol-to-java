@@ -86,9 +86,9 @@ fields; the record lengths include the dropped filler.
 The VSAM `CCXREF` file is therefore a relational join table.  `CARDAIX`
 and `CXACAIX` are alternate indexes, not extra records: they become
 relational indexes for card/account lookups.  The current migration creates
-indexes on `card_xref(cust_id)` and `card_xref(acct_id)`; the source's
-CARDAIX path is also represented by the card/account relationship and is
-not a separate table.
+indexes on `card_xref(cust_id)` and `card_xref(acct_id)`; migration V2 adds
+`idx_card_acct_id` on `card(acct_id)` for the CARDAIX card-by-account path.
+Neither alternate index is a separate table.
 
 ## `transaction` from `CVTRA05Y` (RECLN 350)
 
@@ -116,8 +116,8 @@ not a separate table.
 | TRANCAT-ACCT-ID | 9(11) | 1/11 | acct_id | NUMERIC(11,0) | id.acctId / BigDecimal | composite PK, FK account |
 | TRANCAT-TYPE-CD | X(2) | 12/2 | tran_type_cd | VARCHAR(2) | id.tranTypeCd / String | composite PK |
 | TRANCAT-CD | 9(04) | 14/4 | tran_cat_cd | NUMERIC(4,0) | id.tranCatCd / BigDecimal | composite PK |
-| TRAN-CAT-BAL | S9(09)V99 | 18/12 | tran_cat_bal | NUMERIC(11,2) | tranCatBal / BigDecimal | |
-| FILLER | X(22) | 30/22 | — | — | — | dropped |
+| TRAN-CAT-BAL | S9(09)V99 | 18/11 | tran_cat_bal | NUMERIC(11,2) | tranCatBal / BigDecimal | |
+| FILLER | X(22) | 29/22 | — | — | — | dropped |
 
 The composite VSAM `TRAN-CAT-KEY` is preserved as the JPA
 `TranCatBalId`/SQL composite primary key `(acct_id, tran_type_cd,
