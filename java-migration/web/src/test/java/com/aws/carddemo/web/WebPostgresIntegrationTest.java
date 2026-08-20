@@ -57,7 +57,7 @@ class WebPostgresIntegrationTest {
   @Test
   void seededAccountViewReturnsRealValues() throws Exception {
     loader.loadAll();
-    mvc.perform(get("/api/accounts/1").with(bearer(tokens.issue("ADMIN001", "ROLE_ADMIN"))))
+    mvc.perform(get("/api/accounts/1").with(bearer(tokens.issue("USER001", "ROLE_USER"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data.account.acctId").value(1))
         .andExpect(jsonPath("$.data.account.currBal").exists())
@@ -68,16 +68,12 @@ class WebPostgresIntegrationTest {
   void cardListUsesSevenRowWindows() throws Exception {
     loader.loadAll();
     mvc.perform(
-            get("/api/cards")
-                .param("page", "0")
-                .with(bearer(tokens.issue("ADMIN001", "ROLE_ADMIN"))))
+            get("/api/cards").param("page", "0").with(bearer(tokens.issue("USER001", "ROLE_USER"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data.pageSize").value(7))
         .andExpect(jsonPath("$.data.cards.length()").value(7));
     mvc.perform(
-            get("/api/cards")
-                .param("page", "1")
-                .with(bearer(tokens.issue("ADMIN001", "ROLE_ADMIN"))))
+            get("/api/cards").param("page", "1").with(bearer(tokens.issue("USER001", "ROLE_USER"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data.cards.length()").value(7));
   }
