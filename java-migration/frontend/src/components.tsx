@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "./api";
 import { FieldSpec, MapSpec } from "./maps";
@@ -11,9 +11,9 @@ const PROGRAM_ROUTES: Record<string, string> = {
   COTRN02C: "/transactions/add", COBIL00C: "/bill-payment", CORPT00C: "/reports",
   COUSR00C: "/admin/users", COUSR01C: "/admin/users/add", COUSR02C: "/admin/users/update",
   COUSR03C: "/admin/users/delete",
-  CPVSC: "/authorizations", CPVDC: "/authorizations/detail", COPAUS0C: "/authorizations",
-  COPAUS1C: "/authorizations/detail", CTLIC: "/admin/transaction-types", COTRTLIC: "/admin/transaction-types",
-  CTTUC: "/admin/transaction-types/update", COTRTUPC: "/admin/transaction-types/update",
+  CPVS: "/authorizations", CPVD: "/authorizations/detail", CPVSC: "/authorizations", CPVDC: "/authorizations/detail", COPAUS0C: "/authorizations",
+  COPAUS1C: "/authorizations/detail", CTLI: "/admin/transaction-types", CTLIC: "/admin/transaction-types", COTRTLIC: "/admin/transaction-types",
+  CTTU: "/admin/transaction-types/update", CTTUC: "/admin/transaction-types/update", COTRTUPC: "/admin/transaction-types/update",
 };
 
 export function routeForProgram(program?: string): string {
@@ -22,12 +22,15 @@ export function routeForProgram(program?: string): string {
 
 export function usePfKeys(
   context: Context | null | undefined,
-  paging?: { up?: () => void; down?: () => void },
+  paging?: { up?: () => void; down?: () => void; enter?: () => void | Promise<void> },
 ) {
   const navigate = useNavigate();
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "F3") {
+      if (event.key === "Enter" && paging?.enter) {
+        event.preventDefault();
+        void paging.enter();
+      } else if (event.key === "F3") {
         event.preventDefault();
         navigate(routeForProgram(context?.fromProgram));
       } else if (event.key === "F7" && paging?.up) {
@@ -57,13 +60,23 @@ export function BmsScreen({
   message: string;
   context?: Context | null;
   children: React.ReactNode;
-  onSubmit?: () => void;
+  onSubmit?: () => void | Promise<void>;
   onBack?: () => void;
   onPageUp?: () => void;
   onPageDown?: () => void;
 }) {
   const navigate = useNavigate();
-  usePfKeys(context, { up: onPageUp, down: onPageDown });
+  const submitting = useRef(false);
+  const submit = async () => {
+    if (submitting.current || !onSubmit) return;
+    submitting.current = true;
+    try {
+      await onSubmit();
+    } finally {
+      submitting.current = false;
+    }
+  };
+  usePfKeys(context, { up: onPageUp, down: onPageDown, enter: submit });
   return (
     <main className="terminal-shell">
       <header className="terminal-header">
@@ -76,12 +89,12 @@ export function BmsScreen({
         <span>3270 ONLINE APPLICATION</span>
         <span>USER: {context?.userId || "SIGNON"}</span>
       </div>
-      <form className="screen-body" onSubmit={(event) => { event.preventDefault(); onSubmit?.(); }}>
+      <form className="screen-body" onSubmit={(event) => { event.preventDefault(); void submit(); }}>
         {children}
         <div className="message-line" role="alert" aria-live="polite">{message}</div>
       </form>
       <nav className="pf-bar" aria-label="PF key controls">
-        <button type="button" onClick={onSubmit} disabled={!onSubmit}>ENTER <kbd>Enter</kbd></button>
+        <button type="button" onClick={() => void submit()} disabled={!onSubmit}>ENTER <kbd>Enter</kbd></button>
         <button type="button" onClick={onBack ?? (() => navigate(routeForProgram(context?.fromProgram)))}>PF3 <kbd>F3</kbd> Back</button>
         {onPageUp && <button type="button" onClick={onPageUp}>PF7 <kbd>F7</kbd> Page Up</button>}
         {onPageDown && <button type="button" onClick={onPageDown}>PF8 <kbd>F8</kbd> Page Down</button>}

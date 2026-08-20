@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 import { api, Context, MenuData } from "./api";
 import { AuthProvider, useAuth } from "./auth";
 import { BmsScreen, MapFields, RecordTable, routeForProgram } from "./components";
@@ -17,18 +17,18 @@ function ScreenState({ map, children, onSubmit, context, message = "", onBack, o
 }
 
 function Signon() {
-  const { signon } = useAuth();
+  const { signon, authMessage } = useAuth();
   const navigate = useNavigate();
   const [values, setValues] = useState({ userId: "", password: "" });
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(authMessage);
   const set = (key: string, value: string) => setValues((old) => ({ ...old, [key]: value }));
   async function submit() {
     if (!values.userId.trim()) return setMessage("Please enter User ID ...");
     if (!values.password.trim()) return setMessage("Please enter Password ...");
     try {
-      const responseMessage = await signon(values.userId, values.password);
-      if (responseMessage) setMessage(responseMessage);
-      else navigate("/menu");
+      const response = await signon(values.userId, values.password);
+      if (response.message) setMessage(response.message);
+      else navigate(routeForProgram(response.nextRoute));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to verify the User ...");
     }
@@ -62,7 +62,7 @@ function Menu({ admin = false }: { admin?: boolean }) {
     else setMessage("Please enter a valid option number...");
   }} onBack={() => { signout(); navigate("/signon"); }}>
     <section className="menu-options">
-      {data?.options.filter((item) => admin ? item.userType === "A" && role === "ROLE_ADMIN" : item.userType === "U").map((item) => <button type="button" key={item.number} onClick={() => choose(item.number, item.program)}><b>{String(item.number).padStart(2, " ")}</b> {item.label}</button>)}
+      {data?.options.filter((item) => admin ? item.userType === "A" && role === "ROLE_ADMIN" : item.userType === "U").map((item) => <button type="button" key={item.number} onClick={() => choose(item.number, item.program)}><b>{String(item.number).padStart(2, " ")}</b> {item.name}</button>)}
     </section>
     <label className="option-input">Option<input aria-label="Option" maxLength={2} value={option} onChange={(e) => setOption(e.target.value)} /></label>
   </ScreenState>;
@@ -217,6 +217,9 @@ function ExtensionScreen({
   update?: boolean;
   transactionTypes?: boolean;
 }) {
+  const { context } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const map = transactionTypes
     ? update
       ? MAPS.COTRTUP
@@ -224,10 +227,83 @@ function ExtensionScreen({
     : update
       ? MAPS.COPAU01
       : MAPS.COPAU00;
-  const [values, setValues] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<Record<string, string>>({
+    authorizationId: searchParams.get("id") ?? "",
+  });
   const [message, setMessage] = useState("");
+  const [rows, setRows] = useState<Record<string, unknown>[]>([]);
+  const [page, setPage] = useState(0);
   const set = (name: string, value: string) => setValues((old) => ({ ...old, [name]: value }));
-  return <ScreenState map={map} message={message} onSubmit={() => setMessage(update ? "Transaction type update ready..." : "Enter an account to display authorizations...")}><MapFields map={map} values={values} setValue={set} exclude={["message"]} /></ScreenState>;
+  async function submit(targetPage = page) {
+    try {
+      if (transactionTypes && update) {
+        const response = await api.saveTransactionType({
+          type: values.type ?? "",
+          description: values.description ?? "",
+        });
+        setMessage(response.message);
+      } else if (transactionTypes) {
+        const response = await api.transactionTypes(targetPage);
+        setRows(response.data ?? []);
+        setMessage(response.message);
+      } else if (update) {
+        const response = await api.authorization(values.authorizationId ?? values.id ?? "");
+        setRows(response.data ? [response.data] : []);
+        setMessage(response.message);
+      } else {
+        const response = await api.authorizations(values.accountId ?? "", targetPage);
+        setRows(response.data ?? []);
+        setMessage(response.message);
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to process request");
+    }
+  }
+  return <ScreenState map={map} message={message} context={context} onSubmit={submit}
+    onPageUp={!update ? () => { const target = Math.max(0, page - 1); setPage(target); void submit(target); } : undefined}
+    onPageDown={!update ? () => { const target = page + 1; setPage(target); void submit(target); } : undefined}>
+    <MapFields map={map} values={values} setValue={set} exclude={["message"]} />
+    {rows.length > 0 && <RecordTable rows={rows} />}
+    {!transactionTypes && !update && rows.length > 0 && (
+      <div className="extension-controls">
+        {rows.map((row, index) => (
+          <button
+            key={String(row.id ?? row.authorizationId ?? index)}
+            type="button"
+            onClick={() => {
+              setValues((old) => ({
+                ...old,
+                authorizationId: String(row.id ?? row.authorizationId ?? ""),
+              }));
+              navigate(`/authorizations/detail?id=${encodeURIComponent(String(row.id ?? row.authorizationId ?? ""))}`);
+            }}
+          >
+            Select row {index + 1}
+          </button>
+        ))}
+      </div>
+    )}
+    {!transactionTypes && update && rows.length > 0 && (
+      <button
+        type="button"
+        onClick={async () => {
+          const id = values.authorizationId ?? values.id ?? "";
+          const response = await api.markAuthorizationFraud(id, values.fraud?.toUpperCase() === "Y");
+          setMessage(response.message);
+        }}
+      >
+        PF5 Mark/Remove Fraud
+      </button>
+    )}
+    {transactionTypes && !update && (
+      <div className="extension-controls">
+        <button type="button" onClick={() => navigate("/admin/transaction-types/update")}>
+          PF2 Add
+        </button>
+        <button type="button" onClick={() => void submit()}>F10 Save</button>
+      </div>
+    )}
+  </ScreenState>;
 }
 
 function AppRoutes() {

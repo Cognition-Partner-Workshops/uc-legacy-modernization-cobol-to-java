@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Embeddable
 public class AuthFraudId implements Serializable {
@@ -34,5 +35,17 @@ public class AuthFraudId implements Serializable {
 
   public void setAuthTs(LocalDateTime value) {
     authTs = value;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) return true;
+    if (!(other instanceof AuthFraudId that)) return false;
+    return Objects.equals(cardNum, that.cardNum) && Objects.equals(authTs, that.authTs);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(cardNum, authTs);
   }
 }

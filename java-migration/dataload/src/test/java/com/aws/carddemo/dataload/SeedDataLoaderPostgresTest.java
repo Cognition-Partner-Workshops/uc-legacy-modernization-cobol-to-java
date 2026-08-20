@@ -1,6 +1,7 @@
 package com.aws.carddemo.dataload;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.aws.carddemo.domain.AccountRepository;
 import com.aws.carddemo.domain.CardRepository;
@@ -105,6 +106,22 @@ class SeedDataLoaderPostgresTest {
     assertEquals("A", user.getSecUsrType());
 
     assertEquals(expectedTotal, loader.loadAll());
+    assertEquals(50, accountRepository.count());
+    assertEquals(300, dailyTransactionRepository.count());
+  }
+
+  @Test
+  void accountOnlyReloadRefusesPopulatedDependentsButFullReloadStillWorks() {
+    loader.loadAll();
+
+    IllegalStateException failure =
+        assertThrows(IllegalStateException.class, () -> loader.load(SeedDataset.ACCOUNT));
+    assertEquals(
+        "Cannot reload account independently while dependent rows exist; use --dataset=all",
+        failure.getMessage());
+    assertEquals(50, accountRepository.count());
+
+    loader.loadAll();
     assertEquals(50, accountRepository.count());
     assertEquals(300, dailyTransactionRepository.count());
   }

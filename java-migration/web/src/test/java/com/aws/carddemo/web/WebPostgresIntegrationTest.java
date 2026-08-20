@@ -45,6 +45,7 @@ class WebPostgresIntegrationTest {
   @Autowired MockMvc mvc;
   @Autowired SeedDataLoader loader;
   @Autowired TokenService tokens;
+  @Autowired com.aws.carddemo.domain.CardRepository cardRepository;
 
   @BeforeAll
   static void start() {
@@ -62,11 +63,16 @@ class WebPostgresIntegrationTest {
   @Test
   void seededAccountViewReturnsRealValues() throws Exception {
     loader.loadAll();
-    mvc.perform(get("/api/accounts/1").with(bearer(tokens.issue("USER001", "ROLE_USER"))))
+    mvc.perform(
+            get("/api/accounts/1")
+                .param("userId", "ATTACKER")
+                .with(bearer(tokens.issue("USER001", "ROLE_USER"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data.account.acctId").value(1))
         .andExpect(jsonPath("$.data.account.currBal").exists())
-        .andExpect(jsonPath("$.data.customer.firstName").exists());
+        .andExpect(jsonPath("$.data.customer.firstName").exists())
+        .andExpect(jsonPath("$.context.userId").value("USER001"))
+        .andExpect(jsonPath("$.context.userType").value("U"));
   }
 
   @Test
@@ -81,6 +87,18 @@ class WebPostgresIntegrationTest {
             get("/api/cards").param("page", "1").with(bearer(tokens.issue("USER001", "ROLE_USER"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data.cards.length()").value(7));
+  }
+
+  @Test
+  void cardListFilterBySeededAccountReturnsOnlyThatAccountsCards() throws Exception {
+    loader.loadAll();
+    mvc.perform(
+            get("/api/cards")
+                .param("accountId", "1")
+                .with(bearer(tokens.issue("USER001", "ROLE_USER"))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.cards.length()").value(cardRepository.findByAcctId(1L).size()))
+        .andExpect(jsonPath("$.data.cards[0].acctId").value(1));
   }
 
   @Test

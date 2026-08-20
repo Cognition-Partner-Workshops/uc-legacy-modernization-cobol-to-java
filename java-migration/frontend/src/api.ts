@@ -21,7 +21,7 @@ export type ApiResponse<T> = {
 
 export type MenuOption = {
   number: number;
-  label: string;
+  name: string;
   program: string;
   userType: string;
 };
@@ -50,7 +50,16 @@ export type UserPage = {
   previousPage: boolean;
 };
 
+export type ExtensionPage = {
+  rows: Record<string, unknown>[];
+  page?: number;
+  pageSize?: number;
+  nextPage?: boolean;
+  previousPage?: boolean;
+};
+
 let token: string | null = null;
+let authFailureHandler: (() => void) | null = null;
 const TOKEN_KEY = "carddemo.jwt";
 
 export function restoreToken(): string | null {
@@ -68,6 +77,10 @@ export function getToken(): string | null {
   return token;
 }
 
+export function setAuthFailureHandler(handler: (() => void) | null): void {
+  authFailureHandler = handler;
+}
+
 async function request<T>(
   path: string,
   init: RequestInit = {},
@@ -78,6 +91,7 @@ async function request<T>(
   const response = await fetch(path, { ...init, headers });
   if (response.status === 401) {
     setToken(null);
+    authFailureHandler?.();
     throw new Error("Unauthorized");
   }
   const body = (await response.json()) as ApiResponse<T>;
@@ -98,7 +112,9 @@ export const api = {
   adminMenu: (context?: Context) =>
     request<MenuData>("/api/admin/menu", json({ context })),
   account: (accountId: string, context?: Context) =>
-    request<Record<string, unknown>>(`/api/accounts/${accountId}?fromProgram=${encodeURIComponent(context?.fromProgram ?? "")}&userId=${encodeURIComponent(context?.userId ?? "")}`),
+    request<Record<string, unknown>>(
+      `/api/accounts/${accountId}?fromProgram=${encodeURIComponent(context?.fromProgram ?? "")}`,
+    ),
   updateAccount: (accountId: string, value: Record<string, unknown>) =>
     request<Record<string, unknown>>(`/api/accounts/${accountId}`, {
       method: "PUT",
@@ -141,4 +157,21 @@ export const api = {
     }),
   deleteUser: (id: string, value: Record<string, unknown>) =>
     request<null>(`/api/admin/users/${id}`, { ...json(value), method: "DELETE" }),
+  authorizations: (accountId: string, page = 0) =>
+    request<Record<string, unknown>[]>(`/api/authorizations/summary/${accountId}?page=${page}`),
+  authorization: (id: string) =>
+    request<Record<string, unknown>>(`/api/authorizations/detail/${id}`),
+  markAuthorizationFraud: (id: string, marked: boolean) =>
+    request<string>(`/api/authorizations/detail/${id}/fraud?marked=${marked}`, {
+      method: "POST",
+    }),
+  transactionTypes: (page = 0, direction = "FORWARD") =>
+    request<Record<string, unknown>[]>(
+      `/api/admin/transaction-types?page=${page}&direction=${direction}`,
+    ),
+  saveTransactionType: (value: Record<string, unknown>, remove = false) =>
+    request<Record<string, unknown> | null>(
+      `/api/admin/transaction-types?delete=${remove}`,
+      json(value),
+    ),
 };

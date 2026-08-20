@@ -54,8 +54,8 @@ mvn -pl web spring-boot:run
 ```
 
 The REST application listens on `http://localhost:8080`; health is available
-at `/actuator/health`. Set `CARDDEMO_JWT_SECRET` to replace the development
-JWT signing-key default.
+at `/actuator/health`. Local and test profiles generate a per-JVM signing key;
+set `CARDDEMO_JWT_SECRET` for production/production-like profiles.
 
 The packaged web application is executable:
 
@@ -123,6 +123,8 @@ importJob
 combtranJob
 transactionBackupJob
 categoryBalancePrintJob
+authorizationPurgeJob
+transactionTypeUpdateJob
 ```
 
 Common job parameters include `runDate`, `startDate`, `endDate`, `outputPath`,
@@ -179,8 +181,14 @@ common ───► dataload ───► domain (JPA + Flyway/PostgreSQL)
 | `batch` | Complete for the current mapped estate |
 | `web` | Complete for all 17 core online programs |
 | `frontend` | Complete for all 17 core BMS views |
-| STEP 7 extensions | Not yet done |
-| STEP 8 end-to-end reconciliation suite | Not yet done |
+| STEP 7 extensions | Complete |
+| STEP 8 end-to-end reconciliation suite | Complete |
 
-The final two rows are intentionally open and are the next migration
-handoffs.
+The migration estate is covered by the following mapping and acceptance
+documents:
+
+- [`../docs/INVENTORY.md`](../docs/INVENTORY.md)
+- [`../docs/DATA-MODEL.md`](../docs/DATA-MODEL.md)
+- [`../docs/BATCH-MAPPING.md`](../docs/BATCH-MAPPING.md)
+- [`../docs/WEB-MAPPING.md`](../docs/WEB-MAPPING.md)
+- [`../docs/RECONCILIATION.md`](../docs/RECONCILIATION.md)

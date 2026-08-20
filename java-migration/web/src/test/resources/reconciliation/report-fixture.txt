@@ -1,0 +1,4 @@
+DALYREPT
+Daily Transaction Report
+Transaction ID Account ID
+Grand Total

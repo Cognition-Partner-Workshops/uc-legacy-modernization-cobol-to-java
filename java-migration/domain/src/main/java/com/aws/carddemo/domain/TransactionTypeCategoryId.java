@@ -3,6 +3,7 @@ package com.aws.carddemo.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Embeddable
 public class TransactionTypeCategoryId implements Serializable {
@@ -33,5 +34,17 @@ public class TransactionTypeCategoryId implements Serializable {
 
   public void setCategory(String value) {
     category = value;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) return true;
+    if (!(other instanceof TransactionTypeCategoryId that)) return false;
+    return Objects.equals(typeCode, that.typeCode) && Objects.equals(category, that.category);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(typeCode, category);
   }
 }
