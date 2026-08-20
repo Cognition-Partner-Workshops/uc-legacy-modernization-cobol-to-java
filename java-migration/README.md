@@ -21,7 +21,7 @@ Prerequisites:
 - Maven.
 - Verification was performed with JDK 21 in this environment.
 
-## Build and run
+## Build and quickstart
 
 From this directory:
 
@@ -30,74 +30,67 @@ mvn -q clean verify
 mvn -q compile
 ```
 
-Run the web application:
+The signon quickstart uses a persistent file-based H2 database.  Run the
+steps in order so the batch loader creates the schema and loads `USRSEC`
+before the web application starts:
 
-```bash
-mvn -pl web -am spring-boot:run
-```
+1. Load the EBCDIC seed into persistent H2:
 
-The default web profile uses an in-memory H2 database in PostgreSQL
-compatibility mode.  Flyway runs the migrations and Hibernate validates the
-schema (`ddl-auto=validate`); Hibernate does not create or alter tables.
+   ```bash
+   mvn -pl batch -am spring-boot:run \
+     -Dspring-boot.run.arguments="--spring.batch.job.name=usrsecLoadJob --carddemo.usrsec.input-file=/path/to/uc-legacy-modernization-cobol-to-java/app/data/EBCDIC/AWS.M2.CARDDEMO.USRSEC.PS --spring.datasource.url=jdbc:h2:file:/path/to/carddemo-batch-db;MODE=PostgreSQL"
+   ```
 
-The signon endpoint is:
+2. Start the web application against the same database:
 
-```bash
-curl -i -c /tmp/carddemo.cookies \
-  -H 'Content-Type: application/json' \
-  -d '{"userId":"ADMIN001","password":"PASSWORD"}' \
-  http://localhost:8080/api/signon
-```
+   ```bash
+   mvn -pl web -am spring-boot:run \
+     -Dspring-boot.run.arguments="--spring.datasource.url=jdbc:h2:file:/path/to/carddemo-batch-db;MODE=PostgreSQL"
+   ```
+
+3. Sign on with a credential from the seed file:
+
+   ```bash
+   curl -i -c /tmp/carddemo.cookies \
+     -H 'Content-Type: application/json' \
+     -d '{"userId":"ADMIN001","password":"PASSWORD"}' \
+     http://localhost:8080/api/signon
+   ```
+
+4. With the returned session cookie, call the gated admin probe:
+
+   ```bash
+   curl -i -b /tmp/carddemo.cookies http://localhost:8080/api/admin/menu
+   ```
 
 `ADMIN001`/`PASSWORD` and `USER0001`/`PASSWORD` are real credentials in the
-repository's USRSEC seed file.  The endpoint returns the user identity,
-role, and next program (`COADM01C` for type `A`, `COMEN01C` otherwise).
-With the cookie returned by signon, an admin can call the currently gated
-probe endpoint:
-
-```bash
-curl -i -b /tmp/carddemo.cookies http://localhost:8080/api/admin/menu
-```
-
-The application has no BMS UI or Java replacement for the other screens yet.
+repository's EBCDIC seed file.  The default web profile instead uses an
+in-memory H2 database with an empty `usrsec` table; signon returns `401 User
+not found. Try again ...` there until the batch load is run against that
+same database.  The application has no BMS UI or Java replacement for the
+other screens yet.
 
 ## USRSEC batch load
 
-Run the batch module with the default input:
-
-```bash
-mvn -pl batch -am spring-boot:run \
-  -Dspring-boot.run.arguments="--spring.batch.job.name=usrsecLoadJob"
-```
-
-The property `carddemo.usrsec.input-file` supplies the default input path.
-The source default is `${user.dir}/../app/data/EBCDIC/AWS.M2.CARDDEMO.USRSEC.PS`.
-It is intentionally CWD-relative and fragile: Maven and IDEs can choose a
-different current working directory.  Pass a safe absolute path instead:
-
-```bash
-mvn -pl batch -am spring-boot:run \
-  -Dspring-boot.run.arguments="--spring.batch.job.name=usrsecLoadJob --carddemo.usrsec.input-file=/home/ubuntu/repos/uc-legacy-modernization-cobol-to-java/app/data/EBCDIC/AWS.M2.CARDDEMO.USRSEC.PS"
-```
-
-The job also accepts the `inputFile` job parameter (the integration test
-uses it), for example when launching through a Spring Batch launcher:
+The input path is required.  Supply either the
+`carddemo.usrsec.input-file` property, as in the quickstart above, or the
+`inputFile` Spring Batch job parameter:
 
 ```text
 --job.name=usrsecLoadJob inputFile=/absolute/path/AWS.M2.CARDDEMO.USRSEC.PS
 ```
 
-The source is ten fixed 80-byte records in IBM037/CP037 with no line
-delimiters.  The load is an upsert by `sec_usr_id`, so rerunning it does not
-duplicate rows.  USRSEC contains display-character fields only; no packed
-decimal is decoded by this job.
+If neither is supplied, the job fails before opening the reader with a
+message naming both accepted inputs.  The source is ten fixed 80-byte
+records in IBM037/CP037 with no line delimiters.  The load is an upsert by
+`sec_usr_id`, so rerunning it does not duplicate rows.  USRSEC contains
+display-character fields only; no packed decimal is decoded by this job.
 
 The default in-memory H2 database disappears when the application exits, so a
 CLI load is meaningful only when the datasource points at a persistent
-database.  For file-based H2, add
-`--spring.datasource.url=jdbc:h2:file:/absolute/path/carddemo-batch-db;MODE=PostgreSQL`
-to the command above.  PostgreSQL can be used by supplying its datasource
-URL, username, and password instead.
+database.  For file-based H2, use a URL such as
+`jdbc:h2:file:/path/to/carddemo-batch-db;MODE=PostgreSQL`; PostgreSQL can be
+used by supplying its datasource URL, username, and password instead.
 
 ## Database configuration
 

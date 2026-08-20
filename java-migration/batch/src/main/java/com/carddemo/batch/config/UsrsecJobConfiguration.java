@@ -25,8 +25,16 @@ public class UsrsecJobConfiguration {
     @StepScope
     FixedLengthEbcdicReader usrsecReader(
             @Value("#{jobParameters['inputFile']}") String inputFile,
-            @Value("${carddemo.usrsec.input-file}") String defaultInputFile) {
-        return new FixedLengthEbcdicReader(Path.of(inputFile == null ? defaultInputFile : inputFile));
+            @Value("${carddemo.usrsec.input-file:}") String defaultInputFile) {
+        String resolvedInputFile = inputFile == null || inputFile.isBlank()
+                ? defaultInputFile
+                : inputFile;
+        if (resolvedInputFile == null || resolvedInputFile.isBlank()) {
+            throw new IllegalArgumentException(
+                    "USRSEC load requires an input path: provide job parameter 'inputFile' "
+                            + "or property 'carddemo.usrsec.input-file'.");
+        }
+        return new FixedLengthEbcdicReader(Path.of(resolvedInputFile));
     }
 
     @Bean

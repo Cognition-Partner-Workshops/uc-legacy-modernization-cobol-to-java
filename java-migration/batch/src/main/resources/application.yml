@@ -13,6 +13,3 @@ spring:
   batch:
     jdbc:
       initialize-schema: always
-carddemo:
-  usrsec:
-    input-file: ${user.dir}/../app/data/EBCDIC/AWS.M2.CARDDEMO.USRSEC.PS

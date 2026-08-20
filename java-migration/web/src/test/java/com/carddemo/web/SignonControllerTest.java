@@ -1,7 +1,9 @@
 package com.carddemo.web;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,18 +17,20 @@ import com.carddemo.web.signon.SignonService;
 import com.carddemo.web.security.CardDemoUserDetailsService;
 import com.carddemo.web.security.LegacyPasswordEncoder;
 import com.carddemo.web.security.SecurityConfig;
-import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.context.ContextConfiguration;
 
 @WebMvcTest(controllers = SignonController.class)
 @ContextConfiguration(classes = {SignonController.class,
@@ -57,6 +61,32 @@ class SignonControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.role").value("ROLE_ADMIN"))
                 .andExpect(jsonPath("$.nextProgram").value("COADM01C"));
+    }
+
+    @Test
+    void successfulSignonRotatesExistingSessionId() throws Exception {
+        when(signonService.signon("ADMIN001", "PASSWORD"))
+                .thenReturn(new SignonOutcome(
+                        new SignonResponse("ADMIN001", "MARGARET", "GOLD", "A", "ROLE_ADMIN", "COADM01C"),
+                        List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+        when(userDetailsService.loadUserByUsername("ADMIN001"))
+                .thenReturn(User.withUsername("ADMIN001").password("PASSWORD").authorities("ROLE_ADMIN").build());
+
+        MockHttpSession existingSession = new MockHttpSession();
+        String oldSessionId = existingSession.getId();
+
+        MvcResult signon = mockMvc.perform(post("/api/signon")
+                        .session(existingSession)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(new SignonRequest("ADMIN001", "PASSWORD"))))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String newSessionId = signon.getRequest().getSession(false).getId();
+        assertThat(newSessionId).isNotEqualTo(oldSessionId);
+        mockMvc.perform(get("/api/admin/menu")
+                        .cookie(new Cookie("JSESSIONID", oldSessionId)))
+                .andExpect(status().isForbidden());
     }
 
     @Test

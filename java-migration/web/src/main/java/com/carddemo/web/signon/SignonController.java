@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,14 +23,17 @@ public class SignonController {
     private final SignonService signonService;
     private final CardDemoUserDetailsService userDetailsService;
     private final SecurityContextRepository securityContextRepository;
+    private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
 
     public SignonController(
             SignonService signonService,
             CardDemoUserDetailsService userDetailsService,
-            SecurityContextRepository securityContextRepository) {
+            SecurityContextRepository securityContextRepository,
+            SessionAuthenticationStrategy sessionAuthenticationStrategy) {
         this.signonService = signonService;
         this.userDetailsService = userDetailsService;
         this.securityContextRepository = securityContextRepository;
+        this.sessionAuthenticationStrategy = sessionAuthenticationStrategy;
     }
 
     @PostMapping("/signon")
@@ -43,6 +47,7 @@ public class SignonController {
                 principal, null, outcome.authorities());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
+        sessionAuthenticationStrategy.onAuthentication(authentication, httpRequest, httpResponse);
         securityContextRepository.saveContext(context, httpRequest, httpResponse);
         return outcome.response();
     }
