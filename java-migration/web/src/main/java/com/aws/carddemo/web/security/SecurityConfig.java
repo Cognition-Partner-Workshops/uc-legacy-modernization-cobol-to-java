@@ -1,6 +1,7 @@
 package com.aws.carddemo.web.security;
 
 import com.aws.carddemo.domain.UsrsecRepository;
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -49,6 +50,8 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             requests ->
                 requests
+                    .dispatcherTypeMatchers(DispatcherType.ERROR)
+                    .permitAll()
                     .requestMatchers("/api/signon", "/actuator/health")
                     .permitAll()
                     .requestMatchers("/api/admin/**")

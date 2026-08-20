@@ -235,9 +235,12 @@ describe("CardDemo SPA", () => {
       .mockResolvedValueOnce(new Response(JSON.stringify(screenResponses.transaction), { status: 200 }));
     render(<MemoryRouter initialEntries={["/transactions"]}><App /></MemoryRouter>);
     expect(await screen.findByText("2022071800000001")).toBeInTheDocument();
+    expect(screen.getByText("2022-06-10")).toBeInTheDocument();
+    expect(screen.getByText("-919.00")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Select" }));
     await waitFor(() => expect(screen.getByDisplayValue("PURCHASE")).toBeInTheDocument());
-    expect(screen.getByDisplayValue("12.34")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("-919.00")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("2022-06-10")).toBeInTheDocument();
   });
 
   it("renders real user rows and keeps admin routes guarded", async () => {

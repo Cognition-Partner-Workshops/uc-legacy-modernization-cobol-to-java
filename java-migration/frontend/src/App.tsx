@@ -20,6 +20,19 @@ function text(value: unknown): string {
   return value === null || value === undefined ? "" : String(value);
 }
 
+function money(value: unknown): string {
+  const raw = text(value).replace(/,/g, "").trim();
+  if (!raw) return "";
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed.toFixed(2) : text(value);
+}
+
+function displayDate(value: unknown): string {
+  const raw = text(value);
+  if (/^\d{8}$/.test(raw)) return `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+  return /^\d{4}-\d{2}-\d{2}/.test(raw) ? raw.slice(0, 10) : raw;
+}
+
 function datePart(value: unknown, part: "year" | "month" | "day"): string {
   const date = text(value);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return "";
@@ -36,11 +49,11 @@ function accountValues(payload: Record<string, unknown>, update: boolean): Recor
     openDate: text(account.openDate),
     expirationDate: text(account.expiraionDate),
     reissueDate: text(account.reissueDate),
-    creditLimit: text(account.creditLimit),
-    cashLimit: text(account.cashCreditLimit),
-    currentBalance: text(account.currBal),
-    cycleCredit: text(account.currCycCredit),
-    cycleDebit: text(account.currCycDebit),
+    creditLimit: money(account.creditLimit),
+    cashLimit: money(account.cashCreditLimit),
+    currentBalance: money(account.currBal),
+    cycleCredit: money(account.currCycCredit),
+    cycleDebit: money(account.currCycDebit),
     groupId: text(account.groupId),
     customerNumber: text(customer.custId),
     ssn: text(customer.ssn),
@@ -104,9 +117,9 @@ function transactionValues(payload: Record<string, unknown>): Record<string, str
     categoryCode: text(payload.catCd),
     source: text(payload.source),
     description: text(payload.tranDesc),
-    amount: text(payload.amt),
-    origDate: text(payload.origTs),
-    procDate: text(payload.procTs),
+    amount: money(payload.amt),
+    origDate: displayDate(payload.origTs),
+    procDate: displayDate(payload.procTs),
     merchantId: text(payload.merchantId),
     merchantName: text(payload.merchantName),
     merchantCity: text(payload.merchantCity),
@@ -120,7 +133,7 @@ function authorizationValues(payload: Record<string, unknown>): Record<string, s
     accountId: text(payload.acctId),
     cardNumber: text(payload.cardNum),
     transactionId: text(payload.transactionId),
-    amount: text(payload.approvedAmt ?? payload.transactionAmt),
+    amount: money(payload.approvedAmt ?? payload.transactionAmt),
     responseCode: text(payload.authRespCode),
     matchStatus: text(payload.matchStatus),
     fraud: text(payload.authFraud),
@@ -364,7 +377,7 @@ function TransactionList() {
         <tbody>{(data?.transactions ?? []).map((row) => (
           <tr key={text(row.tranId)}>
             <td><button type="button" onClick={() => navigate(`/transactions/view?transactionId=${encodeURIComponent(text(row.tranId))}`)}>Select</button></td>
-            <td>{text(row.tranId)}</td><td>{text(row.procTs)}</td><td>{text(row.tranDesc)}</td><td>{text(row.amt)}</td>
+            <td>{text(row.tranId)}</td><td>{displayDate(row.origTs)}</td><td>{text(row.tranDesc)}</td><td>{money(row.amt)}</td>
           </tr>
         ))}</tbody>
       </table>
@@ -414,7 +427,7 @@ function BillPayment() {
   const { context } = useAuth();
   const [values, setValues] = useState({ accountId: "", confirm: "" });
   const [message, setMessage] = useState("");
-  return <ScreenState map={MAPS.COBIL00} message={message} context={context} onSubmit={() => api.billPayment({ accountId: values.accountId ? Number(values.accountId) : null, confirm: values.confirm.toUpperCase() === "Y", context }).then((r) => { setMessage(r.message); if (r.data) setValues((old) => ({ ...old, currentBalance: text((r.data as Record<string, unknown>).remainingBalance) })); }).catch((e: Error) => setMessage(e.message))}><MapFields map={MAPS.COBIL00} values={values} setValue={(name, value) => setValues((old) => ({ ...old, [name]: value }))} exclude={["message"]} /></ScreenState>;
+  return <ScreenState map={MAPS.COBIL00} message={message} context={context} onSubmit={() => api.billPayment({ accountId: values.accountId ? Number(values.accountId) : null, confirm: values.confirm.toUpperCase() === "Y", context }).then((r) => { setMessage(r.message); if (r.data) setValues((old) => ({ ...old, currentBalance: money((r.data as Record<string, unknown>).remainingBalance) })); }).catch((e: Error) => setMessage(e.message))}><MapFields map={MAPS.COBIL00} values={values} setValue={(name, value) => setValues((old) => ({ ...old, [name]: value }))} exclude={["message"]} /></ScreenState>;
 }
 
 function Reports() {
@@ -529,7 +542,7 @@ function ExtensionScreen({
     {rows.length > 0 && (transactionTypes ? (
       <div className="record-table"><table aria-label="Transaction type list"><thead><tr><th>Select</th><th>Type</th><th>Description</th></tr></thead><tbody>{rows.map((row) => <tr key={text(row.typeCd)}><td><button type="button" onClick={() => navigate(`/admin/transaction-types/update?type=${encodeURIComponent(text(row.typeCd))}`)}>Select</button></td><td>{text(row.typeCd)}</td><td>{text(row.typeDesc)}</td></tr>)}</tbody></table></div>
     ) : (
-      <div className="record-table"><table aria-label="Authorization summary"><thead><tr><th>Select</th><th>Auth Date</th><th>Auth Time</th><th>Card Number</th><th>Transaction ID</th><th>Amount</th><th>Status</th></tr></thead><tbody>{rows.map((row) => <tr key={text(row.id)}><td><button type="button" onClick={() => navigate(`/authorizations/detail?id=${encodeURIComponent(text(row.id))}`)}>Select</button></td><td>{text(row.authDate)}</td><td>{text(row.authTime)}</td><td>{text(row.cardNum)}</td><td>{text(row.transactionId)}</td><td>{text(row.approvedAmt)}</td><td>{text(row.matchStatus)}</td></tr>)}</tbody></table></div>
+      <div className="record-table"><table aria-label="Authorization summary"><thead><tr><th>Select</th><th>Auth Date</th><th>Auth Time</th><th>Card Number</th><th>Transaction ID</th><th>Amount</th><th>Status</th></tr></thead><tbody>{rows.map((row) => <tr key={text(row.id)}><td><button type="button" onClick={() => navigate(`/authorizations/detail?id=${encodeURIComponent(text(row.id))}`)}>Select</button></td><td>{displayDate(row.authDate)}</td><td>{text(row.authTime)}</td><td>{text(row.cardNum)}</td><td>{text(row.transactionId)}</td><td>{money(row.approvedAmt)}</td><td>{text(row.matchStatus)}</td></tr>)}</tbody></table></div>
     ))}
     {!transactionTypes && !update && rows.length > 0 && (
       <div className="extension-controls">

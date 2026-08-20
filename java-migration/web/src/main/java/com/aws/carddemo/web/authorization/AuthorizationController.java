@@ -16,7 +16,8 @@ public class AuthorizationController {
 
   @GetMapping("/summary/{accountId}")
   public Response<List<PendingAuthDetail>> summary(
-      @PathVariable Long accountId, @RequestParam(required = false) Integer page) {
+      @PathVariable("accountId") Long accountId,
+      @RequestParam(name = "page", required = false) Integer page) {
     List<PendingAuthDetail> result = service.details(accountId);
     int from = Math.max(0, (page == null ? 0 : page) * 5);
     if (from >= result.size()) {
@@ -26,7 +27,7 @@ public class AuthorizationController {
   }
 
   @GetMapping("/detail/{id}")
-  public Response<PendingAuthDetail> detail(@PathVariable Long id) {
+  public Response<PendingAuthDetail> detail(@PathVariable("id") Long id) {
     return service
         .detail(id)
         .map(value -> Response.ok(value, "COPAUS1C", null))
@@ -34,7 +35,8 @@ public class AuthorizationController {
   }
 
   @PostMapping("/detail/{id}/fraud")
-  public Response<String> fraud(@PathVariable Long id, @RequestParam boolean marked) {
+  public Response<String> fraud(
+      @PathVariable("id") Long id, @RequestParam(name = "marked") boolean marked) {
     return Response.ok(service.setFraud(id, marked), "COPAUS1C", null);
   }
 }

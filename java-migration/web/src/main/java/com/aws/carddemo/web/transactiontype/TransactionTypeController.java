@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin/transaction-types")
 public class TransactionTypeController {
-  private static final int PAGE_SIZE = 5;
+  private static final int PAGE_SIZE = 8;
   private final TransactionTypeRepository repository;
 
   public TransactionTypeController(TransactionTypeRepository repository) {
@@ -18,8 +18,8 @@ public class TransactionTypeController {
 
   @GetMapping
   public Response<List<TransactionType>> list(
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "FORWARD") String direction) {
+      @RequestParam(name = "page", defaultValue = "0") int page,
+      @RequestParam(name = "direction", defaultValue = "FORWARD") String direction) {
     List<TransactionType> rows = repository.findAllByOrderByTypeCdAsc();
     int target = "BACK".equalsIgnoreCase(direction) ? Math.max(0, page - 1) : Math.max(0, page);
     int from = Math.min(target * PAGE_SIZE, rows.size());
@@ -33,7 +33,7 @@ public class TransactionTypeController {
   @PostMapping
   public Response<TransactionType> save(
       @RequestBody TransactionTypeRequest request,
-      @RequestParam(defaultValue = "false") boolean delete) {
+      @RequestParam(name = "delete", defaultValue = "false") boolean delete) {
     String type = request.type() == null ? "" : request.type().trim();
     if (!type.matches("[A-Za-z0-9]{2}")) {
       return Response.error("Transaction Type must be 2 characters", "type", null);

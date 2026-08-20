@@ -16,14 +16,21 @@ import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -37,10 +44,27 @@ import org.testcontainers.junit.jupiter.Testcontainers;
     })
 @AutoConfigureMockMvc
 @ContextConfiguration(initializers = WebPostgresIntegrationTest.Initializer.class)
+@Import(WebPostgresIntegrationTest.FailureControllerConfiguration.class)
 @ActiveProfiles("test")
 @Testcontainers
 @EnabledIf("dockerAvailable")
 class WebPostgresIntegrationTest {
+  @TestConfiguration
+  static class FailureControllerConfiguration {
+    @Bean
+    FailureController failureController() {
+      return new FailureController();
+    }
+  }
+
+  @RestController
+  static class FailureController {
+    @GetMapping("/api/test/failure")
+    String failure() {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "test failure");
+    }
+  }
+
   @Container
   static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:16-alpine");
 
@@ -89,6 +113,26 @@ class WebPostgresIntegrationTest {
             get("/api/cards").param("page", "1").with(bearer(tokens.issue("USER001", "ROLE_USER"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data.cards.length()").value(7));
+  }
+
+  @Test
+  void transactionTypeQueryParametersBindWithCompiledParameterMetadata() throws Exception {
+    loader.loadAll();
+    mvc.perform(
+            get("/api/admin/transaction-types")
+                .param("page", "0")
+                .param("direction", "FORWARD")
+                .with(bearer(tokens.issue("ADMIN001", "ROLE_ADMIN"))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data").isArray())
+        .andExpect(jsonPath("$.data.length()").value(7))
+        .andExpect(jsonPath("$.data[0].typeCd").exists());
+  }
+
+  @Test
+  void handlerFailureSurfacesAsServerErrorInsteadOfUnauthorized() throws Exception {
+    mvc.perform(get("/api/test/failure").with(bearer(tokens.issue("USER001", "ROLE_USER"))))
+        .andExpect(status().isInternalServerError());
   }
 
   @Test
