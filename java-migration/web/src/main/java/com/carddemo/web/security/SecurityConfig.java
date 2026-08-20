@@ -1,5 +1,6 @@
 package com.carddemo.web.security;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,6 +24,7 @@ public class SecurityConfig {
                 .securityContext(securityContext -> securityContext
                         .securityContextRepository(securityContextRepository))
                 .authorizeHttpRequests(authorize -> authorize
+                        .dispatcherTypeMatchers(DispatcherType.ERROR, DispatcherType.FORWARD).permitAll()
                         .requestMatchers("/api/signon").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())

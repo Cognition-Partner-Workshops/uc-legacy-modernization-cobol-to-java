@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -106,5 +107,13 @@ class SignonControllerTest {
                         .content(objectMapper.writeValueAsString(new SignonRequest("ADMIN001", "NOPE"))))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Wrong Password. Try again ..."));
+    }
+
+    @Test
+    void malformedJsonFromUnauthenticatedCallerReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/signon")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{bad json"))
+                .andExpect(status().isBadRequest());
     }
 }
