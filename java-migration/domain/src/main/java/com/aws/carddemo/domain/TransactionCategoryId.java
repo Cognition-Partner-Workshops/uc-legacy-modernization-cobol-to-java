@@ -1,0 +1,3 @@
+package com.aws.carddemo.domain;
+import jakarta.persistence.*; import java.io.Serializable;
+@Embeddable public class TransactionCategoryId implements Serializable { @Column(name="type_cd",length=2) String typeCd; @Column(name="cat_cd") Integer catCd; public TransactionCategoryId(){} public TransactionCategoryId(String t,Integer c){typeCd=t;catCd=c;} public String getTypeCd(){return typeCd;} public void setTypeCd(String v){typeCd=v;} public Integer getCatCd(){return catCd;} public void setCatCd(Integer v){catCd=v;} @Override public boolean equals(Object o){return o instanceof TransactionCategoryId k && java.util.Objects.equals(typeCd,k.typeCd)&&java.util.Objects.equals(catCd,k.catCd);} @Override public int hashCode(){return java.util.Objects.hash(typeCd,catCd);} }
