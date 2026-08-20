@@ -17,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = CardDemoBatchApplication.class)
 class UsrsecLoadJobTest {
-    private static final Path SEED = Path.of("../app/data/EBCDIC/AWS.M2.CARDDEMO.USRSEC.PS");
+    private static final Path SEED = Path.of("../../app/data/EBCDIC/AWS.M2.CARDDEMO.USRSEC.PS");
 
     @Autowired
     private JobLauncher jobLauncher;

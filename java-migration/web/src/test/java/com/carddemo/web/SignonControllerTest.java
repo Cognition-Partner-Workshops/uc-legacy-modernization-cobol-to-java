@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.carddemo.web.signon.SignonFailureException;
+import com.carddemo.web.signon.SignonController;
 import com.carddemo.web.signon.SignonRequest;
 import com.carddemo.web.signon.SignonResponse;
 import com.carddemo.web.signon.SignonService;
@@ -16,10 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = SignonController.class)
+@ContextConfiguration(classes = {SignonController.class,
+        com.carddemo.web.security.SecurityConfig.class,
+        com.carddemo.web.security.LegacyPasswordEncoder.class})
 @Import({com.carddemo.web.security.SecurityConfig.class, com.carddemo.web.security.LegacyPasswordEncoder.class})
 class SignonControllerTest {
     @Autowired

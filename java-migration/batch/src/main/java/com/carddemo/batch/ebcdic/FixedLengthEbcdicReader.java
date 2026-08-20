@@ -2,6 +2,7 @@ package com.carddemo.batch.ebcdic;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,12 +25,16 @@ public class FixedLengthEbcdicReader implements ItemStreamReader<UsrsecRecord> {
     }
 
     @Override
-    public void open(ExecutionContext executionContext) throws Exception {
-        inputStream = Files.newInputStream(inputPath);
-        recordNumber = executionContext.getInt("usrsec.recordNumber", 0);
-        long skipped = inputStream.skip((long) recordNumber * RECORD_LENGTH);
-        if (skipped != (long) recordNumber * RECORD_LENGTH) {
-            throw new IOException("Unable to resume USRSEC reader at record " + recordNumber);
+    public void open(ExecutionContext executionContext) {
+        try {
+            inputStream = Files.newInputStream(inputPath);
+            recordNumber = executionContext.getInt("usrsec.recordNumber", 0);
+            long skipped = inputStream.skip((long) recordNumber * RECORD_LENGTH);
+            if (skipped != (long) recordNumber * RECORD_LENGTH) {
+                throw new IOException("Unable to resume USRSEC reader at record " + recordNumber);
+            }
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to open USRSEC input " + inputPath, exception);
         }
     }
 
@@ -62,9 +67,13 @@ public class FixedLengthEbcdicReader implements ItemStreamReader<UsrsecRecord> {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         if (inputStream != null) {
-            inputStream.close();
+            try {
+                inputStream.close();
+            } catch (IOException exception) {
+                throw new UncheckedIOException("Unable to close USRSEC input " + inputPath, exception);
+            }
         }
     }
 }
