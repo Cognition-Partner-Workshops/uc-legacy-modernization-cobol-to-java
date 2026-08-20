@@ -164,3 +164,24 @@ numeric zero.
 All numeric money/rate fields use exact COBOL precision and scale. No date
 field was converted to SQL `DATE`; callers can use `DateValidator` and
 `DateConverter` from `common`.
+
+## STEP 7 extension tables
+
+The IMS `DBPAUTP0` root segment `PAUTSUM0` is represented by
+`pending_auth_summary` keyed by `acct_id`. Its `PAUTDTL1` child segment is
+represented by `pending_auth_detail`, retaining authorization date/time, card,
+merchant, response, match, fraud, amount, account, and customer fields.
+The detail uniqueness constraint on `(acct_id, auth_date, auth_time)` preserves
+IMS child ordering without treating the IMS segment pointer as a relational
+key.
+
+DB2 `AUTHFRDS` is represented by `authfrds` with all 26 source columns and
+composite key `(card_num, auth_ts)`. Monetary fields use `NUMERIC(12,2)`;
+nullable response, merchant, fraud, account, and customer fields remain
+nullable. The source spelling `MERCHANT_CATAGORY_CODE` is retained.
+
+The extension `TRANSACTION_TYPE_CATEGORY` DDL is represented by
+`transaction_type_category` with composite key
+`(trc_type_code, trc_type_category)` and a restricting foreign key to the
+existing `transaction_type` table. The existing base table matches the
+extension's `TRANSACTION_TYPE` DDL and is reused.

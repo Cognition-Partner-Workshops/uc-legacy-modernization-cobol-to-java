@@ -123,11 +123,13 @@ function CardScreen({ update = false }: { update?: boolean }) {
       ? await api.updateCard(values.cardNumber, {
         embossedName: values.cardName,
         activeStatus: values.status,
-        expirationDate: `${values.expirationMonth ?? ""}/${values.expirationYear ?? ""}`,
+        expirationMonth: values.expirationMonth,
+        expirationYear: values.expirationYear,
         preImage: {
           embossedName: values.cardName,
           activeStatus: values.status,
-          expirationDate: `${values.expirationMonth ?? ""}/${values.expirationYear ?? ""}`,
+          expirationMonth: values.expirationMonth,
+          expirationYear: values.expirationYear,
         },
         confirm: values.confirm === "Y",
       })
@@ -208,6 +210,26 @@ function Users({ mode = "list" }: { mode?: "list" | "add" | "update" | "delete" 
   return <ScreenState map={map} message={message} context={context} onSubmit={mode === "list" ? undefined : submit} onPageUp={mode === "list" ? () => setPage(Math.max(page - 1, 0)) : undefined} onPageDown={mode === "list" ? () => setPage(page + 1) : undefined}><MapFields map={map} values={values} setValue={set} exclude={["message"]} />{mode === "list" && <RecordTable rows={rows} />}</ScreenState>;
 }
 
+function ExtensionScreen({
+  update = false,
+  transactionTypes = false,
+}: {
+  update?: boolean;
+  transactionTypes?: boolean;
+}) {
+  const map = transactionTypes
+    ? update
+      ? MAPS.COTRTUP
+      : MAPS.COTRTLI
+    : update
+      ? MAPS.COPAU01
+      : MAPS.COPAU00;
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [message, setMessage] = useState("");
+  const set = (name: string, value: string) => setValues((old) => ({ ...old, [name]: value }));
+  return <ScreenState map={map} message={message} onSubmit={() => setMessage(update ? "Transaction type update ready..." : "Enter an account to display authorizations...")}><MapFields map={map} values={values} setValue={set} exclude={["message"]} /></ScreenState>;
+}
+
 function AppRoutes() {
   return <Routes>
     <Route path="/signon" element={<Signon />} />
@@ -227,6 +249,10 @@ function AppRoutes() {
     <Route path="/admin/users/add" element={<Guard admin><Users mode="add" /></Guard>} />
     <Route path="/admin/users/update" element={<Guard admin><Users mode="update" /></Guard>} />
     <Route path="/admin/users/delete" element={<Guard admin><Users mode="delete" /></Guard>} />
+    <Route path="/authorizations" element={<Guard><ExtensionScreen /></Guard>} />
+    <Route path="/authorizations/detail" element={<Guard><ExtensionScreen update /></Guard>} />
+    <Route path="/admin/transaction-types" element={<Guard admin><ExtensionScreen transactionTypes /></Guard>} />
+    <Route path="/admin/transaction-types/update" element={<Guard admin><ExtensionScreen update transactionTypes /></Guard>} />
     <Route path="*" element={<Navigate to="/signon" replace />} />
   </Routes>;
 }

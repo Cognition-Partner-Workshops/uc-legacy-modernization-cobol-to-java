@@ -34,7 +34,7 @@ class FlywayPostgresTest {
               .current()
               .getVersion()
               .toString()
-              .equals("4"));
+              .equals("5"));
     }
   }
 }

@@ -56,7 +56,7 @@ class ImportTasklet implements Tasklet {
         BatchSupport.parameter(
             context.getStepContext().getStepExecution().getJobParameters(),
             "exportPath",
-            "target/output/carddemo-export.dat");
+            "target/input/carddemo-export.dat");
     List<Customer> customerRows = new ArrayList<>();
     List<Account> accountRows = new ArrayList<>();
     List<CardXref> xrefRows = new ArrayList<>();
@@ -65,6 +65,7 @@ class ImportTasklet implements Tasklet {
     int unknown = 0;
     int invalid = 0;
     int read = 0;
+    List<String> errors = new ArrayList<>();
     for (String line : Files.readAllLines(Path.of(path))) {
       if (line.isBlank()) {
         continue;
@@ -82,19 +83,26 @@ class ImportTasklet implements Tasklet {
         }
       } catch (RuntimeException e) {
         invalid++;
+        errors.add(line + " | " + e.getMessage());
       }
     }
-    transactions.deleteAllInBatch();
-    xrefs.deleteAllInBatch();
-    cards.deleteAllInBatch();
-    balances.deleteAllInBatch();
-    accounts.deleteAllInBatch();
-    customers.deleteAllInBatch();
-    customers.saveAll(customerRows);
-    accounts.saveAll(accountRows);
-    cards.saveAll(cardRows);
-    xrefs.saveAll(xrefRows);
-    transactions.saveAll(transactionRows);
+    var parameters = context.getStepContext().getStepExecution().getJobParameters();
+    write(
+        BatchSupport.parameter(parameters, "customerOutput", "target/output/CUSTOUT.dat"),
+        customerRows.stream().map(row -> ExportCodec.customer(0, row)).toList());
+    write(
+        BatchSupport.parameter(parameters, "accountOutput", "target/output/ACCTOUT.dat"),
+        accountRows.stream().map(row -> ExportCodec.account(0, row)).toList());
+    write(
+        BatchSupport.parameter(parameters, "xrefOutput", "target/output/XREFOUT.dat"),
+        xrefRows.stream().map(row -> ExportCodec.xref(0, row)).toList());
+    write(
+        BatchSupport.parameter(parameters, "transactionOutput", "target/output/TRNXOUT.dat"),
+        transactionRows.stream().map(row -> ExportCodec.transaction(0, row)).toList());
+    write(
+        BatchSupport.parameter(parameters, "cardOutput", "target/output/CARDOUT.dat"),
+        cardRows.stream().map(row -> ExportCodec.card(0, row)).toList());
+    write(BatchSupport.parameter(parameters, "errorOutput", "target/output/ERROUT.dat"), errors);
     var executionContext =
         context.getStepContext().getStepExecution().getJobExecution().getExecutionContext();
     executionContext.putInt("totalRecordsRead", read);
@@ -110,8 +118,15 @@ class ImportTasklet implements Tasklet {
             + accountRows.size()
             + xrefRows.size()
             + transactionRows.size()
-            + cardRows.size());
+            + cardRows.size()
+            + errors.size());
     return RepeatStatus.FINISHED;
+  }
+
+  private void write(String path, List<String> lines) throws IOException {
+    Path output = Path.of(path).toAbsolutePath();
+    if (output.getParent() != null) Files.createDirectories(output.getParent());
+    Files.write(output, lines);
   }
 
   private Customer customer(List<String> f) {

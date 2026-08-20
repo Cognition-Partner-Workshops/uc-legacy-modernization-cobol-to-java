@@ -3,9 +3,11 @@ package com.aws.carddemo.web.security;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,8 +17,16 @@ public class TokenService {
   private final String secret;
 
   public TokenService(
-      @Value("${carddemo.security.jwt-secret:dev-only-change-this-carddemo-key}") String secret) {
-    this.secret = secret;
+      @Value("${carddemo.security.jwt-secret:}") String secret, Environment environment) {
+    if (secret != null && !secret.isBlank()) {
+      this.secret = secret;
+    } else if (java.util.Arrays.stream(environment.getActiveProfiles())
+        .anyMatch(profile -> profile.equals("prod") || profile.equals("production"))) {
+      throw new IllegalStateException(
+          "CARDDEMO_JWT_SECRET must be configured outside local/test profiles");
+    } else {
+      this.secret = UUID.randomUUID().toString() + UUID.randomUUID();
+    }
   }
 
   public String issue(String userId, String role) {

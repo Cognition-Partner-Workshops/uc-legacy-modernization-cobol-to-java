@@ -2,8 +2,6 @@ package com.aws.carddemo.batch;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -13,16 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@EnableBatchProcessing
 public class BatchJobConfiguration {
-  @Bean
-  JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(
-      org.springframework.batch.core.configuration.JobRegistry jobRegistry) {
-    JobRegistryBeanPostProcessor processor = new JobRegistryBeanPostProcessor();
-    processor.setJobRegistry(jobRegistry);
-    return processor;
-  }
-
   @Bean
   Job postTransactionsJob(
       JobRepository repository, @Qualifier("postTransactionsStep") Step postTransactionsStep) {
@@ -86,6 +75,23 @@ public class BatchJobConfiguration {
       @Qualifier("categoryBalancePrintStep") Step categoryBalancePrintStep) {
     return new JobBuilder("categoryBalancePrintJob", repository)
         .start(categoryBalancePrintStep)
+        .build();
+  }
+
+  @Bean
+  Job authorizationPurgeJob(
+      JobRepository repository, @Qualifier("authorizationPurgeStep") Step authorizationPurgeStep) {
+    return new JobBuilder("authorizationPurgeJob", repository)
+        .start(authorizationPurgeStep)
+        .build();
+  }
+
+  @Bean
+  Job transactionTypeUpdateJob(
+      JobRepository repository,
+      @Qualifier("transactionTypeUpdateStep") Step transactionTypeUpdateStep) {
+    return new JobBuilder("transactionTypeUpdateJob", repository)
+        .start(transactionTypeUpdateStep)
         .build();
   }
 
@@ -179,6 +185,26 @@ public class BatchJobConfiguration {
       PlatformTransactionManager transactionManager,
       CategoryBalancePrintTasklet tasklet) {
     return new StepBuilder("categoryBalancePrintStep", repository)
+        .tasklet(tasklet, transactionManager)
+        .build();
+  }
+
+  @Bean
+  Step authorizationPurgeStep(
+      JobRepository repository,
+      PlatformTransactionManager transactionManager,
+      AuthorizationPurgeTasklet tasklet) {
+    return new StepBuilder("authorizationPurgeStep", repository)
+        .tasklet(tasklet, transactionManager)
+        .build();
+  }
+
+  @Bean
+  Step transactionTypeUpdateStep(
+      JobRepository repository,
+      PlatformTransactionManager transactionManager,
+      TransactionTypeUpdateTasklet tasklet) {
+    return new StepBuilder("transactionTypeUpdateStep", repository)
         .tasklet(tasklet, transactionManager)
         .build();
   }

@@ -11,6 +11,9 @@ const PROGRAM_ROUTES: Record<string, string> = {
   COTRN02C: "/transactions/add", COBIL00C: "/bill-payment", CORPT00C: "/reports",
   COUSR00C: "/admin/users", COUSR01C: "/admin/users/add", COUSR02C: "/admin/users/update",
   COUSR03C: "/admin/users/delete",
+  CPVSC: "/authorizations", CPVDC: "/authorizations/detail", COPAUS0C: "/authorizations",
+  COPAUS1C: "/authorizations/detail", CTLIC: "/admin/transaction-types", COTRTLIC: "/admin/transaction-types",
+  CTTUC: "/admin/transaction-types/update", COTRTUPC: "/admin/transaction-types/update",
 };
 
 export function routeForProgram(program?: string): string {

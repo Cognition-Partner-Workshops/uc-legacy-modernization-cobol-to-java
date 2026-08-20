@@ -28,6 +28,7 @@ import com.aws.carddemo.domain.UsrsecRepository;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class SeedDataLoader {
 
   @Autowired
   public SeedDataLoader(
-      @Value("${carddemo.data-root:../app/data}") Path dataRoot,
+      @Value("${carddemo.data-root:../app/data}") String dataRoot,
       UsrsecRepository usrsecRepository,
       CustomerRepository customerRepository,
       AccountRepository accountRepository,
@@ -67,7 +68,7 @@ public class SeedDataLoader {
       TranCategoryBalanceRepository tranCategoryBalanceRepository,
       TransactionCategoryRepository transactionCategoryRepository,
       TransactionTypeRepository transactionTypeRepository) {
-    this.dataRoot = dataRoot;
+    this.dataRoot = Paths.get(dataRoot);
     this.usrsecRepository = usrsecRepository;
     this.customerRepository = customerRepository;
     this.accountRepository = accountRepository;
@@ -182,6 +183,12 @@ public class SeedDataLoader {
   }
 
   private int loadAccounts(List<byte[]> records, SeedDataset dataset) {
+    if (cardRepository.count() > 0
+        || cardXrefRepository.count() > 0
+        || tranCategoryBalanceRepository.count() > 0) {
+      throw new IllegalStateException(
+          "Cannot reload account independently while dependent rows exist; use --dataset=all");
+    }
     accountRepository.deleteAllInBatch();
     List<Account> values = new ArrayList<>();
     for (Map<String, Object> row : rows(records, dataset)) {

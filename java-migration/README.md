@@ -19,13 +19,26 @@ user: carddemo
 password: carddemo
 ```
 
+Docker Compose is provided for environments where PostgreSQL is not already
+running, but the default host port is commonly occupied by a local instance.
+Use the existing local PostgreSQL service on `localhost:5432` when available,
+or remap the Compose port (for example, `"15432:5432"`) and update the JDBC
+URL accordingly.
+
 ```bash
 cd java-migration
-docker compose up -d postgres
 export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/carddemo
 export SPRING_DATASOURCE_USERNAME=carddemo
 export SPRING_DATASOURCE_PASSWORD=carddemo
-mvn -pl dataload spring-boot:run -Dspring-boot.run.arguments="--dataset=all"
+mvn -pl dataload spring-boot:run \
+  -Dspring-boot.run.arguments="--dataset=all --carddemo.data-root=../../app/data"
+```
+
+The packaged loader is also executable:
+
+```bash
+mvn -pl dataload package -DskipTests
+java -jar dataload/target/dataload-0.1.0-SNAPSHOT-exec.jar --dataset=all
 ```
 
 Flyway creates the schema when an application starts. The loader reads the
@@ -43,6 +56,13 @@ mvn -pl web spring-boot:run
 The REST application listens on `http://localhost:8080`; health is available
 at `/actuator/health`. Set `CARDDEMO_JWT_SECRET` to replace the development
 JWT signing-key default.
+
+The packaged web application is executable:
+
+```bash
+mvn -pl web package -DskipTests
+java -jar web/target/web-0.1.0-SNAPSHOT-exec.jar
+```
 
 ### Frontend
 
@@ -71,8 +91,20 @@ Spring Batch metadata tables are owned by Flyway. Select a job with
 
 ```bash
 mvn -pl batch spring-boot:run \
-  -Dspring-boot.run.arguments="--spring.batch.job.name=postTransactionsJob,--runDate=20220718"
+  -Dspring-boot.run.jvmArguments="-Dspring.batch.job.name=postTransactionsJob" \
+  -Dspring-boot.run.arguments="runDate=20220718"
 ```
+
+Or run the executable batch jar:
+
+```bash
+mvn -pl batch package -DskipTests
+java -jar batch/target/batch-0.1.0-SNAPSHOT-exec.jar \
+  --spring.batch.job.name=postTransactionsJob runDate=20220718
+```
+
+An individual account reload refuses to remove dependent card, xref, and
+balance rows. Use `--dataset=all` for a complete FK-safe reload.
 
 The current job registry is:
 

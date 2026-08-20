@@ -20,7 +20,7 @@ public class CardService {
 
   public Response<CardPage> list(CardListRequest request) {
     if (request.accountId() != null
-        && (request.accountId() <= 0 || request.accountId().toString().length() != 11)) {
+        && (request.accountId() <= 0 || request.accountId() > 99_999_999_999L)) {
       return Response.error(
           "ACCOUNT FILTER,IF SUPPLIED MUST BE A 11 DIGIT NUMBER", "accountId", request.context());
     }
@@ -77,18 +77,19 @@ public class CardService {
           "Card Name can have alphabets only.", "embossedName", request.context());
     if (blank(request.activeStatus()) || !request.activeStatus().matches("(?i)[YN]"))
       return Response.error("Card Status must be Y or N.", "activeStatus", request.context());
-    if (blank(request.expirationDate()) || !request.expirationDate().matches("\\d{2}/\\d{2}"))
+    String expirationDate = expirationDate(request);
+    if (expirationDate == null)
       return Response.error("Expiration Date is not valid", "expirationDate", request.context());
     if (request.preImage() == null
         || !Objects.equals(card.getEmbossedName(), request.preImage().embossedName())
         || !Objects.equals(card.getActiveStatus(), request.preImage().activeStatus())
-        || !Objects.equals(card.getExpiraionDate(), request.preImage().expirationDate())) {
+        || !Objects.equals(card.getExpiraionDate(), preImageDate(request.preImage()))) {
       return Response.error(
           "Record changed by some one else. Please review", "cardNumber", request.context());
     }
     if (Objects.equals(card.getEmbossedName(), request.embossedName())
         && Objects.equals(card.getActiveStatus(), request.activeStatus())
-        && Objects.equals(card.getExpiraionDate(), request.expirationDate())) {
+        && Objects.equals(card.getExpiraionDate(), expirationDate)) {
       return Response.error(
           "No change detected with respect to values fetched.", "cardNumber", request.context());
     }
@@ -96,13 +97,40 @@ public class CardService {
       return Response.ok(card, "COCRDUPC", withCard(request.context(), cardNumber, "COCRDUPC"));
     card.setEmbossedName(request.embossedName());
     card.setActiveStatus(request.activeStatus().toUpperCase());
-    card.setExpiraionDate(request.expirationDate());
+    card.setExpiraionDate(expirationDate);
     return Response.ok(
         cards.save(card), "COCRDUPC", withCard(request.context(), cardNumber, "COCRDUPC"));
   }
 
   private static boolean blank(String value) {
     return value == null || value.isBlank();
+  }
+
+  private static String expirationDate(CardUpdateRequest request) {
+    String year = request.expirationYear();
+    String month = request.expirationMonth();
+    if (year != null
+        && month != null
+        && year.matches("\\d{4}")
+        && month.matches("(0[1-9]|1[0-2])")) {
+      return year + "-" + month + "-01";
+    }
+    if (request.expirationDate() != null
+        && request.expirationDate().matches("\\d{4}-\\d{2}-\\d{2}")) {
+      return request.expirationDate();
+    }
+    return null;
+  }
+
+  private static String preImageDate(CardPreImage preImage) {
+    if (preImage == null) return null;
+    if (preImage.expirationYear() != null
+        && preImage.expirationMonth() != null
+        && preImage.expirationYear().matches("\\d{4}")
+        && preImage.expirationMonth().matches("(0[1-9]|1[0-2])")) {
+      return preImage.expirationYear() + "-" + preImage.expirationMonth() + "-01";
+    }
+    return preImage.expirationDate();
   }
 
   private static Context withCard(Context c, String card, String program) {
@@ -127,12 +155,19 @@ public class CardService {
   public record CardPage(
       List<Card> cards, int page, int pageSize, boolean nextPage, boolean previousPage) {}
 
-  public record CardPreImage(String embossedName, String activeStatus, String expirationDate) {}
+  public record CardPreImage(
+      String embossedName,
+      String activeStatus,
+      String expirationDate,
+      String expirationMonth,
+      String expirationYear) {}
 
   public record CardUpdateRequest(
       String embossedName,
       String activeStatus,
       String expirationDate,
+      String expirationMonth,
+      String expirationYear,
       CardPreImage preImage,
       boolean confirm,
       Context context) {}

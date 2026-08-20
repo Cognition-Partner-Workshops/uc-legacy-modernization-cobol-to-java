@@ -44,7 +44,7 @@ break apply accumulated state across rows.
 | `READXREF.jcl` / `CBACT03C` | `xrefFilePrintJob` / `xrefFilePrintStep` | Ordered JPA input replaces VSAM sequential input. |
 | `READCUST.jcl` / `CBCUS01C` | `customerFilePrintJob` / `customerFilePrintStep` | Ordered JPA input replaces VSAM sequential input. |
 | `CBEXPORT.jcl` / `CBEXPORT` | `exportJob` / `exportStep` | Five sections are written in customer, account, xref, transaction, card order. Records are fixed at 500 characters with common type/timestamp/sequence/branch/region fields. COMP/COMP-3 values use deterministic ASCII logical values, not byte-identical mainframe binary encoding. |
-| `CBIMPORT.jcl` / `CBIMPORT` | `importJob` / `importStep` | Records are validated and counted by type, then saved in FK-safe order (cards before xrefs). The non-exported category-balance rows are cleared first so account replacement satisfies relational FKs. Unknown and malformed records are counted in the execution context. |
+| `CBIMPORT.jcl` / `CBIMPORT` | `importJob` / `importStep` | Records are validated and counted by type, then written as CUSTOUT/ACCTOUT/XREFOUT/TRNXOUT/CARDOUT files plus ERROUT. The master tables are never mutated; the default input is `target/input/carddemo-export.dat`, separate from export output. |
 | `COMBTRAN.jcl` / `STEP05R` + `STEP10` | `combtranJob` / `combtranStep` | Two transaction export files (`backupPath`, `systemPath`) are merged, sorted by transaction ID, and loaded into the transaction table. |
 | `TRANBKP.jcl` / `REPROC` | `transactionBackupJob` / `transactionBackupStep` | Ordered table rows are written as transaction export records. |
 | `PRTCATBL.jcl` | `categoryBalancePrintJob` / `categoryBalancePrintStep` | Ordered repository report replaces VSAM backup and sort. |
@@ -82,3 +82,13 @@ above. Twenty-nine entries map to concrete Java behavior (including
 repository/schema/dataload equivalents), while eleven are intentionally not
 separate Java jobs because they are infrastructure, lifecycle, definition, or
 integration concerns.
+
+## Extension batch mappings
+
+| Legacy asset | Java mapping | Notes |
+|---|---|---|
+| `CBPAUP0J` / `CBPAUP0C` | `authorizationPurgeJob` | Five-day expiry default; approved/pending exceptions are retained and summaries are deleted when approved count is zero. IMS `CHKP` maps to the Spring Batch step transaction boundary. |
+| `DBUNLDGS` / `UNLDGSAM.JCL` | Intentional N/A | IMS GSAM unload is replaced by relational export services. |
+| `PAUDBLOD` / `LOADPADB.JCL` | Dataload/import path | IMS root/child load files map to pending authorization repositories. |
+| `PAUDBUNL` / `UNLDPADB.JCL` | Relational export path | Root and child segments can be exported as ordered relational rows. |
+| `COBTUPDT` / `MNTTRDB2.jcl` | `transactionTypeUpdateJob` | Pipe input `I|type|description`, `U|type|description`, or `D|type` preserves batch CRUD intent. |

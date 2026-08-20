@@ -334,18 +334,30 @@ class BatchJobsPostgresTest {
     List<String> exportLines = Files.readAllLines(exportPath);
     assertEquals(200, exportLines.size());
     assertTrue(exportLines.stream().allMatch(line -> line.length() == ExportCodec.RECORD_LENGTH));
-    transactions.deleteAllInBatch();
-    xrefs.deleteAllInBatch();
-    cards.deleteAllInBatch();
-    balances.deleteAllInBatch();
-    accounts.deleteAllInBatch();
-    customers.deleteAllInBatch();
     JobExecution imported =
         run(
             importJob,
             "import-" + System.nanoTime(),
-            new JobParametersBuilder().addString("exportPath", exportPath.toString()));
+            new JobParametersBuilder()
+                .addString("exportPath", exportPath.toString())
+                .addString("customerOutput", OUTPUT.resolve("CUSTOUT.dat").toString())
+                .addString("accountOutput", OUTPUT.resolve("ACCTOUT.dat").toString())
+                .addString("xrefOutput", OUTPUT.resolve("XREFOUT.dat").toString())
+                .addString("transactionOutput", OUTPUT.resolve("TRNXOUT.dat").toString())
+                .addString("cardOutput", OUTPUT.resolve("CARDOUT.dat").toString())
+                .addString("errorOutput", OUTPUT.resolve("ERROUT.dat").toString()));
     assertEquals("COMPLETED", imported.getExitStatus().getExitCode());
+    assertEquals(
+        before.get("customers").size(), Files.readAllLines(OUTPUT.resolve("CUSTOUT.dat")).size());
+    assertEquals(
+        before.get("accounts").size(), Files.readAllLines(OUTPUT.resolve("ACCTOUT.dat")).size());
+    assertEquals(
+        before.get("xrefs").size(), Files.readAllLines(OUTPUT.resolve("XREFOUT.dat")).size());
+    assertEquals(
+        before.get("transactions").size(),
+        Files.readAllLines(OUTPUT.resolve("TRNXOUT.dat")).size());
+    assertEquals(
+        before.get("cards").size(), Files.readAllLines(OUTPUT.resolve("CARDOUT.dat")).size());
     assertEquals(before, exportedSnapshot());
   }
 

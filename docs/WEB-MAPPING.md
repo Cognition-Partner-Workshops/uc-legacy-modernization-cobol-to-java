@@ -27,6 +27,11 @@ returns that program as `nextRoute`.
 | `POST /api/admin/users` | `COUSR01C` | `ROLE_ADMIN` |
 | `PUT /api/admin/users/{userId}` | `COUSR02C` | `ROLE_ADMIN` |
 | `DELETE /api/admin/users/{userId}` | `COUSR03C` | `ROLE_ADMIN` |
+| `GET /api/authorizations/summary/{accountId}` | `COPAUS0C` | Authenticated |
+| `GET /api/authorizations/detail/{id}` | `COPAUS1C` | Authenticated |
+| `POST /api/authorizations/detail/{id}/fraud` | `COPAUS2C` (called service) | Authenticated |
+| `GET /api/admin/transaction-types` | `COTRTLIC` | `ROLE_ADMIN` |
+| `POST /api/admin/transaction-types` | `COTRTUPC` | `ROLE_ADMIN` |
 
 The corresponding `CARDDEMO.CSD` transaction IDs are `CC00` (signon),
 `CM00` (main menu), `CA00` (admin menu), `CAVW` (account view), `CAUP`
@@ -34,6 +39,12 @@ The corresponding `CARDDEMO.CSD` transaction IDs are `CC00` (signon),
 (card update), `CT00` (transaction list), `CT01` (transaction view), `CT02`
 (transaction add), `CB00` (bill payment), `CR00` (report submission), `CU00`
 (user list), `CU01` (add user), `CU02` (update user), and `CU03` (delete user).
+
+The extension transaction IDs are `CP00` (MQ authorization request), `CPVS`
+(authorization summary), `CPVD` (authorization detail), `CTLI` (transaction
+type list), `CTTU` (transaction type update), `CDRA` (account inquiry), and
+`CDRD` (system-date inquiry). JMS preserves the fixed-width COBOL bodies while
+using JMS reply-to and correlation metadata for transport.
 
 All 17 core online programs listed in `docs/INVENTORY.md` are represented above.
 Report submission launches the existing `transactionReportJob`; it does not
