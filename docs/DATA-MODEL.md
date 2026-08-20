@@ -143,6 +143,24 @@ card seed row, and the inventory explicitly requires nullable-tolerant batch
 loading. It remains a plain indexed column. Transaction category references are
 enforced through `(type_cd, cat_cd)` and category-to-type through `type_cd`.
 
+The fixed-width ASCII seed verification found no violations:
+
+| Relationship | Referencing rows checked | Violations |
+|---|---:|---:|
+| `card_xref.card_num` → `card.card_num` | 50 | 0 |
+| `card_xref.acct_id` → `account.acct_id` | 50 | 0 |
+| `card_xref.cust_id` → `customer.cust_id` | 50 | 0 |
+| `card.acct_id` → `account.acct_id` | 50 | 0 |
+
+The check used the fixed-width offsets from this document over
+`custdata.txt`, `acctdata.txt`, `carddata.txt`, and `cardxref.txt`; no
+whitespace splitting or inferred relationships were used.
+
+For dataload, blank and low-value numeric fields are represented as SQL
+`NULL`; they are not coerced to zero. Text fields, including date fields,
+retain their trimmed text value, while low-values remain distinguishable from
+numeric zero.
+
 All numeric money/rate fields use exact COBOL precision and scale. No date
 field was converted to SQL `DATE`; callers can use `DateValidator` and
 `DateConverter` from `common`.

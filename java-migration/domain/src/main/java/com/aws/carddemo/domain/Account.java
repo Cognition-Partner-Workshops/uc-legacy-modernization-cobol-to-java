@@ -1,10 +1,141 @@
 package com.aws.carddemo.domain;
-import jakarta.persistence.*; import java.math.BigDecimal;
-@Entity @Table(name="account")
+
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "account")
 public class Account {
- @Id @Column(name="acct_id") Long acctId; @Column(name="active_status",length=1) String activeStatus;
- @Column(name="curr_bal",precision=12,scale=2) BigDecimal currBal; @Column(name="credit_limit",precision=12,scale=2) BigDecimal creditLimit; @Column(name="cash_credit_limit",precision=12,scale=2) BigDecimal cashCreditLimit;
- @Column(name="open_date",length=10) String openDate; @Column(name="expiraion_date",length=10) String expiraionDate; @Column(name="reissue_date",length=10) String reissueDate;
- @Column(name="curr_cyc_credit",precision=12,scale=2) BigDecimal currCycCredit; @Column(name="curr_cyc_debit",precision=12,scale=2) BigDecimal currCycDebit; @Column(name="addr_zip",length=10) String addrZip; @Column(name="group_id",length=10) String groupId;
- public Long getAcctId(){return acctId;} public void setAcctId(Long v){acctId=v;} public String getActiveStatus(){return activeStatus;} public void setActiveStatus(String v){activeStatus=v;} public BigDecimal getCurrBal(){return currBal;} public void setCurrBal(BigDecimal v){currBal=v;} public BigDecimal getCreditLimit(){return creditLimit;} public void setCreditLimit(BigDecimal v){creditLimit=v;} public BigDecimal getCashCreditLimit(){return cashCreditLimit;} public void setCashCreditLimit(BigDecimal v){cashCreditLimit=v;} public String getOpenDate(){return openDate;} public void setOpenDate(String v){openDate=v;} public String getExpiraionDate(){return expiraionDate;} public void setExpiraionDate(String v){expiraionDate=v;} public String getReissueDate(){return reissueDate;} public void setReissueDate(String v){reissueDate=v;} public BigDecimal getCurrCycCredit(){return currCycCredit;} public void setCurrCycCredit(BigDecimal v){currCycCredit=v;} public BigDecimal getCurrCycDebit(){return currCycDebit;} public void setCurrCycDebit(BigDecimal v){currCycDebit=v;} public String getAddrZip(){return addrZip;} public void setAddrZip(String v){addrZip=v;} public String getGroupId(){return groupId;} public void setGroupId(String v){groupId=v;}
+  @Id
+  @Column(name = "acct_id")
+  Long acctId;
+
+  @Column(name = "active_status", length = 1)
+  String activeStatus;
+
+  @Column(name = "curr_bal", precision = 12, scale = 2)
+  BigDecimal currBal;
+
+  @Column(name = "credit_limit", precision = 12, scale = 2)
+  BigDecimal creditLimit;
+
+  @Column(name = "cash_credit_limit", precision = 12, scale = 2)
+  BigDecimal cashCreditLimit;
+
+  @Column(name = "open_date", length = 10)
+  String openDate;
+
+  @Column(name = "expiraion_date", length = 10)
+  String expiraionDate;
+
+  @Column(name = "reissue_date", length = 10)
+  String reissueDate;
+
+  @Column(name = "curr_cyc_credit", precision = 12, scale = 2)
+  BigDecimal currCycCredit;
+
+  @Column(name = "curr_cyc_debit", precision = 12, scale = 2)
+  BigDecimal currCycDebit;
+
+  @Column(name = "addr_zip", length = 10)
+  String addrZip;
+
+  @Column(name = "group_id", length = 10)
+  String groupId;
+
+  public Long getAcctId() {
+    return acctId;
+  }
+
+  public void setAcctId(Long v) {
+    acctId = v;
+  }
+
+  public String getActiveStatus() {
+    return activeStatus;
+  }
+
+  public void setActiveStatus(String v) {
+    activeStatus = v;
+  }
+
+  public BigDecimal getCurrBal() {
+    return currBal;
+  }
+
+  public void setCurrBal(BigDecimal v) {
+    currBal = v;
+  }
+
+  public BigDecimal getCreditLimit() {
+    return creditLimit;
+  }
+
+  public void setCreditLimit(BigDecimal v) {
+    creditLimit = v;
+  }
+
+  public BigDecimal getCashCreditLimit() {
+    return cashCreditLimit;
+  }
+
+  public void setCashCreditLimit(BigDecimal v) {
+    cashCreditLimit = v;
+  }
+
+  public String getOpenDate() {
+    return openDate;
+  }
+
+  public void setOpenDate(String v) {
+    openDate = v;
+  }
+
+  public String getExpiraionDate() {
+    return expiraionDate;
+  }
+
+  public void setExpiraionDate(String v) {
+    expiraionDate = v;
+  }
+
+  public String getReissueDate() {
+    return reissueDate;
+  }
+
+  public void setReissueDate(String v) {
+    reissueDate = v;
+  }
+
+  public BigDecimal getCurrCycCredit() {
+    return currCycCredit;
+  }
+
+  public void setCurrCycCredit(BigDecimal v) {
+    currCycCredit = v;
+  }
+
+  public BigDecimal getCurrCycDebit() {
+    return currCycDebit;
+  }
+
+  public void setCurrCycDebit(BigDecimal v) {
+    currCycDebit = v;
+  }
+
+  public String getAddrZip() {
+    return addrZip;
+  }
+
+  public void setAddrZip(String v) {
+    addrZip = v;
+  }
+
+  public String getGroupId() {
+    return groupId;
+  }
+
+  public void setGroupId(String v) {
+    groupId = v;
+  }
 }
