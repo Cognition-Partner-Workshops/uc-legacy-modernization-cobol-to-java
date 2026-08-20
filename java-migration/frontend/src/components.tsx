@@ -140,7 +140,10 @@ export function MapField({
         readOnly={spec.protected}
         disabled={spec.protected}
         type={spec.password ? "password" : "text"}
-        style={{ width: `${spec.length}ch`, flex: `0 0 ${spec.length}ch` }}
+        style={{
+          width: `calc(${spec.length}ch + 0.6rem + 2px)`,
+          flex: `0 0 calc(${spec.length}ch + 0.6rem + 2px)`,
+        }}
         onChange={(event) => onChange(event.target.value)}
       />
     </label>

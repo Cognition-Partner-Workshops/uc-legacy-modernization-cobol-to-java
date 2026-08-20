@@ -240,9 +240,9 @@ describe("CardDemo SPA", () => {
     await waitFor(() => expect(screen.getByDisplayValue("PURCHASE")).toBeInTheDocument());
     expect(screen.getByDisplayValue("-919.00")).toBeInTheDocument();
     expect(screen.getByDisplayValue("2022-06-10")).toBeInTheDocument();
-    expect(screen.getByLabelText("Transaction ID")).toHaveStyle({ width: "16ch" });
-    expect(screen.getByLabelText("Original Date")).toHaveStyle({ width: "10ch" });
-    expect(screen.getByLabelText("Merchant ID")).toHaveStyle({ width: "9ch" });
+    expect(screen.getByLabelText("Transaction ID")).toHaveStyle({ width: "calc(16ch + 0.6rem + 2px)" });
+    expect(screen.getByLabelText("Original Date")).toHaveStyle({ width: "calc(10ch + 0.6rem + 2px)" });
+    expect(screen.getByLabelText("Merchant ID")).toHaveStyle({ width: "calc(9ch + 0.6rem + 2px)" });
   });
 
   it("renders real user rows and keeps admin routes guarded", async () => {
