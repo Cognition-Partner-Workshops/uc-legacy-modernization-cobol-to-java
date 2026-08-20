@@ -18,11 +18,28 @@ returns that program as `nextRoute`.
 | `GET /api/cards` | `COCRDLIC` | Authenticated |
 | `GET /api/cards/{cardNumber}` | `COCRDSLC` | Authenticated |
 | `PUT /api/cards/{cardNumber}` | `COCRDUPC` | Authenticated |
+| `GET /api/transactions` | `COTRN00C` | `ROLE_USER` |
+| `GET /api/transactions/{transactionId}` | `COTRN01C` | `ROLE_USER` |
+| `POST /api/transactions` | `COTRN02C` | `ROLE_USER` |
+| `POST /api/bill-payments` | `COBIL00C` | `ROLE_USER` |
+| `POST /api/reports` | `CORPT00C` | `ROLE_USER` |
+| `GET /api/admin/users` | `COUSR00C` | `ROLE_ADMIN` |
+| `POST /api/admin/users` | `COUSR01C` | `ROLE_ADMIN` |
+| `PUT /api/admin/users/{userId}` | `COUSR02C` | `ROLE_ADMIN` |
+| `DELETE /api/admin/users/{userId}` | `COUSR03C` | `ROLE_ADMIN` |
 
 The corresponding `CARDDEMO.CSD` transaction IDs are `CC00` (signon),
 `CM00` (main menu), `CA00` (admin menu), `CAVW` (account view), `CAUP`
 (account update), `CCLI` (card list), `CCDL` (card detail), and `CCUP`
-(card update).
+(card update), `CT00` (transaction list), `CT01` (transaction view), `CT02`
+(transaction add), `CB00` (bill payment), `CR00` (report submission), `CU00`
+(user list), `CU01` (add user), `CU02` (update user), and `CU03` (delete user).
+
+All 17 core online programs listed in `docs/INVENTORY.md` are represented above.
+Report submission launches the existing `transactionReportJob`; it does not
+duplicate report-generation logic in the web module. Transaction, bill-payment,
+and report routes require `ROLE_USER`; user administration requires
+`ROLE_ADMIN`.
 
 `COMEN02Y.cpy` and `COADM02Y.cpy` are ported as menu data. Menu option numbers
 are validated server-side and the user-type flag is never trusted from the

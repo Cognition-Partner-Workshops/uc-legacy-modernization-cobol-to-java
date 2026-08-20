@@ -8,6 +8,8 @@ import com.aws.carddemo.web.menu.MenuController;
 import com.aws.carddemo.web.menu.MenuService;
 import com.aws.carddemo.web.security.TokenService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,6 +25,7 @@ class SecurityRouteTest {
   @MockBean MenuService menu;
   @MockBean UsrsecRepository users;
   @MockBean TokenService tokenService;
+  @MockBean com.aws.carddemo.web.user.UserAdminService userAdmin;
 
   @Test
   void unauthenticatedUserCannotOpenMenu() throws Exception {
@@ -39,5 +42,12 @@ class SecurityRouteTest {
   @WithMockUser(roles = "ADMIN")
   void adminCanOpenAdminMenu() throws Exception {
     mvc.perform(post("/api/admin/menu")).andExpect(status().isOk());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"/api/admin/users", "/api/admin/users/USER001"})
+  @WithMockUser(roles = "USER")
+  void userCannotOpenAnyUserAdministrationRoute(String route) throws Exception {
+    mvc.perform(post(route)).andExpect(status().isForbidden());
   }
 }

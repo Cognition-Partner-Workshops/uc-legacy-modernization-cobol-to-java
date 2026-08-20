@@ -1,11 +1,15 @@
 package com.aws.carddemo.web;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.aws.carddemo.dataload.SeedDataLoader;
 import com.aws.carddemo.web.security.TokenService;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
@@ -15,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
@@ -76,6 +81,95 @@ class WebPostgresIntegrationTest {
             get("/api/cards").param("page", "1").with(bearer(tokens.issue("USER001", "ROLE_USER"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data.cards.length()").value(7));
+  }
+
+  @Test
+  void transactionAddPersistsAndBillPaymentUpdatesAccount() throws Exception {
+    loader.loadAll();
+    String userToken = tokens.issue("USER001", "ROLE_USER");
+    String transaction =
+        """
+        {
+          "accountId":"1","typeCode":"01","categoryCode":"1","source":"ONLINE",
+          "description":"WEB ADD","amount":"+00000100.00","origDate":"2022-01-01",
+          "procDate":"2022-01-01","merchantId":"123456789","merchantName":"MERCHANT",
+          "merchantCity":"CITY","merchantZip":"12345","confirmValue":"Y","confirm":true,
+          "context":{"userId":"USER001","userType":"U"}
+        }
+        """;
+    mvc.perform(
+            post("/api/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(transaction)
+                .with(bearer(userToken)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.amt").value(100.0));
+    mvc.perform(
+            post("/api/bill-payments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                    {"accountId":1,"confirm":true,"context":{"userId":"USER001","userType":"U"}}
+                    """)
+                .with(bearer(userToken)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.remainingBalance").value(0.0));
+  }
+
+  @Test
+  void adminUserRoundTripPersistsAgainstUsrsec() throws Exception {
+    loader.loadAll();
+    String adminToken = tokens.issue("ADMIN001", "ROLE_ADMIN");
+    mvc.perform(
+            post("/api/admin/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                    {"firstName":"Test","lastName":"User","userId":"WEBUSR01",
+                     "password":"PASSWORD","userType":"U"}
+                    """)
+                .with(bearer(adminToken)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.secUsrId").value("WEBUSR01"));
+    mvc.perform(
+            put("/api/admin/users/WEBUSR01")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                    {"firstName":"Updated","lastName":"User","password":"PASSWORD",
+                     "userType":"U","confirm":true}
+                    """)
+                .with(bearer(adminToken)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.secUsrFname").value("Updated"));
+    mvc.perform(
+            org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete(
+                    "/api/admin/users/WEBUSR01")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"confirm\":true}")
+                .with(bearer(adminToken)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  void reportEndpointSubmitsExistingBatchJob() throws Exception {
+    loader.loadAll();
+    mvc.perform(
+            post("/api/reports")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                    {"reportType":"monthly","startDate":"2022-01-01",
+                     "endDate":"2022-12-31","confirm":true}
+                    """)
+                .with(bearer(tokens.issue("USER001", "ROLE_USER"))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.status").value("SUBMITTED"));
+    Path output = Path.of("target/output/transaction-report.txt");
+    for (int attempt = 0; attempt < 50 && !Files.exists(output); attempt++) {
+      Thread.sleep(100);
+    }
+    org.junit.jupiter.api.Assertions.assertTrue(Files.exists(output));
   }
 
   private static RequestPostProcessor bearer(String token) {
