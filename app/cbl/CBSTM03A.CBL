@@ -160,10 +160,10 @@
              88  HTML-LTRE VALUE '</tr>'.
              88  HTML-LTDS VALUE '<td>'.
              88  HTML-LTDE VALUE '</td>'.
-             88  HTML-L10 VALUE '<td colspan="3" style="padding:0px 5px;
-      -             'background-color:#1d1d96b3;">'.
-             88  HTML-L15 VALUE '<td colspan="3" style="padding:0px 5px;
-      -             'background-color:#FFAF33;">'.
+             88  HTML-L10 VALUE '<td colspan="3" style="padding:4px 8px;
+      -             ' background-color:#0A2540; color:#FFFFFF;">'.
+             88  HTML-L15 VALUE '<td colspan="3" style="padding:4px 8px;
+      -             ' background-color:#0A2540; color:#FFFFFF;">'.
              88  HTML-L16
                VALUE '<p style="font-size:16px">Bank of XYZ</p>'.
              88  HTML-L17
@@ -171,38 +171,41 @@
              88  HTML-L18
                VALUE '<p>Seattle WA 99999</p>'.
              88  HTML-L22-35
-                          VALUE '<td colspan="3" style="padding:0px 5px;
-      -              'background-color:#f2f2f2;">'.
+                          VALUE '<td colspan="3" style="padding:4px 8px;
+      -              ' background-color:#f2f2f2;">'.
              88  HTML-L30-42
-                          VALUE '<td colspan="3" style="padding:0px 5px;
-      -              'background-color:#33FFD1; text-align:center;">'.
+                          VALUE '<td colspan="3" style="padding:4px 8px;
+      -              ' background-color:#E9ECEF; text-align:center;">'.
              88  HTML-L31
                VALUE '<p style="font-size:16px">Basic Details</p>'.
              88  HTML-L43
               VALUE '<p style="font-size:16px">Transaction Summary</p>'.
              88  HTML-L47
-               VALUE '<td style="width:25%; padding:0px 5px; background-
-      -              'color:#33FF5E; text-align:left;">'.
+               VALUE '<td style="width:25%; padding:4px 8px; background-
+      -              'color:#1F4E79; text-align:left;">'.
              88  HTML-L48
-               VALUE '<p style="font-size:16px">Tran ID</p>'.
+               VALUE '<p style="font-size:16px; color:#FFFFFF; font-
+      -              'weight:bold">Tran ID</p>'.
              88  HTML-L50
-               VALUE '<td style="width:55%; padding:0px 5px; background-
-      -              'color:#33FF5E; text-align:left;">'.
+               VALUE '<td style="width:55%; padding:4px 8px; background-
+      -              'color:#1F4E79; text-align:left;">'.
              88  HTML-L51
-               VALUE '<p style="font-size:16px">Tran Details</p>'.
+               VALUE '<p style="font-size:16px; color:#FFFFFF; font-
+      -              'weight:bold">Tran Details</p>'.
              88  HTML-L53
-               VALUE '<td style="width:20%; padding:0px 5px; background-
-      -              'color:#33FF5E; text-align:right;">'.
+               VALUE '<td style="width:20%; padding:4px 8px; background-
+      -              'color:#1F4E79; text-align:right;">'.
              88  HTML-L54
-               VALUE '<p style="font-size:16px">Amount</p>'.
+               VALUE '<p style="font-size:16px; color:#FFFFFF; font-
+      -              'weight:bold">Amount</p>'.
              88  HTML-L58
-               VALUE '<td style="width:25%; padding:0px 5px; background-
+               VALUE '<td style="width:25%; padding:4px 8px; background-
       -              'color:#f2f2f2; text-align:left;">'.
              88  HTML-L61
-               VALUE '<td style="width:55%; padding:0px 5px; background-
+               VALUE '<td style="width:55%; padding:4px 8px; background-
       -              'color:#f2f2f2; text-align:left;">'.
              88  HTML-L64
-               VALUE '<td style="width:20%; padding:0px 5px; background-
+               VALUE '<td style="width:20%; padding:4px 8px; background-
       -              'color:#f2f2f2; text-align:right;">'.
              88  HTML-L75
                VALUE '<h3>End of Statement</h3>'.
