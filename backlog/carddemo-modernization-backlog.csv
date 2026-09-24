@@ -1,0 +1,1050 @@
+"Issue Type","Summary","Description","Priority","Labels","Epic Name","Parent","Story Points","Components"
+"Epic","Platform Foundation and Shared Utilities","Spring Boot 3.5 / Java 21 monorepo skeleton, Spring Batch runtime, common CICS-replacement abstractions (COMMAREA -> session/DTO, BMS map -> web view or REST), shared utility programs (CSUTLDTC, COBSWAIT, COBDATFT/MVSWAIT assembler), CI/CD and observability. Everything else depends on this epic.","Highest","modernization platform","Platform Foundation and Shared Utilities","","","Platform"
+"Epic","Shared Data Foundation and VSAM/Db2/IMS Migration","One story per VSAM cluster / Db2 table / IMS database: copybook record layout -> JPA entity + Flyway DDL, EBCDIC unload/convert/load pipeline (COMP-3, COMP, signed DISPLAY), AIX -> secondary index, GDG -> versioned object store, plus the export/import bridge programs (CBEXPORT/CBIMPORT). Derived from data_dictionary_cbl.csv, dsn_to_file.csv and the IDCAMS define/load JCL.","Highest","modernization data","Shared Data Foundation and VSAM/Db2/IMS Migration","","","Data"
+"Epic","Sign-on, Menus and Navigation","COSGN00C (CC00) sign-on against USRSEC, COMEN01C (CM00) user menu and COADM01C (CA00) admin menu, COCOM01Y commarea contract, COMEN02Y/COADM02Y menu option tables (dynamic XCTL targets the vendor flagged as unresolved). Gateway for every online function.","High","modernization online","Sign-on, Menus and Navigation","","","Online"
+"Epic","User Administration","COUSR00C/01C/02C/03C (CU00-CU03): list, add, update, delete users in USRSEC (CSUSR01Y). Admin-only, reached via COADM01C.","Medium","modernization online","User Administration","","","Online"
+"Epic","Account and Customer Management","COACTVWC (CAVW) account view, COACTUPC (CAUP) account+customer update, batch readers CBACT01C/CBCUS01C. Touches ACCTDATA, CUSTDATA and the CARDXREF AIX path (CXACAIX).","High","modernization online","Account and Customer Management","","","Online"
+"Epic","Card Management","COCRDLIC (CCLI) card list with browse, COCRDSLC (CCDL) card detail, COCRDUPC (CCUP) card update, batch readers CBACT02C/CBACT03C. Touches CARDDATA (+CARDAIX) and CARDXREF.","High","modernization online","Card Management","","","Online"
+"Epic","Transaction Inquiry, Entry and Bill Payment","COTRN00C (CT00) transaction list, COTRN01C (CT01) detail, COTRN02C (CT02) add transaction, COBIL00C (CB00) bill payment. All read/write TRANSACT and use CXACAIX/CCXREF lookups; CT02 and CR00 call CSUTLDTC for date validation.","High","modernization online","Transaction Inquiry, Entry and Bill Payment","","","Online"
+"Epic","Transaction Posting and Interest Batch","Daily posting chain POSTTRAN (CBTRN02C), legacy poster CBTRN01C, monthly INTCALC (CBACT04C) and COMBTRAN, category balances TCATBALF, DISCGRP, DALYREJS rejects, SYSTRAN. Control-M MONTHLY-InterestCalculation and DAILY-TransactionBackup flows.","High","modernization batch","Transaction Posting and Interest Batch","","","Batch"
+"Epic","Reporting and Statements","CORPT00C (CR00) online report request that submits TRANREPT via the internal reader, CBTRN03C transaction report, CBSTM03A/CBSTM03B statement generation (text + HTML), TXT2PDF1, PRTCATBL, REPTFILE.","Medium","modernization batch","Reporting and Statements","","","Batch"
+"Epic","Transaction Type Reference Data (Db2 sub-application)","app-transaction-type-db2: COTRTLIC (CTLI) list with forward/backward cursors, COTRTUPC (CTTU) maintenance, COBTUPDT batch update via MNTTRDB2, CREADB21 DDL bootstrap, TRANEXTR unload. Tables CARDDEMO.TRANSACTION_TYPE and TRANSACTION_TYPE_CATEGORY (DCLTRTYP/DCLTRCAT).","Medium","modernization db2","Transaction Type Reference Data (Db2 sub-application)","","","Db2"
+"Epic","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","app-authorization-ims-db2-mq: MQ-driven authorizer COPAUA0C, online viewers COPAUS0C (CPVS) / COPAUS1C (CPVD), fraud marking COPAUS2C into Db2 AUTHFRDS, IMS DB PAUTDB (DBPAUTP0/DBPAUTX0 DBDs, PSBPAUTB/PSBPAUTL PSBs), batch purge CBPAUP0C (EXEC DLI) and unload/load utilities PAUDBUNL/PAUDBLOD/DBUNLDGS.","Medium","modernization ims","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","","","IMS"
+"Epic","MQ Request/Reply Services (VSAM-MQ sub-application)","app-vsam-mq: COACCT01 (CDRA) account inquiry and CODATE01 (CDRD) date service, triggered from MQ queues via CICS; re-platform as message listeners (JMS/AMQP) with the same request/reply contracts.","Low","modernization integration","MQ Request/Reply Services (VSAM-MQ sub-application)","","","Integration"
+"Epic","Parity Testing, Cutover and Decommission","Cross-cutting tasks: golden-file harness, EBCDIC test-data fixtures, screen/REST parity suites, batch run-book parity, scheduler migration, dual-run and cutover, mainframe decommission.","High","modernization platform","Parity Testing, Cutover and Decommission","","","Platform"
+"Task","Bootstrap Spring Boot 3.5 / Java 21 multi-module project and CI pipeline","Maven multi-module (core, online, batch, integration), spring-boot-starter-parent 3.5.x, Java 21, Flyway, JPA, Spring Batch, Actuator, Spotless + JaCoCo gates, GitHub Actions running ./mvnw verify.
+
+Acceptance criteria:
+- empty app boots, /actuator/health is UP, CI green.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","Highest","platform ci","","Platform Foundation and Shared Utilities","5","Platform"
+"Task","Build the CICS-replacement abstractions: COMMAREA session model, BMS map to view/REST mapping, pseudo-conversational flow","Model COCOM01Y (CARDDEMO-COMMAREA: user id/type, from/to program and transaction, selected account/card/customer, PFK handling) as a typed session DTO; map each BMS map in app/bms and app/cpy-bms (21 maps: COSGN00, COMEN01, COADM01, COACTVW, COACTUP, COCRDLI, COCRDSL, COCRDUP, COTRN00-02, COBIL00, CORPT00, COUSR00-03, COTRTLI, COTRTUP, COPAU00, COPAU01) to a Thymeleaf view or REST resource; shared header/title (COTTL01Y), date (CSDAT01Y) and message (CSMSG01Y/CSMSG02Y) copybooks become a layout fragment.
+
+Acceptance criteria:
+- one reference screen (COSGN00) round-trips through the abstraction.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","Highest","cics platform","","Platform Foundation and Shared Utilities","8","Platform"
+"Task","Build the Spring Batch job framework replacing JCL step semantics","Job/step skeleton with return-code mapping (COBOL RETURN-CODE / CEE3ABD abend -> ExitStatus), restartability, GDG-style versioned output writer, IDCAMS/IEBGENER/SORT step equivalents (delete-define, copy, sort/merge as tasklets), CLOSEFIL/OPENFIL replaced by a maintenance-mode toggle on the online API. Covers utility JCL: CLOSEFIL, OPENFIL, WAITSTEP, DEFGDGB, DEFGDGD, DEFCUST, ESDSRRDS, DUSRSECJ, DALYREJS, REPTFILE, CBADMCDJ, FTPJCL, INTRDRJ1, INTRDRJ2, TXT2PDF1.
+
+Acceptance criteria:
+- a no-op job runs under Control-M-equivalent scheduler with the same exit codes.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","Highest","batch platform","","Platform Foundation and Shared Utilities","8","Platform"
+"Task","Retire assembler dependencies (COBDATFT.asm, MVSWAIT.asm, CSUTLDTC maclib) with Java equivalents","COBDATFT (date formatting, called by CBACT01C) -> java.time DateTimeFormatter; MVSWAIT (STIMER wait, called by COBSWAIT) -> scheduler dependency; document CEEDAYS/CEE3ABD LE calls.
+
+Acceptance criteria:
+- no program story depends on an assembler artifact.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","Highest","asm platform","","Platform Foundation and Shared Utilities","3","Platform"
+"Task","Generate the copybook-to-entity mapping catalogue from data_dictionary_cbl.csv","For every record-layout copybook in app/cpy (CVACT01Y, CVACT02Y, CVACT03Y, CVCUS01Y, CUSTREC, CVTRA01Y-CVTRA07Y, CSUSR01Y, CVEXPORT, CIPAUDTY, CIPAUSMY, DCLTRTYP, DCLTRCAT, AUTHFRDS) produce field -> Java type mapping (PIC X -> String, S9 COMP-3 -> BigDecimal(scale), COMP -> int/long, level-88 -> enum, REDEFINES -> discriminated union, OCCURS -> list) using the level/PIC/usage/offset columns of the vendor data dictionary. Output: docs/data-mapping.md + JSON consumed by the converter.
+
+Acceptance criteria:
+- every field of every copybook has a mapping row; offsets sum to the record length.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","Highest","data-migration cobol","","Shared Data Foundation and VSAM/Db2/IMS Migration","8","Data"
+"Task","Build the EBCDIC fixed-width to relational conversion pipeline","Generic converter (Spring Batch) driven by the mapping catalogue: reads app/data/EBCDIC/*.PS (code page 037), decodes COMP-3/COMP/zoned, validates against the copybook length, loads Postgres via JDBC batch, emits reject file and row counts. Reused by every dataset story.
+
+Acceptance criteria:
+- round-trip test - convert EBCDIC -> DB -> re-encode EBCDIC yields byte-identical records for ACCTDATA sample.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","Highest","data-migration vsam","","Shared Data Foundation and VSAM/Db2/IMS Migration","8","Data"
+"Task","Build the golden-file batch parity harness","Runs a legacy batch output (captured from the mainframe or the EBCDIC samples in app/data) and the Java job on identical input, compares record-by-record after EBCDIC->ASCII normalisation, reports diffs. Used by all batch parity tests (POSTTRAN, INTCALC, TRANREPT, CREASTMT, CBEXPORT/CBIMPORT, READ* dumps).
+
+Acceptance criteria:
+- harness detects a deliberately mutated amount field.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","High","testing batch","","Parity Testing, Cutover and Decommission","5","Platform"
+"Task","Build the online screen/API parity suite","For each CICS transaction (CC00, CM00, CA00, CU00-CU03, CAVW, CAUP, CCLI, CCDL, CCUP, CT00-CT02, CB00, CR00, CTLI, CTTU, CPVS, CPVD) a scripted scenario set (happy path, each validation error, PF-key navigation) with expected field values derived from the COBOL edit rules; executed against the Java app via HTTP/Playwright.
+
+Acceptance criteria:
+- suite runs in CI; every story in the online epics links its scenarios here.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","High","testing cics","","Parity Testing, Cutover and Decommission","8","Platform"
+"Task","Curate EBCDIC and ASCII test-data fixtures from app/data","Version the 13 EBCDIC PS files and the ASCII equivalents under test resources, add synthetic edge cases (negative COMP-3, max credit limit, expired card, missing DISCGRP group, duplicate user id), document PII masking.
+
+Acceptance criteria:
+- fixtures load through the conversion pipeline with zero rejects.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","High","testing data-migration","","Parity Testing, Cutover and Decommission","3","Platform"
+"Task","Migrate the Control-M / CA7 schedules to the target scheduler","Recreate the 15 Control-M jobs found by the vendor (DAILY-TransactionBackup: CLOSEFIL, TRANBKP, WAITSTEP, OPENFIL; WEEKLY-DisclosureGroupsRefresh: CLOSEFIL, DISCGRP, WAITSTEP, OPENFIL; MONTHLY-InterestCalculation: CLOSEFIL, INTCALC, COMBTRAN, WAITSTEP, OPENFIL; WEEKLY-TransactionTypesDBRefresh: MNTTRDB2, TRANEXTR) plus the CA7 definitions in app/scheduler/CardDemo.ca7 as scheduler DAGs calling Spring Batch jobs.
+
+Acceptance criteria:
+- calendar, dependency order and failure handling match the XML.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","High","batch scheduler","","Parity Testing, Cutover and Decommission","5","Platform"
+"Task","Plan and execute dual-run, cutover and mainframe decommission","Wave-by-wave dual run (see backlog/README.md migration waves): freeze window, final EBCDIC unload + convert, reconciliation report (row counts, balance totals per account, TCATBALF totals), DNS/queue switch for MQ services, rollback plan, CICS/IMS/Db2 resource decommission checklist (CSD groups CARDDEMO, CRDDEMO2, CRDDEMOM).
+
+Acceptance criteria:
+- signed-off reconciliation for every dataset story; legacy regions stopped.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","High","cutover","","Parity Testing, Cutover and Decommission","8","Platform"
+"Task","Provision MQ/JMS infrastructure and queue definitions for authorization and inquiry services","Request/reply queues used by COPAUA0C (authorization request/response), COACCT01 and CODATE01 (inquiry), dead-letter/error queues (WS-ERR-QUEUE in COACCT01), CMQ* copybook constants -> JMS headers. Provide a local broker in docker-compose for tests.
+
+Acceptance criteria:
+- a test client can put a request and receive a correlated reply through the Java listener skeleton.
+Parity test: enabling task - verified by the program/data stories that depend on it passing their own parity tests; this task is done when its acceptance criteria are demonstrated in CI.","Medium","mq platform","","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","5","IMS"
+"Story","Data migration: ACCTDATA - Account","Migrate AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS (VSAM KSDS) to the relational target.
+Record layout: CVACT01Y.cpy; entity: Account (ACCT-ID key, balances, credit limits, cycle dates, group id; COMP-3 amounts); 14 data-dictionary items.
+Program consumers (dsn_to_file): CBACT01C (READ); CBACT04C (READ; UPDATE; WRITE); CBEXPORT (READ); CBSTM03B (READ); CBTRN02C (READ; UPDATE; WRITE); COACCT01 (READ); COACTUPC (READ; UPDATE; WRITE); COACTVWC (READ); COBIL00C (READ; UPDATE; WRITE); COPAUA0C (READ); COPAUS0C (READ).
+JCL define/load/backup steps: ACCTFILE.jcl step IDCAMS (CREATE); ACCTFILE.jcl step IDCAMS (DELETE); ACCTFILE.jcl step IDCAMS (WRITE); CBEXPORT.jcl step CBEXPORT (); CREASTMT.JCL step CBSTM03B (); INTCALC.jcl step CBACT04C (); POSTTRAN.jcl step CBTRN02C (); READACCT.jcl step CBACT01C ().
+Related JCL: ACCTFILE.jcl.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","8","Data"
+"Story","Data migration: CUSTDATA - Customer","Migrate AWS.M2.CARDDEMO.CUSTDATA.VSAM.KSDS (VSAM KSDS) to the relational target.
+Record layout: CVCUS01Y.cpy, CUSTREC.cpy; entity: Customer (CUST-ID key, PII, address, SSN, FICO, DOB); 40 data-dictionary items.
+Program consumers (dsn_to_file): CBCUS01C (READ); CBEXPORT (READ); CBSTM03B (READ); COACTUPC (READ; UPDATE; WRITE); COACTVWC (READ); COPAUA0C (READ); COPAUS0C (READ).
+JCL define/load/backup steps: CBEXPORT.jcl step CBEXPORT (); CREASTMT.JCL step CBSTM03B (); CUSTFILE.jcl step IDCAMS (CREATE); CUSTFILE.jcl step IDCAMS (DELETE); CUSTFILE.jcl step IDCAMS (WRITE); READCUST.jcl step CBCUS01C ().
+Related JCL: CUSTFILE.jcl, DEFCUST.jcl.
+Notes: CUSTREC.cpy (used by CBSTM03A) and CVCUS01Y.cpy (everything else) describe the same 500-byte record; reconcile into one entity. DEFCUST.jcl defines an alternate cluster name AWS.CUSTDATA.CLUSTER that no program uses.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration pii","","Shared Data Foundation and VSAM/Db2/IMS Migration","8","Data"
+"Story","Data migration: CARDDATA - Card","Migrate AWS.M2.CARDDEMO.CARDDATA.VSAM.KSDS (VSAM KSDS + AIX (CARDDATA.VSAM.AIX on account id -> CARDAIX path)) to the relational target.
+Record layout: CVACT02Y.cpy; entity: Card (CARD-NUM key, ACCT-ID alternate key, CVV, embossed name, expiry, status); 8 data-dictionary items.
+Program consumers (dsn_to_file): CBACT02C (READ); CBEXPORT (READ); COCRDLIC (READ); COCRDSLC (READ); COCRDUPC (READ; UPDATE; WRITE).
+JCL define/load/backup steps: CARDFILE.jcl step IDCAMS (CREATE); CARDFILE.jcl step IDCAMS (DELETE); CARDFILE.jcl step IDCAMS (READ); CARDFILE.jcl step IDCAMS (WRITE); CBEXPORT.jcl step CBEXPORT (); READCARD.jcl step CBACT02C ().
+Related JCL: CARDFILE.jcl.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration pii","","Shared Data Foundation and VSAM/Db2/IMS Migration","8","Data"
+"Story","Data migration: CARDXREF - Card/Customer/Account cross reference","Migrate AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS (VSAM KSDS + AIX (CARDXREF.VSAM.AIX on account id -> CXACAIX/CCXREF paths)) to the relational target.
+Record layout: CVACT03Y.cpy; entity: Card/Customer/Account cross reference (50 bytes); 5 data-dictionary items.
+Program consumers (dsn_to_file): CBACT03C (READ); CBACT04C (READ); CBEXPORT (READ); CBSTM03B (READ); CBTRN02C (READ); CBTRN03C (READ); COPAUA0C (READ); COTRN02C (READ).
+JCL define/load/backup steps: CBEXPORT.jcl step CBEXPORT (); CREASTMT.JCL step CBSTM03B (); INTCALC.jcl step CBACT04C (); POSTTRAN.jcl step CBTRN02C (); READXREF.jcl step CBACT03C (); TRANREPT.jcl step CBTRN03C (); XREFFILE.jcl step IDCAMS (CREATE); XREFFILE.jcl step IDCAMS (DELETE); XREFFILE.jcl step IDCAMS (READ); XREFFILE.jcl step IDCAMS (WRITE).
+Related JCL: XREFFILE.jcl.
+Notes: Most-read dataset in the estate (12 readers). Candidate to collapse into foreign keys on Card once Account/Customer/Card are relational.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","5","Data"
+"Story","Data migration: TRANSACT - Posted transaction","Migrate AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS (VSAM KSDS + AIX (TRANSACT.VSAM.AIX, defined by TRANFILE/TRANIDX)) to the relational target.
+Record layout: CVTRA05Y.cpy; entity: Posted transaction (TRAN-ID key, type/category codes, amount COMP-3, merchant, card, orig/proc timestamps); 15 data-dictionary items.
+Program consumers (dsn_to_file): CBEXPORT (READ); CBTRN02C (WRITE); COBIL00C (READ; WRITE); COTRN00C (READ); COTRN01C (READ); COTRN02C (READ; WRITE).
+JCL define/load/backup steps: CBEXPORT.jcl step CBEXPORT (); COMBTRAN.jcl step IDCAMS (WRITE); CREASTMT.JCL step SORT (READ); POSTTRAN.jcl step CBTRN02C (); TRANBKP.jcl step IDCAMS (CREATE); TRANBKP.jcl step IDCAMS (DELETE); TRANBKP.jcl step IDCAMS (READ); TRANFILE.jcl step IDCAMS (CREATE); TRANFILE.jcl step IDCAMS (DELETE); TRANFILE.jcl step IDCAMS (READ); TRANFILE.jcl step IDCAMS (WRITE); TRANIDX.jcl step IDCAMS (READ); TRANREPT.jcl step IDCAMS (READ).
+Related JCL: TRANFILE.jcl, TRANIDX.jcl, TRANBKP.jcl.
+Notes: TRANBKP/COMBTRAN back up and rebuild the cluster daily; GDG TRANSACT.BKUP/COMBINED become versioned snapshots.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","8","Data"
+"Story","Data migration: TCATBALF - Transaction category balance per account/type/category","Migrate AWS.M2.CARDDEMO.TCATBALF.VSAM.KSDS (VSAM KSDS) to the relational target.
+Record layout: CVTRA01Y.cpy; entity: Transaction category balance per account/type/category; 7 data-dictionary items.
+Program consumers (dsn_to_file): CBACT04C (READ); CBTRN02C (READ; UPDATE; WRITE).
+JCL define/load/backup steps: INTCALC.jcl step CBACT04C (); POSTTRAN.jcl step CBTRN02C (); PRTCATBL.jcl step IDCAMS (READ); TCATBALF.jcl step IDCAMS (CREATE); TCATBALF.jcl step IDCAMS (DELETE); TCATBALF.jcl step IDCAMS (WRITE).
+Related JCL: TCATBALF.jcl, PRTCATBL.jcl.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","5","Data"
+"Story","Data migration: DISCGRP - Disclosure group interest rates","Migrate AWS.M2.CARDDEMO.DISCGRP.VSAM.KSDS (VSAM KSDS) to the relational target.
+Record layout: CVTRA02Y.cpy; entity: Disclosure group interest rates (group id + type + category key); 7 data-dictionary items.
+Program consumers (dsn_to_file): CBACT04C (READ).
+JCL define/load/backup steps: DISCGRP.jcl step IDCAMS (CREATE); DISCGRP.jcl step IDCAMS (DELETE); DISCGRP.jcl step IDCAMS (WRITE); INTCALC.jcl step CBACT04C ().
+Related JCL: DISCGRP.jcl, DEFGDGD.jcl.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","3","Data"
+"Story","Data migration: TRANTYPE - Transaction type reference","Migrate AWS.M2.CARDDEMO.TRANTYPE.VSAM.KSDS (VSAM KSDS) to the relational target.
+Record layout: CVTRA03Y.cpy; entity: Transaction type reference (VSAM copy; the Db2 sub-app holds the same data in CARDDEMO.TRANSACTION_TYPE); 4 data-dictionary items.
+Program consumers (dsn_to_file): CBTRN03C (READ).
+JCL define/load/backup steps: TRANREPT.jcl step CBTRN03C (); TRANTYPE.jcl step IDCAMS (CREATE); TRANTYPE.jcl step IDCAMS (DELETE); TRANTYPE.jcl step IDCAMS (WRITE).
+Related JCL: TRANTYPE.jcl.
+Notes: Duplicated in Db2 (TRANEXTR unloads Db2 back to TRANTYPE.PS). Target keeps a single reference table; decide system of record.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","3","Data"
+"Story","Data migration: TRANCATG - Transaction category reference","Migrate AWS.M2.CARDDEMO.TRANCATG.VSAM.KSDS (VSAM KSDS) to the relational target.
+Record layout: CVTRA04Y.cpy; entity: Transaction category reference (type + category key); 6 data-dictionary items.
+Program consumers (dsn_to_file): CBTRN03C (READ).
+JCL define/load/backup steps: TRANCATG.jcl step IDCAMS (CREATE); TRANCATG.jcl step IDCAMS (DELETE); TRANCATG.jcl step IDCAMS (WRITE); TRANREPT.jcl step CBTRN03C ().
+Related JCL: TRANCATG.jcl.
+Notes: Also duplicated in Db2 as CARDDEMO.TRANSACTION_TYPE_CATEGORY.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","3","Data"
+"Story","Data migration: USRSEC - Security user","Migrate AWS.M2.CARDDEMO.USRSEC.VSAM.KSDS (VSAM KSDS (ESDS/RRDS variants defined by ESDSRRDS.jcl are unused by programs)) to the relational target.
+Record layout: CSUSR01Y.cpy; entity: Security user (user id key, plaintext password, first/last name, type A/U); 7 data-dictionary items.
+Program consumers (dsn_to_file): COSGN00C (READ); COUSR00C (READ); COUSR01C (WRITE); COUSR02C (READ; UPDATE; WRITE); COUSR03C (DELETE; READ).
+JCL define/load/backup steps: DUSRSECJ.jcl step IDCAMS (CREATE); DUSRSECJ.jcl step IDCAMS (DELETE; CREATE); DUSRSECJ.jcl step IDCAMS (WRITE).
+Related JCL: DUSRSECJ.jcl, ESDSRRDS.jcl.
+Notes: Passwords are stored in clear text; migration must hash them (BCrypt) rather than copy.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration security","","Shared Data Foundation and VSAM/Db2/IMS Migration","5","Data"
+"Story","Data migration: TRXFL - Statement work file keyed by card number","Migrate AWS.M2.CARDDEMO.TRXFL.VSAM.KSDS (VSAM KSDS (temporary, rebuilt by CREASTMT from a SORT of TRANSACT)) to the relational target.
+Record layout: inline in consuming program; entity: Statement work file keyed by card number (layout inline in CBSTM03B, see data_dictionary_cbl.csv); 0 data-dictionary items.
+Program consumers (dsn_to_file): CBSTM03B (READ).
+JCL define/load/backup steps: CREASTMT.JCL step CBSTM03B (); CREASTMT.JCL step IDCAMS (DELETE; CREATE); CREASTMT.JCL step IDCAMS (WRITE).
+Related JCL: CREASTMT.JCL.
+Notes: Not a system-of-record dataset; in the target it disappears in favour of a query on transactions by card.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam batch","","Shared Data Foundation and VSAM/Db2/IMS Migration","2","Data"
+"Story","Data migration: EXPORT - Export envelope: record type + one of account/card/xref/customer/transaction payloads","Migrate AWS.M2.CARDDEMO.EXPORT.DATA (VSAM KSDS (500-byte polymorphic multi-record export)) to the relational target.
+Record layout: CVEXPORT.cpy; entity: Export envelope: record type + one of account/card/xref/customer/transaction payloads; 72 data-dictionary items.
+Program consumers (dsn_to_file): CBEXPORT (WRITE); CBIMPORT (READ).
+JCL define/load/backup steps: CBEXPORT.jcl step CBEXPORT (); CBEXPORT.jcl step IDCAMS (CREATE); CBEXPORT.jcl step IDCAMS (DELETE; CREATE); CBIMPORT.jcl step CBIMPORT ().
+Related JCL: CBEXPORT.jcl, CBIMPORT.jcl.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","5","Data"
+"Story","Data migration: DALYTRAN - Daily transaction feed and reject record","Migrate AWS.M2.CARDDEMO.DALYTRAN.PS (Sequential (PS) input + DALYREJS GDG output) to the relational target.
+Record layout: CVTRA06Y.cpy; entity: Daily transaction feed and reject record (CVTRA06Y payload + reject reason); 15 data-dictionary items.
+Program consumers (dsn_to_file): CBTRN02C (READ); CBTRN02C (WRITE).
+JCL define/load/backup steps: DALYREJS.jcl step IDCAMS (CREATE); POSTTRAN.jcl step CBTRN02C (); TRANFILE.jcl step IDCAMS (READ).
+Related JCL: TRANFILE.jcl, DALYREJS.jcl.
+Notes: External feed contract: keep fixed-width EBCDIC ingestion adapter until upstream is modernized.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol batch data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","5","Data"
+"Story","Data migration: TRANREPT - Report/statement output layouts","Migrate AWS.M2.CARDDEMO.TRANREPT (GDG report output (+ SYSTRAN GDG written by CBACT04C, STATEMNT.PS/HTML written by CBSTM03A)) to the relational target.
+Record layout: CVTRA07Y.cpy; entity: Report/statement output layouts; 45 data-dictionary items.
+Program consumers (dsn_to_file): CBACT04C (WRITE); CBSTM03A (WRITE); CBTRN03C (WRITE).
+JCL define/load/backup steps: COMBTRAN.jcl step SORT (READ); CREASTMT.JCL step CBSTM03A (); CREASTMT.JCL step IEFBR14 (DELETE); DEFGDGB.jcl step IDCAMS (CREATE); INTCALC.jcl step CBACT04C (); REPTFILE.jcl step IDCAMS (CREATE); TRANREPT.jcl step CBTRN03C (); TXT2PDF1.JCL step IKJEFT1B ().
+Related JCL: DEFGDGB.jcl, REPTFILE.jcl.
+Notes: GDG generations map to versioned files in object storage with retention matching the LIMIT in DEFGDGB.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol batch","","Shared Data Foundation and VSAM/Db2/IMS Migration","3","Data"
+"Story","Data migration: DB2TRTYP - Transaction type and category reference tables","Migrate CARDDEMO.TRANSACTION_TYPE / CARDDEMO.TRANSACTION_TYPE_CATEGORY (Db2 tables (DDL TRNTYPE.ddl, TRNTYCAT.ddl, indexes XTRNTYPE/XTRNTYCT, CREADB21.jcl bootstrap)) to the relational target.
+Record layout: DCLTRTYP.dcl, DCLTRCAT.dcl; entity: Transaction type and category reference tables; 0 data-dictionary items.
+Program consumers (dsn_to_file): COTRTLIC (DELETE; SELECT; UPDATE); COTRTUPC (DELETE; INSERT; SELECT; UPDATE).
+JCL define/load/backup steps: none.
+Related JCL: CREADB21.jcl, TRANEXTR.jcl.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol db2 data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","3","Data"
+"Story","Data migration: DB2AUTHFRDS - Authorization fraud markers","Migrate CARDDEMO.AUTHFRDS (Db2 table (AUTHFRDS.ddl, index XAUTHFRD on CARD_NUM + AUTH_TS DESC)) to the relational target.
+Record layout: AUTHFRDS.dcl; entity: Authorization fraud markers; 0 data-dictionary items.
+Program consumers (dsn_to_file): COPAUS2C (INSERT; UPDATE).
+JCL define/load/backup steps: none.
+Related JCL: none.
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol db2 data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","2","Data"
+"Story","Data migration: IMSPAUTDB - Pending authorization summary","Migrate OEM.IMS.IMSP.PAUTHDB / PAUTHDBX (DBDs DBPAUTP0, DBPAUTX0; GSAM DBDs PASFLDBD, PADFLDBD) (IMS DB HIDAM root (account summary) + child (authorization detail) with secondary index; PSBs PSBPAUTB, PSBPAUTL, PAUTBUNL, DLIGSAMP) to the relational target.
+Record layout: CIPAUDTY.cpy, CIPAUSMY.cpy, PAUTBPCB.CPY, PASFLPCB.CPY, PADFLPCB.CPY; entity: Pending authorization summary (root) and authorization messages (child); 79 data-dictionary items.
+Program consumers (dsn_to_file): DBUNLDGS (mode not captured); PAUDBLOD (READ); PAUDBUNL (WRITE); PAUDBUNL (mode not captured).
+JCL define/load/backup steps: DBPAUTP0.jcl step DFSRRC00/DFSURGU0 (); DBPAUTP0.jcl step IEFBR14 (DELETE); LOADPADB.JCL step DFSRRC00/PAUDBLOD (); UNLDGSAM.JCL step DFSRRC00/DBUNLDGS (); UNLDGSAM.JCL step DFSRRC00/DBUNLDGS (READ); UNLDPADB.JCL step DFSRRC00/PAUDBUNL (); UNLDPADB.JCL step DFSRRC00/PAUDBUNL (READ); UNLDPADB.JCL step IEFBR14 (DELETE).
+Related JCL: DBPAUTP0.jcl, LOADPADB.JCL, UNLDPADB.JCL, UNLDGSAM.JCL.
+Notes: Hierarchical -> relational: root becomes authorization_summary(account_id), child becomes authorization(account_id, auth_ts). DFSVSMDB control card is missing from the analysis input (vendor issue).
+
+Acceptance criteria:
+- JPA entity + Flyway migration generated from the copybook mapping catalogue (types, scale, nullability, key, secondary indexes for every AIX/path).
+- Conversion pipeline loads the EBCDIC/DDL source with zero unexplained rejects; row count and control totals (sum of every COMP-3 amount field) match the source.
+- Repository API covers every access mode used by the consumers listed above (READ, browse forward/backward, UPDATE, WRITE, DELETE).
+- Reverse mapping (entity -> fixed-width record) available for batch outputs and parity tests.
+Parity test: unload legacy dataset -> convert -> load -> re-encode; compare byte-for-byte with the original after code-page normalisation, and reconcile per-key checksums.","Highest","cobol ims data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","13","Data"
+"Story","CSUTLDTC - Date validation utility","Migrate CSUTLDTC (app/cbl/CSUTLDTC.cbl), utility subprogram: date validation utility (CEEDAYS wrapper) called by COTRN02C and CORPT00C.
+
+Metrics (assets csv): 158 total / 115 effective lines, cyclomatic complexity 12, 48 data items in the vendor data dictionary.
+Copybooks: none (record layouts declared inline).
+Called / transferred from: CORPT00C, COTRN02C.
+System / assembler calls: CEEDAYS.
+Notes from reading the COBOL: Statically CALLed (not CICS LINK); becomes a shared DateValidationService bean.
+
+Acceptance criteria:
+- Exposed as a Spring bean with the same input/output contract as the COBOL CALL interface.
+- Property-based tests cover the full input domain (leap years, invalid formats, boundary dates).
+Parity test: table-driven test with inputs/expected outputs captured from the COBOL routine on the mainframe.","Highest","cobol utility","","Platform Foundation and Shared Utilities","1","Platform"
+"Story","COBSWAIT - Batch wait step calling MVSWAIT assembler, used by WAITSTEP.jcl bet...","Migrate COBSWAIT (app/cbl/COBSWAIT.cbl), batch program: batch wait step calling MVSWAIT assembler, used by WAITSTEP.jcl between scheduler steps.
+
+Metrics (assets csv): 42 total / 14 effective lines, cyclomatic complexity 1, 2 data items in the vendor data dictionary.
+Copybooks: none (record layouts declared inline).
+Datasets: none captured in program_to_dsn.
+Executed by JCL: WAITSTEP.jcl.
+System / assembler calls: MVSWAIT.asm.
+Notes from reading the COBOL: Replace with scheduler-native delay/dependency; MVSWAIT.asm has no Java equivalent and should be retired.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Highest","cobol batch asm","","Platform Foundation and Shared Utilities","1","Platform"
+"Story","COSGN00C - Sign-on screen; validates user id/password against USRSEC and XCTLs...","Migrate COSGN00C (app/cbl/COSGN00C.cbl), CICS online program: sign-on screen; validates user id/password against USRSEC and XCTLs to admin or user menu.
+
+Metrics (assets csv): 261 total / 173 effective lines, cyclomatic complexity 16, 14 data items in the vendor data dictionary.
+CICS transaction(s): CC00.
+BMS map(s): COSGN00.bms.
+Copybooks: COCOM01Y.cpy, COSGN00.CPY, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CSUSR01Y.cpy.
+CICS files: USRSEC (Exec CICS Read dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.USRSEC.VSAM.KSDS [VSAM KSDS; READ].
+Calls / transfers to: COADM01C, COMEN01C.
+Called / transferred from: COADM01C, COBIL00C, COMEN01C, COPAUS0C, CORPT00C, COTRN00C, COTRN01C, COTRN02C, COUSR00C, COUSR01C, COUSR02C, COUSR03C.
+Notes from reading the COBOL: Plaintext password compare in COBOL; target uses Spring Security + BCrypt with a one-off hash migration of USRSEC.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics vsam security","","Sign-on, Menus and Navigation","2","Online"
+"Story","COMEN01C - Main user menu; dispatches to option programs from the COMEN02Y table","Migrate COMEN01C (app/cbl/COMEN01C.cbl), CICS online program: main user menu; dispatches to option programs from the COMEN02Y table.
+
+Metrics (assets csv): 309 total / 214 effective lines, cyclomatic complexity 32, 16 data items in the vendor data dictionary.
+CICS transaction(s): CM00.
+BMS map(s): COMEN01.bms.
+Copybooks: COCOM01Y.cpy, COMEN01.CPY, COMEN02Y.cpy, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CSUSR01Y.cpy.
+Datasets: none captured in program_to_dsn.
+Calls / transfers to: COSGN00C.
+Called / transferred from: COACTUPC, COACTVWC, COBIL00C, COCRDLIC, COCRDSLC, COCRDUPC, COPAUS0C, CORPT00C, COSGN00C, COTRN00C, COTRN01C, COTRN02C.
+Vendor code_issues: Missing dependency detected: Missing Dynamic Call Value: CDEMO-MENU-OPT-PGMNAME (Exec CICS program; [Dynamic] Call), Line(s): 156, 184.
+Notes from reading the COBOL: Vendor flagged CDEMO-MENU-OPT-PGMNAME as an unresolved dynamic call; the target list is the static table in COMEN02Y.cpy (CAVW, CAUP, CCLI, CCDL, CCUP, CT00, CT01, CT02, CR00, CB00).
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics","","Sign-on, Menus and Navigation","3","Online"
+"Story","COADM01C - Admin menu; dispatches to user-admin and Db2 transaction-type progr...","Migrate COADM01C (app/cbl/COADM01C.cbl), CICS online program: admin menu; dispatches to user-admin and Db2 transaction-type programs from COADM02Y.
+
+Metrics (assets csv): 289 total / 189 effective lines, cyclomatic complexity 28, 16 data items in the vendor data dictionary.
+CICS transaction(s): CA00.
+BMS map(s): COADM01.bms.
+Copybooks: COADM01.CPY, COADM02Y.cpy, COCOM01Y.cpy, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CSUSR01Y.cpy.
+Datasets: none captured in program_to_dsn.
+Calls / transfers to: COSGN00C.
+Called / transferred from: COSGN00C, COTRTLIC, COTRTUPC, COUSR00C, COUSR01C, COUSR02C, COUSR03C.
+Vendor code_issues: Missing dependency detected: Missing Dynamic Call Value: CDEMO-ADMIN-OPT-PGMNAME (Exec CICS program; [Dynamic] Call), Line(s): 145.
+Notes from reading the COBOL: Vendor flagged CDEMO-ADMIN-OPT-PGMNAME as unresolved; targets are in COADM02Y.cpy (COUSR00C-03C, COTRTLIC/COTRTUPC).
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics","","Sign-on, Menus and Navigation","3","Online"
+"Story","COUSR00C - User list with STARTBR/READNEXT/READPREV paging over USRSEC","Migrate COUSR00C (app/cbl/COUSR00C.cbl), CICS online program: user list with STARTBR/READNEXT/READPREV paging over USRSEC.
+
+Metrics (assets csv): 696 total / 532 effective lines, cyclomatic complexity 89, 39 data items in the vendor data dictionary.
+CICS transaction(s): CU00.
+BMS map(s): COUSR00.bms.
+Copybooks: COCOM01Y.cpy, COTTL01Y.cpy, COUSR00.CPY, CSDAT01Y.cpy, CSMSG01Y.cpy, CSUSR01Y.cpy.
+CICS files: USRSEC (Exec CICS Endbr dataset; Exec CICS Readnext dataset; Exec CICS Readprev dataset; Exec CICS Startbr dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.USRSEC.VSAM.KSDS [VSAM KSDS; READ].
+Calls / transfers to: COADM01C, COSGN00C, COUSR02C, COUSR03C.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics vsam","","User Administration","5","Online"
+"Story","COUSR01C - Add user","Migrate COUSR01C (app/cbl/COUSR01C.cbl), CICS online program: add user (WRITE USRSEC).
+
+Metrics (assets csv): 300 total / 199 effective lines, cyclomatic complexity 26, 12 data items in the vendor data dictionary.
+CICS transaction(s): CU01.
+BMS map(s): COUSR01.bms.
+Copybooks: COCOM01Y.cpy, COTTL01Y.cpy, COUSR01.CPY, CSDAT01Y.cpy, CSMSG01Y.cpy, CSUSR01Y.cpy.
+CICS files: USRSEC (Exec CICS Write dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.USRSEC.VSAM.KSDS [VSAM KSDS; WRITE].
+Calls / transfers to: COADM01C, COSGN00C.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics vsam","","User Administration","3","Online"
+"Story","COUSR02C - Update user","Migrate COUSR02C (app/cbl/COUSR02C.cbl), CICS online program: update user (READ UPDATE / REWRITE USRSEC).
+
+Metrics (assets csv): 415 total / 303 effective lines, cyclomatic complexity 41, 24 data items in the vendor data dictionary.
+CICS transaction(s): CU02.
+BMS map(s): COUSR02.bms.
+Copybooks: COCOM01Y.cpy, COTTL01Y.cpy, COUSR02.CPY, CSDAT01Y.cpy, CSMSG01Y.cpy, CSUSR01Y.cpy.
+CICS files: USRSEC (Exec CICS Read dataset; Exec CICS Rewrite dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.USRSEC.VSAM.KSDS [VSAM KSDS; READ; UPDATE; WRITE].
+Calls / transfers to: COADM01C, COSGN00C.
+Called / transferred from: COUSR00C.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics vsam","","User Administration","3","Online"
+"Story","COUSR03C - Delete user","Migrate COUSR03C (app/cbl/COUSR03C.cbl), CICS online program: delete user (READ / DELETE USRSEC).
+
+Metrics (assets csv): 360 total / 251 effective lines, cyclomatic complexity 32, 24 data items in the vendor data dictionary.
+CICS transaction(s): CU03.
+BMS map(s): COUSR03.bms.
+Copybooks: COCOM01Y.cpy, COTTL01Y.cpy, COUSR03.CPY, CSDAT01Y.cpy, CSMSG01Y.cpy, CSUSR01Y.cpy.
+CICS files: USRSEC (Exec CICS Delete dataset; Exec CICS Read dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.USRSEC.VSAM.KSDS [VSAM KSDS; DELETE; READ].
+Calls / transfers to: COADM01C, COSGN00C.
+Called / transferred from: COUSR00C.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics vsam","","User Administration","3","Online"
+"Story","COACTVWC - Account view","Migrate COACTVWC (app/cbl/COACTVWC.cbl), CICS online program: account view: card xref via CXACAIX path, then ACCTDAT and CUSTDAT reads.
+
+Metrics (assets csv): 942 total / 706 effective lines, cyclomatic complexity 75, 96 data items in the vendor data dictionary.
+CICS transaction(s): CAVW.
+BMS map(s): COACTVW.bms.
+Copybooks: COACTVW.CPY, COCOM01Y.cpy, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CSMSG02Y.cpy, CSSTRPFY.cpy, CSUSR01Y.cpy, CVACT01Y.cpy, CVACT02Y.cpy, CVACT03Y.cpy, CVCRD01Y.cpy, CVCUS01Y.cpy.
+CICS files: ACCTDAT (Exec CICS Read dataset); CUSTDAT (Exec CICS Read dataset); CXACAIX (Exec CICS Read dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ]; AWS.M2.CARDDEMO.CARDXREF.VSAM.AIX.PATH [VSAM PATH; READ]; AWS.M2.CARDDEMO.CUSTDATA.VSAM.KSDS [VSAM KSDS; READ].
+Calls / transfers to: COMEN01C.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics vsam","","Account and Customer Management","8","Online"
+"Story","COACTUPC - Account and customer update with full field-level edit rules","Migrate COACTUPC (app/cbl/COACTUPC.cbl), CICS online program: account and customer update with full field-level edit rules (largest online program, CC 373).
+
+Metrics (assets csv): 4237 total / 3390 effective lines, cyclomatic complexity 373, 578 data items in the vendor data dictionary.
+CICS transaction(s): CAUP.
+BMS map(s): COACTUP.bms.
+Copybooks: COACTUP.CPY, COCOM01Y.cpy, COTTL01Y.cpy, CSDAT01Y.cpy, CSLKPCDY.cpy, CSMSG01Y.cpy, CSMSG02Y.cpy, CSSETATY.cpy, CSSTRPFY.cpy, CSUSR01Y.cpy, CSUTLDPY.cpy, CSUTLDWY.cpy, CVACT01Y.cpy, CVACT03Y.cpy, CVCRD01Y.cpy, CVCUS01Y.cpy.
+CICS files: ACCTDAT (Exec CICS Read dataset; Exec CICS Rewrite dataset); CUSTDAT (Exec CICS Read dataset; Exec CICS Rewrite dataset); CXACAIX (Exec CICS Read dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ; UPDATE; WRITE]; AWS.M2.CARDDEMO.CARDXREF.VSAM.AIX.PATH [VSAM PATH; READ]; AWS.M2.CARDDEMO.CUSTDATA.VSAM.KSDS [VSAM KSDS; READ; UPDATE; WRITE].
+Calls / transfers to: COMEN01C.
+Notes from reading the COBOL: Contains the bulk of the business validation rules (state/zip via CSLKPCDY, phone, SSN, FICO range, date edits via CSUTLDPY/CSUTLDWY); rules must be extracted into Bean Validation + service-level checks. Two-file update (ACCTDAT + CUSTDAT) needs a single transaction.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics vsam","","Account and Customer Management","21","Online"
+"Story","CBACT01C - Account file reader/dumper; writes three sequential variants","Migrate CBACT01C (app/cbl/CBACT01C.cbl), batch program: account file reader/dumper; writes three sequential variants (PS, VB, array) and calls COBDATFT assembler.
+
+Metrics (assets csv): 431 total / 358 effective lines, cyclomatic complexity 45, 66 data items in the vendor data dictionary.
+Copybooks: CODATECN.cpy, CVACT01Y.cpy.
+Datasets / DD names (program_to_dsn): ARRYFILE -> AWS.M2.CARDDEMO.ACCTDATA.ARRYPS [Dataset; WRITE]; OUTFILE -> AWS.M2.CARDDEMO.ACCTDATA.PSCOMP [Dataset; WRITE]; VBRCFILE -> AWS.M2.CARDDEMO.ACCTDATA.VBPS [Dataset; WRITE]; ACCTFILE -> AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ].
+Executed by JCL: READACCT.jcl.
+System / assembler calls: CEE3ABD, COBDATFT.asm.
+Notes from reading the COBOL: COBDATFT.asm date-format call has no lineage entry; replace with java.time formatting.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","High","cobol batch vsam asm","","Account and Customer Management","3","Online"
+"Story","CBCUS01C - Customer file sequential reader","Migrate CBCUS01C (app/cbl/CBCUS01C.cbl), batch program: customer file sequential reader (READCUST).
+
+Metrics (assets csv): 179 total / 130 effective lines, cyclomatic complexity 20, 22 data items in the vendor data dictionary.
+Copybooks: CVCUS01Y.cpy.
+Datasets / DD names (program_to_dsn): CUSTFILE -> AWS.M2.CARDDEMO.CUSTDATA.VSAM.KSDS [VSAM KSDS; READ].
+Executed by JCL: READCUST.jcl.
+System / assembler calls: CEE3ABD.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","High","cobol batch vsam","","Account and Customer Management","2","Online"
+"Story","COCRDLIC - Card list with browse, filter by account/card and selection to deta...","Migrate COCRDLIC (app/cbl/COCRDLIC.cbl), CICS online program: card list with browse, filter by account/card and selection to detail/update.
+
+Metrics (assets csv): 1460 total / 1103 effective lines, cyclomatic complexity 136, 129 data items in the vendor data dictionary.
+CICS transaction(s): CCLI.
+BMS map(s): COCRDLI.bms.
+Copybooks: COCOM01Y.cpy, COCRDLI.CPY, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CSSTRPFY.cpy, CSUSR01Y.cpy, CVACT02Y.cpy, CVCRD01Y.cpy.
+CICS files: CARDDAT (Exec CICS Endbr dataset; Exec CICS Readnext dataset; Exec CICS Readprev dataset; Exec CICS Startbr dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.CARDDATA.VSAM.KSDS [VSAM KSDS; READ].
+Calls / transfers to: COCRDSLC, COCRDUPC, COMEN01C.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics vsam","","Card Management","13","Online"
+"Story","COCRDSLC - Card detail view via CARDDAT primary key or CARDAIX alternate index","Migrate COCRDSLC (app/cbl/COCRDSLC.cbl), CICS online program: card detail view via CARDDAT primary key or CARDAIX alternate index.
+
+Metrics (assets csv): 888 total / 649 effective lines, cyclomatic complexity 80, 94 data items in the vendor data dictionary.
+CICS transaction(s): CCDL.
+BMS map(s): COCRDSL.bms.
+Copybooks: COCOM01Y.cpy, COCRDSL.CPY, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CSMSG02Y.cpy, CSSTRPFY.cpy, CSUSR01Y.cpy, CVACT02Y.cpy, CVCRD01Y.cpy, CVCUS01Y.cpy.
+CICS files: CARDAIX (Exec CICS Read file); CARDDAT (Exec CICS Read file).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.CARDDATA.VSAM.AIX.PATH [VSAM PATH; READ]; AWS.M2.CARDDEMO.CARDDATA.VSAM.KSDS [VSAM KSDS; READ].
+Calls / transfers to: COMEN01C.
+Called / transferred from: COCRDLIC.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics vsam","","Card Management","8","Online"
+"Story","COCRDUPC - Card update","Migrate COCRDUPC (app/cbl/COCRDUPC.cbl), CICS online program: card update (name, status, expiry) with READ UPDATE / REWRITE on CARDDAT.
+
+Metrics (assets csv): 1561 total / 1205 effective lines, cyclomatic complexity 170, 179 data items in the vendor data dictionary.
+CICS transaction(s): CCUP.
+BMS map(s): COCRDUP.bms.
+Copybooks: COCOM01Y.cpy, COCRDUP.CPY, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CSMSG02Y.cpy, CSSTRPFY.cpy, CSUSR01Y.cpy, CVACT02Y.cpy, CVCRD01Y.cpy, CVCUS01Y.cpy.
+CICS files: CARDDAT (Exec CICS Read file; Exec CICS Rewrite file).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.CARDDATA.VSAM.KSDS [VSAM KSDS; READ; UPDATE; WRITE].
+Calls / transfers to: COMEN01C.
+Called / transferred from: COCRDLIC.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics vsam","","Card Management","13","Online"
+"Story","CBACT02C - Card file sequential reader","Migrate CBACT02C (app/cbl/CBACT02C.cbl), batch program: card file sequential reader (READCARD).
+
+Metrics (assets csv): 179 total / 129 effective lines, cyclomatic complexity 20, 22 data items in the vendor data dictionary.
+Copybooks: CVACT02Y.cpy.
+Datasets / DD names (program_to_dsn): CARDFILE -> AWS.M2.CARDDEMO.CARDDATA.VSAM.KSDS [VSAM KSDS; READ].
+Executed by JCL: READCARD.jcl.
+System / assembler calls: CEE3ABD.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","High","cobol batch vsam","","Card Management","2","Online"
+"Story","CBACT03C - Card cross-reference sequential reader","Migrate CBACT03C (app/cbl/CBACT03C.cbl), batch program: card cross-reference sequential reader (READXREF).
+
+Metrics (assets csv): 179 total / 130 effective lines, cyclomatic complexity 20, 22 data items in the vendor data dictionary.
+Copybooks: CVACT03Y.cpy.
+Datasets / DD names (program_to_dsn): XREFFILE -> AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS [VSAM KSDS; READ].
+Executed by JCL: READXREF.jcl.
+System / assembler calls: CEE3ABD.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","High","cobol batch vsam","","Card Management","2","Online"
+"Story","COTRN00C - Transaction list with paging over TRANSACT","Migrate COTRN00C (app/cbl/COTRN00C.cbl), CICS online program: transaction list with paging over TRANSACT.
+
+Metrics (assets csv): 700 total / 532 effective lines, cyclomatic complexity 88, 32 data items in the vendor data dictionary.
+CICS transaction(s): CT00.
+BMS map(s): COTRN00.bms.
+Copybooks: COCOM01Y.cpy, COTRN00.CPY, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CVTRA05Y.cpy.
+CICS files: TRANSACT (Exec CICS Endbr dataset; Exec CICS Readnext dataset; Exec CICS Readprev dataset; Exec CICS Startbr dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS [VSAM KSDS; READ].
+Calls / transfers to: COMEN01C, COSGN00C, COTRN01C.
+Called / transferred from: COTRN01C.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics vsam","","Transaction Inquiry, Entry and Bill Payment","5","Online"
+"Story","COTRN01C - Transaction detail view","Migrate COTRN01C (app/cbl/COTRN01C.cbl), CICS online program: transaction detail view.
+
+Metrics (assets csv): 331 total / 231 effective lines, cyclomatic complexity 25, 26 data items in the vendor data dictionary.
+CICS transaction(s): CT01.
+BMS map(s): COTRN01.bms.
+Copybooks: COCOM01Y.cpy, COTRN01.CPY, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CVTRA05Y.cpy.
+CICS files: TRANSACT (Exec CICS Read dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS [VSAM KSDS; READ].
+Calls / transfers to: COMEN01C, COSGN00C, COTRN00C.
+Called / transferred from: COTRN00C.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics vsam","","Transaction Inquiry, Entry and Bill Payment","3","Online"
+"Story","COTRN02C - Add transaction","Migrate COTRN02C (app/cbl/COTRN02C.cbl), CICS online program: add transaction: xref lookup, date validation via CSUTLDTC, next-id via READPREV, WRITE TRANSACT.
+
+Metrics (assets csv): 784 total / 616 effective lines, cyclomatic complexity 87, 43 data items in the vendor data dictionary.
+CICS transaction(s): CT02.
+BMS map(s): COTRN02.bms.
+Copybooks: COCOM01Y.cpy, COTRN02.CPY, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CVACT01Y.cpy, CVACT03Y.cpy, CVTRA05Y.cpy.
+CICS files: CCXREF (Exec CICS Read dataset); CXACAIX (Exec CICS Read dataset); TRANSACT (Exec CICS Endbr dataset; Exec CICS Readprev dataset; Exec CICS Startbr dataset; Exec CICS Write dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.CARDXREF.VSAM.AIX.PATH [VSAM PATH; READ]; AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS [VSAM KSDS; READ]; AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS [VSAM KSDS; READ; WRITE].
+Calls / transfers to: COMEN01C, COSGN00C, CSUTLDTC.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics vsam","","Transaction Inquiry, Entry and Bill Payment","8","Online"
+"Story","COBIL00C - Bill payment","Migrate COBIL00C (app/cbl/COBIL00C.cbl), CICS online program: bill payment: pays full balance, writes a TRANSACT record and REWRITEs ACCTDAT balance.
+
+Metrics (assets csv): 573 total / 422 effective lines, cyclomatic complexity 50, 36 data items in the vendor data dictionary.
+CICS transaction(s): CB00.
+BMS map(s): COBIL00.bms.
+Copybooks: COBIL00.CPY, COCOM01Y.cpy, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CVACT01Y.cpy, CVACT03Y.cpy, CVTRA05Y.cpy.
+CICS files: ACCTDAT (Exec CICS Read dataset; Exec CICS Rewrite dataset); CXACAIX (Exec CICS Read dataset); TRANSACT (Exec CICS Endbr dataset; Exec CICS Readprev dataset; Exec CICS Startbr dataset; Exec CICS Write dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ; UPDATE; WRITE]; AWS.M2.CARDDEMO.CARDXREF.VSAM.AIX.PATH [VSAM PATH; READ]; AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS [VSAM KSDS; READ; WRITE].
+Calls / transfers to: COMEN01C, COSGN00C.
+Notes from reading the COBOL: Two-file update (TRANSACT write + ACCTDAT rewrite) requires one Spring transaction; confirmation flow (Y/N) is a two-step screen conversation.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","High","cobol cics vsam","","Transaction Inquiry, Entry and Bill Payment","3","Online"
+"Story","CBTRN01C - Legacy daily transaction poster","Migrate CBTRN01C (app/cbl/CBTRN01C.cbl), batch program: legacy daily transaction poster (xref/account/card/customer lookups for each DALYTRAN record).
+
+Metrics (assets csv): 495 total / 416 effective lines, cyclomatic complexity 64, 55 data items in the vendor data dictionary.
+Copybooks: CVACT01Y.cpy, CVACT02Y.cpy, CVACT03Y.cpy, CVCUS01Y.cpy, CVTRA05Y.cpy, CVTRA06Y.cpy.
+Datasets: none captured in program_to_dsn.
+System / assembler calls: CEE3ABD.
+Notes from reading the COBOL: Vendor produced NO data lineage and NO JCL for this program: no job in app/jcl executes it (superseded by CBTRN02C). Migrate as a verification-only reader or retire after confirming with the business.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","High","cobol batch vsam","","Transaction Posting and Interest Batch","3","Batch"
+"Story","CBTRN02C - Daily transaction posting","Migrate CBTRN02C (app/cbl/CBTRN02C.cbl), batch program: daily transaction posting: validates DALYTRAN, writes TRANSACT, updates ACCTFILE balances and TCATBALF, rejects to DALYREJS (POSTTRAN).
+
+Metrics (assets csv): 732 total / 619 effective lines, cyclomatic complexity 89, 92 data items in the vendor data dictionary.
+Copybooks: CVACT01Y.cpy, CVACT03Y.cpy, CVTRA01Y.cpy, CVTRA05Y.cpy, CVTRA06Y.cpy.
+Datasets / DD names (program_to_dsn): ACCTFILE -> AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ; UPDATE; WRITE]; XREFFILE -> AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS [VSAM KSDS; READ]; DALYREJS -> AWS.M2.CARDDEMO.DALYREJS [GDG Base; WRITE]; DALYTRAN -> AWS.M2.CARDDEMO.DALYTRAN.PS [Non VSAM; READ]; TCATBALF -> AWS.M2.CARDDEMO.TCATBALF.VSAM.KSDS [VSAM KSDS; READ; UPDATE; WRITE]; TRANFILE -> AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS [VSAM KSDS; WRITE].
+Executed by JCL: POSTTRAN.jcl.
+System / assembler calls: CEE3ABD.
+Notes from reading the COBOL: Core business rules: card-not-found, account-not-found, over-limit (credit limit vs balance+amount), expired card; reject codes 100-103 are the parity contract.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","High","cobol batch vsam gdg","","Transaction Posting and Interest Batch","8","Batch"
+"Story","CBACT04C - Monthly interest calculation per account/category using DISCGRP rat...","Migrate CBACT04C (app/cbl/CBACT04C.cbl), batch program: monthly interest calculation per account/category using DISCGRP rates, writes SYSTRAN interest transactions and updates ACCTFILE (INTCALC).
+
+Metrics (assets csv): 653 total / 552 effective lines, cyclomatic complexity 78, 90 data items in the vendor data dictionary.
+Copybooks: CVACT01Y.cpy, CVACT03Y.cpy, CVTRA01Y.cpy, CVTRA02Y.cpy, CVTRA05Y.cpy.
+Datasets / DD names (program_to_dsn): ACCTFILE -> AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ; UPDATE; WRITE]; XREFFIL1 -> AWS.M2.CARDDEMO.CARDXREF.VSAM.AIX.PATH [VSAM PATH; (mode not captured by vendor)]; XREFFILE -> AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS [VSAM KSDS; READ]; DISCGRP -> AWS.M2.CARDDEMO.DISCGRP.VSAM.KSDS [VSAM KSDS; READ]; TRANSACT -> AWS.M2.CARDDEMO.SYSTRAN [GDG Base; WRITE]; TCATBALF -> AWS.M2.CARDDEMO.TCATBALF.VSAM.KSDS [VSAM KSDS; READ].
+Executed by JCL: INTCALC.jcl.
+System / assembler calls: CEE3ABD.
+Notes from reading the COBOL: Default-group fallback when DISCGRP key is missing; interest = balance * rate / 1200 with COMP-3 truncation semantics that must be reproduced with BigDecimal scale/rounding.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","High","cobol batch vsam gdg","","Transaction Posting and Interest Batch","8","Batch"
+"Story","CORPT00C - Report request screen","Migrate CORPT00C (app/cbl/CORPT00C.cbl), CICS online program: report request screen (monthly/yearly/custom range) that builds TRANREPT JCL and submits it via the CICS internal reader (TDQ JOBS).
+
+Metrics (assets csv): 650 total / 501 effective lines, cyclomatic complexity 45, 81 data items in the vendor data dictionary.
+CICS transaction(s): CR00.
+BMS map(s): CORPT00.bms.
+Copybooks: COCOM01Y.cpy, CORPT00.CPY, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CVTRA05Y.cpy.
+Datasets: none captured in program_to_dsn.
+Calls / transfers to: COMEN01C, COSGN00C, CSUTLDTC.
+Notes from reading the COBOL: Dynamic JCL submission has no lineage entry; replace with an async job trigger (Spring Batch JobLauncher / queue).
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics batch","","Reporting and Statements","5","Batch"
+"Story","CBTRN03C - Transaction detail report by date range with page/account/grand totals","Migrate CBTRN03C (app/cbl/CBTRN03C.cbl), batch program: transaction detail report by date range with page/account/grand totals (TRANREPT).
+
+Metrics (assets csv): 650 total / 547 effective lines, cyclomatic complexity 83, 64 data items in the vendor data dictionary.
+Copybooks: CVACT03Y.cpy, CVTRA03Y.cpy, CVTRA04Y.cpy, CVTRA05Y.cpy, CVTRA07Y.cpy.
+Datasets / DD names (program_to_dsn): CARDXREF -> AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS [VSAM KSDS; READ]; DATEPARM -> AWS.M2.CARDDEMO.DATEPARM [Non VSAM; READ]; TRANCATG -> AWS.M2.CARDDEMO.TRANCATG.VSAM.KSDS [VSAM KSDS; READ]; TRANREPT -> AWS.M2.CARDDEMO.TRANREPT [GDG Base; WRITE]; TRANFILE -> AWS.M2.CARDDEMO.TRANSACT.DALY [GDG Base; READ]; TRANTYPE -> AWS.M2.CARDDEMO.TRANTYPE.VSAM.KSDS [VSAM KSDS; READ].
+Executed by JCL: TRANREPT.jcl.
+System / assembler calls: CEE3ABD.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Medium","cobol batch vsam gdg","","Reporting and Statements","5","Batch"
+"Story","CBSTM03A - Statement generator","Migrate CBSTM03A (app/cbl/CBSTM03A.CBL), batch program: statement generator: text and HTML statements per account, calls CBSTM03B for file access (CREASTMT).
+
+Metrics (assets csv): 925 total / 784 effective lines, cyclomatic complexity 60, 173 data items in the vendor data dictionary.
+Copybooks: COSTM01.CPY, CUSTREC.cpy, CVACT01Y.cpy, CVACT03Y.cpy.
+Datasets / DD names (program_to_dsn): HTMLFILE -> AWS.M2.CARDDEMO.STATEMNT.HTML [Dataset; WRITE]; STMTFILE -> AWS.M2.CARDDEMO.STATEMNT.PS [Dataset; WRITE].
+Executed by JCL: CREASTMT.JCL.
+Calls / transfers to: CBSTM03B.
+System / assembler calls: CEE3ABD.
+Notes from reading the COBOL: Uses ALTER/GO TO-style control flow and a 2-D OCCURS array of transactions; restructure rather than transliterate.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Medium","cobol batch vsam","","Reporting and Statements","5","Batch"
+"Story","CBSTM03B - File-access subroutine for CBSTM03A","Migrate CBSTM03B (app/cbl/CBSTM03B.CBL), batch program: file-access subroutine for CBSTM03A (open/read/close TRNXFILE, XREFFILE, CUSTFILE, ACCTFILE).
+
+Metrics (assets csv): 231 total / 162 effective lines, cyclomatic complexity 30, 39 data items in the vendor data dictionary.
+Copybooks: none (record layouts declared inline).
+Datasets / DD names (program_to_dsn): ACCTFILE -> AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ]; XREFFILE -> AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS [VSAM KSDS; READ]; CUSTFILE -> AWS.M2.CARDDEMO.CUSTDATA.VSAM.KSDS [VSAM KSDS; READ]; TRNXFILE -> AWS.M2.CARDDEMO.TRXFL.VSAM.KSDS [VSAM KSDS; READ].
+Executed by JCL: CREASTMT.JCL.
+Called / transferred from: CBSTM03A.
+Notes from reading the COBOL: Vendor lists no copybooks for this program: record layouts are declared inline, so data_dictionary_cbl.csv is the only source for its record structures.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Medium","cobol batch vsam","","Reporting and Statements","2","Batch"
+"Story","COTRTLIC - Transaction type list with forward/backward Db2 cursors and inline...","Migrate COTRTLIC (app/app-transaction-type-db2/cbl/COTRTLIC.cbl), CICS online program: transaction type list with forward/backward Db2 cursors and inline delete/update (CTLI).
+
+Metrics (assets csv): 2099 total / 1861 effective lines, cyclomatic complexity 221, 251 data items in the vendor data dictionary.
+CICS transaction(s): CTLI.
+BMS map(s): COTRTLI.bms.
+Copybooks: COCOM01Y.cpy, COTRTLI.cpy, COTTL01Y.cpy, CSDAT01Y.cpy, CSDB2RPY.cpy, CSDB2RWY.cpy, CSMSG01Y.cpy, CSSTRPFY.cpy, CSUSR01Y.cpy, CVACT02Y.cpy, CVCRD01Y.cpy, DCLTRTYP.dcl.
+Db2 tables: CARDDEMO.TRANSACTION_TYPE (Delete/Drop query; Select query; Update query).
+Datasets / DD names (program_to_dsn): CARDDEMO.TRANSACTION_TYPE [Database; DELETE; SELECT; UPDATE].
+Calls / transfers to: COADM01C, COTRTUPC.
+System / assembler calls: DSNTIAC.
+Vendor code_issues: Unsupported system utility call detected: System utility not supported: DSNTIAC.
+Notes from reading the COBOL: Vendor flagged DSNTIAC (Db2 error-message formatter) as unsupported; replace with SQLException mapping.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics db2","","Transaction Type Reference Data (Db2 sub-application)","13","Db2"
+"Story","COTRTUPC - Transaction type add/update/delete screen","Migrate COTRTUPC (app/app-transaction-type-db2/cbl/COTRTUPC.cbl), CICS online program: transaction type add/update/delete screen (CTTU).
+
+Metrics (assets csv): 1703 total / 1429 effective lines, cyclomatic complexity 208, 146 data items in the vendor data dictionary.
+CICS transaction(s): CTTU.
+BMS map(s): COTRTUP.bms.
+Copybooks: COCOM01Y.cpy, COTRTUP.cpy, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CSMSG02Y.cpy, CSSETATY.cpy, CSSTRPFY.cpy, CSUSR01Y.cpy, CSUTLDWY.cpy, CVCRD01Y.cpy, DCLTRCAT.dcl, DCLTRTYP.dcl.
+Db2 tables: CARDDEMO.TRANSACTION_TYPE (Delete/Drop query; Insert query; Select query; Update query).
+Datasets / DD names (program_to_dsn): CARDDEMO.TRANSACTION_TYPE [Database; DELETE; INSERT; SELECT; UPDATE].
+Calls / transfers to: COADM01C.
+Called / transferred from: COTRTLIC.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics db2","","Transaction Type Reference Data (Db2 sub-application)","13","Db2"
+"Story","COBTUPDT - Batch insert/update/delete of TRANSACTION_TYPE from a control file","Migrate COBTUPDT (app/app-transaction-type-db2/cbl/COBTUPDT.cbl), batch program: batch insert/update/delete of TRANSACTION_TYPE from a control file (MNTTRDB2).
+
+Metrics (assets csv): 238 total / 205 effective lines, cyclomatic complexity 25, 17 data items in the vendor data dictionary.
+Copybooks: DCLTRTYP.dcl.
+Db2 tables: CARDDEMO.TRANSACTION_TYPE (Delete/Drop query; Insert query; Update query).
+Datasets / DD names (program_to_dsn): DBRMLIB -> AWS.M2.CARDDEMO.DBRMLIB [Dataset; (mode not captured by vendor)]; INPFILE -> INPFILE [Dataset; READ].
+Executed by JCL: MNTTRDB2.jcl.
+Notes from reading the COBOL: INPFILE DD resolves to the literal DSN 'INPFILE' in MNTTRDB2.jcl (vendor reports it as missing); the real input is supplied at run time.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Medium","cobol batch db2","","Transaction Type Reference Data (Db2 sub-application)","2","Db2"
+"Story","COPAUA0C - MQ-triggered authorization engine","Migrate COPAUA0C (app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl), CICS online program: MQ-triggered authorization engine: reads request from queue, checks card/account/customer, applies rules, stores decision in IMS PAUTDB and replies.
+
+Metrics (assets csv): 1027 total / 772 effective lines, cyclomatic complexity 86, 116 data items in the vendor data dictionary.
+CICS transaction(s): CP00 (MQ trigger).
+Copybooks: CCPAUERY.cpy, CCPAURLY.cpy, CCPAURQY.cpy, CIPAUDTY.cpy, CIPAUSMY.cpy, CVACT01Y.cpy, CVACT03Y.cpy, CVCUS01Y.cpy.
+CICS files: ACCTDAT (Exec CICS Read dataset); CCXREF (Exec CICS Read dataset); CUSTDAT (Exec CICS Read dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ]; AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS [VSAM KSDS; READ]; AWS.M2.CARDDEMO.CUSTDATA.VSAM.KSDS [VSAM KSDS; READ].
+System / assembler calls: MQCLOSE, MQGET, MQOPEN, MQPUT1.
+Notes from reading the COBOL: No CICS transaction linked by the vendor; CRDDEMO2.csd defines it under CP00 (MQ trigger). IMS EXEC DLI calls to PAUTDB are NOT in the vendor lineage.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics mq ims vsam","","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","13","IMS"
+"Story","COPAUS0C - Pending authorizations summary by account","Migrate COPAUS0C (app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl), CICS online program: pending authorizations summary by account (CPVS).
+
+Metrics (assets csv): 1033 total / 801 effective lines, cyclomatic complexity 82, 86 data items in the vendor data dictionary.
+CICS transaction(s): CPVS.
+BMS map(s): COPAU00.bms.
+Copybooks: CIPAUDTY.cpy, CIPAUSMY.cpy, COCOM01Y.cpy, COPAU00.cpy, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CSMSG02Y.cpy, CVACT01Y.cpy, CVACT02Y.cpy, CVACT03Y.cpy, CVCUS01Y.cpy.
+CICS files: ACCTDAT (Exec CICS Read dataset); CUSTDAT (Exec CICS Read dataset); CXACAIX (Exec CICS Read dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ]; AWS.M2.CARDDEMO.CARDXREF.VSAM.AIX.PATH [VSAM PATH; READ]; AWS.M2.CARDDEMO.CUSTDATA.VSAM.KSDS [VSAM KSDS; READ].
+Calls / transfers to: COMEN01C, COPAUS1C, COSGN00C.
+Called / transferred from: COPAUS1C.
+Notes from reading the COBOL: IMS DB reads (EXEC DLI) not captured by the vendor lineage; only the VSAM lookups are.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics ims vsam","","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","8","IMS"
+"Story","COPAUS1C - Authorization detail view","Migrate COPAUS1C (app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl), CICS online program: authorization detail view (CPVD) with option to mark fraud via COPAUS2C.
+
+Metrics (assets csv): 605 total / 469 effective lines, cyclomatic complexity 47, 71 data items in the vendor data dictionary.
+CICS transaction(s): CPVD.
+BMS map(s): COPAU01.bms.
+Copybooks: CIPAUDTY.cpy, CIPAUSMY.cpy, COCOM01Y.cpy, COPAU01.cpy, COTTL01Y.cpy, CSDAT01Y.cpy, CSMSG01Y.cpy, CSMSG02Y.cpy.
+Datasets: none captured in program_to_dsn.
+Calls / transfers to: COPAUS0C, COPAUS2C.
+Called / transferred from: COPAUS0C.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics ims","","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","5","IMS"
+"Story","COPAUS2C - Mark authorization as fraud","Migrate COPAUS2C (app/app-authorization-ims-db2-mq/cbl/COPAUS2C.cbl), CICS online program: mark authorization as fraud: INSERT/UPDATE CARDDEMO.AUTHFRDS.
+
+Metrics (assets csv): 245 total / 203 effective lines, cyclomatic complexity 5, 38 data items in the vendor data dictionary.
+Copybooks: AUTHFRDS.dcl, AUTHFRDS.ddl, CIPAUDTY.cpy.
+Db2 tables: CARDDEMO.AUTHFRDS (Insert query; Update query).
+Datasets / DD names (program_to_dsn): CARDDEMO.AUTHFRDS [Database; INSERT; UPDATE].
+Called / transferred from: COPAUS1C.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Medium","cobol cics db2","","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","2","IMS"
+"Story","CBPAUP0C - Delete expired pending authorizations from IMS PAUTDB via EXEC DLI...","Migrate CBPAUP0C (app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl), batch program: delete expired pending authorizations from IMS PAUTDB via EXEC DLI GN/GNP/DLET (CBPAUP0J).
+
+Metrics (assets csv): 387 total / 266 effective lines, cyclomatic complexity 42, 66 data items in the vendor data dictionary.
+Copybooks: CIPAUDTY.cpy, CIPAUSMY.cpy.
+Datasets / DD names (program_to_dsn): IMS -> IMS.DBDLIB [Dataset; (mode not captured by vendor)]; PROCLIB -> IMS.PROCLIB [Dataset; (mode not captured by vendor)]; IMS -> IMS.PSBLIB [Dataset; (mode not captured by vendor)]; DFSRESLB -> IMS.SDFSRESL [Missing [Dataset, PDS]; (mode not captured by vendor)]; DFSSEL -> IMS.SDFSRESL [Missing [Dataset, PDS]; (mode not captured by vendor)].
+Executed by JCL: CBPAUP0J.jcl.
+Notes from reading the COBOL: Vendor lineage lists only IMS system libraries; the actual DB access (EXEC DLI on PCB 2 of PSBPAUTB) is not represented.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Medium","cobol batch ims","","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","3","IMS"
+"Story","PAUDBUNL - Unload PAUTDB root/child segments to two sequential files","Migrate PAUDBUNL (app/app-authorization-ims-db2-mq/cbl/PAUDBUNL.CBL), batch program: unload PAUTDB root/child segments to two sequential files (UNLDPADB).
+
+Metrics (assets csv): 318 total / 222 effective lines, cyclomatic complexity 22, 72 data items in the vendor data dictionary.
+Copybooks: CIPAUDTY.cpy, CIPAUSMY.cpy, IMSFUNCS.cpy, PAUTBPCB.CPY.
+Datasets / DD names (program_to_dsn): OUTFIL2 -> AWS.M2.CARDDEMO.PAUTDB.CHILD.FILEO [Dataset; WRITE]; OUTFIL1 -> AWS.M2.CARDDEMO.PAUTDB.ROOT.FILEO [Dataset; WRITE]; IMS -> OEM.IMS.IMSP.DBDLIB [Dataset; (mode not captured by vendor)]; DDPAUTP0 -> OEM.IMS.IMSP.PAUTHDB [Dataset; (mode not captured by vendor)]; DDPAUTX0 -> OEM.IMS.IMSP.PAUTHDBX [Dataset; (mode not captured by vendor)]; IMS -> OEM.IMS.IMSP.PSBLIB [Dataset; (mode not captured by vendor)]; DFSRESLB -> OEMA.IMS.IMSP.SDFSRESL [Missing [Dataset, PDS]; (mode not captured by vendor)]; DFSVSAMP -> OEMPP.IMS.V15R01MB.PROCLIB(DFSVSMDB) [Dataset; (mode not captured by vendor)].
+Executed by JCL: UNLDPADB.JCL.
+Vendor code_issues: Missing dependency detected: Missing Dynamic Call Value: CHILD-UNQUAL-SSA (IMS message invocation; [Dynamic] Call), Line(s): 257 | Missing dependency detected: Missing Dynamic Call Value: ROOT-UNQUAL-SSA (IMS message invocation; [Dynamic] Call), Line(s): 213.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Medium","cobol batch ims","","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","2","IMS"
+"Story","PAUDBLOD - Load PAUTDB from root/child sequential files","Migrate PAUDBLOD (app/app-authorization-ims-db2-mq/cbl/PAUDBLOD.CBL), batch program: load PAUTDB from root/child sequential files (LOADPADB).
+
+Metrics (assets csv): 370 total / 274 effective lines, cyclomatic complexity 35, 82 data items in the vendor data dictionary.
+Copybooks: CIPAUDTY.cpy, CIPAUSMY.cpy, IMSFUNCS.cpy, PAUTBPCB.CPY.
+Datasets / DD names (program_to_dsn): INFILE2 -> AWS.M2.CARDDEMO.PAUTDB.CHILD.FILEO [Dataset; READ]; INFILE1 -> AWS.M2.CARDDEMO.PAUTDB.ROOT.FILEO [Dataset; READ]; IMS -> OEM.IMS.IMSP.DBDLIB [Dataset; (mode not captured by vendor)]; IMS -> OEM.IMS.IMSP.PSBLIB [Dataset; (mode not captured by vendor)]; DFSRESLB -> OEMA.IMS.IMSP.SDFSRESL [Missing [Dataset, PDS]; (mode not captured by vendor)]; DFSVSAMP -> OEMPP.IMS.V15R01MB.PROCLIB(DFSVSMDB) [Dataset; (mode not captured by vendor)].
+Executed by JCL: LOADPADB.JCL.
+Vendor code_issues: Missing dependency detected: Missing Dynamic Call Value: CHILD-UNQUAL-SSA (IMS message invocation; [Dynamic] Call), Line(s): 321 | Missing dependency detected: Missing Dynamic Call Value: ROOT-QUAL-SSA (IMS message invocation; [Dynamic] Call), Line(s): 296 | Missing dependency detected: Missing Dynamic Call Value: ROOT-UNQUAL-SSA (IMS message invocation; [Dynamic] Call), Line(s): 244.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Medium","cobol batch ims","","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","3","IMS"
+"Story","DBUNLDGS - Unload PAUTDB to GSAM datasets via CBLTDLI","Migrate DBUNLDGS (app/app-authorization-ims-db2-mq/cbl/DBUNLDGS.CBL), batch program: unload PAUTDB to GSAM datasets via CBLTDLI (UNLDGSAM).
+
+Metrics (assets csv): 367 total / 211 effective lines, cyclomatic complexity 25, 72 data items in the vendor data dictionary.
+Copybooks: CIPAUDTY.cpy, CIPAUSMY.cpy, IMSFUNCS.cpy, PADFLPCB.CPY, PASFLPCB.CPY, PAUTBPCB.CPY.
+Datasets / DD names (program_to_dsn): PADFILOP -> AWS.M2.CARDDEMO.PAUTDB.CHILD.GSAM [Dataset; (mode not captured by vendor)]; PASFILOP -> AWS.M2.CARDDEMO.PAUTDB.ROOT.GSAM [Dataset; (mode not captured by vendor)]; IMS -> OEM.IMS.IMSP.DBDLIB [Dataset; (mode not captured by vendor)]; DDPAUTP0 -> OEM.IMS.IMSP.PAUTHDB [Dataset; (mode not captured by vendor)]; DDPAUTX0 -> OEM.IMS.IMSP.PAUTHDBX [Dataset; (mode not captured by vendor)]; IMS -> OEM.IMS.IMSP.PSBLIB [Dataset; (mode not captured by vendor)]; DFSRESLB -> OEMA.IMS.IMSP.SDFSRESL [Missing [Dataset, PDS]; (mode not captured by vendor)]; DFSVSAMP -> OEMPP.IMS.V15R01MB.PROCLIB(DFSVSMDB) [Dataset; (mode not captured by vendor)].
+Executed by JCL: UNLDGSAM.JCL.
+System / assembler calls: CBLTDLI.
+Vendor code_issues: Missing dependency detected: Missing Dynamic Call Value: CHILD-UNQUAL-SSA (IMS message invocation; [Dynamic] Call), Line(s): 267 | Missing dependency detected: Missing Dynamic Call Value: ROOT-UNQUAL-SSA (IMS message invocation; [Dynamic] Call), Line(s): 222.
+Notes from reading the COBOL: Vendor lineage has empty access modes for the GSAM outputs; they are WRITE.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Medium","cobol batch ims","","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","2","IMS"
+"Story","COACCT01 - MQ request/reply account inquiry","Migrate COACCT01 (app/app-vsam-mq/cbl/COACCT01.cbl), CICS online program: MQ request/reply account inquiry: MQGET request, READ ACCTDAT, MQPUT reply (CDRA).
+
+Metrics (assets csv): 621 total / 601 effective lines, cyclomatic complexity 32, 99 data items in the vendor data dictionary.
+CICS transaction(s): CDRA.
+Copybooks: CVACT01Y.cpy.
+CICS files: ACCTDAT (Exec CICS Read dataset).
+Datasets / DD names (program_to_dsn): AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ].
+System / assembler calls: MQCLOSE, MQGET, MQOPEN, MQPUT.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Low","cobol cics mq vsam","","MQ Request/Reply Services (VSAM-MQ sub-application)","5","Integration"
+"Story","CODATE01 - MQ request/reply current-date service","Migrate CODATE01 (app/app-vsam-mq/cbl/CODATE01.cbl), CICS online program: MQ request/reply current-date service (CDRD).
+
+Metrics (assets csv): 525 total / 508 effective lines, cyclomatic complexity 29, 70 data items in the vendor data dictionary.
+CICS transaction(s): CDRD.
+Copybooks: none (record layouts declared inline).
+Datasets: none captured in program_to_dsn.
+System / assembler calls: MQCLOSE, MQGET, MQOPEN, MQPUT.
+Notes from reading the COBOL: No file or DB access; vendor graph shows MQ API calls only.
+
+Acceptance criteria:
+- Every field, edit rule and message text of the BMS map is reproduced in the Java view/REST DTO with Bean Validation.
+- PF-key navigation (PF3 back, PF7/PF8 paging where present, ENTER) and COMMAREA hand-offs behave as in the COBOL.
+- All file/DB accesses above go through Spring Data repositories on the migrated entities inside one transaction per user action.
+- Unit coverage >= 80% on the service layer; scenarios registered in the online parity suite.
+Parity test: online parity suite replays the transaction scenarios against the legacy screen recordings (or the CICS region) and the Java endpoint; field values, error messages and resulting record images in the touched datasets must be identical.","Low","cobol cics mq","","MQ Request/Reply Services (VSAM-MQ sub-application)","3","Integration"
+"Story","CBEXPORT - Export accounts, cards, xrefs, customers and transactions into the...","Migrate CBEXPORT (app/cbl/CBEXPORT.cbl), batch program: export accounts, cards, xrefs, customers and transactions into the 500-byte multi-record EXPORT.DATA file (CVEXPORT).
+
+Metrics (assets csv): 583 total / 396 effective lines, cyclomatic complexity 42, 41 data items in the vendor data dictionary.
+Copybooks: CVACT01Y.cpy, CVACT02Y.cpy, CVACT03Y.cpy, CVCUS01Y.cpy, CVEXPORT.cpy, CVTRA05Y.cpy.
+Datasets / DD names (program_to_dsn): ACCTFILE -> AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS [VSAM KSDS; READ]; CARDFILE -> AWS.M2.CARDDEMO.CARDDATA.VSAM.KSDS [VSAM KSDS; READ]; XREFFILE -> AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS [VSAM KSDS; READ]; CUSTFILE -> AWS.M2.CARDDEMO.CUSTDATA.VSAM.KSDS [VSAM KSDS; READ]; EXPFILE -> AWS.M2.CARDDEMO.EXPORT.DATA [VSAM KSDS; WRITE]; TRANSACT -> AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS [VSAM KSDS; READ].
+Executed by JCL: CBEXPORT.jcl.
+System / assembler calls: CEE3ABD.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Highest","cobol batch vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","3","Data"
+"Story","CBIMPORT - Split EXPORT.DATA back into per-entity import files with an error file","Migrate CBIMPORT (app/cbl/CBIMPORT.cbl), batch program: split EXPORT.DATA back into per-entity import files with an error file (CBIMPORT).
+
+Metrics (assets csv): 488 total / 338 effective lines, cyclomatic complexity 37, 39 data items in the vendor data dictionary.
+Copybooks: CVACT01Y.cpy, CVACT02Y.cpy, CVACT03Y.cpy, CVCUS01Y.cpy, CVEXPORT.cpy, CVTRA05Y.cpy.
+Datasets / DD names (program_to_dsn): ACCTOUT -> AWS.M2.CARDDEMO.ACCTDATA.IMPORT [Dataset; WRITE]; XREFOUT -> AWS.M2.CARDDEMO.CARDXREF.IMPORT [Dataset; WRITE]; CUSTOUT -> AWS.M2.CARDDEMO.CUSTDATA.IMPORT [Dataset; WRITE]; EXPFILE -> AWS.M2.CARDDEMO.EXPORT.DATA [VSAM KSDS; READ]; ERROUT -> AWS.M2.CARDDEMO.IMPORT.ERRORS [Dataset; WRITE]; TRNXOUT -> AWS.M2.CARDDEMO.TRANSACT.IMPORT [Dataset; WRITE].
+Executed by JCL: CBIMPORT.jcl.
+System / assembler calls: CEE3ABD.
+
+Acceptance criteria:
+- Implemented as a Spring Batch job with the same DD-name-to-input/output contract and exit codes (0 ok, 4 warnings, 8/12 abend via CEE3ABD).
+- Every dataset above is read/written through the migrated entity or a fixed-width adapter with identical record layout.
+- Restartable; reject/report outputs written as versioned objects where the JCL used GDG (+1).
+- Wired into the migrated scheduler flow where a Control-M / CA7 entry references the JCL.
+Parity test: golden-file harness runs the legacy job and the Spring Batch job on the same EBCDIC fixtures; all output datasets/reports and post-run record images of updated datasets must match byte-for-byte after code-page normalisation; row counts and control totals are reconciled.","Highest","cobol batch vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","3","Data"
+"Story","Batch job POSTTRAN - daily posting flow (CBTRN02C)","Single-step job STEP15 EXEC PGM=CBTRN02C. Wrap the CBTRN02C job with the DD contract from jcl_to_dsn, DALYREJS (+1) GDG increment, and the CLOSEFIL/OPENFIL bracket from the daily schedule.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","High","jcl batch vsam gdg","","Transaction Posting and Interest Batch","3","Batch"
+"Story","Batch job INTCALC - monthly interest flow (CBACT04C)","Runs CBACT04C with ACCTFILE/XREFFILE/DISCGRP/TCATBALF/TRANSACT DDs, SYSTRAN GDG output. Sits in the MONTHLY-InterestCalculation Control-M flow between CLOSEFIL and COMBTRAN.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","High","jcl batch vsam gdg","","Transaction Posting and Interest Batch","3","Batch"
+"Story","Batch job COMBTRAN - merge SYSTRAN interest transactions into TRANSACT","SORT merge of TRANSACT.BKUP + SYSTRAN into TRANSACT.COMBINED then IDCAMS REPRO into TRANSACT.VSAM.KSDS. Becomes a Spring Batch merge step or a set-based SQL insert; no COBOL.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","High","jcl batch vsam gdg sort","","Transaction Posting and Interest Batch","3","Batch"
+"Story","Batch job TRANBKP - daily TRANSACT backup and cluster rebuild (with TRANIDX)","IDCAMS REPRO of TRANSACT to TRANSACT.BKUP GDG, delete/define of the KSDS and AIX (TRANIDX.jcl), reload. DAILY-TransactionBackup flow. In the target this is a DB backup/snapshot policy plus index maintenance; keep the versioned snapshot for parity.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","High","jcl batch vsam gdg","","Transaction Posting and Interest Batch","2","Batch"
+"Story","Batch job TRANREPT - transaction report flow (SORT + CBTRN03C)","Steps: IDCAMS REPRO TRANSACT -> TRANSACT.BKUP, SORT by date range into TRANSACT.DALY GDG, CBTRN03C with DATEPARM (start/end date card) producing TRANREPT GDG. Submitted on demand by CORPT00C via the internal reader and by schedule.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","Medium","jcl batch vsam gdg sort","","Reporting and Statements","3","Batch"
+"Story","Batch job CREASTMT - statement generation flow (SORT + CBSTM03A/CBSTM03B)","SORT TRANSACT into TRXFL.SEQ, IDCAMS define/load TRXFL.VSAM.KSDS, CBSTM03A produces STATEMNT.PS and STATEMNT.HTML; TXT2PDF1.JCL converts text statements to PDF (missing PDS AWS.M2.LBD.TXT2PDF.* per vendor). Target: statement job writing text/HTML/PDF via a template engine.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","Medium","jcl batch vsam","","Reporting and Statements","3","Batch"
+"Story","Batch job PRTCATBL - transaction category balance report","IDCAMS REPRO TCATBALF to TCATBALF.BKUP GDG then SORT report to TCATBALF.REPT. No COBOL; becomes a SQL report job.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","Medium","jcl batch vsam gdg sort","","Reporting and Statements","2","Batch"
+"Story","Batch jobs CBEXPORT / CBIMPORT - export-import bridge flow","CBEXPORT.jcl deletes/defines EXPORT.DATA and runs CBEXPORT; CBIMPORT.jcl runs CBIMPORT producing *.IMPORT files and IMPORT.ERRORS (all reported as missing datasets by the vendor because they are created at run time). Used as the bulk data bridge during dual-run.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","Highest","jcl batch vsam data-migration","","Shared Data Foundation and VSAM/Db2/IMS Migration","2","Data"
+"Story","Batch jobs READACCT / READCUST / READCARD / READXREF - verification dumps","Each runs a reader program (CBACT01C, CBCUS01C, CBACT02C, CBACT03C) against the KSDS and writes sequential dumps (ACCTDATA.PSCOMP/VBPS/ARRYPS reported missing by the vendor: created by the job). Keep as data-verification jobs whose output feeds the parity harness.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","High","jcl batch vsam","","Account and Customer Management","2","Online"
+"Story","Batch jobs MNTTRDB2 / TRANEXTR / CREADB21 - transaction type Db2 maintenance flow","CREADB21 runs DSNTIAD/DSNTEP4 with control cards DB2CREAT, DB2FREE, DB2TIAD1, DB2LTTYP, DB2LTCAT, DB2TEP41 (schema + load); MNTTRDB2 runs COBTUPDT under IKJEFT01; TRANEXTR unloads via DSNTIAUL to TRANTYPE.PS / TRANCATG.PS with GDG backups. WEEKLY-TransactionTypesDBRefresh flow. Target: Flyway migrations + a reference-data import job.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","Medium","jcl batch db2 gdg","","Transaction Type Reference Data (Db2 sub-application)","3","Db2"
+"Story","Batch jobs CBPAUP0J / DBPAUTP0 / LOADPADB / UNLDPADB / UNLDGSAM - IMS PAUTDB maintenance flow","DFSRRC00 BMP/DLI regions running CBPAUP0C (purge), PAUDBLOD (load), PAUDBUNL (unload), DBUNLDGS (GSAM unload) and DFSURGU0 image copy (DBPAUTP0). Vendor flags missing control card DFSVSMDB and missing IMS/Db2 system libraries (OEM.IMS.*, OEMA.*). Target: SQL purge job + backup policy; unload/load become the conversion pipeline.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","Medium","jcl batch ims","","Card Pre-authorization (IMS DB / Db2 / MQ sub-application)","3","IMS"
+"Story","Batch jobs CLOSEFIL / OPENFIL / WAITSTEP - CICS file quiesce bracket","CEMT SET FILE CLOSED/OPEN via the batch CICS interface and a timed wait (COBSWAIT). Every scheduled flow wraps its business steps with these. Target: online maintenance-mode toggle exposed by the API and awaited by the scheduler.
+
+Acceptance criteria:
+- Job graph reproduced in Spring Batch with identical step order, DD contracts and exit codes.
+- Scheduler entry migrated where the job appears in Control-M / CA7.
+Parity test: golden-file harness compares every output dataset of the legacy job run with the Java job on the same fixtures.","Highest","jcl batch cics","","Platform Foundation and Shared Utilities","2","Platform"
