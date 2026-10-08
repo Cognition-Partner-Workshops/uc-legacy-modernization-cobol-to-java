@@ -203,7 +203,7 @@ quadrantChart
 - **Duplicated validation logic**: transaction validity rules exist in `CBTRN01C`, `CBTRN02C`, `COTRN02C` and `COPAUA0C` with differences; consolidate into one domain service.
 - **Dual reference-data stores**: transaction types live in Db2 (optional module) and VSAM (`TRANTYPE`/`TRANCATG`) synchronized weekly by `TRANEXTR`.
 - **Security**: clear-text passwords in `USRSEC`; PII (SSN, DOB, government ID) in `CUSTDAT` and the export file.
-- **Legacy constructs**: `ALTER` (`CBSTM03A`), 200+ `GO TO`s across the online programs, assembler dependencies (`COBDATFT`, `MVSWAIT`), EBCDIC packed-decimal data files.
+- **Legacy constructs**: `ALTER` (`CBSTM03A`), 185 `GO TO`s (158 in the online programs), assembler dependencies (`COBDATFT`, `MVSWAIT`), EBCDIC packed-decimal data files.
 - **Shared COMMAREA (`COCOM01Y`)** couples all 17 core online programs; changes ripple across every screen.
 
 ## 6. Suggested modernization sequence
