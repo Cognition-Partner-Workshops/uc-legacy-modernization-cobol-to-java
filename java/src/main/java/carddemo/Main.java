@@ -55,11 +55,12 @@ public final class Main {
             rc = program.run(new JobContext(ddNames, sysout));
         } catch (Abend e) {
             rc = e.abendCode();
-        }
-        try {
-            sysout.flush();
-        } catch (IOException e) {
-            throw new UncheckedIOException("cannot flush SYSOUT", e);
+        } finally {
+            try {
+                sysout.flush();
+            } catch (IOException e) {
+                throw new UncheckedIOException("cannot flush SYSOUT", e);
+            }
         }
         // PrintStream records write failures instead of throwing them.
         if (stdout.checkError()) {

@@ -18,6 +18,10 @@ JAVA_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$JAVA_DIR/.." && pwd)"
 WORK="${1:-$JAVA_DIR/target/parity}"
 mkdir -p "$WORK" && WORK="$(cd "$WORK" && pwd)"
+# Only clear the default target/parity, a directory this script created (marker file), or an empty one.
+if [[ "$WORK" != "$JAVA_DIR/target/parity" && ! -e "$WORK/.parity-work" && -n "$(ls -A "$WORK")" ]]; then
+  echo "refusing to use non-empty WORK_DIR $WORK (not created by run-parity.sh)" >&2; exit 2
+fi
 GOLDEN="$JAVA_DIR/src/test/resources/golden"
 JAR="$JAVA_DIR/target/carddemo-batch.jar"
 COBC_FLAGS=(-std=ibm -fsign=EBCDIC -I "$REPO/app/cpy")
@@ -26,8 +30,9 @@ for tool in cobc java mvn cmp; do
   command -v "$tool" >/dev/null || { echo "missing required tool: $tool" >&2; exit 2; }
 done
 
-rm -rf "$WORK"
+find "$WORK" -mindepth 1 -delete
 mkdir -p "$WORK/bin"
+touch "$WORK/.parity-work"
 
 echo "== build Java port"
 mvn -q -f "$JAVA_DIR/pom.xml" -DskipTests package

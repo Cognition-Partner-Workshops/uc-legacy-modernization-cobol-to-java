@@ -146,6 +146,16 @@ class Cbact01cTest {
     }
 
     @Test
+    void unexpectedFailureStillClosesOpenedOutputs() throws IOException {
+        Files.write(dir.resolve("ACCTFILE"), new byte[0]);
+        Map<String, Path> dds = Map.of("ACCTFILE", dir.resolve("ACCTFILE"), "OUTFILE", dir.resolve("o"));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Cbact01c().run(new JobContext(dds, new ByteArrayOutputStream())));
+        assertTrue(Files.exists(dir.resolve("o")));
+        Files.delete(dir.resolve("o"));
+    }
+
+    @Test
     void ioStatusFormatting() {
         assertEquals("0035", Cbact01c.ioStatus04("35"));
         assertEquals("9034", Cbact01c.ioStatus04("9\""));

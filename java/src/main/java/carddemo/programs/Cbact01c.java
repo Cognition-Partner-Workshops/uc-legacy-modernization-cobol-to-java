@@ -149,6 +149,7 @@ public final class Cbact01c implements BatchProgram {
         }
         started = true;
         this.job = jobContext;
+        boolean completed = false;
         try {
             job.display("START OF EXECUTION OF PROGRAM CBACT01C");
             acctFileOpen();
@@ -165,9 +166,14 @@ public final class Cbact01c implements BatchProgram {
 
             acctFileClose();
             job.display("END OF EXECUTION OF PROGRAM CBACT01C");
-        } catch (Abend abend) {
-            closeOutputs().ifPresent(abend::addSuppressed);
-            throw abend;
+            completed = true;
+        } catch (RuntimeException failure) {
+            closeOutputs().ifPresent(failure::addSuppressed);
+            throw failure;
+        } finally {
+            if (!completed) {
+                closeOutputs();
+            }
         }
         Optional<IllegalStateException> closeFailure = closeOutputs();
         if (closeFailure.isPresent()) {
