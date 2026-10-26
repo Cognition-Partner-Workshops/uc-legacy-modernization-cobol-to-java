@@ -2,6 +2,7 @@
 # Byte-for-byte parity check: original CBACT01C (GnuCOBOL) vs the Java 21 port.
 #
 #   usage: java/scripts/run-parity.sh [--update-golden] [WORK_DIR]
+#   WORK_DIR defaults to java/target/parity (cleared each run); an explicit WORK_DIR must be new or empty.
 #
 # For every scenario both implementations run against the same account fixture, then
 # OUTFILE, ARRYFILE, VBRCFILE, SYSOUT (stdout) and the return code are compared with cmp.
@@ -18,9 +19,9 @@ JAVA_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$JAVA_DIR/.." && pwd)"
 WORK="${1:-$JAVA_DIR/target/parity}"
 mkdir -p "$WORK" && WORK="$(cd "$WORK" && pwd)"
-# Only clear the default target/parity, a directory this script created (marker file), or an empty one.
-if [[ "$WORK" != "$JAVA_DIR/target/parity" && ! -e "$WORK/.parity-work" && -n "$(ls -A "$WORK")" ]]; then
-  echo "refusing to use non-empty WORK_DIR $WORK (not created by run-parity.sh)" >&2; exit 2
+# Only the default build-output dir is ever cleared; an explicit WORK_DIR must be new or empty.
+if [[ "$WORK" != "$JAVA_DIR/target/parity" && -n "$(ls -A "$WORK")" ]]; then
+  echo "refusing to use non-empty WORK_DIR $WORK; pass a new or empty directory" >&2; exit 2
 fi
 GOLDEN="$JAVA_DIR/src/test/resources/golden"
 JAR="$JAVA_DIR/target/carddemo-batch.jar"
@@ -32,7 +33,6 @@ done
 
 find "$WORK" -mindepth 1 -delete
 mkdir -p "$WORK/bin"
-touch "$WORK/.parity-work"
 
 echo "== build Java port"
 mvn -q -f "$JAVA_DIR/pom.xml" -DskipTests package
