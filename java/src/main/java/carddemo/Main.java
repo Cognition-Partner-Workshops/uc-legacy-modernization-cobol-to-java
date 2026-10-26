@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -26,6 +27,8 @@ public final class Main {
     private static final Map<String, BatchProgram> PROGRAMS = Map.of(
             "CBACT02C", new Cbact02c());
 
+    static final int SYSOUT_ERROR_RC = 12;
+
     private Main() {
     }
 
@@ -35,6 +38,9 @@ public final class Main {
             rc = run(args, System.out);
         } catch (Abend e) {
             rc = Abend.ABEND_CODE;
+        } catch (SysoutException e) {
+            System.err.println("error: " + e.getMessage());
+            rc = SYSOUT_ERROR_RC;
         } catch (IllegalArgumentException e) {
             System.err.println("error: " + e.getMessage());
             System.err.println(usage());
@@ -47,7 +53,7 @@ public final class Main {
         if (args.length == 0) {
             throw new IllegalArgumentException("missing program name");
         }
-        String programName = args[0].toUpperCase();
+        String programName = args[0].toUpperCase(Locale.ROOT);
         BatchProgram program = PROGRAMS.get(programName);
         if (program == null) {
             throw new IllegalArgumentException("unknown program " + args[0]);
@@ -66,19 +72,38 @@ public final class Main {
             if (eq <= 0) {
                 throw new IllegalArgumentException("--dd expects NAME=PATH, got '" + spec + "'");
             }
-            ddNames.put(spec.substring(0, eq).toUpperCase(), Path.of(spec.substring(eq + 1)));
+            ddNames.put(spec.substring(0, eq).toUpperCase(Locale.ROOT), Path.of(spec.substring(eq + 1)));
         }
 
         OutputStream sysout = new BufferedOutputStream(stdout);
         JobContext job = new JobContext(ddNames, sysout);
+        int rc;
         try {
-            return program.run(job);
-        } finally {
-            try {
-                sysout.flush();
-            } catch (IOException e) {
-                throw new IllegalStateException("cannot flush SYSOUT", e);
-            }
+            rc = program.run(job);
+        } catch (Abend e) {
+            flushSysout(sysout, stdout);
+            throw e;
+        }
+        flushSysout(sysout, stdout);
+        return rc;
+    }
+
+    /** PrintStream swallows write errors, so a lost SYSOUT is detected through checkError(). */
+    private static void flushSysout(OutputStream sysout, PrintStream stdout) {
+        try {
+            sysout.flush();
+        } catch (IOException e) {
+            throw new SysoutException(e);
+        }
+        if (stdout.checkError()) {
+            throw new SysoutException(null);
+        }
+    }
+
+    /** SYSOUT could not be written; the run fails with {@link #SYSOUT_ERROR_RC}. */
+    static final class SysoutException extends RuntimeException {
+        SysoutException(IOException cause) {
+            super("cannot write SYSOUT", cause);
         }
     }
 

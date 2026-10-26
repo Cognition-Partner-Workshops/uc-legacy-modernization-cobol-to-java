@@ -57,11 +57,13 @@ Record count reconciliation: 50 records in, 50 `CARD-RECORD` lines out (52 SYSOU
 - **Codecs**: zoned-decimal overpunch signs, COMP-3 packing, `INITIALIZE` compared with `MOVE 0`, and how `9910-DISPLAY-IO-STATUS` formats a file status.
 - **Record layout**: the `CVACT02Y` field offsets, decoding fixture records, and the 150-byte length check.
 - **Program logic**: reading in key order, an empty file, a missing file (status 35), a corrupt or short file (status 30), and the abend code.
-- **Command line**: the CLI wiring and argument checks.
+- **Command line**: the CLI wiring, argument checks, DD names that don't depend on the locale, and failing the run when SYSOUT cannot be written.
 
 ## Deliberate deviations
 
 - **Dataset format.** GnuCOBOL stores `INDEXED` files as Berkeley DB, and z/OS stores them as VSAM. The Java port does not read either native format. It reads the KSDS content as a flat file of fixed 150-byte records, which is the `REPRO` unload form, and orders it by the 16-byte key (unsigned byte compare) in memory. Both programs are fed the same records.
 - **Errors after a successful OPEN.** If the flat file length is not a multiple of 150, the Java port reports it at OPEN with status 30. On VSAM, a damaged dataset would usually fail on OPEN or READ with a VSAM-specific status. The parity scenarios do not exercise this path.
+- **Memory.** The Java port streams the unload one record at a time, so a file over 2 GB is not read into a single array. The sorted key index is still held in memory, so heap size limits how large a card master it can handle. A very large master would need an external sort, or an unload that is already in key order.
+- **Lost SYSOUT.** A Java `PrintStream` does not throw on write errors. If SYSOUT cannot be written (for example, the disk is full), `Main` checks `checkError()` and ends the run with RC 12 instead of RC 0.
 - **CLOSE.** CLOSE on the in-memory dataset cannot fail, so the `ERROR CLOSING CARDFILE` branch has nothing to trigger it. The code keeps it so the structure matches the COBOL.
 - **Spring Batch / scheduler (ticket acceptance criteria).** KAN-62 asks for a Spring Batch job wired into the migrated scheduler. Those depend on KAN-17 (Spring Boot 3.5 / Java 21 multi-module project) and KAN-19 (Spring Batch job framework), and both are still To Do. This port is a plain Java 21 module. `Cbact02c` implements `BatchProgram.run(JobContext)`, using the DD-name contract and return codes, so a Spring Batch `Tasklet` can wrap it once KAN-19 exists. READCARD has no GDG outputs, so the versioned-output and restart criteria do not apply to it.

@@ -1,6 +1,8 @@
 package carddemo.cobol;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -15,16 +17,20 @@ public final class FixedFile {
 
     /** Reads every record; propagates the {@link IOException} so callers can map it to a COBOL file status. */
     public static List<byte[]> readAll(Path path, int recordLength) throws IOException {
-        byte[] data = Files.readAllBytes(path);
-        if (data.length % recordLength != 0) {
-            throw new IOException(
-                    path + ": size " + data.length + " is not a multiple of record length " + recordLength);
+        List<byte[]> records = new ArrayList<>();
+        try (InputStream in = new BufferedInputStream(Files.newInputStream(path))) {
+            while (true) {
+                byte[] record = in.readNBytes(recordLength);
+                if (record.length == 0) {
+                    return records;
+                }
+                if (record.length < recordLength) {
+                    throw new IOException(path + ": trailing partial record of " + record.length
+                            + " bytes (record length " + recordLength + ")");
+                }
+                records.add(record);
+            }
         }
-        List<byte[]> records = new ArrayList<>(data.length / recordLength);
-        for (int i = 0; i < data.length; i += recordLength) {
-            records.add(Bytes.slice(data, i, recordLength));
-        }
-        return records;
     }
 
     /** Sequential output file opened with {@code OPEN OUTPUT} (truncated on open). */
