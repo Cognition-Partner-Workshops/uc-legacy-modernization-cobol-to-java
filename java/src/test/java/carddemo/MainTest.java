@@ -25,10 +25,12 @@ class MainTest {
 
     @Test
     void missingDdIsReportedBeforeRunning() {
-        PrintStream out = new PrintStream(new ByteArrayOutputStream());
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        PrintStream out = new PrintStream(bytes);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> Main.run(new String[] {"CBACT02C"}, out));
         assertEquals("DD CARDFILE is not allocated (use --dd CARDFILE=PATH)", e.getMessage());
+        assertEquals("START OF EXECUTION OF PROGRAM CBACT02C\n", bytes.toString());
     }
 
     private static Path cardFile() throws IOException {

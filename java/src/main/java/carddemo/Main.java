@@ -80,8 +80,12 @@ public final class Main {
         int rc;
         try {
             rc = program.run(job);
-        } catch (Abend e) {
-            flushSysout(sysout, stdout);
+        } catch (RuntimeException e) {
+            try {
+                flushSysout(sysout, stdout);
+            } catch (SysoutException flushError) {
+                e.addSuppressed(flushError);
+            }
             throw e;
         }
         flushSysout(sysout, stdout);
