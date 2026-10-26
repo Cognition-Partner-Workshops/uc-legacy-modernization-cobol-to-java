@@ -22,11 +22,14 @@ import java.util.function.Supplier;
  *
  * DDs can also be allocated through {@code DD_NAME=PATH} environment variables (the GnuCOBOL
  * convention); {@code --dd} wins. The process exit status is the program's RETURN-CODE, or the
- * abend code (999, seen by the shell as 999 mod 256 = 231) after a CEE3ABD.
+ * abend code (999, seen by the shell as 999 mod 256 = 231) after a CEE3ABD. A run that ends
+ * normally but cannot write SYSOUT exits with 12.
  */
 public final class Main {
     private static final Map<String, Supplier<BatchProgram>> PROGRAMS = Map.of(
             "CBACT01C", Cbact01c::new);
+
+    static final int SYSOUT_FAILURE = 12;
 
     private Main() {
     }
@@ -47,17 +50,23 @@ public final class Main {
             return 2;
         }
         OutputStream sysout = new BufferedOutputStream(stdout);
+        int rc;
         try {
-            return program.run(new JobContext(ddNames, sysout));
+            rc = program.run(new JobContext(ddNames, sysout));
         } catch (Abend e) {
-            return e.abendCode();
-        } finally {
-            try {
-                sysout.flush();
-            } catch (IOException e) {
-                throw new UncheckedIOException("cannot flush SYSOUT", e);
-            }
+            rc = e.abendCode();
         }
+        try {
+            sysout.flush();
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot flush SYSOUT", e);
+        }
+        // PrintStream records write failures instead of throwing them.
+        if (stdout.checkError()) {
+            stderr.println("error: SYSOUT could not be written");
+            return rc == 0 ? SYSOUT_FAILURE : rc;
+        }
+        return rc;
     }
 
     private static BatchProgram program(String[] args) {

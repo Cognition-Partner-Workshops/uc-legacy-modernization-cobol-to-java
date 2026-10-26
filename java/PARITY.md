@@ -80,7 +80,7 @@ In the `RC` rows, `2` and `4` are the byte sizes of the files `0\n` and `231\n`.
 0 on normal completion and 231 after an abend: abend code 999 mod 256, which is the code the shell
 sees from both GnuCOBOL and the JVM.
 
-`mvn -q -f java/pom.xml verify` passes: 50 JUnit tests, 0 failures. They cover the codec
+`mvn -q -f java/pom.xml verify` passes: 52 JUnit tests, 0 failures. They cover the codec
 (`CodecTest`, `FileIoTest`), the `COBDATFT` replacement (`DateFormatConverterTest`), the program
 logic (`Cbact01cTest`), the CLI (`MainTest`) and the golden files (`Cbact01cGoldenTest`).
 
@@ -110,6 +110,8 @@ logic (`Cbact01cTest`), the CLI (`MainTest`) and the golden files (`Cbact01cGold
   records in any order. It does not read a VSAM cluster or a BDB file. A short file, or one
   with a duplicate key, is rejected with status 30. GnuCOBOL would return 35 for a missing
   file, and the Java port does the same.
+  The key-ordered view of the unload is held in memory, one copy per record. That is fine for
+  the CardDemo account master, but a very large master should be pre-sorted and read sequentially.
 * **Date conversion.** `DateFormatConverter` replaces `COBDATFT` and uses `java.time` with
   strict `uuuu-MM-dd` and `uuuuMMdd` formats. If the input is not a valid date, it falls back to
   the assembler's positional byte moves. The output is therefore always the same as the

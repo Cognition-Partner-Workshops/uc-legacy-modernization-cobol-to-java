@@ -42,6 +42,21 @@ class MainTest {
     }
 
     @Test
+    void sysoutWriteFailureFailsTheStep() throws Exception {
+        Files.write(dir.resolve("acct"), new byte[0]);
+        PrintStream broken = new PrintStream(new java.io.OutputStream() {
+            @Override
+            public void write(int b) throws java.io.IOException {
+                throw new java.io.IOException("disk full");
+            }
+        });
+        int rc = Main.run(new String[] {"CBACT01C", "--dd", "ACCTFILE=" + dir.resolve("acct"),
+            "--dd", "OUTFILE=" + dir.resolve("o"), "--dd", "ARRYFILE=" + dir.resolve("a"),
+            "--dd", "VBRCFILE=" + dir.resolve("v")}, Map.of(), broken, new PrintStream(new ByteArrayOutputStream()));
+        assertEquals(Main.SYSOUT_FAILURE, rc);
+    }
+
+    @Test
     void usageErrors() {
         ByteArrayOutputStream err = new ByteArrayOutputStream();
         PrintStream stderr = new PrintStream(err);

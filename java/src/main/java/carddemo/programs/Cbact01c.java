@@ -8,6 +8,7 @@ import carddemo.cobol.SequentialFile;
 import carddemo.records.AccountRecord;
 import carddemo.records.CodatecnRecord;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * CBACT01C - reads the account master (ACCTFILE, VSAM KSDS) sequentially, DISPLAYs every account
@@ -135,8 +136,18 @@ public final class Cbact01c implements BatchProgram {
     private SequentialFile vbrcFile;
     private boolean endOfFile;
 
+    private boolean started;
+
+    /**
+     * One call per instance, like one COBOL run unit: the FD record areas carry state from record
+     * to record (see {@link #populAcctRecord()}), so a rerun needs a fresh instance.
+     */
     @Override
     public int run(JobContext jobContext) {
+        if (started) {
+            throw new IllegalStateException("Cbact01c instances are single-use; create a new one per run");
+        }
+        started = true;
         this.job = jobContext;
         try {
             job.display("START OF EXECUTION OF PROGRAM CBACT01C");
@@ -154,10 +165,15 @@ public final class Cbact01c implements BatchProgram {
 
             acctFileClose();
             job.display("END OF EXECUTION OF PROGRAM CBACT01C");
-            return 0;
-        } finally {
-            closeOutputs();
+        } catch (Abend abend) {
+            closeOutputs().ifPresent(abend::addSuppressed);
+            throw abend;
         }
+        Optional<IllegalStateException> closeFailure = closeOutputs();
+        if (closeFailure.isPresent()) {
+            throw closeFailure.get();
+        }
+        return 0;
     }
 
     /** 1000-ACCTFILE-GET-NEXT. */
@@ -353,16 +369,30 @@ public final class Cbact01c implements BatchProgram {
         return "00" + ioStatus;
     }
 
-    /** Implicit CLOSE of the output files at GOBACK / STOP RUN. */
-    private void closeOutputs() {
+    /**
+     * Implicit CLOSE of the output files at GOBACK / STOP RUN. Every opened file is closed even if
+     * an earlier close fails; the failures are returned rather than thrown so an abend in flight
+     * keeps its code.
+     */
+    private Optional<IllegalStateException> closeOutputs() {
+        IllegalStateException failure = null;
         for (SequentialFile file : new SequentialFile[] {outFile, arryFile, vbrcFile}) {
-            if (file != null) {
-                try {
-                    file.close();
-                } catch (FileStatusException e) {
-                    throw new IllegalStateException(e.getMessage(), e);
+            if (file == null) {
+                continue;
+            }
+            try {
+                file.close();
+            } catch (FileStatusException e) {
+                if (failure == null) {
+                    failure = new IllegalStateException("implicit CLOSE failed", e);
+                } else {
+                    failure.addSuppressed(e);
                 }
             }
         }
+        outFile = null;
+        arryFile = null;
+        vbrcFile = null;
+        return Optional.ofNullable(failure);
     }
 }

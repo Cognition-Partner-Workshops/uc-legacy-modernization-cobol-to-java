@@ -135,6 +135,17 @@ class Cbact01cTest {
     }
 
     @Test
+    void instancesAreSingleUse() throws IOException {
+        Files.write(dir.resolve("ACCTFILE"), new byte[0]);
+        Map<String, Path> dds = Map.of("ACCTFILE", dir.resolve("ACCTFILE"), "OUTFILE", dir.resolve("o"),
+                "ARRYFILE", dir.resolve("a"), "VBRCFILE", dir.resolve("v"));
+        Cbact01c program = new Cbact01c();
+        assertEquals(0, program.run(new JobContext(dds, new ByteArrayOutputStream())));
+        assertThrows(IllegalStateException.class,
+                () -> program.run(new JobContext(dds, new ByteArrayOutputStream())));
+    }
+
+    @Test
     void ioStatusFormatting() {
         assertEquals("0035", Cbact01c.ioStatus04("35"));
         assertEquals("9034", Cbact01c.ioStatus04("9\""));

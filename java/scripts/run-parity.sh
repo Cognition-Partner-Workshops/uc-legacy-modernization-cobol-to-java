@@ -17,6 +17,7 @@ if [[ "${1:-}" == "--update-golden" ]]; then UPDATE_GOLDEN=1; shift; fi
 JAVA_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$JAVA_DIR/.." && pwd)"
 WORK="${1:-$JAVA_DIR/target/parity}"
+mkdir -p "$WORK" && WORK="$(cd "$WORK" && pwd)"
 GOLDEN="$JAVA_DIR/src/test/resources/golden"
 JAR="$JAVA_DIR/target/carddemo-batch.jar"
 COBC_FLAGS=(-std=ibm -fsign=EBCDIC -I "$REPO/app/cpy")
@@ -41,6 +42,7 @@ export COB_VARSEQ_FORMAT=0
 OUTPUTS=(OUTFILE ARRYFILE VBRCFILE SYSOUT RC)
 REPORT="$WORK/parity-report.txt"
 FAILED=0
+SCENARIOS=()
 printf '%-26s %-9s %-8s %10s %10s\n' SCENARIO OUTPUT STATUS COBOL_B JAVA_B | tee "$REPORT"
 
 # scenario NAME FIXTURE [OUTFILE_OVERRIDE]
@@ -61,6 +63,9 @@ scenario() {
   (cd "$dir/cobol" && DD_ACCTFILE="$ksds" DD_OUTFILE="$outfile" DD_ARRYFILE=ARRYFILE DD_VBRCFILE=VBRCFILE \
      "$WORK/bin/CBACT01C" >SYSOUT 2>stderr.txt) || rc=$?
   echo "$rc" >"$dir/cobol/RC"
+  if [[ $rc -eq 126 || $rc -eq 127 ]]; then
+    echo "COBOL executable could not be run in scenario $name (rc=$rc)" >&2; exit 2
+  fi
 
   rc=0
   (cd "$dir/java" && java -jar "$JAR" CBACT01C --dd ACCTFILE="$flat" --dd OUTFILE="$outfile" \
@@ -81,13 +86,20 @@ scenario() {
     printf '%-26s %-9s %-8s %10s %10s\n' "$name" "$out" "$status" "$cb" "$jb" | tee -a "$REPORT"
   done
 
-  if [[ $UPDATE_GOLDEN -eq 1 ]]; then
+  SCENARIOS+=("$name")
+}
+
+# Goldens are refreshed only from a fully matching run, so a broken COBOL run cannot replace them.
+update_golden() {
+  local name out
+  for name in "${SCENARIOS[@]}"; do
     rm -rf "${GOLDEN:?}/$name"
     mkdir -p "$GOLDEN/$name"
     for out in "${OUTPUTS[@]}"; do
-      [[ -e "$dir/cobol/$out" ]] && cp "$dir/cobol/$out" "$GOLDEN/$name/$out"
+      if [[ -e "$WORK/$name/cobol/$out" ]]; then cp "$WORK/$name/cobol/$out" "$GOLDEN/$name/$out"; fi
     done
-  fi
+  done
+  echo "golden files updated in $GOLDEN"
 }
 
 scenario acctdata               "$REPO/app/data/ASCII/acctdata.txt"
@@ -99,7 +111,9 @@ scenario abend-outfile-open     "$JAVA_DIR/src/test/resources/fixtures/acct-edge
 echo
 if [[ $FAILED -eq 0 ]]; then
   echo "PARITY: all compared outputs match" | tee -a "$REPORT"
+  if [[ $UPDATE_GOLDEN -eq 1 ]]; then update_golden; fi
 else
   echo "PARITY: MISMATCH (see $WORK)" | tee -a "$REPORT"
+  if [[ $UPDATE_GOLDEN -eq 1 ]]; then echo "golden files NOT updated" >&2; fi
   exit 1
 fi

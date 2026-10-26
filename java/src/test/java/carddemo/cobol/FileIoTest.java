@@ -63,6 +63,8 @@ class FileIoTest {
                 () -> KeyedFile.openInput(dir.resolve("none"), 3, 0, 2)).status());
         Path ragged = Files.write(dir.resolve("ragged"), Bytes.ascii("10a2"));
         assertEquals("30", assertThrows(FileStatusException.class,
+                () -> KeyedFile.openInput(Files.write(dir.resolve("short"), Bytes.ascii("1")), 3, 0, 2)).status());
+        assertEquals("30", assertThrows(FileStatusException.class,
                 () -> KeyedFile.openInput(ragged, 3, 0, 2)).status());
         Path dup = Files.write(dir.resolve("dup"), Bytes.ascii("10a10b"));
         assertEquals("30", assertThrows(FileStatusException.class,
