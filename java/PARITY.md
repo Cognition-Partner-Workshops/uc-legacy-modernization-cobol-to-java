@@ -80,7 +80,7 @@ In the `RC` rows, `2` and `4` are the byte sizes of the files `0\n` and `231\n`.
 0 on normal completion and 231 after an abend: abend code 999 mod 256, which is the code the shell
 sees from both GnuCOBOL and the JVM.
 
-`mvn -q -f java/pom.xml verify` passes: 52 JUnit tests, 0 failures. They cover the codec
+`mvn -q -f java/pom.xml verify` passes: 53 JUnit tests, 0 failures. They cover the codec
 (`CodecTest`, `FileIoTest`), the `COBDATFT` replacement (`DateFormatConverterTest`), the program
 logic (`Cbact01cTest`), the CLI (`MainTest`) and the golden files (`Cbact01cGoldenTest`).
 
